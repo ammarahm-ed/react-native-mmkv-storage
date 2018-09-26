@@ -1,0 +1,6 @@
+framework module MMKV {
+  umbrella header "MMKV.h"
+
+  export *
+  module * { export * }
+}

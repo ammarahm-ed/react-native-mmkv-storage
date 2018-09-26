@@ -1,0 +1,44 @@
+
+buildscript {
+  repositories {
+    jcenter()
+    google()
+    maven {
+      url 'https://maven.google.com'
+    }
+  }
+
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.0.0'
+  }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion 26
+  buildToolsVersion '26.0.2'
+
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion 26
+  }
+  lintOptions {
+    abortOnError false
+    warning 'InvalidPackage'
+  }
+}
+
+repositories {
+  mavenCentral()
+  maven {
+   url 'https://maven.google.com'
+  }
+  maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-native:+'
+    implementation 'com.tencent:mmkv:1.0.10'
+}
+  
