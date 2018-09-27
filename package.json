@@ -1,7 +1,7 @@
 {
   "name": "react-native-fast-storage",
   "version": "0.0.1",
-  "description": "",
+  "description": "react-native-fast-storage is a drop in replacement for AsyncStorage",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,10 @@
   "keywords": [
     "react-native"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FidMe/react-native-fast-storage"
+  },
   "author": "Michaël Villeneuve for @FidMe",
   "license": "MIT",
   "peerDependencies": {
