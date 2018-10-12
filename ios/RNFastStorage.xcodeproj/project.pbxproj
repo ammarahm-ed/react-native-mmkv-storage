@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7682389121707FDD00A83AC5 /* MMKV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7682389021707FDD00A83AC5 /* MMKV.framework */; };
+		768238A52170840D00A83AC5 /* MMKV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768238A42170840D00A83AC5 /* MMKV.framework */; };
 		B3E7B58A1CC2AC0600A0062D /* RNFastStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */; };
 /* End PBXBuildFile section */
 
@@ -25,7 +25,7 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastStorage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastStorage.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		7682389021707FDD00A83AC5 /* MMKV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MMKV.framework; sourceTree = "<group>"; };
+		768238A42170840D00A83AC5 /* MMKV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MMKV.framework; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNFastStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastStorage.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastStorage.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -35,7 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7682389121707FDD00A83AC5 /* MMKV.framework in Frameworks */,
+				768238A52170840D00A83AC5 /* MMKV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +53,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				7682389021707FDD00A83AC5 /* MMKV.framework */,
+				768238A42170840D00A83AC5 /* MMKV.framework */,
 				B3E7B5881CC2AC0600A0062D /* RNFastStorage.h */,
 				B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
