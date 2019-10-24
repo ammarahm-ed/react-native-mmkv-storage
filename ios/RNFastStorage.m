@@ -71,8 +71,7 @@ RCT_EXPORT_METHOD(removeItem:(NSString*)key
 }
 
 #pragma mark clearStore
-RCT_EXPORT_METHOD(clearStore:(NSString*)key
-                  resolve:(RCTPromiseResolveBlock)resolve
+RCT_EXPORT_METHOD(clearStore:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
     dispatch_async(dispatch_queue_create("FastStorage.clearStore", 0), ^{
