@@ -1,6 +1,6 @@
 {
   "name": "react-native-fast-storage",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "react-native-fast-storage is a drop in replacement for AsyncStorage",
   "main": "index.js",
   "scripts": {
