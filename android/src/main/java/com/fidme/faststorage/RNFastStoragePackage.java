@@ -1,5 +1,5 @@
 
-package com.fidme;
+package com.fidme.faststorage;
 
 import java.util.Arrays;
 import java.util.Collections;

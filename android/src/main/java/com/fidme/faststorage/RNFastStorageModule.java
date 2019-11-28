@@ -1,5 +1,5 @@
 
-package com.fidme;
+package com.fidme.faststorage;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
