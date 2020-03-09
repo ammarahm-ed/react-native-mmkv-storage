@@ -84,11 +84,17 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getMap(String key, Promise promise) {
         try {
-            MMKV kv = MMKV.defaultMMKV();
-            Bundle bundle = kv.decodeParcelable(key, Bundle.class);
-            WritableMap map = Arguments.fromBundle(bundle);
 
-            promise.resolve(map);
+            MMKV kv = MMKV.defaultMMKV();
+            if (kv.containsKey(key)) {
+                Bundle bundle = kv.decodeParcelable(key, Bundle.class);
+                WritableMap map = Arguments.fromBundle(bundle);
+
+                promise.resolve(map);
+            } else {
+                promise.resolve(null);
+            }
+
         } catch (Error e) {
             promise.reject("Error", "Unable to get Map");
         } catch (Exception e) {
@@ -119,12 +125,19 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             MMKV kv = MMKV.defaultMMKV();
             for (int i = 0; i < keys.size(); i++) {
                 String key = keys.getString(i);
-                Bundle bundle = kv.decodeParcelable(key, Bundle.class);
-                WritableMap value = Arguments.fromBundle(bundle);
-                WritableArray item = Arguments.createArray();
-                item.pushString(key);
-                item.pushMap(value);
-                args.pushArray(item);
+                if (kv.containsKey(key)) {
+                    Bundle bundle = kv.decodeParcelable(key, Bundle.class);
+                    WritableMap value = Arguments.fromBundle(bundle);
+                    WritableArray item = Arguments.createArray();
+                    item.pushString(key);
+                    item.pushMap(value);
+                    args.pushArray(item);
+                } else {
+                    WritableArray item = Arguments.createArray();
+                    item.pushString(key);
+                    item.pushMap(null);
+                }
+
             }
             promise.resolve(args);
 
