@@ -33,20 +33,37 @@ You need to manually follow these steps :
 ## Usage
 
 ```javascript
-import FastStorage from "react-native-fast-storage";
+import FastStorage,{setArray, getArray} from "react-native-fast-storage";
 
-await FastStorage.setItem("key", "Coucou toi");
+await FastStorage.setString("key", "Coucou toi");
 
-const item = await FastStorage.getItem("key");
+const item = await FastStorage.getString("key");
+
+await FastStorage.setArray('array',['a','b']);
+
+const array = await getArray('array');
+
+await FastStorage.setMap('map',{a:"a"});
+
+const map = await FastStorage.getMap('map');
+
+
+
 ```
 
 ## Methods
 
-All methods are asynchronous, just like AsyncStorage.
+All methods are asynchronous.
 
 | Prop       |     Params      | Returns  | Description                    |
 | :--------- | :-------------: | :------: | :----------------------------- |
-| setItem    |  `key`, `value` |  `value` |  Allows to set an item         |
-| getItem    |      `key`      |  `value` |  Retrieve the item             |
+| setString    |  `key`, `value` |  boolean |  Allows to set an String       |
+| getString   |      `key`      |  value |  Retrieve the String            |
+| setMap    |  `key`, `value` |  boolean |  Allows to set a Map     |
+| getMap   |      `key`      |  Map |  Retrieve the Map           |
+| setArray    |  `key`, `value` |  boolean |  Allows to set an Array     |
+| getArray   |      `key`      |  Array |  Retrieve the Array         |
+| getMultipleItems   |      `Array of Keys`      |  Array of Objects (Only works with keys which have Object as value) |  Retrieve Multiple Objects in a single request        |
+| hasKey |      `key`      |   boolean   |  Check if a key exists |
 | removeItem |      `key`      |   null   |  Remove an item from the store |
 | clearStore |       none      |   null   |  Clear the entire store        |
