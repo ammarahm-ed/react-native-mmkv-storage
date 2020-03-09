@@ -13,7 +13,10 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeArray;
 import com.tencent.mmkv.MMKV;
+
+import java.util.Map;
 
 public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
@@ -41,9 +44,9 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             kv.encode(key, value);
             promise.resolve("done");
         } catch (Error e) {
-            promise.reject("Error", "Unable to setItem");
+            promise.reject("Error", "Unable to set String");
         } catch (Exception e) {
-            promise.reject("Error", "Unable to setItem");
+            promise.reject("Error", "Unable to set String");
         }
     }
 
@@ -56,9 +59,9 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             promise.resolve(kv.decodeString(key));
 
         } catch (Error e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get String");
         } catch (Exception e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get String");
         }
     }
 
@@ -71,9 +74,9 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             kv.encode(key, bundle);
             promise.resolve("done");
         } catch (Error e) {
-            promise.reject("Error", "Unable to setItem");
+            promise.reject("Error", "Unable to set Map");
         } catch (Exception e) {
-            promise.reject("Error", "Unable to setItem");
+            promise.reject("Error", "Unable to set Map");
         }
     }
 
@@ -84,16 +87,28 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             MMKV kv = MMKV.defaultMMKV();
             Bundle bundle = kv.decodeParcelable(key, Bundle.class);
             WritableMap map = Arguments.fromBundle(bundle);
+
             promise.resolve(map);
         } catch (Error e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get Map");
         } catch (Exception e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get Map");
         }
     }
 
+    @ReactMethod
+    public void hasKey(String key, Promise promise) {
+        try {
+
+            MMKV kv = MMKV.defaultMMKV();
+            promise.resolve(kv.containsKey(key));
+
+        } catch(Error e) {
+            promise.reject("Error", "Unable to check if key exists");
+        }
 
 
+    }
 
 
     @ReactMethod
@@ -114,9 +129,9 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             promise.resolve(args);
 
         } catch (Error e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get Multiple Items");
         } catch (Exception e) {
-            promise.reject("Error", "Unable to getItem");
+            promise.reject("Error", "Unable to get Multiple Items");
         }
 
     }
