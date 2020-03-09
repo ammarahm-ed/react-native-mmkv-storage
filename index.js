@@ -25,7 +25,7 @@ export async function getArray(key) {
   if (data) {
     return data[key];
   } else {
-    return undefined;
+    return [];
   }
 }
 
