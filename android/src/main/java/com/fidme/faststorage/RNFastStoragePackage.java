@@ -1,5 +1,5 @@
 
-package com.fidme.faststorage;
+package com.ammarahmed.mmkv;
 
 import java.util.Arrays;
 import java.util.Collections;
