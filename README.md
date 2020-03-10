@@ -26,7 +26,7 @@ target="_blank"
 </a> 
 </div>
 <p align="center">
-This library is the React Native wrapper of https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
+This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
 </p>
 
 
@@ -63,7 +63,9 @@ You need to manually follow these steps :
 
 
 
-## STORAGE API
+<div align="center">
+<h1>Storage API</h1>
+</div>
 
 #### `MMKV.setString(key,value)`
 Sets a string value in storage for the given key.
