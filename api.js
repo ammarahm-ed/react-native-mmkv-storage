@@ -2,7 +2,11 @@ import { NativeModules } from "react-native";
 
 const RNFastStorage = NativeModules.RNFastStorage;
 
+
+
 if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
+
+
 
 /**
  * Set a string value to storag for a given key.
@@ -11,7 +15,7 @@ if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
  * @param {String} value
  *
  */
-async function setString(key, value) {
+export async function setString(key, value) {
   return await RNFastStorage.setString(key, value);
 }
 
@@ -19,7 +23,7 @@ async function setString(key, value) {
  * Get a string value for a given key.
  * @param {String} key
  */
-async function getString(key) {
+export async function getString(key) {
   return await RNFastStorage.getString(key);
 }
 
@@ -30,15 +34,17 @@ async function getString(key) {
  * @param {Object} value
  *
  */
-async function setMap(key, value) {
+export async function setMap(key, value) {
+  alert("here");
   return await RNFastStorage.setMap(key, value);
+
 }
 
 /**
  * Get an Object from storage for a given key.
  * @param {String} key
  */
-async function getMap(key) {
+export async function getMap(key) {
   return await RNFastStorage.getMap(key);
 }
 
@@ -47,7 +53,7 @@ async function getMap(key) {
  *
  * @param {String} key
  */
-async function removeItem(key) {
+export async function removeItem(key) {
   return await RNFastStorage.removeItem(key);
 }
 
@@ -56,7 +62,7 @@ async function removeItem(key) {
  *
  */
 
-async function clearStore() {
+export async function clearStore() {
   return await RNFastStorage.clearStore();
 }
 
@@ -66,9 +72,10 @@ async function clearStore() {
  * @param {String} key
  */
 
-async function hasKey(key) {
+export async function hasKey(key) {
   return await RNFastStorage.hasKey(key);
 }
+
 
 /**
  * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
@@ -76,16 +83,7 @@ async function hasKey(key) {
  *
  * @param {Array} keys
  */
-async function getMultipleItems(keys) {
-  return await RNFastStorage.getMultipleItems(keys);
-}
-/**
- * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
- * Arrays will also be returned but wrappen in a object.
- *
- * @param {Array} keys
- */
-async function getMultipleItems(keys) {
+export async function getMultipleItems(keys) {
   return await RNFastStorage.getMultipleItems(keys);
 }
 
@@ -94,7 +92,7 @@ async function getMultipleItems(keys) {
  * @param {String} key
  * @param {Array} array
  */
-async function setArray(key, array) {
+export async function setArray(key, array) {
   let data = {};
   data[key] = array;
 
@@ -106,7 +104,7 @@ async function setArray(key, array) {
  * @param {String} key
  */
 
-async function getArray(key) {
+export async function getArray(key) {
   try {
     let data = await RNFastStorage.getMap(key);
     if (data) {
@@ -119,14 +117,3 @@ async function getArray(key) {
   }
 }
 
-/**
- * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
- * Arrays will also be returned but wrappen in a object.
- *
- * **Will not work if a key as a String value.**
- *
- * @param {Array} keys
- */
-async function getMultipleItems(keys) {
-  return await RNFastStorage.getMultipleItems(keys);
-}
