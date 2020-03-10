@@ -243,10 +243,14 @@ import MMKV from "react-native-mmkv-storage";
 await MMKV.clearStore();
 
 ```
+#
+
+## Find this library useful? ❤️
+Support it by joining stargazers for this repository. ⭐️ and follow me for my next creations!
+
 
 # 
 
 ### MMKV is Licenced under[ BSD 3-Clause Licence](https://github.com/Tencent/MMKV/blob/master/LICENSE.TXT)
-
 
 #### This library is MIT Licenced
