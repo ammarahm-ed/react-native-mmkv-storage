@@ -39,7 +39,7 @@ await FastStorage.setString("key", "Coucou toi");
 
 const item = await FastStorage.getString("key");
 
-await FastStorage.setArray('array',['a','b']);
+await setArray('array',['a','b']);
 
 const array = await getArray('array');
 
