@@ -1,7 +1,7 @@
 {
-  "name": "react-native-fast-storage",
-  "version": "0.1.4",
-  "description": "react-native-fast-storage is a drop in replacement for AsyncStorage",
+  "name": "react-native-mmkv-storage",
+  "version": "0.1.5",
+  "description": "This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original react-native-fast-storage project and allows setting data types other than just strings.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,9 +11,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/FidMe/react-native-fast-storage"
+    "url": "https://github.com/FidMe/react-native-mmkv-storage"
   },
-  "author": "Michaël Villeneuve for @FidMe",
+  "author": "Ammar Ahmed for @ammarahm-ed",
   "license": "MIT",
   "peerDependencies": {
     "react-native": "^0.56.3"
