@@ -1,4 +1,4 @@
-# react-native-fast-storage
+# react-native-mmkv-storage
 
 react-native-fast-storage is a drop in replacement for `AsyncStorage`.
 
@@ -8,9 +8,9 @@ It provides very fast read and write access.
 
 ## Getting started
 
-`$ npm install react-native-fast-storage --save`
+`$ npm install react-native-mmkv-storage --save`
 
-`$ react-native link react-native-fast-storage`
+`$ react-native link react-native-mmkv-storage`
 
 **Additional IOS step**
 
