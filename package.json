@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/FidMe/react-native-mmkv-storage"
+    "url": "https://github.com/ammarahm-ed/react-native-mmkv-storage"
   },
   "author": "Ammar Ahmed for @ammarahm-ed",
   "license": "MIT",
