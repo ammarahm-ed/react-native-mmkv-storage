@@ -1,5 +1,5 @@
 
-package com.ammarahmed.mmkv;
+package com.fidme.faststorage;
 
 import android.os.Bundle;
 import android.util.Log;
