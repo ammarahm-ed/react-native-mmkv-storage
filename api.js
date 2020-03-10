@@ -60,6 +60,12 @@ async function clearStore() {
   return await RNFastStorage.clearStore();
 }
 
+/**
+ * Check if a key exists in storage.
+ *
+ * @param {String} key
+ */
+
 async function hasKey(key) {
   return await RNFastStorage.hasKey(key);
 }
