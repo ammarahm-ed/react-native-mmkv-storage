@@ -1,16 +1,48 @@
-# react-native-fast-storage
 
-react-native-fast-storage is a drop in replacement for `AsyncStorage`.
+<div align="center">
+<h1>react-native-mmkv-storage</h1>
+</div>
+<div
+align="center"
+style="width:100%;"
+>
+<a
+href="https://github.com/ammarahm-ed/react-native-mmkv-storage/pulls"
+target="_blank"
+>
+<img  src="https://img.shields.io/badge/PRs-welcome-green"/>
+</a>
+<a
+href="https://www.npmjs.com/package/react-native-mmkv-storage"
+target="_blank"
+>
+<img src="https://img.shields.io/npm/v/react-native-mmkv-storage?color=green"/>
+</a>
+<a
+href="https://www.npmjs.com/package/react-native-mmkv-storage"
+target="_blank"
+>
+<img  src="https://img.shields.io/npm/dt/react-native-mmkv-storage?color=green"/>
+</a> 
+</div>
+<p align="center">
+This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
+</p>
 
-This library is the React Native implementation of https://github.com/Tencent/MMKV.
 
-It provides very fast read and write access.
+<div align="center">
+<h2>Installation</h2>
+</div>
 
-## Getting started
+`$ npm install react-native-mmkv-storage --save`
+OR
 
-`$ npm install react-native-fast-storage --save`
+`$ yarn react-native-mmkv-storage`
 
-`$ react-native link react-native-fast-storage`
+If you are on react-native@0.59 or below you need to use the following to link the library.
+
+`$ react-native link react-native-mmkv-storage`
+
 
 **Additional IOS step**
 
@@ -19,7 +51,6 @@ If you encounter this error :
 ```
 ld: warning: Could not find auto-linked framework 'MMKV'
 ```
-
 You need to manually follow these steps :
 
 - Open up your project in Xcode
@@ -30,40 +61,192 @@ You need to manually follow these steps :
 - In Xcode, select the project, then select the main target (under "Targets"), then go to the "General" tab and find the "Embedded Binaries" section. Click the "+" icon and select MMKV.framework which appears under "Frameworks" then click "Add".
 - In Xcode do "Product" -> "Clean".
 
-## Usage
-
-```javascript
-import FastStorage,{setArray, getArray} from "react-native-fast-storage";
-
-await FastStorage.setString("key", "Coucou toi");
-
-const item = await FastStorage.getString("key");
-
-await setArray('array',['a','b']);
-
-const array = await getArray('array');
-
-await FastStorage.setMap('map',{a:"a"});
-
-const map = await FastStorage.getMap('map');
 
 
+<div align="center">
+<h1>Storage API</h1>
+</div>
+
+#### `MMKV.setString(key,value)`
+Sets a string value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | String |
+
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.setString('myString','helloworld');
+```
+
+**Returns**
+`boolean`
+#
+#### `MMKV.getString(key)`
+Gets a string value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.getString('string');
+```
+
+**Returns**
+`A string value`
+
+#
+#### `MMKV.setMap(key,value)`
+Sets an object to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Object |
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let myObject = {foo:"foo",bar:"bar"};
+
+await MMKV.setMap('myobject', myObject );
+```
+
+**Returns**
+`boolean`
+
+#
+#### `MMKV.getMap(key)`
+Gets an object from storage.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.getMap('myobject');
+```
+
+**Returns**
+`An Object`
+
+#
+#### `MMKV.setArray(key,value)`
+Sets an array to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Array |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let myArray = ["foo", "bar"]
+
+await MMKV.setArray('myArray', myArray);
+```
+
+**Returns**
+`boolean`
+
+#
+#### `MMKV.getArray(key)`
+Sets an array to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.getArray('myArray');
+```
+
+**Returns**
+`An Array`
+
+#
+#### `MMKV.getMultipleItems([keys])`
+Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| keys | Array of Keys |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.getMultipleItems(["foo","bar","loo"]);
+```
+
+**Returns**
+`An array of objects`
+
+
+#
+#### `MMKV.hasKey(key)`
+Check if a key exists in the storage.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.hasKey(key);
+```
+
+**Returns**
+`boolean`
+
+#
+#### `MMKV.removeItem(key)`
+Remove an item for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.removeItem(key);
 
 ```
 
-## Methods
+#
+#### `MMKV.clearStore()`
+Clear the storage.
 
-All methods are asynchronous.
+```jsx
+import MMKV from "react-native-mmkv-storage";
 
-| Prop       |     Params      | Returns  | Description                    |
-| :--------- | :-------------: | :------: | :----------------------------- |
-| setString    |  `key`, `value` |  boolean |  Allows to set an String       |
-| getString   |      `key`      |  value |  Retrieve the String            |
-| setMap    |  `key`, `value` |  boolean |  Allows to set a Map     |
-| getMap   |      `key`      |  Map |  Retrieve the Map           |
-| setArray    |  `key`, `value` |  boolean |  Allows to set an Array     |
-| getArray   |      `key`      |  Array |  Retrieve the Array         |
-| getMultipleItems   |      `Array of Keys`      |  Array of Objects (Only works with keys which have Object as value) |  Retrieve Multiple Objects in a single request        |
-| hasKey |      `key`      |   boolean   |  Check if a key exists |
-| removeItem |      `key`      |   null   |  Remove an item from the store |
-| clearStore |       none      |   null   |  Clear the entire store        |
+await MMKV.clearStore();
+
+```
+
+# 
+
+### MMKV is Licenced under[ BSD 3-Clause Licence](https://github.com/Tencent/MMKV/blob/master/LICENSE.TXT)
+
+
+#### This library is MIT Licenced
