@@ -3,6 +3,8 @@
  
 declare function MMKV(): any;
 
+export default MMKV;
+
 declare module MMKV {
   /**
  * Set a string value to storag for a given key.
@@ -71,5 +73,3 @@ declare module MMKV {
 
 }
 
-
-export default MMKV;
