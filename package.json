@@ -1,13 +1,25 @@
 {
   "name": "react-native-mmkv-storage",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original react-native-fast-storage project and allows setting data types other than just strings.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "react-native"
+    "react-native",
+    "fast-storage",
+    "react",
+    "native",
+    "asyncstorage",
+    "async-storage",
+    "mmkv-database",
+    "mmkv",
+    "android",
+    "ios",
+    "database",
+    "fast",
+    "storage"
   ],
   "repository": {
     "type": "git",
