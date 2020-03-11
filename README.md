@@ -26,7 +26,7 @@ target="_blank"
 </a> 
 </div>
 <p align="center">
-This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
+This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project uses part of code from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
 </p>
 
 
@@ -243,10 +243,14 @@ import MMKV from "react-native-mmkv-storage";
 await MMKV.clearStore();
 
 ```
+#
+
+## Find this library useful? ❤️
+Support it by joining stargazers for this repository. ⭐️ and follow me for my next creations!
+
 
 # 
 
 ### MMKV is Licenced under[ BSD 3-Clause Licence](https://github.com/Tencent/MMKV/blob/master/LICENSE.TXT)
-
 
 #### This library is MIT Licenced
