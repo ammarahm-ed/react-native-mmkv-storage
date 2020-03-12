@@ -30,6 +30,19 @@ This library is the React Native wrapper for https://github.com/Tencent/MMKV. wh
 </p>
 
 
+
+<div align="center">
+<h2>Features</h2>
+</div>
+
+**Efficient:** MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values, making the most of iOS/macOS to achieve best performance.
+
+**Easy-to-use:** You can use MMKV as you go, no configurations needed. All changes are saved immediately, no synchronize calls needed.
+
+**Small:** A handful of files: MMKV contains encode/decode helpers and mmap logics and nothing more. It's really tidy.
+Less than 30K in binary size: MMKV adds less than 30K per architecture on App size, and much less when zipped (ipa).
+
+
 <div align="center">
 <h2>Installation</h2>
 </div>
