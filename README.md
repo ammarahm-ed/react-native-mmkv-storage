@@ -1,4 +1,5 @@
 
+
 <div align="center">
 <h1>react-native-mmkv-storage</h1>
 </div>
@@ -80,6 +81,8 @@ You need to manually follow these steps :
 <h1>Storage API</h1>
 </div>
 
+All methods are asynchronous
+
 #### `MMKV.setString(key,value)`
 Sets a string value in storage for the given key.
 
@@ -97,7 +100,7 @@ await MMKV.setString('myString','helloworld');
 ```
 
 **Returns**
-`boolean`
+`Promise<boolean>`
 #
 #### `MMKV.getString(key)`
 Gets a string value for a given key.
@@ -110,11 +113,11 @@ Gets a string value for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.getString('string');
+let myString = await MMKV.getString('myString');
 ```
 
 **Returns**
-`A string value`
+`Promise<string>`
 
 #
 #### `MMKV.setMap(key,value)`
@@ -134,7 +137,7 @@ await MMKV.setMap('myobject', myObject );
 ```
 
 **Returns**
-`boolean`
+`Promise<boolean>`
 
 #
 #### `MMKV.getMap(key)`
@@ -148,11 +151,11 @@ Gets an object from storage.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.getMap('myobject');
+let myObject = await MMKV.getMap('myobject');
 ```
 
 **Returns**
-`An Object`
+`Promise<object>`
 
 #
 #### `MMKV.setArray(key,value)`
@@ -173,7 +176,7 @@ await MMKV.setArray('myArray', myArray);
 ```
 
 **Returns**
-`boolean`
+`Promise<boolean>`
 
 #
 #### `MMKV.getArray(key)`
@@ -187,11 +190,11 @@ Sets an array to storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.getArray('myArray');
+let myArray = await MMKV.getArray('myArray');
 ```
 
 **Returns**
-`An Array`
+`Promise<Array<>>`
 
 #
 #### `MMKV.getMultipleItems([keys])`
@@ -205,11 +208,11 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.getMultipleItems(["foo","bar","loo"]);
+let multipleItems = await MMKV.getMultipleItems(["foo","bar","loo"]);
 ```
 
 **Returns**
-`An array of objects`
+`Promise<Array<object>>`
 
 
 #
@@ -224,11 +227,17 @@ Check if a key exists in the storage.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.hasKey(key);
+MMKV.hasKey(key).then(result => {
+if (result) {
+	// if true do this.
+} else {
+	// if false do this.
+}
+})
 ```
 
 **Returns**
-`boolean`
+`Promise<boolean>`
 
 #
 #### `MMKV.removeItem(key)`
