@@ -1,6 +1,6 @@
 {
   "name": "react-native-mmkv-storage",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project is forked from the original react-native-fast-storage project and allows setting data types other than just strings.",
   "main": "index.js",
   "scripts": {
