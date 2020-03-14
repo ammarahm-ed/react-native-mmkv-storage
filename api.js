@@ -2,11 +2,7 @@ import { NativeModules } from "react-native";
 
 const RNFastStorage = NativeModules.RNFastStorage;
 
-
-
 if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
-
-
 
 /**
  * Set a string value to storag for a given key.
@@ -35,9 +31,7 @@ export async function getString(key) {
  *
  */
 export async function setMap(key, value) {
-  alert("here");
   return await RNFastStorage.setMap(key, value);
-
 }
 
 /**
@@ -76,7 +70,6 @@ export async function hasKey(key) {
   return await RNFastStorage.hasKey(key);
 }
 
-
 /**
  * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
  * Arrays will also be returned but wrappen in a object.
@@ -93,8 +86,9 @@ export async function getMultipleItems(keys) {
  * @param {Array} array
  */
 export async function setArray(key, array) {
+  if (!Array.isArray(array)) throw new Error("Provided value is not an array");
   let data = {};
-  data[key] = array;
+  data[key] = array.slice();
 
   return await RNFastStorage.setMap(key, data);
 }
@@ -108,7 +102,7 @@ export async function getArray(key) {
   try {
     let data = await RNFastStorage.getMap(key);
     if (data) {
-      return data[key];
+      return data[key].slice();
     } else {
       return [];
     }
@@ -116,4 +110,3 @@ export async function getArray(key) {
     return e;
   }
 }
-
