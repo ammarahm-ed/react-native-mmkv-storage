@@ -295,7 +295,9 @@ The Array returned has the following structure:
   ["bar", Object<any>]
 ];
 ```
-The first item in each array is the `key` for the object, and the second item is object itself.
+The first item in each array is the `key` for the object, and the second item is object itself. 
+
+If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
 
 #
 
