@@ -1,6 +1,3 @@
-
-
- 
 declare function MMKV(): any;
 
 export default MMKV;

@@ -33,7 +33,7 @@ export async function getString(key) {
  *
  */
 export async function setInt(key, value) {
-  if (!isNaN(value)) throw new Error("The provided value is not a number");
+  if (isNaN(value)) throw new Error("The provided value is not a number");
   return await RNFastStorage.setInt(key, value);
 }
 
