@@ -67,6 +67,66 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
+    public void setBool(String key, boolean value, Promise promise) {
+        try {
+            MMKV kv = MMKV.defaultMMKV();
+
+            kv.encode(key, value);
+
+            promise.resolve("done");
+        } catch (Error e) {
+            promise.reject("Error", "Unable to set String");
+        } catch (Exception e) {
+            promise.reject("Error", "Unable to set String");
+        }
+    }
+
+
+    @ReactMethod
+    public void getBool(String key, Promise promise) {
+        try {
+            MMKV kv = MMKV.defaultMMKV();
+
+            promise.resolve(kv.decodeBool(key));
+
+        } catch (Error e) {
+            promise.reject("Error", "Unable to get String");
+        } catch (Exception e) {
+            promise.reject("Error", "Unable to get String");
+        }
+    }
+
+    @ReactMethod
+    public void setInt(String key, int value, Promise promise) {
+        try {
+            MMKV kv = MMKV.defaultMMKV();
+            kv.encode(key, value);
+
+            promise.resolve("done");
+        } catch (Error e) {
+            promise.reject("Error", "Unable to set String");
+        } catch (Exception e) {
+            promise.reject("Error", "Unable to set String");
+        }
+    }
+
+
+    @ReactMethod
+    public void getInt(String key, Promise promise) {
+        try {
+            MMKV kv = MMKV.defaultMMKV();
+
+            promise.resolve(kv.decodeInt(key));
+
+        } catch (Error e) {
+            promise.reject("Error", "Unable to get String");
+        } catch (Exception e) {
+            promise.reject("Error", "Unable to get String");
+        }
+    }
+
+
+    @ReactMethod
     public void setMap(String key, ReadableMap value, Promise promise) {
         try {
             MMKV kv = MMKV.defaultMMKV();
@@ -109,7 +169,7 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             MMKV kv = MMKV.defaultMMKV();
             promise.resolve(kv.containsKey(key));
 
-        } catch(Error e) {
+        } catch (Error e) {
             promise.reject("Error", "Unable to check if key exists");
         }
 
