@@ -46,13 +46,13 @@ Less than 30K in binary size: MMKV adds less than 30K per architecture on App si
 `$ npm install react-native-mmkv-storage --save`
 OR
 
-`$ yarn react-native-mmkv-storage`
+`$ yarn add react-native-mmkv-storage`
 
 If you are on react-native@0.59 or below you need to use the following to link the library.
 
 `$ react-native link react-native-mmkv-storage`
 
-**Additional IOS step**
+**iOS**
 
 run `pod install` inside ios folder.
 
