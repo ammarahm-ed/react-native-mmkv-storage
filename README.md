@@ -285,7 +285,17 @@ let multipleItems = await MMKV.getMultipleItems(["foo", "bar", "loo"]);
 ```
 
 **Returns**
-`Promise<Array<object>>`
+`Promise<Array<[]>>`
+
+The Array returned has the following structure:
+
+```jsx
+[
+  ["foo", Object<any>],
+  ["bar", Object<any>]
+];
+```
+The first item in each array is the `key` for the object, and the second item is object itself.
 
 #
 
