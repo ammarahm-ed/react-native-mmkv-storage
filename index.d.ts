@@ -19,6 +19,39 @@ declare module MMKV {
  * @param {String} key
  */
  function getString(key:string): Promise<string>;
+
+
+ /**
+ * Set a number value to storage for a given key.
+ *
+ * @param {String} key
+ * @param {number} value
+ *
+ */
+export async function setInt(key:string,value:number):Promise<boolean>;
+
+/**
+ * Get a number value for a given key
+ * @param {String} key
+ */
+export async function getInt(key:string):Promise<number>;
+
+/**
+ * Set a boolean value to storag for a given key.
+ *
+ * @param {String} key
+ * @param {boolean} value
+ *
+ */
+export async function setBool(key:string, value:boolean):Promise<boolean>;
+
+/**
+ * Get a boolean value for a given key.
+ * @param {String} key
+ */
+export async function getBool(key:string):Promise<boolean>;
+
+
 /**
  * Set an Object to storage for a given key.
  *
@@ -26,6 +59,7 @@ declare module MMKV {
  * @param {Object} value
  *
  */
+
  function setMap(key:string,value:object): Promise<boolean>;
 /**
  * Get an Object from storage for a given key.
