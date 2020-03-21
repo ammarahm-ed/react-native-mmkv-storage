@@ -12,6 +12,8 @@ if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
  *
  */
 export async function setString(key, value) {
+  if (typeof(value) !== "string") throw new Error("The provided value is not a string");
+
   return await RNFastStorage.setString(key, value);
 }
 
@@ -24,6 +26,46 @@ export async function getString(key) {
 }
 
 /**
+ * Set a number value to storage for a given key.
+ *
+ * @param {String} key
+ * @param {number} value
+ *
+ */
+export async function setInt(key, value) {
+  if (!isNaN(value)) throw new Error("The provided value is not a number");
+  return await RNFastStorage.setInt(key, value);
+}
+
+/**
+ * Get a number value for a given key
+ * @param {String} key
+ */
+export async function getInt(key) {
+  return await RNFastStorage.getInt(key);
+}
+
+/**
+ * Set a boolean value to storag for a given key.
+ *
+ * @param {String} key
+ * @param {boolean} value
+ *
+ */
+export async function setBool(key, value) {
+  if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
+  return await RNFastStorage.setBool(key, value);
+}
+
+/**
+ * Get a boolean value for a given key.
+ * @param {String} key
+ */
+export async function getBool(key) {
+  return await RNFastStorage.getBool(key);
+}
+
+/**
  * Set an Object to storage for a given key.
  *
  * @param {String} key
@@ -31,6 +73,7 @@ export async function getString(key) {
  *
  */
 export async function setMap(key, value) {
+  if (typeof value !== "object") throw new Error('The provided value is not a object');
   return await RNFastStorage.setMap(key, value);
 }
 
