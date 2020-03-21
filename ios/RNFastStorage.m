@@ -24,7 +24,7 @@ RCT_EXPORT_METHOD(setString:(NSString*)key
                 resolve(@YES);
             }
             @catch (NSException *exception) {
-                reject(@"cannot_set", @"Cannot set item", nil);
+                reject(@"cannot_set", @"Cannot set string", nil);
             }
             
         });
@@ -49,6 +49,99 @@ RCT_EXPORT_METHOD(getString:(NSString*)key
         });
     });
 }
+
+#pragma mark setInt
+RCT_EXPORT_METHOD( setInt:(NSString*)key
+                  value:(nonnull NSNumber*)value
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    dispatch_async(dispatch_queue_create("FastStorage.setString", 0), ^{
+        MMKV *mmkv = [MMKV defaultMMKV];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @try {
+                [mmkv setObject:value forKey:key];
+                resolve(@YES);
+            }
+            @catch (NSException *exception) {
+                reject(@"cannot_set", @"Cannot set int value", nil);
+            }
+            
+        });
+    });
+}
+
+#pragma mark getInt
+RCT_EXPORT_METHOD(getInt:(NSString*)key
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    dispatch_async(dispatch_queue_create("FastStorage.getString", 0), ^{
+        MMKV *mmkv = [MMKV defaultMMKV];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @try {
+                
+                resolve([mmkv getObjectOfClass:NSNumber.class forKey:key]);
+            }
+            @catch (NSException *exception) {
+                reject(@"cannot_get", exception.reason, nil);
+            }
+            
+        });
+    });
+}
+
+#pragma mark setBool
+RCT_EXPORT_METHOD(setBool:(NSString*)key
+                  value:(BOOL *)value
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    dispatch_async(dispatch_queue_create("FastStorage.setString", 0), ^{
+        MMKV *mmkv = [MMKV defaultMMKV];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @try {
+                [mmkv setBool:value forKey:key];
+                resolve(@YES);
+            }
+            @catch (NSException *exception) {
+                reject(@"cannot_set", @"Cannot set bool value", nil);
+            }
+            
+        });
+    });
+}
+
+#pragma mark getBool
+RCT_EXPORT_METHOD(getBool:(NSString*)key
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    dispatch_async(dispatch_queue_create("FastStorage.getString", 0), ^{
+        MMKV *mmkv = [MMKV defaultMMKV];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            @try {
+                
+                
+                bool boolValue =  [mmkv getBoolForKey:key];
+                if (boolValue) {
+                    resolve(@YES);
+                } else {
+                    resolve(@NO);
+                }
+                
+            }
+            @catch (NSException *exception) {
+                reject(@"cannot_get", exception.reason, nil);
+            }
+            
+        });
+    });
+}
+
+
+
+
 #pragma mark setMap
 RCT_EXPORT_METHOD(setMap:(NSString*)key
                   value:(NSDictionary*)value
@@ -126,7 +219,7 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSArray*)keys
                     } else {
                         resolve(@NO);
                     }
-                
+                    
                 }
                 resolve(myArray);
             }
