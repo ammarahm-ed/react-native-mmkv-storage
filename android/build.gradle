@@ -42,6 +42,6 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.tencent:mmkv-static:1.0.23'
+    implementation 'com.tencent:mmkv-static:1.0.24'
 }
   
