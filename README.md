@@ -54,7 +54,7 @@ If you are on react-native@0.59 or below you need to use the following to link t
 
 **Additional IOS step**
 
- run `pod install` inside ios folder.
+run `pod install` inside ios folder.
 
 <div align="center">
 <h1>Storage API</h1>
@@ -103,6 +103,88 @@ let myString = await MMKV.getString("myString");
 
 #
 
+#### `MMKV.setInt(key,value)`
+
+Sets a number value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Number |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.setInt("myNumber", 10);
+```
+
+**Returns**
+`Promise<boolean>`
+
+#
+
+#### `MMKV.getInt(key)`
+
+Gets a number value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let myNumber = await MMKV.getInt("myNumber");
+```
+
+**Returns**
+`Promise<number>`
+
+#
+
+#### `MMKV.setBool(key,value)`
+
+Sets a boolean value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | boolean |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+await MMKV.setString("myBooleanValue", false);
+```
+
+**Returns**
+`Promise<boolean>`
+
+#
+
+#### `MMKV.getBool(key)`
+
+Gets a boolean value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let myBooleanValue = await MMKV.getString("myBooleanValue");
+```
+
+**Returns**
+`Promise<boolean>`
+
+#
+
 #### `MMKV.setMap(key,value)`
 
 Sets an object to storage for the given key.
@@ -123,8 +205,6 @@ await MMKV.setMap("myobject", myObject);
 
 **Returns**
 `Promise<boolean>`
-
-#
 
 #### `MMKV.getMap(key)`
 
