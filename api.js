@@ -5,7 +5,7 @@ const RNFastStorage = NativeModules.RNFastStorage;
 if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
 
 /**
- * Set a string value to storag for a given key.
+ * Set a string value to storage for a given key.
  *
  * @param {String} key
  * @param {String} value
@@ -102,6 +102,18 @@ export async function removeItem(key) {
 export async function clearStore() {
   return await RNFastStorage.clearStore();
 }
+
+/**
+ * get all keys in storage.
+ *
+ */
+
+export async function getKeys() {
+
+  return await RNFastStorage.getKeys();
+}
+
+
 
 /**
  * Check if a key exists in storage.

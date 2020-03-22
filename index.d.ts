@@ -1,3 +1,6 @@
+
+
+ 
 declare function MMKV(): any;
 
 export default MMKV;
@@ -84,6 +87,14 @@ export async function getBool(key:string):Promise<boolean>;
  * @param {Array} keys
  */
  function getMultipleItems(keys:Array<string>):Promise<Array<object>>;
+
+/**
+ * Get all keys from storage.
+ *
+ */
+function getKeys():Promise<Array<string>>;
+
+
 /**
  * Check if a key exists in storage.
  *
