@@ -2,8 +2,12 @@
 package com.fidme.faststorage;
 
 import android.os.Bundle;
+import android.telecom.Call;
+
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -15,12 +19,12 @@ import com.facebook.react.bridge.WritableMap;
 import com.tencent.mmkv.MMKV;
 
 
-
 public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
 
     private MMKV mmkv;
+
     public static volatile DispatchQueue dispatchQueue;
 
     public RNFastStorageModule(ReactApplicationContext reactContext) {
@@ -47,7 +51,7 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void setString(final String key, final String value, final Promise promise) {
+    public void setStringAsync(final String key, final String value,  final Promise promise) {
         dispatchQueue.postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -62,7 +66,22 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getString(final String key, final Promise promise) {
+    public void setString(final String key, final String value, @Nullable final Callback callback) {
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+                mmkv.encode(key, value);
+                callback.invoke(true);
+
+            }
+        });
+
+    }
+
+
+    @ReactMethod
+    public void getStringAsync(final String key,  final Promise promise) {
 
         dispatchQueue.postRunnable(new Runnable() {
             @Override
@@ -77,18 +96,44 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void getString(final String key, final Callback callback) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (mmkv.containsKey(key)) {
+                    callback.invoke(mmkv.decodeString(key));
+                } else {
+                    WritableMap map = Arguments.createMap();
+                    map.putString("Error", "Value for key does not exist");
+                    callback.invoke(map);
+                }
+            }
+        });
+
+    }
+
 
     @ReactMethod
-    public void setBool(final String key, final boolean value, final Promise promise) {
+    public void setBoolAsync(final String key, final boolean value, final Promise promise) {
 
         mmkv.encode(key, value);
         promise.resolve(true);
 
     }
 
+    @ReactMethod
+    public void setBool(final String key, final boolean value,@Nullable final Callback callback) {
+
+        mmkv.encode(key, value);
+        callback.invoke(true);
+
+    }
+
 
     @ReactMethod
-    public void getBool(final String key, final Promise promise) {
+    public void getBoolAsync(final String key, final Promise promise) {
         if (mmkv.containsKey(key)) {
             promise.resolve(mmkv.decodeBool(key));
         } else {
@@ -96,8 +141,26 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
         }
     }
 
+
     @ReactMethod
-    public void setInt(final String key, final int value, final Promise promise) {
+    public void getBool(final String key, final Callback callback) {
+        if (mmkv.containsKey(key)) {
+
+            callback.invoke(mmkv.decodeBool(key));
+
+        } else {
+            WritableMap map = Arguments.createMap();
+            map.putString("Error", "Value for key does not exist");
+            callback.invoke(map);
+        }
+    }
+
+
+
+
+
+    @ReactMethod
+    public void setIntAsync(final String key, final int value, final Promise promise) {
 
         mmkv.encode(key, value);
         promise.resolve(true);
@@ -106,7 +169,16 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void getInt(final String key, final Promise promise) {
+    public void setInt(final String key, final int value, @Nullable final Callback callback) {
+
+        mmkv.encode(key, value);
+        callback.invoke(true);
+
+    }
+
+
+    @ReactMethod
+    public void getIntAsync(final String key, final Promise promise) {
 
         if (mmkv.containsKey(key)) {
             promise.resolve(mmkv.decodeInt(key));
@@ -117,8 +189,24 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
     }
 
 
+
+
     @ReactMethod
-    public void setMap(final String key, final ReadableMap value, final Promise promise) {
+    public void getInt(final String key, final Callback callback) {
+
+        if (mmkv.containsKey(key)) {
+            callback.invoke(mmkv.decodeInt(key));
+        } else {
+            WritableMap map = Arguments.createMap();
+            map.putString("Error", "Value for key does not exist");
+            callback.invoke(map);
+        }
+
+    }
+
+
+    @ReactMethod
+    public void setMapAsync(final String key, final ReadableMap value, final Promise promise) {
 
         dispatchQueue.postRunnable(new Runnable() {
             @Override
@@ -134,7 +222,7 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void getMap(final String key, final Promise promise) {
+    public void getMapAsync(final String key, final Promise promise) {
 
         dispatchQueue.postRunnable(new Runnable() {
             @Override
@@ -152,8 +240,51 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
         });
     }
 
+
+
     @ReactMethod
-    public void hasKey(final String key, final Promise promise) {
+    public void setMap(final String key, final ReadableMap value, @Nullable final Callback callback) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                Bundle bundle = Arguments.toBundle(value);
+                mmkv.encode(key, bundle);
+                callback.invoke(true);
+
+            }
+        });
+
+    }
+
+
+    @ReactMethod
+    public void getMap(final String key, final Callback callback) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                if (mmkv.containsKey(key)) {
+
+                    Bundle bundle = mmkv.decodeParcelable(key, Bundle.class);
+                    WritableMap map = Arguments.fromBundle(bundle);
+                    callback.invoke(map);
+
+                } else {
+
+                    WritableMap map = Arguments.createMap();
+                    map.putString("Error", "Value for key does not exist");
+                    callback.invoke(map);
+                }
+
+            }
+        });
+    }
+
+
+
+    @ReactMethod
+    public void hasKeyAsync(final String key, final Promise promise) {
 
         promise.resolve(mmkv.containsKey(key));
 
@@ -161,7 +292,15 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void getKeys(final Promise promise) {
+    public void hasKey(final String key, final Callback callback) {
+
+        callback.invoke(mmkv.containsKey(key));
+
+    }
+
+
+    @ReactMethod
+    public void getKeysAsync(final Promise promise) {
 
         dispatchQueue.postRunnable(new Runnable() {
             @Override
@@ -183,8 +322,38 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
     }
 
 
+
     @ReactMethod
-    public void getMultipleItems(final ReadableArray keys, final Promise promise) {
+    public void getKeys(final Callback callback) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+                String[] keys = mmkv.allKeys();
+                if (keys != null) {
+
+                    WritableArray array = Arguments.fromJavaArgs(keys);
+                    callback.invoke(array);
+
+                } else {
+
+                    WritableMap map = Arguments.createMap();
+                    map.putString("Error", "database appears to be empty");
+                    callback.invoke(map);
+
+                }
+
+
+            }
+        });
+
+
+    }
+
+
+    @ReactMethod
+    public void getMultipleItemsAsync(final ReadableArray keys, final Promise promise) {
 
         dispatchQueue.postRunnable(new Runnable() {
             @Override
@@ -215,6 +384,40 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void getMultipleItems(final ReadableArray keys, final Callback callback) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+                WritableArray args = Arguments.createArray();
+
+                for (int i = 0; i < keys.size(); i++) {
+                    String key = keys.getString(i);
+                    if (mmkv.containsKey(key)) {
+                        Bundle bundle = mmkv.decodeParcelable(key, Bundle.class);
+                        WritableMap value = Arguments.fromBundle(bundle);
+                        WritableArray item = Arguments.createArray();
+                        item.pushString(key);
+                        item.pushMap(value);
+                        args.pushArray(item);
+                    } else {
+                        WritableArray item = Arguments.createArray();
+                        item.pushString(key);
+                        item.pushMap(null);
+                    }
+
+                }
+                callback.invoke(args);
+            }
+        });
+
+
+    }
+
+
+
 
     @ReactMethod
     public void removeItem(final String key, final Promise promise) {
@@ -226,6 +429,7 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
             promise.resolve(true);
         }
     }
+
 
     @ReactMethod
     public void clearStore(final Promise promise) {
