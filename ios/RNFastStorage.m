@@ -39,12 +39,15 @@ RCT_EXPORT_METHOD(setupLibrary) {
 
 
 
+
+
 #pragma mark setString
 RCT_EXPORT_METHOD(setString:(NSString*)key
                   value:(NSString*)value
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
+    
     
     dispatch_async(RCTGetMethodQueue(), ^{
         
@@ -230,6 +233,15 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSArray*)keys
         
     });
 }
+
+
+#pragma mark getKeys
+RCT_EXPORT_METHOD(getKeys:(RCTPromiseResolveBlock)resolve
+                rejecter:(RCTPromiseRejectBlock)reject) {
+    NSArray *array =  mmkv.allKeys;
+    resolve(array);
+}
+
 
 #pragma mark hasKey
 RCT_EXPORT_METHOD(hasKey:(NSString*)key
