@@ -9,20 +9,20 @@ if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
  *
  * @param {String} key
  * @param {String} value
- *
+ *Async
  */
-export async function setString(key, value) {
+export async function setStringAsync(key, value) {
   if (typeof(value) !== "string") throw new Error("The provided value is not a string");
 
-  return await RNFastStorage.setString(key, value);
+  return await RNFastStorage.setStringAsync(key, value);
 }
 
 /**
  * Get a string value for a given key.
  * @param {String} key
  */
-export async function getString(key) {
-  return await RNFastStorage.getString(key);
+export async function getStringAsync(key) {
+  return await RNFastStorage.getStringAsync(key);
 }
 
 /**
@@ -32,17 +32,17 @@ export async function getString(key) {
  * @param {number} value
  *
  */
-export async function setInt(key, value) {
+export async function setIntAsync(key, value) {
   if (isNaN(value)) throw new Error("The provided value is not a number");
-  return await RNFastStorage.setInt(key, value);
+  return await RNFastStorage.setIntAsync(key, value);
 }
 
 /**
  * Get a number value for a given key
  * @param {String} key
  */
-export async function getInt(key) {
-  return await RNFastStorage.getInt(key);
+export async function getIntAsync(key) {
+  return await RNFastStorage.getIntAsync(key);
 }
 
 /**
@@ -52,17 +52,17 @@ export async function getInt(key) {
  * @param {boolean} value
  *
  */
-export async function setBool(key, value) {
+export async function setBoolAsync(key, value) {
   if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
-  return await RNFastStorage.setBool(key, value);
+  return await RNFastStorage.setBoolAsync(key, value);
 }
 
 /**
  * Get a boolean value for a given key.
  * @param {String} key
  */
-export async function getBool(key) {
-  return await RNFastStorage.getBool(key);
+export async function getBoolAsync(key) {
+  return await RNFastStorage.getBoolAsync(key);
 }
 
 /**
@@ -72,17 +72,17 @@ export async function getBool(key) {
  * @param {Object} value
  *
  */
-export async function setMap(key, value) {
+export async function setMapAsync(key, value) {
   if (typeof value !== "object") throw new Error('The provided value is not a object');
-  return await RNFastStorage.setMap(key, value);
+  return await RNFastStorage.setMapAsync(key, value);
 }
 
 /**
  * Get an Object from storage for a given key.
  * @param {String} key
  */
-export async function getMap(key) {
-  return await RNFastStorage.getMap(key);
+export async function getMapAsync(key) {
+  return await RNFastStorage.getMapAsync(key);
 }
 
 /**
@@ -108,9 +108,9 @@ export async function clearStore() {
  *
  */
 
-export async function getKeys() {
+export async function getKeysAsync() {
 
-  return await RNFastStorage.getKeys();
+  return await RNFastStorage.getKeysAsync();
 }
 
 
@@ -121,8 +121,8 @@ export async function getKeys() {
  * @param {String} key
  */
 
-export async function hasKey(key) {
-  return await RNFastStorage.hasKey(key);
+export async function hasKeyAsync(key) {
+  return await RNFastStorage.hasKeyAsync(key);
 }
 
 /**
@@ -131,8 +131,8 @@ export async function hasKey(key) {
  *
  * @param {Array} keys
  */
-export async function getMultipleItems(keys) {
-  return await RNFastStorage.getMultipleItems(keys);
+export async function getMultipleItemsAsync(keys) {
+  return await RNFastStorage.getMultipleItemsAsync(keys);
 }
 
 /**
@@ -140,12 +140,12 @@ export async function getMultipleItems(keys) {
  * @param {String} key
  * @param {Array} array
  */
-export async function setArray(key, array) {
+export async function setArrayAsync(key, array) {
   if (!Array.isArray(array)) throw new Error("Provided value is not an array");
   let data = {};
   data[key] = array.slice();
 
-  return await RNFastStorage.setMap(key, data);
+  return await RNFastStorage.setMapAsync(key, data);
 }
 
 /**
@@ -153,15 +153,169 @@ export async function setArray(key, array) {
  * @param {String} key
  */
 
-export async function getArray(key) {
-  try {
-    let data = await RNFastStorage.getMap(key);
+export async function getArrayAsync(key) {
+
+    let data = await RNFastStorage.getMapAsync(key);
     if (data) {
       return data[key].slice();
     } else {
       return [];
     }
-  } catch (e) {
-    return e;
-  }
+
+}
+
+
+// NO ASYNC CALLS 
+
+/**
+ * Set a string value to storage for a given key.
+ *
+ * @param {String} key
+ * @param {String} value
+ * @param {Function} callback
+ *
+ */
+export function setString(key, value, callback) {
+  if (typeof(value) !== "string") throw new Error("The provided value is not a string");
+
+  return RNFastStorage.setString(key, value, callback);
+}
+
+/**
+ * Get a string value for a given key.
+ * @param {String} key
+ * @param {Function} callback
+ */
+export function getString(key,callback) {
+  return RNFastStorage.getString(key, callback);
+}
+
+/**
+ * Set a number value to storage for a given key.
+ *
+ * @param {String} key
+ * @param {number} value
+ * @param {Function} callback
+ */
+export function setInt(key, value,callback) {
+  if (isNaN(value)) throw new Error("The provided value is not a number");
+  return RNFastStorage.setInt(key, value,callback);
+}
+
+/**
+ * Get a number value for a given key
+ * @param {String} key
+ * @param {Function} callback
+ */
+export function getInt(key,callback) {
+  return RNFastStorage.getInt(key,callback);
+}
+
+/**
+ * Set a boolean value to storag for a given key.
+ *
+ * @param {String} key
+ * @param {boolean} value
+ * @param {Function} callback
+ *
+ */
+export function setBool(key, value,callback) {
+  if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
+  return RNFastStorage.setBool(key, value,callback);
+}
+
+/**
+ * Get a boolean value for a given key.
+ * @param {String} key
+  * @param {Function} callback
+ */
+export function getBool(key,callback) {
+  return RNFastStorage.getBool(key,callback);
+}
+
+/**
+ * Set an Object to storage for a given key.
+ *
+ * @param {String} key
+ * @param {Object} value
+ * @param {Function} callback
+ *
+ */
+export function setMap(key, value,callback) {
+  if (typeof value !== "object") throw new Error('The provided value is not a object');
+  return RNFastStorage.setMap(key, value,callback);
+}
+
+/**
+ * Get an Object from storage for a given key.
+ * @param {String} key
+ * @param {Function} callback
+ */
+export function getMap(key,callback) {
+  return RNFastStorage.getMap(key,callback);
+}
+
+
+/**
+ * get all keys in storage.
+ * @param {Function} callback
+ */
+
+export function getKeys(callback) {
+
+  return RNFastStorage.getKeys(callback);
+}
+
+
+
+/**
+ * Check if a key exists in storage.
+ *
+ * @param {String} key
+ * @param {Function} callback
+ */
+
+export function hasKey(key,callback) {
+  return RNFastStorage.hasKey(key,callback);
+}
+
+/**
+ * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
+ * Arrays will also be returned but wrappen in a object.
+ *
+ * @param {Array} keys
+ * @param {Function} callback
+ */
+export function getMultipleItems(keys,callback) {
+  return RNFastStorage.getMultipleItems(keys,callback);
+}
+
+/**
+ * Set an array to the db.
+ * @param {String} key
+ * @param {Array} array
+ * @param {Function} callback
+ */
+export function setArray(key, array,callback) {
+  if (!Array.isArray(array)) throw new Error("Provided value is not an array");
+  let data = {};
+  data[key] = array.slice();
+
+  return RNFastStorage.setMap(key, data, callback);
+}
+
+/**
+ * get an array from the storage for give key.
+ * @param {String} key
+ * @param {Function} callback
+ */
+
+export function getArray(key,callback) {
+  RNFastStorage.getMap(key,() => {
+    if (data) {
+      return callback(data[key].slice())
+    } else {
+      return callback([]);
+    }
+  });
 }
