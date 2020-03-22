@@ -14,6 +14,8 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.tencent.mmkv.MMKV;
 
+
+
 public class RNFastStorageModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
@@ -154,6 +156,29 @@ public class RNFastStorageModule extends ReactContextBaseJavaModule {
     public void hasKey(final String key, final Promise promise) {
 
         promise.resolve(mmkv.containsKey(key));
+
+    }
+
+
+    @ReactMethod
+    public void getKeys(final Promise promise) {
+
+        dispatchQueue.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+
+                String[] keys = mmkv.allKeys();
+                if (keys != null) {
+                    WritableArray array = Arguments.fromJavaArgs(keys);
+                    promise.resolve(array);
+                } else {
+                    promise.reject("Error", "database appears to be empty");
+                }
+
+
+            }
+        });
+
 
     }
 
