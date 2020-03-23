@@ -330,7 +330,7 @@ RCT_EXPORT_METHOD(getMapAsync:(NSString*)key
     dispatch_async(RCTGetMethodQueue(), ^{
         
         if ([mmkv containsKey:key]) {
-            NSDictionary* data = [mmkv getObjectOfClass:NSDictionary.class forKey:key];
+              NSMutableDictionary * data = [mmkv getObjectOfClass:NSMutableDictionary.class forKey:key];
             resolve(data);
         } else {
             reject(@"cannot_get", @"value for key does not exist", nil);
@@ -347,7 +347,7 @@ RCT_EXPORT_METHOD(getMap:(NSString*)key
         
         NSMutableArray *args = [NSMutableArray array];
         if ([mmkv containsKey:key]) {
-            NSDictionary *data = [mmkv getObjectOfClass:NSDictionary.class forKey:key];
+              NSMutableDictionary * data = [mmkv getObjectOfClass:NSMutableDictionary.class forKey:key];
             [args addObject:data];
         } else {
             NSDictionary *dic = [NSDictionary dictionary];
