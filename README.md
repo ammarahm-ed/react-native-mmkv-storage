@@ -60,9 +60,9 @@ run `pod install` inside ios folder.
 <h1>Storage API</h1>
 </div>
 
-All methods are asynchronous
+All methods have two variants, an **async** variant and a **non-async** variant.
 
-#### `MMKV.setString(key,value)`
+#### `MMKV.setStringAsync(key,value)`
 
 Sets a string value in storage for the given key.
 
@@ -75,15 +75,39 @@ Sets a string value in storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.setString("myString", "helloworld");
+await MMKV.setStringAsync("string", "string");
 ```
 
 **Returns**
 `Promise<boolean>`
 
+
+#### `MMKV.setString(key,value,callback)`
+
+Sets a string value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | String |
+| callback | Function |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.setString("string", "string",(data) => console.log(data));
+```
+
+**Returns**
+`boolean`
+
+
 #
 
-#### `MMKV.getString(key)`
+
+
+#### `MMKV.getStringAsync(key)`
 
 Gets a string value for a given key.
 
@@ -95,15 +119,35 @@ Gets a string value for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myString = await MMKV.getString("myString");
+let string = await MMKV.getStringAsync("string");
 ```
 
 **Returns**
 `Promise<string>`
 
+
+#### `MMKV.getString(key,callback)`
+
+Gets a string value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+|callback |Function|
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getString("string", string => console.log(string));
+```
+
+**Returns**
+`string`
+
 #
 
-#### `MMKV.setInt(key,value)`
+
+#### `MMKV.setIntAsync(key,value)`
 
 Sets a number value in storage for the given key.
 
@@ -116,15 +160,36 @@ Sets a number value in storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.setInt("myNumber", 10);
+await MMKV.setIntAsync("number", 10);
 ```
 
 **Returns**
 `Promise<boolean>`
 
+
+#### `MMKV.setInt(key,value,callback)`
+
+Sets a number value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Number |
+|callback| Function |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.setInt("number", 10, data => console.log(data));
+```
+
+**Returns**
+`boolean`
+
 #
 
-#### `MMKV.getInt(key)`
+#### `MMKV.getIntAsync(key)`
 
 Gets a number value for a given key.
 
@@ -136,15 +201,37 @@ Gets a number value for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myNumber = await MMKV.getInt("myNumber");
+let number = await MMKV.getIntAsync("number");
 ```
 
 **Returns**
 `Promise<number>`
 
+
+#### `MMKV.getInt(key,callback)`
+
+Gets a number value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getInt("number",number => console.log(number));
+
+```
+
+**Returns**
+`number`
+
 #
 
-#### `MMKV.setBool(key,value)`
+
+#### `MMKV.setBoolAsync(key,value)`
 
 Sets a boolean value in storage for the given key.
 
@@ -157,15 +244,36 @@ Sets a boolean value in storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-await MMKV.setString("myBooleanValue", false);
+await MMKV.setBoolAsync("myBooleanValue", false);
 ```
 
 **Returns**
 `Promise<boolean>`
 
+
+#### `MMKV.setBool(key,value,callback)`
+
+Sets a boolean value in storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | boolean |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.setBool("myBooleanValue", false, data => console.log(data));
+```
+
+**Returns**
+`boolean`
+
 #
 
-#### `MMKV.getBool(key)`
+#### `MMKV.getBoolAsync(key)`
 
 Gets a boolean value for a given key.
 
@@ -177,15 +285,35 @@ Gets a boolean value for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myBooleanValue = await MMKV.getString("myBooleanValue");
+let boolean = await MMKV.getBoolAsync("myBooleanValue");
 ```
 
 **Returns**
 `Promise<boolean>`
 
+#### `MMKV.getBool(key,callback)`
+
+Gets a boolean value for a given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getBool("myBooleanValue",boolean => console.log(boolean));
+```
+
+**Returns**
+`boolean`
+
 #
 
-#### `MMKV.setMap(key,value)`
+
+#### `MMKV.setMapAsync(key,value)`
 
 Sets an object to storage for the given key.
 
@@ -200,13 +328,37 @@ import MMKV from "react-native-mmkv-storage";
 
 let myObject = { foo: "foo", bar: "bar" };
 
-await MMKV.setMap("myobject", myObject);
+await MMKV.setMapAsync("myobject", myObject);
 ```
 
 **Returns**
 `Promise<boolean>`
 
-#### `MMKV.getMap(key)`
+#### `MMKV.setMap(key,value,callback)`
+
+Sets an object to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Object |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let object = { foo: "foo", bar: "bar" };
+
+MMKV.setMap("object", object,data => console.log(data));
+```
+
+**Returns**
+`boolean`
+
+#
+
+#### `MMKV.getMapAsync(key)`
 
 Gets an object from storage.
 
@@ -218,15 +370,34 @@ Gets an object from storage.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myObject = await MMKV.getMap("myobject");
+let object = await MMKV.getMapAsync("object");
 ```
 
 **Returns**
 `Promise<object>`
 
+#### `MMKV.getMap(key,callback)`
+
+Gets an object from storage.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getMap("object", object => console.log(object));
+```
+
+**Returns**
+`object`
+
 #
 
-#### `MMKV.setArray(key,value)`
+#### `MMKV.setArrayAsync(key,value)`
 
 Sets an array to storage for the given key.
 
@@ -239,17 +410,41 @@ Sets an array to storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myArray = ["foo", "bar"];
+let array = ["foo", "bar"];
 
-await MMKV.setArray("myArray", myArray);
+await MMKV.setArrayAsync("array", array);
 ```
 
 **Returns**
 `Promise<boolean>`
 
+#### `MMKV.setArray(key,value,callback)`
+
+Sets an array to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| value | Array |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let array = ["foo", "bar"];
+
+MMKV.setArray("array", array, data => console.log(data));
+```
+
+**Returns**
+`boolean`
+
 #
 
-#### `MMKV.getArray(key)`
+
+
+#### `MMKV.getArrayAsync(key)`
 
 Sets an array to storage for the given key.
 
@@ -261,15 +456,34 @@ Sets an array to storage for the given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let myArray = await MMKV.getArray("myArray");
+let myArray = await MMKV.getArrayAsync("array");
 ```
 
 **Returns**
 `Promise<Array<>>`
 
+#### `MMKV.getArray(key,callback)`
+
+Sets an array to storage for the given key.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+| callback | Function |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getArray("array" array => console.log(array));
+```
+
+**Returns**
+`Array<>`
+
 #
 
-#### `MMKV.getMultipleItems([keys])`
+#### `MMKV.getMultipleItemsAsync([keys])`
 
 Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
 
@@ -281,7 +495,7 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let multipleItems = await MMKV.getMultipleItems(["foo", "bar", "loo"]);
+let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);
 ```
 
 **Returns**
@@ -301,7 +515,40 @@ If the value for the key is not an object but an array, the array will be wrappe
 
 #
 
-#### `MMKV.hasKey(key)`
+#### `MMKV.getMultipleItems([keys],callback)`
+
+Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| keys | Array of Keys |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getMultipleItems(["foo", "bar", "loo"], objects => console.log(objects));
+```
+
+**Returns**
+`Array<[]>`
+
+The Array returned has the following structure:
+
+```jsx
+[
+  ["foo", Object<any>],
+  ["bar", Object<any>]
+];
+```
+The first item in each array is the `key` for the object, and the second item is object itself. 
+
+If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
+
+#
+
+#### `MMKV.hasKeyAsync(key)`
 
 Check if a key exists in the storage.
 
@@ -313,7 +560,7 @@ Check if a key exists in the storage.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-MMKV.hasKey(key).then(result => {
+MMKV.hasKeyAsync(key).then(result => {
   if (result) {
     // if true do this.
   } else {
@@ -325,7 +572,66 @@ MMKV.hasKey(key).then(result => {
 **Returns**
 `Promise<boolean>`
 
+#### `MMKV.hasKey(key,callback)`
+
+Check if a key exists in the storage.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| key | String |
+|callback|Function|
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.hasKey(key,result => {
+  if (result) {
+    // if true do this.
+  } else {
+    // if false do this.
+  }
+});
+```
+
+**Returns**
+`boolean`
+
 #
+
+#### `MMKV.getKeysAsync()`
+
+Get all the keys in the storage.
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+let keys = await MMKV.getKeysAsync();
+});
+```
+**Returns**
+`Promise<boolean>`
+
+#### `MMKV.getKeys(callback)`
+
+Get all the keys in the storage.
+
+**Arguments**
+| Name | Type |
+| ---- | -------- |
+| callback | Function |
+
+```jsx
+import MMKV from "react-native-mmkv-storage";
+
+MMKV.getKeys(keys => console.log(keys));
+```
+**Returns**
+`boolean`
+
+
+#
+
 
 #### `MMKV.removeItem(key)`
 
