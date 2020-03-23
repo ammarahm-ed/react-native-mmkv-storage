@@ -311,7 +311,7 @@ export function setArray(key, array,callback) {
  */
 
 export function getArray(key,callback) {
-  RNFastStorage.getMap(key,() => {
+  RNFastStorage.getMap(key,(data) => {
     if (data) {
       return callback(data[key].slice())
     } else {
