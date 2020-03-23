@@ -64,9 +64,9 @@ RCT_EXPORT_METHOD(setString:(NSString*)key
     dispatch_async(RCTGetMethodQueue(), ^{
         
         [mmkv setObject:value forKey:key];
-        NSMutableArray *array = [NSMutableArray array];
-        [array addObject:@YES];
-        callback(array);
+        NSMutableArray *args = [NSMutableArray array];
+        [args addObject:@YES];
+        callback(args);
         
     });
 }
@@ -100,19 +100,20 @@ RCT_EXPORT_METHOD(getString:(NSString*)key
     
     
     dispatch_async(RCTGetMethodQueue(), ^{
-        
+        NSMutableArray *args = [NSMutableArray array];
         if ([mmkv containsKey:key]) {
             NSString *string =[mmkv getObjectOfClass:NSString.class forKey:key];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:string];
-            callback(array);
+            
+            [args addObject:string];
+            
         } else {
             NSDictionary *dic = [NSDictionary dictionary];
             [dic setValue:@"Value for key does not exist" forKey:@"Error"];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:dic];
-            callback(array);
+            
+            [args addObject:dic];
+            
         }
+        callback(args);
         
     });
 }
@@ -150,9 +151,9 @@ RCT_EXPORT_METHOD(setInt:(NSString*)key
         
         
         [mmkv setInt64:value.intValue forKey:key];
-        NSMutableArray *array = [NSMutableArray array];
-        [array addObject:@YES];
-        callback(array);
+        NSMutableArray *args = [NSMutableArray array];
+        [args addObject:@YES];
+        callback(args);
         
     });
     
@@ -179,24 +180,22 @@ RCT_EXPORT_METHOD(getIntAsync:(NSString*)key
 
 #pragma mark getInt
 RCT_EXPORT_METHOD(getInt:(NSString*)key
-                  resolve:(RCTPromiseResolveBlock)resolve
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     dispatch_async(RCTGetMethodQueue(), ^{
-        
+        NSMutableArray *args = [NSMutableArray array];
         if ([mmkv containsKey:key]) {
             int64_t val = [mmkv getInt64ForKey:key];
             NSNumber *number = [NSNumber numberWithUnsignedLongLong:val];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:number];
-            callback(array);
+            [args addObject:number];
+            
         } else {
             NSDictionary *dic = [NSDictionary dictionary];
             [dic setValue:@"Value for key does not exist" forKey:@"Error"];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:dic];
-            callback(array);
+            [args addObject:dic];
         }
+        
+        callback(args);
         
     });
     
@@ -214,13 +213,9 @@ RCT_EXPORT_METHOD(setBoolAsync:(NSString*)key
         
         [mmkv setBool:value forKey:key];
         resolve(@YES);
-        
-        
+       
     });
-    
-    
-    
-    
+  
 }
 
 #pragma mark setBool
@@ -231,9 +226,9 @@ RCT_EXPORT_METHOD(setBool:(NSString*)key
     dispatch_async(RCTGetMethodQueue(), ^{
         
         [mmkv setBool:value forKey:key];
-        NSMutableArray *array = [NSMutableArray array];
-        [array addObject:@YES];
-        callback(array);
+        NSMutableArray *args = [NSMutableArray array];
+        [args addObject:@YES];
+        callback(args);
         
     });
     
@@ -273,25 +268,22 @@ RCT_EXPORT_METHOD(getBool:(NSString*)key
     
     dispatch_async(RCTGetMethodQueue(), ^{
         
-        
+        NSMutableArray *args = [NSMutableArray array];
         if ([mmkv containsKey:key]) {
             bool boolValue =  [mmkv getBoolForKey:key];
-            NSMutableArray *array = [NSMutableArray array];
             
             if (boolValue) {
-                [array addObject:@YES];
+                [args addObject:@YES];
             } else {
-                [array addObject:@NO];
+                [args addObject:@NO];
             }
             
-            callback(array);
         } else {
             NSDictionary *dic = [NSDictionary dictionary];
             [dic setValue:@"Value for key does not exist" forKey:@"Error"];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:dic];
-            callback(array);
+            [args addObject:dic];
         }
+        callback(args);
         
     });
     
@@ -320,9 +312,9 @@ RCT_EXPORT_METHOD(setMap:(NSString*)key
     dispatch_async(RCTGetMethodQueue(), ^{
         
         [mmkv setObject:value forKey:key];
-        NSMutableArray *array = [NSMutableArray array];
-        [array addObject:@YES];
-        callback(array);
+        NSMutableArray *args = [NSMutableArray array];
+        [args addObject:@YES];
+        callback(args);
         
     });
 }
@@ -353,19 +345,16 @@ RCT_EXPORT_METHOD(getMap:(NSString*)key
                   ) {
     dispatch_async(RCTGetMethodQueue(), ^{
         
-        
+        NSMutableArray *args = [NSMutableArray array];
         if ([mmkv containsKey:key]) {
             NSDictionary *data = [mmkv getObjectOfClass:NSDictionary.class forKey:key];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:data];
-            callback(array);
+            [args addObject:data];
         } else {
             NSDictionary *dic = [NSDictionary dictionary];
             [dic setValue:@"Value for key does not exist" forKey:@"Error"];
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:dic];
-            callback(array);
+            [args addObject:dic];
         }
+        callback(args);
     });
 }
 
@@ -379,28 +368,27 @@ RCT_EXPORT_METHOD(getMultipleItemsAsync:(NSArray*)keys
     dispatch_async(RCTGetMethodQueue(), ^{
         
         
-        NSMutableArray * myArray = [NSMutableArray array];
+        NSMutableArray * objects = [NSMutableArray array];
         for (NSString* key in keys)
         {
             
             if ([mmkv containsKey:key]) {
-                
-                NSDictionary* dic = [mmkv getObjectOfClass:NSDictionary.class forKey:key];
                 NSMutableArray * array = [NSMutableArray array];
+                NSDictionary* dic = [mmkv getObjectOfClass:NSDictionary.class forKey:key];
                 [array addObject:key];
                 [array addObject:dic];
-                [myArray addObject:array];
-                
-                
+                [objects addObject:array];
             } else {
                 NSMutableArray * array = [NSMutableArray array];
                 [array addObject:key];
                 [array addObject:@"value for key does not exist"];
-                [myArray addObject:array];
+                [objects addObject:array];
             }
-            resolve(myArray);
+            
             
         }
+        resolve(objects);
+        
         
     });
 }
@@ -412,7 +400,7 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSArray*)keys
     dispatch_async(RCTGetMethodQueue(), ^{
         
         
-        NSMutableArray * myArray = [NSMutableArray array];
+        NSMutableArray * objects = [NSMutableArray array];
         for (NSString* key in keys)
         {
             
@@ -422,20 +410,18 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSArray*)keys
                 NSMutableArray * array = [NSMutableArray array];
                 [array addObject:key];
                 [array addObject:dic];
-                [myArray addObject:array];
-                
+                [objects addObject:array];
                 
             } else {
                 NSMutableArray * array = [NSMutableArray array];
                 [array addObject:key];
                 [array addObject:@"value for key does not exist"];
-                [myArray addObject:array];
+                [objects addObject:array];
             }
-            NSMutableArray *array = [NSMutableArray array];
-            [array addObject:myArray];
-            callback(array);
-            
         }
+        NSMutableArray *args = [NSMutableArray array];
+        [args addObject:objects];
+        callback(args);
         
     });
 }
@@ -449,11 +435,11 @@ RCT_EXPORT_METHOD(getKeysAsync:(RCTPromiseResolveBlock)resolve
 }
 
 #pragma mark getKeys
-RCT_EXPORT_METHOD(callback:(RCTResponseSenderBlock)callback) {
-    NSMutableArray *event = [NSMutableArray array];
+RCT_EXPORT_METHOD(getKeys:(RCTResponseSenderBlock)callback) {
+    NSMutableArray *args = [NSMutableArray array];
     NSArray *array =  mmkv.allKeys;
-    [event addObject:array];
-    callback(event);
+    [args addObject:array];
+    callback(args);
     
 }
 
@@ -480,14 +466,14 @@ RCT_EXPORT_METHOD(hasKey:(NSString*)key
                   ) {
     dispatch_async(RCTGetMethodQueue(), ^{
         
-        NSMutableArray *array = [NSMutableArray array];
+        NSMutableArray *args = [NSMutableArray array];
         
         if ([mmkv containsKey:key]) {
-            [array addObject:@YES];
+            [args addObject:@YES];
         } else {
-            [array addObject:@NO];
+            [args addObject:@NO];
         }
-        callback(array);
+        callback(args);
         
     });
 }
@@ -506,8 +492,6 @@ RCT_EXPORT_METHOD(removeItem:(NSString*)key
         } else {
             resolve(@NO);
         }
-        
-        
         resolve(@YES);
         
     });
