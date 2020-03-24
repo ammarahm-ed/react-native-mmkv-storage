@@ -59,8 +59,9 @@ run `pod install` inside ios folder.
 <div align="center">
 <h1>Storage API</h1>
 </div>
+Asynchronous and Synchronous API is provided. Synchronous API has better performance as it does not use any Promises etc but Asynchronous API is clean when used, this is why both are available so whenever you feel that you need extra performance for some heavy read or write, you can simply use Synchronous API.
 
-All methods have two variants, an **async** variant and a **non-async** variant.
+All methods have two variants, an **async** variant and a **callback** variant.
 
 #### `MMKV.setStringAsync(key,value)`
 
