@@ -1,5 +1,6 @@
 import { NativeModules } from "react-native";
-
+import {stringToHex} from "./helpers";
+import generatePassword from "./keygen";
 export const MMKV = NativeModules.RNFastStorage;
 
 
