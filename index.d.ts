@@ -220,3 +220,108 @@ export function getKeys(callback:Function):Promise<Array<string>>;
 export function hasKey(key:string,callback:Function):boolean;
 
 }
+
+export class loader {
+
+  /**
+   * Initialize the default MMKV Instance.
+   */
+
+  default():null;
+
+  /**
+   * Load MMKV with the specified ID.
+   * @param {String} id
+   */
+  withInstanceID(id:string):this;
+
+  /**
+   * Encrypt MMKV Instance and store the creditials in secured storage for later use.
+   * The key for encryption is automatically generated and the default alias for key storage is 'com.MMKV.ammarahmed' which is converted to HEX for usage.
+   * 
+   * Requires an ID to be specified.
+   * 
+   */
+  withEncryption():this;
+
+
+  /**
+   * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
+   * You must call withEncryption() to use this.
+   * To store your key for later use call withSecureKeyStorage() too.
+   *
+   * @param {String} key the key to encrypt the storage with
+   */
+
+   withCustomKey(key:string):this;
+
+
+   /**
+    * Securely stores your custom key with the given alias. 
+    * If no alias is given, default alias is used.
+    * 
+    * @param {String} alias The alias with which the key will be stored in secure storage.
+    */
+
+    withSecureKeyStorage(key:string):this;
+
+
+    /**
+     * Provide a custom directory path to store mmkv database file.
+     * 
+     * @param {String} path
+     */
+
+     withCustomDirPath(path:string):this;
+
+     /**
+      * Set the processing mode for storage.
+      * 
+      * Will recieve the following values.
+      * MMKV.MULTI_PROCESS
+      * MMKV.SINGLE_PROCESS
+      * 
+      * @param 
+      */
+
+      setProcessMode(mode:number):this;
+
+      /**
+       * You can encrypt an MMKV instance anytime, even after it is created.
+       * 
+       * Calling this without a key will generate a key itself & store it in secure storage.
+       * If no parameters are provided, a key is generated and securely stored in the storage with the default alias for later use.
+       * 
+       * @param {string} key; Provide a custom key to encrypt the storage.
+       * @param {boolean} secureKeyStorage Store the key in secure storage.
+       * @param {string}  alias Provide a custom alias to store the key with in secure storage
+       * @returns An object with alias and key
+       */
+      encrypt(key:string,secureKeyStorage:boolean,alias:string):Object<>;
+
+      /**
+       * You can decrypt an encrypted MMKV instance anytime, even after it is created.
+       * Decrypting the storage will delete the key you encrypted it with
+       * 
+       */
+      decrypt():null;
+
+
+      /**
+       * Change the encryption key incase the old one has been compromised.
+       * @param {string} key; Provide a custom key to encrypt the storage.
+       * @param {boolean} secureKeyStorage Store the key in secure storage.
+       * @param {string}  alias Provide a custom alias to store the key with in secure storage
+       */
+
+      changeEncryptionKey(key:string,secureKeyStorage:boolean,alias:string):Object;
+
+      /**
+       * Finally after setting all the options, call this to create the instance.
+       * 
+       */
+
+       initialize():null;
+
+
+}
