@@ -221,7 +221,7 @@ export function hasKey(key:string,callback:Function):boolean;
 
 }
 
-export class loader {
+export class Loader {
 
   /**
    * Initialize the default MMKV Instance.
