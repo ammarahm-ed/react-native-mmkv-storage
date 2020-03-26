@@ -1,6 +1,158 @@
-import { NativeModules } from "react-native";
+import { NativeModules, TouchableWithoutFeedbackBase } from "react-native";
 
 const RNFastStorage = NativeModules.RNFastStorage;
+
+
+const specials = '_.][?)(&$/{}';
+const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const numbers = '0123456789';
+
+const all = specials + lowercase + uppercase + numbers;
+
+export default function generatePassword() {
+  let password = '';
+
+  password += pick(password, specials, 1, 3);
+  password += pick(password, lowercase, 1, 3);
+  password += pick(password, uppercase, 1, 3);
+  password += pick(password, all, 10);
+
+  return shuffle(password);
+}
+
+function pick(exclusions, string, min, max) {
+  var n, chars = '';
+
+  if (max === undefined) {
+    n = min;
+  } else {
+    n = min + Math.floor(Math.random() * (max - min + 1));
+  }
+
+  var i = 0;
+  while (i < n) {
+    const character = string.charAt(Math.floor(Math.random() * string.length));
+    if (exclusions.indexOf(character) < 0 && chars.indexOf(character) < 0) {
+      chars += character;
+      i++;
+    }
+  }
+
+  return chars;
+}
+
+const stringToHex = (input) => {
+  let str = ""
+  for (const char of input) {
+    str += char.charCodeAt(0).toString(16)
+  }
+  return str
+}
+
+function shuffle(string) {
+  var array = string.split('');
+  var tmp, current, top = array.length;
+
+  if (top) while (--top) {
+    current = Math.floor(Math.random() * (top + 1));
+    tmp = array[current];
+    array[current] = array[top];
+    array[top] = tmp;
+  }
+
+  return array.join('');
+}
+
+
+
+export class loader {
+  constructor() {
+      this.instanceID = null;
+      this.initWithEncryption = false;
+      this.secureKeyStorage = false;
+      this.accessibleModeForSecureKey = null;
+      this.mmkvDirPath = '';
+      this.initWithCustomDirPath = false;
+      this.processingMode = '';
+      this.defaultAlias = 'com.ammarahmed.MMKV';
+      this.alias = null;
+      this.key = null;
+  }
+
+default() {
+  RNFastStorage.setupLibrary();
+}
+
+withInstanceID(id) {
+  this.instanceID = id;
+
+  return this;
+}
+
+withEncryption() {
+  this.initWithEncryption = true;
+  this.key = this.generateKey();
+  this.alias = this.defaultAlias;
+  this.secureKeyStorage = true;
+  return this;
+}
+
+withCustomKey(key) {
+  this.key = key;
+  this.secureKeyStorage = false;
+  return this;
+}
+
+
+withSecureKeyStorage(alias = this.defaultAlias) {
+  this.secureKeyStorage = true;
+  this.alias = stringToHex(alias);
+
+  return this;
+}
+
+withCustomDirPath(path) {
+  this.initWithCustomDirPath = true;
+  this.mmkvDirPath = path;
+
+  return this;
+}
+
+setProcessingMode(mode) {
+  this.processingMode = mode;
+
+  return this;
+}
+
+initialize() {
+ console.log(this);
+}
+
+generateKey() {
+  this.key = generatePassword();
+
+  return this;
+}
+
+encrypt(key) {
+ RNFastStorage.encrypt(key);
+}
+
+decrypt() {
+  RNFastStorage.decrypt();
+}
+
+changeEncryptionKey(key) {
+  RNFastStorage.encrypt(key);
+}
+
+}
+
+
+
+
+
 
 if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
 
@@ -12,8 +164,7 @@ if (RNFastStorage.setupLibrary) RNFastStorage.setupLibrary();
  *Async
  */
 export async function setStringAsync(key, value) {
-  if (typeof value !== "string")
-    throw new Error("The provided value is not a string");
+  if (typeof(value) !== "string") throw new Error("The provided value is not a string");
 
   return await RNFastStorage.setStringAsync(key, value);
 }
@@ -54,8 +205,7 @@ export async function getIntAsync(key) {
  *
  */
 export async function setBoolAsync(key, value) {
-  if (typeof value !== "boolean")
-    throw new Error("The provided value is not a boolean");
+  if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
   return await RNFastStorage.setBoolAsync(key, value);
 }
 
@@ -75,8 +225,7 @@ export async function getBoolAsync(key) {
  *
  */
 export async function setMapAsync(key, value) {
-  if (typeof value !== "object")
-    throw new Error("The provided value is not a object");
+  if (typeof value !== "object") throw new Error('The provided value is not a object');
   return await RNFastStorage.setMapAsync(key, value);
 }
 
@@ -112,8 +261,11 @@ export async function clearStore() {
  */
 
 export async function getKeysAsync() {
+
   return await RNFastStorage.getKeysAsync();
 }
+
+
 
 /**
  * Check if a key exists in storage.
@@ -154,20 +306,18 @@ export async function setArrayAsync(key, array) {
  */
 
 export async function getArrayAsync(key) {
-  let data;
-  try {
-    data = await RNFastStorage.getMapAsync(key);
+
+    let data = await RNFastStorage.getMapAsync(key);
     if (data) {
       return data[key].slice();
     } else {
       return [];
     }
-  } catch (e) {
-    return [];
-  }
+
 }
 
-// NO ASYNC CALLS
+
+// NO ASYNC CALLS 
 
 /**
  * Set a string value to storage for a given key.
@@ -178,8 +328,7 @@ export async function getArrayAsync(key) {
  *
  */
 export function setString(key, value, callback) {
-  if (typeof value !== "string")
-    throw new Error("The provided value is not a string");
+  if (typeof(value) !== "string") throw new Error("The provided value is not a string");
 
   return RNFastStorage.setString(key, value, callback);
 }
@@ -189,7 +338,7 @@ export function setString(key, value, callback) {
  * @param {String} key
  * @param {Function} callback
  */
-export function getString(key, callback) {
+export function getString(key,callback) {
   return RNFastStorage.getString(key, callback);
 }
 
@@ -200,9 +349,9 @@ export function getString(key, callback) {
  * @param {number} value
  * @param {Function} callback
  */
-export function setInt(key, value, callback) {
+export function setInt(key, value,callback) {
   if (isNaN(value)) throw new Error("The provided value is not a number");
-  return RNFastStorage.setInt(key, value, callback);
+  return RNFastStorage.setInt(key, value,callback);
 }
 
 /**
@@ -210,8 +359,8 @@ export function setInt(key, value, callback) {
  * @param {String} key
  * @param {Function} callback
  */
-export function getInt(key, callback) {
-  return RNFastStorage.getInt(key, callback);
+export function getInt(key,callback) {
+  return RNFastStorage.getInt(key,callback);
 }
 
 /**
@@ -222,19 +371,18 @@ export function getInt(key, callback) {
  * @param {Function} callback
  *
  */
-export function setBool(key, value, callback) {
-  if (typeof value !== "boolean")
-    throw new Error("The provided value is not a boolean");
-  return RNFastStorage.setBool(key, value, callback);
+export function setBool(key, value,callback) {
+  if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
+  return RNFastStorage.setBool(key, value,callback);
 }
 
 /**
  * Get a boolean value for a given key.
  * @param {String} key
- * @param {Function} callback
+  * @param {Function} callback
  */
-export function getBool(key, callback) {
-  return RNFastStorage.getBool(key, callback);
+export function getBool(key,callback) {
+  return RNFastStorage.getBool(key,callback);
 }
 
 /**
@@ -245,10 +393,9 @@ export function getBool(key, callback) {
  * @param {Function} callback
  *
  */
-export function setMap(key, value, callback) {
-  if (typeof value !== "object")
-    throw new Error("The provided value is not a object");
-  return RNFastStorage.setMap(key, value, callback);
+export function setMap(key, value,callback) {
+  if (typeof value !== "object") throw new Error('The provided value is not a object');
+  return RNFastStorage.setMap(key, value,callback);
 }
 
 /**
@@ -256,9 +403,10 @@ export function setMap(key, value, callback) {
  * @param {String} key
  * @param {Function} callback
  */
-export function getMap(key, callback) {
-  return RNFastStorage.getMap(key, callback);
+export function getMap(key,callback) {
+  return RNFastStorage.getMap(key,callback);
 }
+
 
 /**
  * get all keys in storage.
@@ -266,8 +414,11 @@ export function getMap(key, callback) {
  */
 
 export function getKeys(callback) {
+
   return RNFastStorage.getKeys(callback);
 }
+
+
 
 /**
  * Check if a key exists in storage.
@@ -276,8 +427,8 @@ export function getKeys(callback) {
  * @param {Function} callback
  */
 
-export function hasKey(key, callback) {
-  return RNFastStorage.hasKey(key, callback);
+export function hasKey(key,callback) {
+  return RNFastStorage.hasKey(key,callback);
 }
 
 /**
@@ -287,8 +438,8 @@ export function hasKey(key, callback) {
  * @param {Array} keys
  * @param {Function} callback
  */
-export function getMultipleItems(keys, callback) {
-  return RNFastStorage.getMultipleItems(keys, callback);
+export function getMultipleItems(keys,callback) {
+  return RNFastStorage.getMultipleItems(keys,callback);
 }
 
 /**
@@ -297,7 +448,7 @@ export function getMultipleItems(keys, callback) {
  * @param {Array} array
  * @param {Function} callback
  */
-export function setArray(key, array, callback) {
+export function setArray(key, array,callback) {
   if (!Array.isArray(array)) throw new Error("Provided value is not an array");
   let data = {};
   data[key] = array.slice();
@@ -311,11 +462,10 @@ export function setArray(key, array, callback) {
  * @param {Function} callback
  */
 
-export function getArray(key, callback) {
-  RNFastStorage.getMap(key, data => {
-    if (data.Error) return callback(data);
-    if (data && data[key]) {
-      return callback(data[key].slice());
+export function getArray(key,callback) {
+  RNFastStorage.getMap(key,(data) => {
+    if (data) {
+      return callback(data[key].slice())
     } else {
       return callback([]);
     }
