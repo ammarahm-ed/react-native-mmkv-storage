@@ -1,9 +1,9 @@
 import { NativeModules } from "react-native";
 
-const RNFastStorage = NativeModules.RNFastStorage;
+export const MMKV = NativeModules.RNFastStorage;
 
 
-export class loader {
+export default class loader {
   constructor() {
       this.instanceID = null;
       this.initWithEncryption = false;
@@ -18,7 +18,7 @@ export class loader {
   }
 
 default() {
-  RNFastStorage.setupLibrary();
+  MMKV.setupLibrary();
 }
 
 withInstanceID(id) {
@@ -73,15 +73,15 @@ generateKey() {
 }
 
 encrypt(key) {
- RNFastStorage.encrypt(key);
+ MMKV.encrypt(key);
 }
 
 decrypt() {
-  RNFastStorage.decrypt();
+  MMKV.decrypt();
 }
 
 changeEncryptionKey(key) {
-  RNFastStorage.encrypt(key);
+  MMKV.encrypt(key);
 }
 
 }

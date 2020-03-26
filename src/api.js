@@ -1,3 +1,7 @@
+import { MMKV } from "./loader";
+
+
+
 
 
 /**
@@ -10,7 +14,7 @@
 export async function setStringAsync(key, value) {
   if (typeof(value) !== "string") throw new Error("The provided value is not a string");
 
-  return await RNFastStorage.setStringAsync(key, value);
+  return await MMKV.setStringAsync(key, value);
 }
 
 /**
@@ -18,7 +22,7 @@ export async function setStringAsync(key, value) {
  * @param {String} key
  */
 export async function getStringAsync(key) {
-  return await RNFastStorage.getStringAsync(key);
+  return await MMKV.getStringAsync(key);
 }
 
 /**
@@ -30,7 +34,7 @@ export async function getStringAsync(key) {
  */
 export async function setIntAsync(key, value) {
   if (isNaN(value)) throw new Error("The provided value is not a number");
-  return await RNFastStorage.setIntAsync(key, value);
+  return await MMKV.setIntAsync(key, value);
 }
 
 /**
@@ -38,7 +42,7 @@ export async function setIntAsync(key, value) {
  * @param {String} key
  */
 export async function getIntAsync(key) {
-  return await RNFastStorage.getIntAsync(key);
+  return await MMKV.getIntAsync(key);
 }
 
 /**
@@ -50,7 +54,7 @@ export async function getIntAsync(key) {
  */
 export async function setBoolAsync(key, value) {
   if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
-  return await RNFastStorage.setBoolAsync(key, value);
+  return await MMKV.setBoolAsync(key, value);
 }
 
 /**
@@ -58,7 +62,7 @@ export async function setBoolAsync(key, value) {
  * @param {String} key
  */
 export async function getBoolAsync(key) {
-  return await RNFastStorage.getBoolAsync(key);
+  return await MMKV.getBoolAsync(key);
 }
 
 /**
@@ -70,7 +74,7 @@ export async function getBoolAsync(key) {
  */
 export async function setMapAsync(key, value) {
   if (typeof value !== "object") throw new Error('The provided value is not a object');
-  return await RNFastStorage.setMapAsync(key, value);
+  return await MMKV.setMapAsync(key, value);
 }
 
 /**
@@ -78,7 +82,7 @@ export async function setMapAsync(key, value) {
  * @param {String} key
  */
 export async function getMapAsync(key) {
-  return await RNFastStorage.getMapAsync(key);
+  return await MMKV.getMapAsync(key);
 }
 
 /**
@@ -87,7 +91,7 @@ export async function getMapAsync(key) {
  * @param {String} key
  */
 export async function removeItem(key) {
-  return await RNFastStorage.removeItem(key);
+  return await MMKV.removeItem(key);
 }
 
 /**
@@ -96,7 +100,7 @@ export async function removeItem(key) {
  */
 
 export async function clearStore() {
-  return await RNFastStorage.clearStore();
+  return await MMKV.clearStore();
 }
 
 /**
@@ -106,7 +110,7 @@ export async function clearStore() {
 
 export async function getKeysAsync() {
 
-  return await RNFastStorage.getKeysAsync();
+  return await MMKV.getKeysAsync();
 }
 
 
@@ -118,7 +122,7 @@ export async function getKeysAsync() {
  */
 
 export async function hasKeyAsync(key) {
-  return await RNFastStorage.hasKeyAsync(key);
+  return await MMKV.hasKeyAsync(key);
 }
 
 /**
@@ -128,7 +132,7 @@ export async function hasKeyAsync(key) {
  * @param {Array} keys
  */
 export async function getMultipleItemsAsync(keys) {
-  return await RNFastStorage.getMultipleItemsAsync(keys);
+  return await MMKV.getMultipleItemsAsync(keys);
 }
 
 /**
@@ -141,7 +145,7 @@ export async function setArrayAsync(key, array) {
   let data = {};
   data[key] = array.slice();
 
-  return await RNFastStorage.setMapAsync(key, data);
+  return await MMKV.setMapAsync(key, data);
 }
 
 /**
@@ -151,7 +155,7 @@ export async function setArrayAsync(key, array) {
 
 export async function getArrayAsync(key) {
 
-    let data = await RNFastStorage.getMapAsync(key);
+    let data = await MMKV.getMapAsync(key);
     if (data) {
       return data[key].slice();
     } else {
@@ -174,7 +178,7 @@ export async function getArrayAsync(key) {
 export function setString(key, value, callback) {
   if (typeof(value) !== "string") throw new Error("The provided value is not a string");
 
-  return RNFastStorage.setString(key, value, callback);
+  return MMKV.setString(key, value, callback);
 }
 
 /**
@@ -183,7 +187,7 @@ export function setString(key, value, callback) {
  * @param {Function} callback
  */
 export function getString(key,callback) {
-  return RNFastStorage.getString(key, callback);
+  return MMKV.getString(key, callback);
 }
 
 /**
@@ -195,7 +199,7 @@ export function getString(key,callback) {
  */
 export function setInt(key, value,callback) {
   if (isNaN(value)) throw new Error("The provided value is not a number");
-  return RNFastStorage.setInt(key, value,callback);
+  return MMKV.setInt(key, value,callback);
 }
 
 /**
@@ -204,7 +208,7 @@ export function setInt(key, value,callback) {
  * @param {Function} callback
  */
 export function getInt(key,callback) {
-  return RNFastStorage.getInt(key,callback);
+  return MMKV.getInt(key,callback);
 }
 
 /**
@@ -217,7 +221,7 @@ export function getInt(key,callback) {
  */
 export function setBool(key, value,callback) {
   if (typeof value !== "boolean") throw new Error('The provided value is not a boolean');
-  return RNFastStorage.setBool(key, value,callback);
+  return MMKV.setBool(key, value,callback);
 }
 
 /**
@@ -226,7 +230,7 @@ export function setBool(key, value,callback) {
   * @param {Function} callback
  */
 export function getBool(key,callback) {
-  return RNFastStorage.getBool(key,callback);
+  return MMKV.getBool(key,callback);
 }
 
 /**
@@ -239,7 +243,7 @@ export function getBool(key,callback) {
  */
 export function setMap(key, value,callback) {
   if (typeof value !== "object") throw new Error('The provided value is not a object');
-  return RNFastStorage.setMap(key, value,callback);
+  return MMKV.setMap(key, value,callback);
 }
 
 /**
@@ -248,7 +252,7 @@ export function setMap(key, value,callback) {
  * @param {Function} callback
  */
 export function getMap(key,callback) {
-  return RNFastStorage.getMap(key,callback);
+  return MMKV.getMap(key,callback);
 }
 
 
@@ -259,7 +263,7 @@ export function getMap(key,callback) {
 
 export function getKeys(callback) {
 
-  return RNFastStorage.getKeys(callback);
+  return MMKV.getKeys(callback);
 }
 
 
@@ -272,7 +276,7 @@ export function getKeys(callback) {
  */
 
 export function hasKey(key,callback) {
-  return RNFastStorage.hasKey(key,callback);
+  return MMKV.hasKey(key,callback);
 }
 
 /**
@@ -283,7 +287,7 @@ export function hasKey(key,callback) {
  * @param {Function} callback
  */
 export function getMultipleItems(keys,callback) {
-  return RNFastStorage.getMultipleItems(keys,callback);
+  return MMKV.getMultipleItems(keys,callback);
 }
 
 /**
@@ -297,7 +301,7 @@ export function setArray(key, array,callback) {
   let data = {};
   data[key] = array.slice();
 
-  return RNFastStorage.setMap(key, data, callback);
+  return MMKV.setMap(key, data, callback);
 }
 
 /**
@@ -307,7 +311,7 @@ export function setArray(key, array,callback) {
  */
 
 export function getArray(key,callback) {
-  RNFastStorage.getMap(key,(data) => {
+  MMKV.getMap(key,(data) => {
     if (data) {
       return callback(data[key].slice())
     } else {
