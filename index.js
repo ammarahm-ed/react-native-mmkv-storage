@@ -1,5 +1,5 @@
 
-const MMKV = require('./api');
+const MMKV = require('./src/api');
 
 
 export default MMKV;
