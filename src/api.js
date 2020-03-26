@@ -1,8 +1,20 @@
-import { MMKV } from "./loader";
 
 
 
+var MMKV = null;
 
+export function setInstance(instance) {
+  
+  MMKV = instance;
+
+}
+
+
+
+export const modes = {
+  MULTI_PROCESS_MODE:1,
+  SINGLE_PROCESS_MODE:2
+}
 
 /**
  * Set a string value to storage for a given key.
