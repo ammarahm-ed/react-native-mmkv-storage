@@ -1,6 +1,7 @@
 import { NativeModules } from "react-native";
 import { stringToHex } from "./helpers";
 import generatePassword from "./keygen";
+import API, { modes } from "./api";
 
 export default class loader {
   constructor() {
@@ -10,7 +11,7 @@ export default class loader {
     this.accessibleModeForSecureKey = null;
     this.mmkvDirPath = "";
     this.initWithCustomDirPath = false;
-    this.processingMode = "";
+    this.processingMode = modes.SINGLE_PROCESS_MODE;
     this.defaultAlias = "com.ammarahmed.MMKV";
     this.alias = null;
     this.key = null;
@@ -18,7 +19,9 @@ export default class loader {
   }
 
   default() {
-    this.MMKV.setupLibrary();
+    this.MMKV.setupDefaultLibrary();
+    
+    return this;
   }
 
   withInstanceID(id) {
@@ -62,7 +65,11 @@ export default class loader {
   }
 
   initialize() {
+    
     console.log(this);
+
+
+
   }
 
   generateKey() {
@@ -84,8 +91,7 @@ export default class loader {
   }
 
   getInstance() {
-    let instance = require("./api");
-    instance.setInstance(this.MMKV);
+    let instance = new API(this.instanceID,this.MMKV);
 
     return instance;
   }
