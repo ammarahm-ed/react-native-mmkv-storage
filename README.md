@@ -28,6 +28,8 @@ target="_blank"
 This library is the React Native wrapper for https://github.com/Tencent/MMKV. which is very fast, efficient and easy to use solution for storing data. This project uses part of code from the original <a href="https://github.com/FidMe/react-native-fast-storage">react-native-fast-storage</a> project and allows setting data types other than just strings.
 </p>
 
+This is the **dev branch** for the next major release that will implement **Encryption, Multi Processing & Multi Instance Storage.**
+
 <div align="center">
 <h2>Features</h2>
 </div>
