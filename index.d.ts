@@ -253,29 +253,13 @@ declare module MMKV {
      * You must call withEncryption() to use this.
      * To store your key for later use call withSecureKeyStorage() too.
      *
-     * @param {String} key the key to encrypt the storage with
+     * @param {string} key the key to encrypt the storage with
+     * @param {boolean} secureKeyStorage Should the key be stored securely.
+     * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
      */
 
-    withCustomKey(key: string): this;
+    withCustomKey(key: string,secureKeyStorage:boolean,alias:string): this;
 
-
-    /**
-     * Securely stores your custom key with the given alias. 
-     * If no alias is given, default alias is used.
-     * 
-     * @param {String} alias The alias with which the key will be stored in secure storage.
-     */
-
-    withSecureKeyStorage(key: string): this;
-
-
-    /**
-     * Provide a custom directory path to store mmkv database file.
-     * 
-     * @param {String} path
-     */
-
-    withCustomDirPath(path: string): this;
 
     /**
      * Set the processing mode for storage.
@@ -284,10 +268,10 @@ declare module MMKV {
      * MMKV.MULTI_PROCESS
      * MMKV.SINGLE_PROCESS
      * 
-     * @param 
+     * @param {number} mode Set processing mode for storage
      */
 
-    setProcessMode(mode: number): this;
+    setProcessingMode(mode: number): this;
 
     /**
      * You can encrypt an MMKV instance anytime, even after it is created.
