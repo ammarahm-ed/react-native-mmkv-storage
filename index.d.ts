@@ -1,8 +1,23 @@
-declare function MMKV(): any;
+declare function MMKVStorage(): any;
 
-export default MMKV;
+export default MMKVStorage;
 
-declare module MMKV {
+declare module MMKVStorage {
+  
+  export const MODES = {
+    SINGLE_PROCESS:1,
+    MULTI_PROCESS:2
+  }
+  export const ACCESSIBLE = {
+    WHEN_UNLOCKED                      : 'AccessibleWhenUnlocked',
+    AFTER_FIRST_UNLOCK                 : 'AccessibleAfterFirstUnlock',
+    ALWAYS                             : 'AccessibleAlways',
+    WHEN_PASSCODE_SET_THIS_DEVICE_ONLY : 'AccessibleWhenPasscodeSetThisDeviceOnly',
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY     : 'AccessibleWhenUnlockedThisDeviceOnly',
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: 'AccessibleAfterFirstUnlockThisDeviceOnly',
+    ALWAYS_THIS_DEVICE_ONLY            : 'AccessibleAlwaysThisDeviceOnly',
+  }
+
 
   class API {
 
@@ -222,18 +237,21 @@ declare module MMKV {
     */
     hasKey(key: string, callback: Function): boolean;
 
+
+    async getAllMMKVInstanceIDs():Promise<Array<string>>;
+
   }
 
-  export class MMKVLoader {
+  export class Loader {
 
     /**
-     * Initialize the default MMKV Instance.
+     * Select the default MMKV Instance.
      */
 
     default(): this;
 
     /**
-     * Load MMKV with the specified ID.
+     * Load MMKV with the specified ID. If instance does not exist, a new instance will be created.
      * @param {String} id
      */
     withInstanceID(id: string): this;
@@ -258,7 +276,7 @@ declare module MMKV {
      * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
      */
 
-    withCustomKey(key: string,secureKeyStorage:boolean,alias:string): this;
+    encryptWithCustomKey(key: string,secureKeyStorage:boolean,alias:string): this;
 
 
     /**
@@ -308,7 +326,7 @@ declare module MMKV {
      * 
      */
 
-    initialize(): null;
+    initialize(): this;
 
     /**
      * Get the instance of current MMKV Storage Instance.
