@@ -1,19 +1,20 @@
 import { NativeModules } from "react-native";
 import { stringToHex } from "./helpers";
 import generatePassword from "./keygen";
-import API, { modes } from "./api";
+import API from "./api";
+import MMKVStorage from "react-native-mmkv-storage";
 
-export default class loader {
+export default class Loader {
   constructor() {
     this.instanceID = "default";
     this.initWithEncryption = false;
     this.secureKeyStorage = true;
     this.accessibleModeForSecureKey = null;
-    this.processingMode = modes.SINGLE_PROCESS_MODE;
+    this.processingMode = MMKVStorage.MODES.SINGLE_PROCESS
     this.aliasPrefix = "com.ammarahmed.MMKV.";
     this.alias = null;
     this.key = null;
-    this.MMKV = NativeModules.RNFastStorage;
+    this.MMKV = NativeModules.MMKVStorage;
     this.initialized = false;
   }
 
@@ -31,14 +32,15 @@ export default class loader {
 
   withEncryption() {
     this.initWithEncryption = true;
-    this.key = this.generateKey();
-    this.alias = this.defaultAlias;
+    this.key = generatePassword();
+    this.alias = stringToHex(this.aliasPrefix + this.instanceID);
     this.secureKeyStorage = true;
     return this;
   }
 
   encryptWithCustomKey(key, secureKeyStorage, alias) {
     this.key = key;
+    this.secureKeyStorage = false;
     if (secureKeyStorage) {
       this.secureKeyStorage = true;
       if (alias) {
@@ -47,7 +49,6 @@ export default class loader {
         this.alias = stringToHex(this.aliasPrefix + this.instanceID);
       }
     }
-    this.secureKeyStorage = false;
 
     return this;
   }
@@ -59,11 +60,17 @@ export default class loader {
   }
 
   initialize() {
+
+    console.log(this.alias,this.key);
     if (this.initWithEncryption) {
+    
       if (this.secureKeyStorage) {
-        this.MMKV.secureKeyExists(this.alias, exists => {
+        this.MMKV.secureKeyExists(this.alias, (error,exists) => {
+       
+          if (error) return;
           if (exists) {
-            this.MMKV.getSecureKey(value => {
+            this.MMKV.getSecureKey(this.alias, (error,value )=> {
+              if (error) return;
               if (value) {
                 if (this.instanceID === "default") {
                   this.MMKV.setupDefaultLibraryWithEncryption(
@@ -80,25 +87,34 @@ export default class loader {
               }
             });
           } else {
+           
             if (this.key == null || this.key.length < 3)
               throw new Error("Key is null or too short");
+           
             this.MMKV.setSecureKey(
               this.alias,
               this.key,
-              { accessible: ACCESSIBLE.WHEN_UNLOCKED },
-              result => {
+              { accessible: MMKVStorage.ACCESSIBLE.WHEN_UNLOCKED },
+              (error,result) => {
+                if (error) return;
                 if (result !== true)
                   throw new Error("Unable to store key in secure storage");
                 if (this.instanceID === "default") {
                   this.MMKV.setupDefaultLibraryWithEncryption(
                     this.processingMode,
-                    this.key
+                    this.key,
+                    (error,result) =>{
+                      console.log(error,result);
+                    }
                   );
                 } else {
                   this.MMKV.setupLibraryWithInstanceIDAndEncryption(
                     this.instanceID,
                     this.processingMode,
-                    this.key
+                    this.key,
+                    (error,result) =>{
+                      console.log(error,result);
+                    }
                   );
                 }
               }
@@ -108,14 +124,25 @@ export default class loader {
       } else {
         if (this.key == null || this.key.length < 3)
           throw new Error("Key is null or too short");
-        this.MMKV.setupDefaultLibraryWithEncryption(
-          this.processingMode,
-          this.key
-        );
+          if (this.instanceID === "default") {
+            this.MMKV.setupDefaultLibraryWithEncryption(
+              this.processingMode,
+              this.key,
+              (error,result) =>{
+                console.log(error,result);
+              }
+            );
+          } else {
+            this.MMKV.setupLibraryWithInstanceIDAndEncryption(this.instanceID,this.processingMode,this.key, (error,result) =>{
+              console.log(error,result);
+            });
+          }
       }
     } else {
       if (this.instanceID === "default") {
-        this.MMKV.setupDefaultLibrary(this.processingMode, "");
+        this.MMKV.setupDefaultLibraryWithEncryption(this.processingMode, "", (error,results) =>{
+          console.log(error,result);
+        });
       } else {
         this.MMKV.setupLibraryWithInstanceID(
           this.instanceID,
@@ -123,6 +150,7 @@ export default class loader {
         );
       }
     }
+    return this;
   }
 
   generateKey() {
@@ -167,7 +195,7 @@ export default class loader {
   }
 
   getInstance() {
-    let instance = new API(this.instanceID, this.MMKV);
+    let instance = new API({id:this.instanceID, mmkv:this.MMKV});
 
     return instance;
   }

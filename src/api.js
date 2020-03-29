@@ -1,12 +1,9 @@
 
 
-export const modes = {
-  MULTI_PROCESS_MODE: 2,
-  SINGLE_PROCESS_MODE: 1
-};
 
 export default class API {
   constructor({id = "default", mmkv }) {
+    
     this.MMKV = mmkv;
     this.instanceID = id;
   }
@@ -84,7 +81,7 @@ export default class API {
   async setMapAsync(key, value) {
     if (typeof value !== "object")
       throw new Error("The provided value is not a object");
-    return await this.MMKV.setMapAsync(this.instanceID, key, value);
+    return await this.MMKV.setMapAsync(this.instanceID, key, value,false);
   }
 
   /**
@@ -122,6 +119,8 @@ export default class API {
     return await this.MMKV.getKeysAsync(this.instanceID);
   }
 
+  
+
   /**
    * Check if a key exists in storage.
    *
@@ -153,7 +152,7 @@ export default class API {
     let data = {};
     data[key] = array.slice();
 
-    return await this.MMKV.setMapAsync(this.instanceID, key, data);
+    return await this.MMKV.setMapAsync(this.instanceID, key, data,true);
   }
 
   /**
@@ -251,7 +250,7 @@ export default class API {
   setMap(key, value, callback) {
     if (typeof value !== "object")
       throw new Error("The provided value is not a object");
-    return this.MMKV.setMap(this.instanceID, key, value, callback);
+    return this.MMKV.setMap(this.instanceID, key, value,false, callback);
   }
 
   /**
@@ -306,7 +305,7 @@ export default class API {
     let data = {};
     data[key] = array.slice();
 
-    return this.MMKV.setMap(this.instanceID, key, data, callback);
+    return this.MMKV.setMap(this.instanceID, key, data,true, callback);
   }
 
   /**
@@ -323,6 +322,14 @@ export default class API {
         return callback([]);
       }
     });
+  }
+
+  async getAllMMKVInstanceIDs() {
+
+
+  return await this.MMKV.getAllMMKVInstanceIDs();
+
+
   }
 
 
