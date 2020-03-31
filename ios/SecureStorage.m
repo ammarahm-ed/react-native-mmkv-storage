@@ -1,19 +1,10 @@
-//
-//  NSObject+SecureStorage.m
-//  DoubleConversion
-//
-//  Created by Ammar Ahmed on 1/10/1399 AP.
-//
-
 #import "SecureStorage.h"
 
 
-
-@implementation SecureStorage
+@implementation SecureStorage : NSObject
 
 
 NSString *serviceName;
-
 
 - (NSMutableDictionary *)newSearchDictionary:(NSString *)identifier {
     NSMutableDictionary *searchDictionary = [[NSMutableDictionary alloc] init];
@@ -154,6 +145,7 @@ CFStringRef accessibleValue(NSDictionary *options)
                                  @"AccessibleAfterFirstUnlockThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
                                  @"AccessibleAlwaysThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAlwaysThisDeviceOnly
                                  };
+        
         NSString *result = keyMap[options[@"accessible"]];
         if (result) {
             return (__bridge CFStringRef)result;

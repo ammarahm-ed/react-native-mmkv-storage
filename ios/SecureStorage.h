@@ -1,9 +1,3 @@
-//
-//  NSObject+SecureStorage.h
-//  DoubleConversion
-//
-//  Created by Ammar Ahmed on 1/10/1399 AP.
-//
 #import <Foundation/Foundation.h>
 
 @interface SecureStorage: NSObject
