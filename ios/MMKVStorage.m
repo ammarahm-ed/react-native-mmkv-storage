@@ -55,6 +55,251 @@ RCT_EXPORT_MODULE()
 
 
 
+
+#pragma mark getAllStringsAsync
+RCT_EXPORT_METHOD(getAllStringsAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            resolve([indexer getAllStrings:kv]);
+        });
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark getAllStrings
+RCT_EXPORT_METHOD(getAllStrings:(NSString *)ID
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    NSMutableArray *args = [NSMutableArray array];
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            NSMutableArray *strings = [indexer getAllStrings:kv];
+            [args addObject:[NSNull null]];
+            [args addObject:strings];
+            
+        });
+        
+    } else {
+        
+        [args addObject:@"database not initialized for the given ID"];
+        [args addObject:[NSNull null]];
+        
+    }
+    callback(args);
+    
+}
+
+#pragma mark getAllIntsAsync
+RCT_EXPORT_METHOD(getAllIntsAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            resolve([indexer getAllInts:kv]);
+        });
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark getAllInts
+RCT_EXPORT_METHOD(getAllInts:(NSString *)ID
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    NSMutableArray *args = [NSMutableArray array];
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            NSMutableArray *ints = [indexer getAllInts:kv];
+            [args addObject:[NSNull null]];
+            [args addObject:ints];
+            
+        });
+        
+    } else {
+        
+        [args addObject:@"database not initialized for the given ID"];
+        [args addObject:[NSNull null]];
+        
+    }
+    callback(args);
+    
+}
+
+#pragma mark getAllBoolsAsync
+RCT_EXPORT_METHOD(getAllBoolsAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            resolve([indexer getAllBooleans:kv]);
+        });
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark getAllBooleans
+RCT_EXPORT_METHOD(getAllBooleans:(NSString *)ID
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    NSMutableArray *args = [NSMutableArray array];
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            NSMutableArray *bools = [indexer getAllBooleans:kv];
+            [args addObject:[NSNull null]];
+            [args addObject:bools];
+            
+        });
+        
+    } else {
+        
+        [args addObject:@"database not initialized for the given ID"];
+        [args addObject:[NSNull null]];
+        
+    }
+    callback(args);
+    
+}
+
+#pragma mark getAllMapsAsync
+RCT_EXPORT_METHOD(getAllMapsAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            resolve([indexer getAllMaps:kv]);
+        });
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark getAllMaps
+RCT_EXPORT_METHOD(getAllMaps:(NSString *)ID
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    NSMutableArray *args = [NSMutableArray array];
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            NSMutableArray *maps = [indexer getAllMaps:kv];
+            [args addObject:[NSNull null]];
+            [args addObject:maps];
+            
+        });
+        
+    } else {
+        
+        [args addObject:@"database not initialized for the given ID"];
+        [args addObject:[NSNull null]];
+        
+    }
+    callback(args);
+    
+}
+
+
+#pragma mark getAllArraysAsync
+RCT_EXPORT_METHOD(getAllArraysAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            resolve([indexer getAllArrays:kv]);
+        });
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark getAllArrays
+RCT_EXPORT_METHOD(getAllArrays:(NSString *)ID
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    NSMutableArray *args = [NSMutableArray array];
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        
+        dispatch_async(RCTGetMethodQueue(), ^{
+            
+            NSMutableArray *bools = [indexer getAllArrays:kv];
+            [args addObject:[NSNull null]];
+            [args addObject:bools];
+            
+        });
+        
+    } else {
+        
+        [args addObject:@"database not initialized for the given ID"];
+        [args addObject:[NSNull null]];
+        
+    }
+    callback(args);
+    
+}
+
+
+
+
 #pragma mark encrypt
 RCT_EXPORT_METHOD(encrypt:(NSString *)ID
                   cryptKey:(NSString *)cryptKey
