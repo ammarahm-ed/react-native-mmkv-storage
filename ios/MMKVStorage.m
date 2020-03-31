@@ -54,6 +54,162 @@ RCT_EXPORT_MODULE()
 
 
 
+#pragma mark setSecureKey
+RCT_EXPORT_METHOD(setSecureKey: (NSString *)key value:(NSString *)value
+                  options: (NSDictionary *)options
+                  callback:(RCTResponseSenderBlock)callback
+                  )
+{
+    NSMutableArray *args = [NSMutableArray array];
+    @try {
+        
+        [secureStorage handleAppUninstallation];
+        BOOL status = [secureStorage createKeychainValue: value forIdentifier: key options: options];
+        if (status) {
+            
+            [args addObject:[NSNull null]];
+            [args addObject:@"Key updated successfully"];
+            callback(args);
+            
+        } else {
+            BOOL status = [secureStorage updateKeychainValue: value forIdentifier: key options: options];
+            if (status) {
+                
+                [args addObject:[NSNull null]];
+                [args addObject:@"Key updated successfully"];
+                callback(args);
+                
+            } else {
+                NSString* errorMessage = @"An error occurred";
+                [args addObject:errorMessage];
+                [args addObject:[NSNull null]];
+                callback(args);
+            }
+        }
+    }
+    @catch (NSException *exception) {
+        NSString* errorMessage = @"key does not present";
+        [args addObject:errorMessage];
+        [args addObject:[NSNull null]];
+        callback(args);
+    }
+}
+
+#pragma mark getSecureKey
+RCT_EXPORT_METHOD(getSecureKey:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback)
+{
+    
+    NSMutableArray *args = [NSMutableArray array];
+    @try {
+        [secureStorage handleAppUninstallation];
+        NSString *value = [secureStorage searchKeychainCopyMatching:key];
+        if (value == nil) {
+            NSString* errorMessage = @"key does not present";
+            [args addObject:errorMessage];
+            [args addObject:[NSNull null]];
+            callback(args);
+        } else {
+            
+            [args addObject:[NSNull null]];
+            [args addObject:value];
+            callback(args);
+            
+        }
+    }
+    @catch (NSException *exception) {
+        NSString* errorMessage = @"key does not present";
+        [args addObject:errorMessage];
+        [args addObject:[NSNull null]];
+        callback(args);
+    }
+}
+
+#pragma mark secureKeyExists
+RCT_EXPORT_METHOD(secureKeyExists:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback)
+{
+    NSMutableArray *args = [NSMutableArray array];
+    @try {
+        [secureStorage handleAppUninstallation];
+        BOOL exists = [secureStorage searchKeychainCopyMatchingExists:key];
+        if (exists) {
+            
+            [args addObject:[NSNull null]];
+            [args addObject:@true];
+            callback(args);
+        } else {
+            
+            [args addObject:[NSNull null]];
+            [args addObject:@false];
+            callback(args);
+            
+        }
+    }
+    @catch(NSException *exception) {
+        
+        [args addObject:exception.reason];
+        [args addObject:[NSNull null]];
+        callback(args);
+        
+    }
+    
+}
+#pragma mark removeSecureKey
+RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback)
+{
+    NSMutableArray *args = [NSMutableArray array];
+    @try {
+        BOOL status = [secureStorage deleteKeychainValue:key];
+        if (status) {
+            [args addObject:[NSNull null]];
+            [args addObject:@"key removed successfully"];
+            callback(args);
+            
+        } else {
+            NSString* errorMessage = @"Could not find the key to delete.";
+            
+            [args addObject:errorMessage];
+            [args addObject:[NSNull null]];
+            callback(args);
+        }
+    }
+    @catch(NSException *exception) {
+        NSString* errorMessage =@"Could not find the key to delete.";
+        [args addObject:errorMessage];
+        [args addObject:[NSNull null]];
+        callback(args);
+    }
+}
+
+
+NSError * secureKeyStoreError(NSString *errMsg)
+{
+    NSError *error = [NSError errorWithDomain:serviceName code:200 userInfo:@{@"reason": errMsg}];
+    return error;
+}
+
+CFStringRef accessibleValue(NSDictionary *options)
+{
+    if (options && options[@"accessible"] != nil) {
+        NSDictionary *keyMap = @{
+            @"AccessibleWhenUnlocked": (__bridge NSString *)kSecAttrAccessibleWhenUnlocked,
+            @"AccessibleAfterFirstUnlock": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlock,
+            @"AccessibleAlways": (__bridge NSString *)kSecAttrAccessibleAlways,
+            @"AccessibleWhenPasscodeSetThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+            @"AccessibleWhenUnlockedThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            @"AccessibleAfterFirstUnlockThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            @"AccessibleAlwaysThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAlwaysThisDeviceOnly
+        };
+        NSString *result = keyMap[options[@"accessible"]];
+        if (result) {
+            return (__bridge CFStringRef)result;
+        }
+    }
+    return kSecAttrAccessibleAfterFirstUnlock;
+}
+
 
 @end
 
