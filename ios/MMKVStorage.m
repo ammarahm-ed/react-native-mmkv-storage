@@ -53,6 +53,161 @@ RCT_EXPORT_MODULE()
 }
 
 
+#pragma mark setupDefaultLibrary
+RCT_EXPORT_METHOD(setupDefaultLibrary) {
+    
+    
+    MMKV *kv = [MMKV mmkvWithID:defaultStorage];
+    
+    bool isPresent = [IdStore exists:defaultStorage];
+    if (!isPresent) {
+        
+        [IdStore add:defaultStorage];
+        
+    }
+    
+    [mmkvMap setObject:kv forKey:defaultStorage];
+    
+}
+
+#pragma mark setupDefaultLibraryWithEncryption
+RCT_EXPORT_METHOD(setupDefaultLibraryWithEncryption:(NSNumber *)mode
+                  cryptKey:(NSString *)cryptKey
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    MMKV *kv;
+    if ([cryptKey isEqualToString:@""]) {
+        enum m;
+        if ([mode isEqualToNumber:@1]) {
+            kv = [MMKV mmkvWithID:defaultStorage mode:MMKVSingleProcess];
+        } else {
+            kv = [MMKV mmkvWithID:defaultStorage mode:MMKVMultiProcess];
+        }
+        
+    } else {
+        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
+        kv = [MMKV mmkvWithID:defaultStorage cryptKey:key];
+    }
+    NSMutableArray *args = [NSMutableArray array];
+    bool isPresent = [IdStore exists:defaultStorage];
+    if (!isPresent) {
+        [IdStore add:defaultStorage];
+        [kv setBool:true forKey:defaultStorage];
+        [mmkvMap setObject:kv forKey:defaultStorage];
+        [args addObject:[NSNull null]];
+        [args addObject:@YES];
+        callback(args);
+    } else {
+        bool isCorrectInstance = [kv containsKey:defaultStorage];
+        if (isCorrectInstance) {
+            [mmkvMap setObject:kv forKey:defaultStorage];
+            [args addObject:[NSNull null]];
+            [args addObject:@YES];
+            callback(args);
+        } else {
+            [args addObject:@"Wrong Password"];
+            [args addObject:[NSNull null]];
+            callback(args);
+        }
+        
+    }
+    
+}
+
+
+
+
+#pragma mark setupLibraryWithInstanceIDAndEncryption
+RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
+                  mode:(NSNumber *)mode
+                  cryptKey:(NSString *)cryptKey
+                  callback:(RCTResponseSenderBlock)callback
+                  ) {
+    
+    NSMutableArray *args = [NSMutableArray array];
+    MMKV *kv;
+    
+    if ([ID isEqualToString:@"default"]) {
+        [args addObject:@"default ID is reserved"];
+        [args addObject:[NSNull null]];
+        callback(args);
+        return;
+        
+    }
+    if ([mode isEqualToNumber:@1]) {
+        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
+        kv = [MMKV mmkvWithID:ID cryptKey:key mode:MMKVSingleProcess];
+    } else {
+        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
+        kv = [MMKV mmkvWithID:ID cryptKey:key mode:MMKVMultiProcess];
+    }
+    
+    
+    bool isPresent = [IdStore exists:ID];
+    if (!isPresent) {
+        [IdStore add:ID];
+        [kv setBool:true forKey:ID];
+        [mmkvMap setObject:kv forKey:ID];
+        [args addObject:[NSNull null]];
+        [args addObject:@YES];
+        callback(args);
+    } else {
+        bool isCorrectInstance = [kv containsKey:ID];
+        if (isCorrectInstance) {
+            [mmkvMap setObject:kv forKey:ID];
+            [args addObject:[NSNull null]];
+            [args addObject:@YES];
+            callback(args);
+        } else {
+            [args addObject:@"Wrong Password"];
+            [args addObject:[NSNull null]];
+            callback(args);
+        }
+    }
+}
+
+
+#pragma mark setupLibraryWithInstanceID
+RCT_EXPORT_METHOD(setupLibraryWithInstanceID:(NSString *)ID
+                  mode:(NSNumber *)mode
+                  ) {
+    MMKV *kv;
+    if ([mode isEqualToNumber:@1]) {
+        
+        kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
+    } else {
+        
+        kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
+    }
+    
+    bool isPresent = [IdStore exists:ID];
+    if (!isPresent) {
+        [IdStore add:ID];
+    }
+    
+    [mmkvMap setObject:kv forKey:ID];
+    
+}
+
+#pragma mark getAllMMKVInstanceIDs
+RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject ) {
+    
+    NSMutableArray *ids = [IdStore getAll];
+    resolve(ids);
+}
+
+
+#pragma mark getCurrentMMKVInstanceIDs
+RCT_EXPORT_METHOD(getCurrentMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject ) {
+    
+    NSArray *ids = [mmkvMap allKeys];
+    resolve(ids);
+}
+
+
+
 
 
 #pragma mark getAllMMKVInstanceIDs
