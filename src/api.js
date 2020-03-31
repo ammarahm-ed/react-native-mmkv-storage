@@ -1,5 +1,12 @@
 
 
+const DATA_TYPES = Object.freeze({
+    STRING:1,
+    NUMBER:2,
+    BOOL:3,
+    MAP:4,
+    ARRAY:5
+});
 
 export default class API {
   constructor({id = "default", mmkv }) {
@@ -27,7 +34,7 @@ export default class API {
    * @param {String} key
    */
   async getStringAsync(key) {
-    return await this.MMKV.getStringAsync(this.instanceID, key);
+    return await this.MMKV.getItemAsync(this.instanceID, key, DATA_TYPES.STRING);
   }
 
   /**
@@ -47,7 +54,7 @@ export default class API {
    * @param {String} key
    */
   async getIntAsync(key) {
-    return await this.MMKV.getIntAsync(this.instanceID, key);
+    return await this.MMKV.getItemAsync(this.instanceID, key, DATA_TYPES.NUMBER);
   }
 
   /**
@@ -68,7 +75,7 @@ export default class API {
    * @param {String} key
    */
   async getBoolAsync(key) {
-    return await this.MMKV.getBoolAsync(this.instanceID, key);
+    return await this.MMKV.getItemAsync(this.instanceID, key, DATA_TYPES.BOOL);
   }
 
   /**
@@ -89,7 +96,7 @@ export default class API {
    * @param {String} key
    */
   async getMapAsync(key) {
-    return await this.MMKV.getMapAsync(this.instanceID, key);
+    return await this.MMKV.getItemAsync(this.instanceID, key, DATA_TYPES.MAP);
   }
 
   /**
@@ -161,7 +168,7 @@ export default class API {
    */
 
   async getArrayAsync(key) {
-    let data = await this.MMKV.getMapAsync(this.instanceID, key);
+    let data = await this.MMKV.getItemAsync(this.instanceID, key,DATA_TYPES.ARRAY);
     if (data) {
       return data[key].slice();
     } else {
@@ -192,7 +199,7 @@ export default class API {
    * @param {Function} callback
    */
   getString(key, callback) {
-    return this.MMKV.getString(this.instanceID, key, callback);
+    return this.MMKV.getItem(this.instanceID, key,DATA_TYPES.STRING, callback);
   }
 
   /**
@@ -213,7 +220,7 @@ export default class API {
    * @param {Function} callback
    */
   getInt(key, callback) {
-    return this.MMKV.getInt(this.instanceID, key, callback);
+    return this.MMKV.getItem(this.instanceID, key,DATA_TYPES.NUMBER, callback);
   }
 
   /**
@@ -236,7 +243,7 @@ export default class API {
    * @param {Function} callback
    */
   getBool(key, callback) {
-    return this.MMKV.getBool(this.instanceID, key, callback);
+    return this.MMKV.getItem(this.instanceID, key,DATA_TYPES.BOOL, callback);
   }
 
   /**
@@ -259,7 +266,7 @@ export default class API {
    * @param {Function} callback
    */
   getMap(key, callback) {
-    return this.MMKV.getMap(this.instanceID, key, callback);
+    return this.MMKV.getItem(this.instanceID, key,DATA_TYPES.MAP, callback);
   }
 
   /**
@@ -315,7 +322,7 @@ export default class API {
    */
 
   getArray(key, callback) {
-    this.MMKV.getMap(this.instanceID, key, data => {
+    this.MMKV.getItem(this.instanceID, key,DATA_TYPES.ARRAY, data => {
       if (data) {
         return callback(data[key].slice());
       } else {
