@@ -54,6 +54,68 @@ RCT_EXPORT_MODULE()
 
 
 
+
+#pragma mark encrypt
+RCT_EXPORT_METHOD(encrypt:(NSString *)ID
+                  cryptKey:(NSString *)cryptKey
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
+        [kv reKey:key];
+        resolve(@YES);
+        
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark decrypt
+RCT_EXPORT_METHOD(decrypt:(NSString *)ID
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        [kv reKey:NULL];
+        resolve(@YES);
+        
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+#pragma mark changeEncryptionKey
+RCT_EXPORT_METHOD(changeEncryptionKey:(NSString *)ID
+                  cryptKey:(NSString *)cryptKey
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
+        [kv reKey:key];
+        resolve(@YES);
+        
+    } else {
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+    
+}
+
+
 #pragma mark setSecureKey
 RCT_EXPORT_METHOD(setSecureKey: (NSString *)key value:(NSString *)value
                   options: (NSDictionary *)options
