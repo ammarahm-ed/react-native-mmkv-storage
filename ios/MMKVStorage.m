@@ -55,6 +55,24 @@ RCT_EXPORT_MODULE()
 
 
 
+#pragma mark getAllMMKVInstanceIDs
+RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject ) {
+    
+    NSMutableArray *ids = [IdStore getAll];
+    resolve(ids);
+}
+
+
+#pragma mark getCurrentMMKVInstanceIDs
+RCT_EXPORT_METHOD(getCurrentMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject ) {
+    
+    NSArray *ids = [mmkvMap allKeys];
+    resolve(ids);
+}
+
+
 
 
 #pragma mark setStringAsync
