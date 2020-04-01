@@ -6,6 +6,8 @@ The following javascript data types are supported
 style="
 display:flex;
 flex-direction:row;
+width:80%;
+flex-wrap:wrap;
 ">
 
 <div
@@ -20,7 +22,7 @@ text-align:center;
 display:flex;
 align-items: center;
 flex-direction: column;
-margin-right:20px;
+margin:20px;
 ">
   <p>
   Strings<br/>
@@ -28,11 +30,6 @@ margin-right:20px;
   </p>
 </div>
 
-<div
-style="
-display:flex;
-flex-direction:row;
-">
 
 <div
 style="
@@ -46,7 +43,7 @@ text-align:center;
 display:flex;
 align-items: center;
 flex-direction: column;
-margin-right:20px;
+margin:20px;
 ">
   <p>
   Boolean<br/>
@@ -64,7 +61,7 @@ color:green;
 justify-content:center;
 text-align:center;
 display:flex;
-margin-right:20px;
+margin:20px;
 align-items: center;
 flex-direction: column;
 ">
@@ -81,7 +78,7 @@ height:100px;
 background-color:lightgreen;
 border-radius:10px;
 color:green;
-margin-right:20px;
+margin:20px;
 justify-content:center;
 text-align:center;
 display:flex;
@@ -104,7 +101,7 @@ color:green;
 justify-content:center;
 text-align:center;
 display:flex;
-margin-right:20px;
+margin:20px;
 align-items: center;
 flex-direction: column;
 ">
@@ -115,3 +112,5 @@ flex-direction: column;
 </div>
 
 </div>
+
+
