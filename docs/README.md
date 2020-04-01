@@ -20,7 +20,7 @@ MMKV supports concurrent read-read and read-write access between processes.
 - **Create unlimited Database instances**<br/>
   You can create many database instances. This helps greatly if you have seperate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
 - **Full encryption support**<br/>
-  The library supports full encryption on Android and iOS. Encryption key is securely stored for continuious usage. It uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels, it uses [secure prefrences](https://github.com/scottyab/secure-preferences/). 
+  The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels, it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs. 
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast. You can get one type of data in a simple function easily.
 
