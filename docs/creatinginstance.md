@@ -3,7 +3,7 @@
 The first step is to import the library in your project files
 
 ```js
-import MMKVStorage from 'react-native-mmkv-storage';
+import MMKVStorage from "react-native-mmkv-storage";
 ```
 
 Creating a new instance is simple and follows a builder pattern. Here is an example of loading the default instance.
@@ -11,7 +11,7 @@ Creating a new instance is simple and follows a builder pattern. Here is an exam
 ```js
 // Create a new Loader Class.
 
-MMKV = new MMKVStorage.Loader();
+const MMKV = new MMKVStorage.Loader();
 
 // Select the default Instance
 
@@ -25,14 +25,92 @@ MMKV.initialize();
 
 MMKV = MMKV.getInstance();
 
+// Then make are read/write requests
+
+await MMKV.setStringAsync("string", "string");
+
+let string = await MMKV.getStringAsync("string");
+
 //
 ```
 
 or you can simply initialize it in a single statement following builder pattern
 
 ```js
-MMKV = MMKV.Loader()
+const MMKV = new MMKVStorage.Loader()
   .default()
   .initialize()
   .getInstance();
+
+// Then make are read/write requests
+
+await MMKV.setStringAsync("string", "string");
+
+let string = await MMKV.getStringAsync("string");
 ```
+
+## MMKV Instance with ID
+
+The library allows you to create as many instances of MMKV as you might need giving a unique ID to each instance.
+
+```js
+const MMKVwithID = new MMKVStorage.Loader()
+  .withInstanceID("mmkvWithID")
+  .initialize()
+  .getInstance();
+
+// Then make are read/write requests
+
+await MMKV.setStringAsync("string", "string");
+
+let string = await MMKV.getStringAsync("string");
+```
+
+## MMKV Instance with Encryption
+
+You can also encrypt MMKV Instance when you initialize it. By default the library generates a strong encryption key and saves it in Keychain on iOS and Android Keystore on Android for continuious usage
+
+```js
+const MMKVwithEncryption = new MMKVStorage.Loader()
+  .default()
+  .withEncryption()
+  .initialize()
+  .getInstance();
+
+// OR if you are initializing with an instance ID
+
+const MMKVwithEncryptionAndID = new MMKVStorage.Loader()
+  .withInstanceID("mmkvWithEncryptionAndID")
+  .withEncryption()
+  .initialize()
+  .getInstance();
+```
+
+
+!> Remember that if you encrypt an already created instance using the loader class, it will create a new MMKV instance even if the instance exists. To encrypt an already existing instance, use encrypt() method. Read in detail about Encryption API here.
+
+## Encryption with custom key
+
+While the library can handle the encryption itself, you can choose to provide your own custom encryption key etc. For example, you maybe want to encrypt the storage with a token or user password.
+
+```js
+const MMKVwithEncryptionKey = new MMKVStorage.Loader()
+  .default()
+  .withEncryption()
+  .withCustomKey("encryptionKey")
+  .initialize()
+  .getInstance();
+```
+
+And if you want the library to store the encryption key you provided, you can choose to do so too.
+
+```js
+const MMKVwithEncryptionKey = new MMKVStorage.Loader()
+  .default()
+  .withEncryption()
+  .withCustomKey("encryptionKey", true)
+  .initialize()
+  .getInstance();
+```
+
+
