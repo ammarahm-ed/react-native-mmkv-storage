@@ -20,9 +20,9 @@ Remove an item for a given key.
 
 **Arguments**
 
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 await MMKV.removeItem(key);
@@ -42,4 +42,20 @@ Clear the memory cache of an instance.
 
 ```js
 await MMKV.clearMemoryCache();
+```
+
+## getAllInstances
+
+Returns a list of all the MMKV Instance IDs created.
+
+```js
+let allInstances = await MMKV.getAllInstances();
+```
+
+## getInitializerInstances
+
+get the currently initialized instance IDs.
+
+```js
+let intializedInstances = await MMKV.clearMemoryCache();
 ```
