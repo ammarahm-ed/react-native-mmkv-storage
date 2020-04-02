@@ -7,11 +7,11 @@
 - API Reference
 
   - [Loader Class](loaderclass.md)
-  - [Async API](themes.md)
-  - [Callback API](themes.md)
-  - [General Methods](themes.md)
-  - [Encryption](themes.md)
-  - [Querying and Indexing](themes.md)
+  - [Promise API](asyncapi.md)
+  - [Callback API](callbackapi.md)
+  - [General Methods](generalmethods.md)
+  - [Encryption](encryption.md)
+  - [Querying and Indexing](querying.md)
 
 
 - [Changelog](changelog.md)
