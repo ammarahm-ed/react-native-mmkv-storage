@@ -49,6 +49,9 @@ MMKV = new MMKVStorage()
 MMKV.decrypt();
 ```
 
+!> Once you have decrypted an already created instance, the loader will not encrypt it when you reload the your app. If you want to encrypt again, you will now call `encrypt()`. Only new created instances are encrypted with the loader class. Once you modify that, it will have no effect. 
+
+
 ## changeEncryptionKey
 
 Change the encryption key of an encrypted instance of MMKV.
@@ -71,10 +74,12 @@ MMKV = new MMKVStorage()
   .initialize()
   .getInstance();
 
-
 MMKV.changeEncryptionKey("encryptionKey", true, "mycustomalias");
 
 // or if you handle the storage of key yourself
 
 MMKV.changeEncryptionKey("encryptionKey");
 ```
+
+
+!> After changing the encryption key, you will need to change your key or provide a key in the loader method above or it will throw error and not load the database.
