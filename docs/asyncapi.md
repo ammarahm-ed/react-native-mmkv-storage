@@ -24,7 +24,7 @@ Sets a string value in storage for the given key.
 | key | String |
 | value | String |
 
-```jsx
+```js
 await MMKV.setStringAsync("string", "string");
 ```
 
@@ -40,7 +40,7 @@ Gets a string value for a given key.
 | ---- | -------- |
 | key | String |
 
-```jsx
+```js
 let string = await MMKV.getStringAsync("string");
 ```
 
@@ -57,7 +57,7 @@ Sets a number value in storage for the given key.
 | key | String |
 | value | Number |
 
-```jsx
+```js
 await MMKV.setIntAsync("number", 10);
 ```
 
@@ -73,7 +73,7 @@ Gets a number value for a given key.
 | ---- | -------- |
 | key | String |
 
-```jsx
+```js
 let number = await MMKV.getIntAsync("number");
 ```
 
@@ -90,7 +90,7 @@ Sets a boolean value in storage for the given key.
 | key | String |
 | value | boolean |
 
-```jsx
+```js
 await MMKV.setBoolAsync("myBooleanValue", false);
 ```
 
@@ -106,7 +106,7 @@ Gets a boolean value for a given key.
 | ---- | -------- |
 | key | String |
 
-```jsx
+```js
 let boolean = await MMKV.getBoolAsync("myBooleanValue");
 ```
 
@@ -123,7 +123,7 @@ Sets an object to storage for the given key.
 | key | String |
 | value | Object |
 
-```jsx
+```js
 let myObject = { foo: "foo", bar: "bar" };
 
 await MMKV.setMapAsync("myobject", myObject);
@@ -141,7 +141,7 @@ Gets an object from storage.
 | ---- | -------- |
 | key | String |
 
-```jsx
+```js
 let object = await MMKV.getMapAsync("object");
 ```
 
@@ -158,7 +158,7 @@ Sets an array to storage for the given key.
 | key | String |
 | value | Array |
 
-```jsx
+```js
 let array = ["foo", "bar"];
 
 await MMKV.setArrayAsync("array", array);
@@ -176,7 +176,7 @@ Sets an array to storage for the given key.
 | ---- | -------- |
 | key | String |
 
-```jsx
+```js
 let myArray = await MMKV.getArrayAsync("array");
 ```
 
@@ -192,7 +192,7 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 | ---- | -------- |
 | keys | Array of Keys |
 
-```jsx
+```js
 let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);
 ```
 
@@ -201,7 +201,7 @@ let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);
 
 The Array returned has the following structure:
 
-```jsx
+```js
 [
   ["foo", Object<any>],
   ["bar", Object<any>]
@@ -212,59 +212,3 @@ The first item in each array is the `key` for the object, and the second item is
 
 If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
 
-## hasKeyAsync
-
-Check if a key exists in the storage.
-
-**Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
-
-```jsx
-MMKV.hasKeyAsync(key).then(result => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-## getKeysAsync
-
-Get all the keys in the storage.
-
-```jsx
-
-let keys = await MMKV.getKeysAsync();
-});
-
-```
-
-**Returns**
-`Promise<boolean>`
-
-## removeItem
-
-Remove an item for a given key.
-
-**Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
-
-```jsx
-await MMKV.removeItem(key);
-```
-
-## clearStore
-
-Clear the storage.
-
-```jsx
-await MMKV.clearStore();
-```

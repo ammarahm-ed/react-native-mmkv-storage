@@ -25,7 +25,7 @@ Sets a string value in storage for the given key.
 | value | String |
 | callback | Function |
 
-```jsx
+```js
 MMKV.setString("string", "string", (error, result) => {
   if (error) {
     console.log(error);
@@ -46,7 +46,7 @@ Gets a string value for a given key.
 | key | String |
 |callback |Function|
 
-```jsx
+```js
 MMKV.getString("string", (error, result) => {
   if (error) {
     console.log(error);
@@ -71,7 +71,7 @@ Sets a number value in storage for the given key.
 | value | Number |
 |callback| Function |
 
-```jsx
+```js
 MMKV.setInt("number", 10, (error, result) => {
   if (error) {
     console.log(error);
@@ -95,7 +95,7 @@ Gets a number value for a given key.
 | key | String |
 |callback|Function|
 
-```jsx
+```js
 MMKV.getInt("number", (error, result) => {
   if (error) {
     console.log(error);
@@ -120,7 +120,7 @@ Sets a boolean value in storage for the given key.
 | value | boolean |
 |callback|Function|
 
-```jsx
+```js
 MMKV.setBool("boolean", true, (error, result) => {
   if (error) {
     console.log(error);
@@ -144,7 +144,7 @@ Gets a boolean value for a given key.
 | key | String |
 |callback|Function|
 
-```jsx
+```js
 MMKV.getBool("boolean", (error, result) => {
   if (error) {
     console.log(error);
@@ -169,7 +169,7 @@ Sets an object to storage for the given key.
 | value | Object |
 |callback|Function|
 
-```jsx
+```js
 let object = { foo: "foo", bar: "bar" };
 
 MMKV.setMap("object", object, (error, result) => {
@@ -197,7 +197,7 @@ Gets an object from storage.
 | key | String |
 |callback|Function|
 
-```jsx
+```js
 MMKV.getMap("object", (error, result) => {
   if (error) {
     console.log(error);
@@ -224,7 +224,7 @@ Sets an array to storage for the given key.
 | value | Array |
 |callback|Function|
 
-```jsx
+```js
 let array = ["foo", "bar"];
 
 MMKV.setArray("array", array, (error, result) => {
@@ -250,7 +250,7 @@ Sets an array to storage for the given key.
 | key | String |
 | callback | Function |
 
-```jsx
+```js
 
 MMKV.getArray("array" array => console.log(array));
 MMKV.getArray("array" , (error, result) => {
@@ -281,7 +281,7 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 | keys | Array of Keys |
 |callback|Function|
 
-```jsx
+```js
 import MMKV from "react-native-mmkv-storage";
 
 MMKV.getMultipleItems(["foo", "bar", "loo"], objects => console.log(objects));
@@ -303,7 +303,7 @@ MMKV.getMultipleItems(["foo", "bar", "loo"], (error, result) => {
 
 The Array returned has the following structure:
 
-```jsx
+```js
 [
   ["foo", Object<any>],
   ["bar", Object<any>]
