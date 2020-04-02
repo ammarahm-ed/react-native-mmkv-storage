@@ -2,6 +2,7 @@
 
   - [Installation](gettingstarted.md)
   - [Creating an MMKV Instance](creatinginstance.md)
+  - [Working with Encryption](workingwithencryption.md)
   - [Supported Data Types](datatypes.md)
 
 - API Reference
@@ -11,7 +12,10 @@
   - [Callback API](callbackapi.md)
   - [General Methods](generalmethods.md)
   - [Encryption](encryption.md)
-  - [Querying and Indexing](querying.md)
+  - [Querying and Indexing](queryingandindexing.md)
 
 
 - [Changelog](changelog.md)
+
+
+
