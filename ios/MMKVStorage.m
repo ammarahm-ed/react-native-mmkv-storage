@@ -1,21 +1,15 @@
-
 #import "MMKVStorage.h"
 #import <MMKV/MMKV.h>
 #import "SecureStorage.h"
 #import "IDStore.h"
 #import "StorageIndexer.h"
+#import "Constants.h"
+#import "Getters.h"
+#import "Setters.h"
+
+
 
 @implementation MMKVStorage
-
-const int DATA_TYPE_STRING = 1;
-
-const int DATA_TYPE_INT = 2;
-
-const int DATA_TYPE_BOOL = 3;
-
-const int DATA_TYPE_MAP = 4;
-
-const int DATA_TYPE_ARRAY = 5;
 
 static dispatch_queue_t RCTGetMethodQueue()
 {
@@ -32,6 +26,8 @@ MMKV *mmkv;
 SecureStorage *secureStorage;
 IDStore *IdStore;
 StorageIndexer *indexer;
+Setters *setters;
+Getters *getters;
 NSMutableDictionary *mmkvMap;
 NSString *defaultStorage = @"default";
 
@@ -51,7 +47,8 @@ RCT_EXPORT_MODULE()
         IdStore = [[IDStore alloc] initWithMMKV:[MMKV mmkvWithID:@"mmkvIdStore"]];
         indexer = [[StorageIndexer alloc] init];
         mmkvMap = [NSMutableDictionary dictionary];
-        
+        setters = [[Setters init] alloc];
+        getters = [[Getters init] alloc];
     }
     
     return self;
@@ -59,7 +56,7 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-  return NO;
+    return NO;
 }
 
 #pragma mark setupDefaultLibrary
@@ -72,43 +69,6 @@ RCT_EXPORT_METHOD(setupDefaultLibrary) {
         [IdStore add:defaultStorage];
     }
     [mmkvMap setObject:kv forKey:defaultStorage];
-}
-
-#pragma mark setupDefaultLibraryWithEncryption
-RCT_EXPORT_METHOD(setupDefaultLibraryWithEncryption:(nonnull NSNumber *)mode
-                  cryptKey:(NSString *)cryptKey
-                  callback:(RCTResponseSenderBlock)callback
-                  ) {
-    MMKV *kv;
-    if ([cryptKey isEqualToString:@""]) {
-        enum m;
-        if ([mode isEqualToNumber:@1]) {
-            kv = [MMKV mmkvWithID:defaultStorage mode:MMKVSingleProcess];
-        } else {
-            kv = [MMKV mmkvWithID:defaultStorage mode:MMKVMultiProcess];
-        }
-        
-    } else {
-        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
-        kv = [MMKV mmkvWithID:defaultStorage cryptKey:key];
-    }
-    bool isPresent = [IdStore exists:defaultStorage];
-    if (!isPresent) {
-        [IdStore add:defaultStorage];
-        [kv setBool:true forKey:defaultStorage];
-        [mmkvMap setObject:kv forKey:defaultStorage];
-        callback(@[[NSNull null]  , @YES ]);
-    } else {
-        bool isCorrectInstance = [kv containsKey:defaultStorage];
-        if (isCorrectInstance) {
-            [mmkvMap setObject:kv forKey:defaultStorage];
-            callback(@[[NSNull null]  , @YES ]);
-        } else {
-            callback(@[[NSNull null]  , @YES ]);
-            callback(@[@"Wrong Password", [NSNull null] ]);
-            
-        }
-    }
 }
 
 #pragma mark setupLibraryWithInstanceIDAndEncryption
@@ -197,8 +157,10 @@ RCT_EXPORT_METHOD(setStringAsync:(NSString *)ID
                   value:(NSString*)value
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
+                  
+                  
                   ) {
-    [self setItemAsync:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL resolve:resolve rejecter:reject];
+    [setters setItemAsync:ID key:key  type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap resolve:resolve rejecter:reject];
 }
 
 #pragma mark setString
@@ -207,133 +169,8 @@ RCT_EXPORT_METHOD(setString:(NSString *)ID
                   value:(NSString*)value
                   callback:(RCTResponseSenderBlock)callback
                   ) {
-    [self setItem:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL callback:callback];
-}
-
-- (void)setItemAsync:(NSString *)ID
-                 key:(NSString*)key
-                type:(int)type
-              string:(nullable NSString *)string
-             boolean:(bool)boolean
-              number:(nullable NSNumber *)number
-                 map:(nullable NSDictionary *)map
-             resolve:(RCTPromiseResolveBlock)resolve
-            rejecter:(RCTPromiseRejectBlock)reject
-{
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            switch (type) {
-                case DATA_TYPE_STRING:
-                    
-                    [kv setObject:string forKey:key];
-                    resolve(@YES);
-                    [indexer addToStringsIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_INT:
-                    
-                    [kv setInt64:number.intValue forKey:key];
-                    resolve(@YES);
-                    [indexer addToIntIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_BOOL:
-                    
-                    [kv setBool:boolean forKey:key];
-                    resolve(@YES);
-                    [indexer addToBoolIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_MAP:
-                    
-                    [kv setObject:map forKey:key];
-                    resolve(@YES);
-                    [indexer addToMapIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_ARRAY:
-                    
-                    [kv setObject:map forKey:key];
-                    resolve(@YES);
-                    [indexer addToArrayIndex:kv key:key];
-            
-                    break;
-                default:
-                    break;
-            }
-            
-        });
-        
-    } else {
-        
-        reject(@"cannot_get", @"database not initialized for the given ID", nil);
-    }
     
-}
-
-
-- (void)setItem:(NSString *)ID
-            key:(NSString*)key
-           type:(int)type
-         string:(nullable NSString *)string
-        boolean:(bool)boolean
-         number:(nullable NSNumber *)number
-            map:(nullable NSDictionary *)map
-       callback:(RCTResponseSenderBlock)callback
-{
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            switch (type) {
-                case DATA_TYPE_STRING:
-                    
-                    [kv setObject:string forKey:key];
-                    callback(@[[NSNull null], @YES]);
-                    [indexer addToStringsIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_INT:
-                    
-                    [kv setInt64:number.intValue forKey:key];
-                    callback(@[[NSNull null], @YES]);
-                    [indexer addToIntIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_BOOL:
-                    
-                    [kv setBool:boolean forKey:key];
-                    callback(@[[NSNull null], @YES]);
-                    [indexer addToBoolIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_MAP:
-                    
-                    [kv setObject:map forKey:key];
-                    callback(@[[NSNull null], @YES]);
-                    [indexer addToMapIndex:kv key:key];
-                    
-                    break;
-                case DATA_TYPE_ARRAY:
-                    
-                    [kv setObject:map forKey:key];
-                    callback(@[[NSNull null], @YES]);
-                    [indexer addToArrayIndex:kv key:key];
-                    break;
-                default:
-                    break;
-            }
-            
-        });
-        
-    } else {
-        callback(@[@"cannot_get", @"database not initialized for the given ID", [NSNull null]]);
-        
-    }
+    [setters setItem:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark getItemAsync
@@ -343,54 +180,8 @@ RCT_EXPORT_METHOD(getItemAsync:(NSString *)ID
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            if ([kv containsKey:key]) {
-                
-                
-                switch (type.integerValue) {
-                    case DATA_TYPE_STRING:
-                        
-                        resolve([kv getObjectOfClass:NSString.class forKey:key]);
-                        break;
-                    case DATA_TYPE_INT:
-                        
-                        resolve([NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]]);
-                        break;
-                    case DATA_TYPE_BOOL:
-                        
-                        if ([kv getBoolForKey:key]) {
-                            resolve(@YES);
-                        } else {
-                            resolve(@NO);
-                        }
-                        break;
-                    case DATA_TYPE_MAP:
-                        
-                        resolve([kv getObjectOfClass:NSDictionary.class forKey:key]);
-                        break;
-                    case DATA_TYPE_ARRAY:
-                        
-                        resolve([kv getObjectOfClass:NSDictionary.class forKey:key]);
-                        break;
-                    default:
-                        break;
-                }
-                
-                
-            } else {
-                reject(@"cannot_get", @"value for key does not exist", nil);
-            }
-            
-        });
-        
-    } else {
-        
-        reject(@"cannot_get", @"database not initialized for the given ID", nil);
-    }
+    
+    [getters getItemAsync:ID key:key type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -400,54 +191,7 @@ RCT_EXPORT_METHOD(getItem:(NSString *)ID
                   type:(nonnull NSNumber *)type
                   callback:(RCTResponseSenderBlock)callback) {
     
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            if ([kv containsKey:key]) {
-                switch (type.integerValue) {
-                    case DATA_TYPE_STRING:
-                        
-                        callback(@[[NSNull null], [kv getObjectOfClass:NSString.class forKey:key]]);
-                        break;
-                    case DATA_TYPE_INT:
-                        
-                        callback(@[[NSNull null], [NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]]]);
-                        break;
-                    case DATA_TYPE_BOOL:
-                        
-                        if ([kv getBoolForKey:key]) {
-                            callback(@[[NSNull null], @YES]);
-                        } else {
-                            callback(@[[NSNull null], @NO]);
-                        }
-                        break;
-                    case DATA_TYPE_MAP:
-                        callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
-                        
-                        break;
-                    case DATA_TYPE_ARRAY:
-                        
-                        callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
-                        
-                        break;
-                    default:
-                        break;
-                }
-                
-                
-            } else {
-                callback(@[@"Value for key does not exist", [NSNull null]]);
-                
-            }
-            
-        });
-        
-    } else {
-        callback(@[@"database not initialized for the given ID", [NSNull null]]);
-        
-    }
+    [getters getItem:ID key:key type:type mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark setIntAsync
@@ -456,7 +200,7 @@ RCT_EXPORT_METHOD(setIntAsync:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
-    [self setItemAsync:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL resolve:resolve rejecter:reject];
+    [setters setItemAsync:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
 }
 
 #pragma mark setInt
@@ -465,7 +209,7 @@ RCT_EXPORT_METHOD(setInt:(NSString *)ID key:(NSString*)key
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     
-    [self setItem:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL callback:callback];
+    [setters setItem:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -476,7 +220,7 @@ RCT_EXPORT_METHOD(setBoolAsync:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
-    [self setItemAsync:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL resolve:resolve rejecter:reject];
+    [setters setItemAsync:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
     
 }
 
@@ -485,7 +229,7 @@ RCT_EXPORT_METHOD(setBool:(NSString *)ID key:(NSString*)key
                   value:(BOOL *)value
                   callback:(RCTResponseSenderBlock)callback
                   ) {
-    [self setItem:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL callback:callback];
+    [setters setItem:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -500,7 +244,7 @@ RCT_EXPORT_METHOD(setMapAsync:(NSString *)ID key:(NSString*)key
     if (isArray) {
         type = DATA_TYPE_ARRAY;
     }
-    [self setItemAsync:ID key:key type:type string:NULL boolean:false number:NULL map:value resolve:resolve rejecter:reject];
+    [setters setItemAsync:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
     
 }
 
@@ -514,7 +258,7 @@ RCT_EXPORT_METHOD(setMap:(NSString *)ID key:(NSString*)key
     if (isArray) {
         type = DATA_TYPE_ARRAY;
     }
-    [self setItem:ID key:key type:type string:NULL boolean:false number:NULL map:value callback:callback];
+    [setters setItem:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -524,39 +268,7 @@ RCT_EXPORT_METHOD(getMultipleItemsAsync:(NSString *)ID key:(NSArray*)keys
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
     
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            
-            
-            NSMutableArray * objects = [NSMutableArray array];
-            for (NSString* key in keys)
-            {
-                
-                if ([kv containsKey:key]) {
-                    NSMutableArray * array = [NSMutableArray array];
-                    NSDictionary* dic = [kv getObjectOfClass:NSDictionary.class forKey:key];
-                    [array addObject:key];
-                    [array addObject:dic];
-                    [objects addObject:array];
-                } else {
-                    NSMutableArray * array = [NSMutableArray array];
-                    [array addObject:key];
-                    [array addObject:[NSNull null]];
-                    [objects addObject:array];
-                }
-            }
-            resolve(objects);
-            
-        });
-        
-        
-    } else {
-        
-        reject(@"cannot_get", @"database not initialized for the given ID", nil);
-    }
+    [getters getMultipleItemsAsync:ID key:keys mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -565,38 +277,7 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSString *)ID key:(NSArray*)keys
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            NSMutableArray * objects = [NSMutableArray array];
-            for (NSString* key in keys)
-            {
-                
-                if ([kv containsKey:key]) {
-                    
-                    NSDictionary* dic = [kv getObjectOfClass:NSDictionary.class forKey:key];
-                    NSMutableArray * array = [NSMutableArray array];
-                    [array addObject:key];
-                    [array addObject:dic];
-                    [objects addObject:array];
-                    
-                } else {
-                    NSMutableArray * array = [NSMutableArray array];
-                    [array addObject:key];
-                    [array addObject:[NSNull null]];
-                    [objects addObject:array];
-                }
-            }
-            
-            callback(@[[NSNull null], objects]);
-            
-        });
-        
-    } else {
-        callback(@[[NSNull null], @"database not initialized for the given ID"]);
-    }
+    [getters getMultipleItems:ID key:keys mmkvMap:mmkvMap callback:callback];
     
 }
 
@@ -642,15 +323,15 @@ RCT_EXPORT_METHOD(hasKeyAsync:(NSString *)ID key:(NSString*)key
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        dispatch_async(RCTGetMethodQueue(), ^{
-            
-            if ([kv containsKey:key]) {
-                resolve(@YES);
-            } else {
-                resolve(@NO);
-            }
-            
-        });
+        
+        
+        if ([kv containsKey:key]) {
+            resolve(@YES);
+        } else {
+            resolve(@NO);
+        }
+        
+        
         
     } else {
         
@@ -667,15 +348,15 @@ RCT_EXPORT_METHOD(hasKey:(NSString *)ID key:(NSString*)key
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
-        dispatch_async(RCTGetMethodQueue(), ^{
-            
-            if ([kv containsKey:key]) {
-                callback(@[[NSNull null], @YES]);
-            } else {
-                callback(@[[NSNull null], @NO]);
-            }
-            
-        });
+        
+        
+        if ([kv containsKey:key]) {
+            callback(@[[NSNull null], @YES]);
+        } else {
+            callback(@[[NSNull null], @NO]);
+        }
+        
+        
         
     } else {
         callback(@[@"database not initialized for the given ID" ,[NSNull null]]);
@@ -693,16 +374,15 @@ RCT_EXPORT_METHOD(removeItem:(NSString *)ID key:(NSString*)key
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        dispatch_async(RCTGetMethodQueue(), ^{
-            
-            if ([kv containsKey:key]) {
-                [kv removeValueForKey:key];
-            } else {
-                resolve(@NO);
-            }
-            resolve(@YES);
-            
-        });
+        
+        
+        if ([kv containsKey:key]) {
+            [kv removeValueForKey:key];
+        } else {
+            resolve(@NO);
+        }
+        resolve(@YES);
+        
         
     } else {
         
@@ -720,13 +400,12 @@ RCT_EXPORT_METHOD(clearStore:(NSString *)ID resolve:(RCTPromiseResolveBlock)reso
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        dispatch_async(RCTGetMethodQueue(), ^{
-            
-            [kv clearAll];
-            [kv setBool:true forKey:ID];
-            resolve(@YES);
-            
-        });
+        
+        
+        [kv clearAll];
+        [kv setBool:true forKey:ID];
+        resolve(@YES);
+        
         
     } else {
         
@@ -745,10 +424,10 @@ RCT_EXPORT_METHOD(clearMemoryCache:(NSString *)ID resolve:(RCTPromiseResolveBloc
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
-        dispatch_async(RCTGetMethodQueue(), ^{
-            [kv clearMemoryCache];
-            resolve(@YES);
-        });
+        
+        [kv clearMemoryCache];
+        resolve(@YES);
+        
         
     } else {
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
@@ -762,47 +441,7 @@ RCT_EXPORT_METHOD(getAllItemsForTypeAsync:(NSString *)ID
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            switch (type.integerValue) {
-                case DATA_TYPE_STRING:
-                    
-                    resolve([indexer getAllStrings:kv]);
-                    
-                    break;
-                case DATA_TYPE_INT:
-                    
-                    resolve([indexer getAllInts:kv]);
-                    
-                    break;
-                case DATA_TYPE_BOOL:
-                    
-                    resolve([indexer getAllBooleans:kv]);
-                    
-                    break;
-                case DATA_TYPE_MAP:
-                    
-                    resolve([indexer getAllMaps:kv]);
-                    
-                    break;
-                case DATA_TYPE_ARRAY:
-                    
-                    resolve([indexer getAllArrays:kv]);
-                    
-                    break;
-                default:
-                    break;
-            }
-            
-        });
-        
-    } else {
-        
-        reject(@"cannot_get", @"database not initialized for the given ID", nil);
-    }
+    [getters getAllItemsForTypeAsync:ID type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -811,46 +450,7 @@ RCT_EXPORT_METHOD(getAllItemsForType:(NSString *)ID
                   type:(nonnull NSNumber *)type
                   callback:(RCTResponseSenderBlock)callback) {
     
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        dispatch_async(RCTGetMethodQueue(), ^{
-            MMKV *kv = [mmkvMap objectForKey:ID];
-            
-            switch (type.integerValue) {
-                case DATA_TYPE_STRING:
-                    
-                    callback(@[[NSNull null], [indexer getAllStrings:kv]]);
-                    
-                    break;
-                case DATA_TYPE_INT:
-                    
-                    callback(@[[NSNull null], [indexer getAllInts:kv]]);
-                    
-                    break;
-                case DATA_TYPE_BOOL:
-                    
-                    callback(@[[NSNull null], [indexer getAllBooleans:kv]]);
-                    
-                    break;
-                case DATA_TYPE_MAP:
-                    callback(@[[NSNull null], [indexer getAllMaps:kv]]);
-                    
-                    break;
-                case DATA_TYPE_ARRAY:
-                    
-                    callback(@[[NSNull null], [indexer getAllArrays:kv]]);
-                    
-                    break;
-                default:
-                    break;
-            }
-            
-        });
-        
-    } else {
-        callback(@[@"database not initialized for the given ID", [NSNull null]]);
-        
-    }
+    [getters getAllItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark encrypt
@@ -918,25 +518,8 @@ RCT_EXPORT_METHOD(setSecureKey: (NSString *)key value:(NSString *)value
                   )
 {
     
-    @try {
-        
-        [secureStorage handleAppUninstallation];
-        BOOL status = [secureStorage createKeychainValue: value forIdentifier: key options: options];
-        if (status) {
-            callback(@[[NSNull null],@"Key updated successfully" ]);
-            
-        } else {
-            BOOL status = [secureStorage updateKeychainValue: value forIdentifier: key options: options];
-            if (status) {
-                callback(@[[NSNull null],@"Key updated successfully" ]);
-            } else {
-                callback(@[@"An error occurred", [NSNull null]]);
-            }
-        }
-    }
-    @catch (NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
-    }
+    [secureStorage setSecureKey:key value:value options:options callback:callback];
+    
 }
 
 #pragma mark getSecureKey
@@ -944,19 +527,9 @@ RCT_EXPORT_METHOD(getSecureKey:(NSString *)key
                   callback:(RCTResponseSenderBlock)callback)
 {
     
-    @try {
-        [secureStorage handleAppUninstallation];
-        NSString *value = [secureStorage searchKeychainCopyMatching:key];
-        if (value == nil) {
-            NSString* errorMessage = @"key does not present";
-            callback(@[errorMessage, [NSNull null]]);
-        } else {
-            callback(@[[NSNull null], value]);
-        }
-    }
-    @catch (NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
-    }
+    [secureStorage getSecureKey:key callback:callback];
+    
+    
 }
 
 #pragma mark secureKeyExists
@@ -964,37 +537,16 @@ RCT_EXPORT_METHOD(secureKeyExists:(NSString *)key
                   callback:(RCTResponseSenderBlock)callback)
 {
     
-    @try {
-        [secureStorage handleAppUninstallation];
-        BOOL exists = [secureStorage searchKeychainCopyMatchingExists:key];
-        if (exists) {
-            callback(@[[NSNull null], @true]);
-        } else {
-            callback(@[[NSNull null], @false]);
-        }
-    }
-    @catch(NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
-    }
+    [secureStorage secureKeyExists:key callback:callback];
+    
 }
 #pragma mark removeSecureKey
 RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
                   callback:(RCTResponseSenderBlock)callback)
 {
-    @try {
-        BOOL status = [secureStorage deleteKeychainValue:key];
-        if (status) {
-            callback(@[[NSNull null], @"key removed successfully"]);
-            
-        } else {
-            NSString* errorMessage = @"Could not find the key to delete.";
-            
-            callback(@[errorMessage, [NSNull null]]);
-        }
-    }
-    @catch(NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
-    }
+    
+    [secureStorage removeSecureKey:key callback:callback];
+    
 }
 
 @end

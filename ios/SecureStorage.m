@@ -1,3 +1,12 @@
+
+
+
+#if __has_include("RCTBridgeModule.h")
+#import "RCTBridgeModule.h"
+#else
+#import <React/RCTBridgeModule.h>
+#endif
+
 #import "SecureStorage.h"
 
 
@@ -5,6 +14,93 @@
 
 
 NSString *serviceName;
+
+
+
+- (void) setSecureKey: (NSString *)key value:(NSString *)value
+                  options: (NSDictionary *)options
+                  callback:(RCTResponseSenderBlock)callback
+                  
+{
+    
+    @try {
+        
+        [self handleAppUninstallation];
+        BOOL status = [self createKeychainValue: value forIdentifier: key options: options];
+        if (status) {
+            callback(@[[NSNull null],@"Key updated successfully" ]);
+            
+        } else {
+            BOOL status = [self updateKeychainValue: value forIdentifier: key options: options];
+            if (status) {
+                callback(@[[NSNull null],@"Key updated successfully" ]);
+            } else {
+                callback(@[@"An error occurred", [NSNull null]]);
+            }
+        }
+    }
+    @catch (NSException *exception) {
+        callback(@[exception.reason, [NSNull null]]);
+    }
+}
+
+- (void) getSecureKey:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback
+{
+    
+    @try {
+        [self handleAppUninstallation];
+        NSString *value = [self searchKeychainCopyMatching:key];
+        if (value == nil) {
+            NSString* errorMessage = @"key does not present";
+            callback(@[errorMessage, [NSNull null]]);
+        } else {
+            callback(@[[NSNull null], value]);
+        }
+    }
+    @catch (NSException *exception) {
+        callback(@[exception.reason, [NSNull null]]);
+    }
+}
+
+- (void) secureKeyExists:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback
+{
+    
+    @try {
+        [self handleAppUninstallation];
+        BOOL exists = [self searchKeychainCopyMatchingExists:key];
+        if (exists) {
+            callback(@[[NSNull null], @true]);
+        } else {
+            callback(@[[NSNull null], @false]);
+        }
+    }
+    @catch(NSException *exception) {
+        callback(@[exception.reason, [NSNull null]]);
+    }
+}
+- (void) removeSecureKey:(NSString *)key
+                  callback:(RCTResponseSenderBlock)callback
+{
+    @try {
+        BOOL status = [self deleteKeychainValue:key];
+        if (status) {
+            callback(@[[NSNull null], @"key removed successfully"]);
+            
+        } else {
+            NSString* errorMessage = @"Could not find the key to delete.";
+            
+            callback(@[errorMessage, [NSNull null]]);
+        }
+    }
+    @catch(NSException *exception) {
+        callback(@[exception.reason, [NSNull null]]);
+    }
+}
+
+
+
 
 - (NSMutableDictionary *)newSearchDictionary:(NSString *)identifier {
     NSMutableDictionary *searchDictionary = [[NSMutableDictionary alloc] init];
