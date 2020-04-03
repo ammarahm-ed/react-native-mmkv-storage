@@ -3,7 +3,6 @@
 #import "SecureStorage.h"
 #import "IDStore.h"
 #import "StorageIndexer.h"
-#import "Constants.h"
 #import "Getters.h"
 #import "Setters.h"
 
@@ -11,9 +10,18 @@
 
 @implementation MMKVStorage
 
+const int DATA_TYPE_STRING = 1;
+
+const  int DATA_TYPE_INT = 2;
+
+const  int DATA_TYPE_BOOL = 3;
+
+const  int DATA_TYPE_MAP = 4;
+
+const  int DATA_TYPE_ARRAY = 5;
+
 static dispatch_queue_t RCTGetMethodQueue()
 {
-    // All instances will share the same queue.
     static dispatch_queue_t queue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -59,54 +67,41 @@ RCT_EXPORT_MODULE()
     return NO;
 }
 
-#pragma mark setupDefaultLibrary
-RCT_EXPORT_METHOD(setupDefaultLibrary) {
-    
-    MMKV *kv = [MMKV mmkvWithID:defaultStorage];
-    
-    bool isPresent = [IdStore exists:defaultStorage];
-    if (!isPresent) {
-        [IdStore add:defaultStorage];
-    }
-    [mmkvMap setObject:kv forKey:defaultStorage];
-}
-
 #pragma mark setupLibraryWithInstanceIDAndEncryption
 RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
                   mode:(nonnull NSNumber *)mode
+                  alias:(NSString *)alias
                   cryptKey:(NSString *)cryptKey
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     MMKV *kv;
     
     if ([ID isEqualToString:@"default"]) {
-        
         callback(@[@"default ID is reserved", [NSNull null] ]);
         return;
-        
     }
+    
+    NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
     if ([mode isEqualToNumber:@1]) {
-        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
         kv = [MMKV mmkvWithID:ID cryptKey:key mode:MMKVSingleProcess];
     } else {
-        NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
         kv = [MMKV mmkvWithID:ID cryptKey:key mode:MMKVMultiProcess];
     }
     
-    
-    bool isPresent = [IdStore exists:ID];
-    if (!isPresent) {
-        [IdStore add:ID];
+    if ([IdStore exists:ID]) {
+        [IdStore add:ID encrypted:true alias:alias];
         [kv setBool:true forKey:ID];
         [mmkvMap setObject:kv forKey:ID];
         callback(@[[NSNull null]  , @YES ]);
     } else {
-        bool isCorrectInstance = [kv containsKey:ID];
-        if (isCorrectInstance) {
+        
+        if ([kv containsKey:ID]) {
             [mmkvMap setObject:kv forKey:ID];
             callback(@[[NSNull null]  , @YES ]);
         } else {
-            callback(@[@"Wrong Password", [NSNull null] ]);
+            
+         [self encryptionHandler:ID mode:mode callback:callback];
+            
         }
     }
 }
@@ -115,30 +110,31 @@ RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
 #pragma mark setupLibraryWithInstanceID
 RCT_EXPORT_METHOD(setupLibraryWithInstanceID:(NSString *)ID
                   mode:(nonnull NSNumber *)mode
+                  callback:(RCTResponseSenderBlock)callback
                   ) {
-    MMKV *kv;
-    if ([mode isEqualToNumber:@1]) {
-        
-        kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
+
+    if ([IdStore exists:ID]) {
+        MMKV *kv;
+        if ([mode isEqualToNumber:@1]) {
+               kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
+           } else {
+               kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
+           }
+         [mmkvMap setObject:kv forKey:ID];
+        [IdStore add:ID encrypted:false alias:NULL];
+        callback(@[[NSNull null], @YES]);
     } else {
         
-        kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
+        [self encryptionHandler:ID mode:mode callback:callback];
+        
     }
-    
-    bool isPresent = [IdStore exists:ID];
-    if (!isPresent) {
-        [IdStore add:ID];
-    }
-    
-    [mmkvMap setObject:kv forKey:ID];
-    
 }
 
 #pragma mark getAllMMKVInstanceIDs
 RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    NSMutableArray *ids = [IdStore getAll];
+    NSMutableDictionary *ids = [IdStore getAll];
     resolve(ids);
 }
 
@@ -157,8 +153,6 @@ RCT_EXPORT_METHOD(setStringAsync:(NSString *)ID
                   value:(NSString*)value
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
-                  
-                  
                   ) {
     [setters setItemAsync:ID key:key  type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap resolve:resolve rejecter:reject];
 }
@@ -281,8 +275,8 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSString *)ID key:(NSArray*)keys
     
 }
 
-#pragma mark getKeysAsync
-RCT_EXPORT_METHOD(getKeysAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
+#pragma mark getKeys
+RCT_EXPORT_METHOD(getKeys:(NSString *)ID resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
@@ -295,27 +289,12 @@ RCT_EXPORT_METHOD(getKeysAsync:(NSString *)ID resolve:(RCTPromiseResolveBlock)re
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
     }
     
-    
-}
-
-#pragma mark getKeys
-RCT_EXPORT_METHOD(getKeys:(NSString *)ID callback:(RCTResponseSenderBlock)callback) {
-    
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        NSArray *array =  kv.allKeys;
-        callback(@[[NSNull null], array]);
-        
-    } else {
-        callback(@[@"database not initialized for the given ID", [NSNull null]]);
-    }
 }
 
 
-#pragma mark hasKeyAsync
-RCT_EXPORT_METHOD(hasKeyAsync:(NSString *)ID key:(NSString*)key
+
+#pragma mark hasKey
+RCT_EXPORT_METHOD(hasKey:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
@@ -324,42 +303,15 @@ RCT_EXPORT_METHOD(hasKeyAsync:(NSString *)ID key:(NSString*)key
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
-        
         if ([kv containsKey:key]) {
             resolve(@YES);
         } else {
             resolve(@NO);
         }
         
-        
-        
     } else {
         
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
-    }
-}
-
-#pragma mark hasKey
-RCT_EXPORT_METHOD(hasKey:(NSString *)ID key:(NSString*)key
-                  callback:(RCTResponseSenderBlock)callback
-                  ) {
-    
-    if ([[mmkvMap allKeys] containsObject:ID]) {
-        
-        MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        
-        
-        if ([kv containsKey:key]) {
-            callback(@[[NSNull null], @YES]);
-        } else {
-            callback(@[[NSNull null], @NO]);
-        }
-        
-        
-        
-    } else {
-        callback(@[@"database not initialized for the given ID" ,[NSNull null]]);
     }
 }
 
@@ -375,15 +327,12 @@ RCT_EXPORT_METHOD(removeItem:(NSString *)ID key:(NSString*)key
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
-        
         if ([kv containsKey:key]) {
             [kv removeValueForKey:key];
         } else {
             resolve(@NO);
         }
         resolve(@YES);
-        
-        
     } else {
         
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
@@ -400,12 +349,9 @@ RCT_EXPORT_METHOD(clearStore:(NSString *)ID resolve:(RCTPromiseResolveBlock)reso
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        
         [kv clearAll];
         [kv setBool:true forKey:ID];
         resolve(@YES);
-        
         
     } else {
         
@@ -423,11 +369,8 @@ RCT_EXPORT_METHOD(clearMemoryCache:(NSString *)ID resolve:(RCTPromiseResolveBloc
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        
-        
         [kv clearMemoryCache];
         resolve(@YES);
-        
         
     } else {
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
@@ -456,13 +399,16 @@ RCT_EXPORT_METHOD(getAllItemsForType:(NSString *)ID
 #pragma mark encrypt
 RCT_EXPORT_METHOD(encrypt:(NSString *)ID
                   cryptKey:(NSString *)cryptKey
+                  alias:(nullable NSString *)alias
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
     
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
+        [IdStore add:ID encrypted:true alias:alias];
         MMKV *kv = [mmkvMap objectForKey:ID];
+        [kv setBool:true forKey:ID];
         NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
         [kv reKey:key];
         resolve(@YES);
@@ -479,11 +425,12 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)ID
                   ) {
     
     if ([[mmkvMap allKeys] containsObject:ID]) {
-        
+  
+        [IdStore add:ID encrypted:false alias:NULL];
         MMKV *kv = [mmkvMap objectForKey:ID];
+        [kv setBool:true forKey:ID];
         [kv reKey:NULL];
         resolve(@YES);
-        
         
     } else {
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
@@ -494,13 +441,16 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)ID
 #pragma mark changeEncryptionKey
 RCT_EXPORT_METHOD(changeEncryptionKey:(NSString *)ID
                   cryptKey:(NSString *)cryptKey
+                  alias:(nullable NSString *)alias
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
     
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
+        [IdStore add:ID encrypted:true alias:alias];
         MMKV *kv = [mmkvMap objectForKey:ID];
+        [kv setBool:true forKey:ID];
         NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
         [kv reKey:key];
         resolve(@YES);
@@ -546,6 +496,53 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
 {
     
     [secureStorage removeSecureKey:key callback:callback];
+    
+}
+
+-(void) encryptionHandler:(NSString *)ID
+                     mode:(NSNumber *)mode
+                 callback:(nullable RCTResponseSenderBlock)callback   {
+    
+    MMKV *kv;
+    
+    if ([IdStore encrypted:ID]) {
+        
+        NSString *alias = [IdStore getAlias:ID];
+        if (alias != NULL) {
+            
+            if ([secureStorage secureKeyExists:alias callback:NULL]) {
+                
+                NSData *cryptKey = [[secureStorage getSecureKey:alias callback:NULL] dataUsingEncoding:NSUTF8StringEncoding];
+                
+                if ([mode isEqualToNumber:@1]) {
+                    kv = [MMKV mmkvWithID:ID  cryptKey:cryptKey mode:MMKVSingleProcess];
+                } else {
+                    kv = [MMKV mmkvWithID:ID  cryptKey:cryptKey mode:MMKVMultiProcess ];
+                }
+                if (callback != NULL) {
+                    callback(@[[NSNull null]  , @YES ]);
+                }
+                [mmkvMap setObject:kv forKey:defaultStorage];
+                
+            } else {
+                if (callback != NULL) {
+                    callback(@[@"Wrong Password or database corrupted", [NSNull null] ]);
+                }
+                
+            }
+        }
+        
+    } else {
+        
+        if ([mode isEqualToNumber:@1]) {
+            kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
+        } else {
+            kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
+        }
+       [mmkvMap setObject:kv forKey:defaultStorage];
+    }
+    
+    
     
 }
 

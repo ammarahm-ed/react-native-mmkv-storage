@@ -18,9 +18,9 @@ NSString *serviceName;
 
 
 - (void) setSecureKey: (NSString *)key value:(NSString *)value
-                  options: (NSDictionary *)options
-                  callback:(RCTResponseSenderBlock)callback
-                  
+              options: (NSDictionary *)options
+             callback:(RCTResponseSenderBlock)callback
+
 {
     
     @try {
@@ -44,8 +44,8 @@ NSString *serviceName;
     }
 }
 
-- (void) getSecureKey:(NSString *)key
-                  callback:(RCTResponseSenderBlock)callback
+- (NSString *) getSecureKey:(NSString *)key
+                   callback:(RCTResponseSenderBlock)callback
 {
     
     @try {
@@ -53,35 +53,66 @@ NSString *serviceName;
         NSString *value = [self searchKeychainCopyMatching:key];
         if (value == nil) {
             NSString* errorMessage = @"key does not present";
-            callback(@[errorMessage, [NSNull null]]);
+            if (callback != NULL) {
+                callback(@[errorMessage, [NSNull null]]);
+            }
+            
+            return NULL;
         } else {
-            callback(@[[NSNull null], value]);
+            
+            if (callback != NULL) {
+                callback(@[[NSNull null], value]);
+                
+                callback(@[[NSNull null], value]);
+            }
+            
+            return value;
         }
     }
     @catch (NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
+        if (callback != NULL) {
+            callback(@[exception.reason, [NSNull null]]);
+        }
+        
+        
+        return NULL;
     }
+    
 }
 
-- (void) secureKeyExists:(NSString *)key
-                  callback:(RCTResponseSenderBlock)callback
+- (bool) secureKeyExists:(NSString *)key
+                callback:(RCTResponseSenderBlock)callback
 {
     
     @try {
         [self handleAppUninstallation];
         BOOL exists = [self searchKeychainCopyMatchingExists:key];
         if (exists) {
-            callback(@[[NSNull null], @true]);
+            if (callback != null) {
+                callback(@[[NSNull null], @true]);
+            }
+            
+            return true;
         } else {
-            callback(@[[NSNull null], @false]);
+            
+            
+            if (callback != null) {
+                callback(@[[NSNull null], @false]);
+            }
+            return false;
         }
     }
     @catch(NSException *exception) {
-        callback(@[exception.reason, [NSNull null]]);
+        if (callback != NULL) {
+            callback(@[exception.reason, [NSNull null]]);
+        }
+        
+        
+        return NULL
     }
 }
 - (void) removeSecureKey:(NSString *)key
-                  callback:(RCTResponseSenderBlock)callback
+                callback:(RCTResponseSenderBlock)callback
 {
     @try {
         BOOL status = [self deleteKeychainValue:key];
@@ -152,7 +183,7 @@ NSString *serviceName;
                                           (CFTypeRef *)&result);
     
     if (status != errSecItemNotFound) {
-      return YES;
+        return YES;
     }
     return NO;
 }
@@ -233,14 +264,14 @@ CFStringRef accessibleValue(NSDictionary *options)
 {
     if (options && options[@"accessible"] != nil) {
         NSDictionary *keyMap = @{
-                                 @"AccessibleWhenUnlocked": (__bridge NSString *)kSecAttrAccessibleWhenUnlocked,
-                                 @"AccessibleAfterFirstUnlock": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlock,
-                                 @"AccessibleAlways": (__bridge NSString *)kSecAttrAccessibleAlways,
-                                 @"AccessibleWhenPasscodeSetThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                 @"AccessibleWhenUnlockedThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-                                 @"AccessibleAfterFirstUnlockThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-                                 @"AccessibleAlwaysThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAlwaysThisDeviceOnly
-                                 };
+            @"AccessibleWhenUnlocked": (__bridge NSString *)kSecAttrAccessibleWhenUnlocked,
+            @"AccessibleAfterFirstUnlock": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlock,
+            @"AccessibleAlways": (__bridge NSString *)kSecAttrAccessibleAlways,
+            @"AccessibleWhenPasscodeSetThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+            @"AccessibleWhenUnlockedThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
+            @"AccessibleAfterFirstUnlockThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            @"AccessibleAlwaysThisDeviceOnly": (__bridge NSString *)kSecAttrAccessibleAlwaysThisDeviceOnly
+        };
         
         NSString *result = keyMap[options[@"accessible"]];
         if (result) {

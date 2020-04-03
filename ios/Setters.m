@@ -10,9 +10,18 @@
 
 #import <Foundation/Foundation.h>
 #import "Setters.h"
-#import "Constants.h"
-#import "StorageIndexer.h";
+#import "StorageIndexer.h"
 @implementation Setters : NSObject
+
+const int DATA_TYPE_STRING = 1;
+
+const  int DATA_TYPE_INT = 2;
+
+const  int DATA_TYPE_BOOL = 3;
+
+const  int DATA_TYPE_MAP = 4;
+
+const  int DATA_TYPE_ARRAY = 5;
 
 StorageIndexer *indexer;
 
@@ -41,6 +50,7 @@ StorageIndexer *indexer;
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
+       
         switch (type) {
             case DATA_TYPE_STRING:
                 
