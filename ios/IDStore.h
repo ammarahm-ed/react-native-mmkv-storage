@@ -15,10 +15,17 @@
 
 - (nonnull id) initWithMMKV:(nonnull MMKV *)kv;
 
-- (void)add:(nonnull NSString *)ID;
+- (void)add:(nonnull NSString *)ID encrypted:(bool)encrypted alias:(nullable NSString *)alias;
 
 -(bool)exists:(nonnull NSString *)ID;
 
-- (nullable NSMutableArray *)getAll;
+- (nullable NSMutableDictionary *)getAll;
+
+- (bool)encrypted:(nonnull NSString *)ID;
+
+- (nonnull NSString *)getAlias:(nonnull NSString *)ID;
+
+- (nonnull NSMutableDictionary *)getProperties:(nonnull NSString *)ID;
+
 @end
 

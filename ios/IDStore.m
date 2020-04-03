@@ -14,7 +14,7 @@
 MMKV *store;
 
 NSString *storeId = @"mmkvIdStore";
-
+NSString *storeData = @"mmkvIdData";
 
 - (id) initWithMMKV:(MMKV *)kv{
     
@@ -26,28 +26,65 @@ NSString *storeId = @"mmkvIdStore";
 
 
 
-- (void)add:(NSString *)ID {
+- (void)add:(NSString *)ID
+  encrypted:(bool)encrypted
+      alias:(NSString *)alias
+{
     
-    bool hasKey = [store containsKey:storeId];
     
-    if (hasKey) {
-        
-        NSMutableArray *mmkvStore = [store getObjectOfClass:NSMutableArray.class forKey:storeId];
-        [mmkvStore addObject:ID];
-        [store setObject:mmkvStore forKey:storeId];
-    } else {
-        NSMutableArray *mmkvStore = [NSMutableArray array];
-        [mmkvStore addObject:ID];
-        [store setObject:mmkvStore forKey:storeId];
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    
+    if ([store containsKey:storeData]) {
+        dic = [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
     }
-
+    
+    NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+    
+    [properties setValue:[NSNumber numberWithBool:encrypted] forKey:@"encrypted"];
+    
+    [properties setValue:alias forKey:@"alias"];
+    
+    
+    [properties setValue:ID forKey:@"id"];
+    [dic setObject:properties forKey:ID];
+    
+    [store setObject:dic forKey:storeData];
+    
 }
 
-- (NSMutableArray *)getAll {
-    bool hasKey = [store containsKey:storeId];
-    if (hasKey) {
+- (bool) encrypted:(NSString *)ID {
+    
+    NSMutableDictionary *dic = [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
+    
+    NSMutableDictionary *properties = [dic objectForKey:ID];
+    
+    return [[properties valueForKey:@"encrypted"] boolValue];
+    
+    
+}
+
+- (NSString *) getAlias:(NSString *)ID {
+    
+    NSMutableDictionary *dic = [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
+    
+    NSMutableDictionary *properties = [dic objectForKey:ID];
+    
+    return [properties valueForKey:@"alias"];
+}
+
+- (NSMutableDictionary *) getProperties:(NSString *)ID {
+    
+    NSMutableDictionary *dic = [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
+    
+    return [dic objectForKey:ID];
+}
+
+
+
+- (NSMutableDictionary *)getAll {
+    if ([store containsKey:storeData]) {
         
-        return [store getObjectOfClass:NSMutableArray.class forKey:storeId];
+        return [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
         
     } else {
         
@@ -55,19 +92,20 @@ NSString *storeId = @"mmkvIdStore";
     }
 }
 
+
+
 -(bool)exists:(NSString *)ID {
     
-     bool hasKey = [store containsKey:storeId];
+    bool hasKey = [store containsKey:storeData];
     
     if (hasKey) {
-        NSMutableArray *mmkvStore = [store getObjectOfClass:NSMutableArray.class forKey:storeId];
+           NSMutableDictionary *mmkvStore = [store getObjectOfClass:NSMutableDictionary.class forKey:storeData];
         
-        return [mmkvStore containsObject:ID];
+        return [[mmkvStore allKeys] containsObject:ID];
         
     } else {
         return false;
     }
-    
     
 }
 
