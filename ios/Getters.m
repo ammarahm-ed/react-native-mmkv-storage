@@ -17,10 +17,19 @@
 #import <MMKV/MMKV.h>
 #import <Foundation/Foundation.h>
 #import "Getters.h"
-#import "Constants.h"
 #import "StorageIndexer.h"
 
 @implementation Getters : NSObject
+
+const int DATA_TYPE_STRING = 1;
+
+const  int DATA_TYPE_INT = 2;
+
+const  int DATA_TYPE_BOOL = 3;
+
+const  int DATA_TYPE_MAP = 4;
+
+const  int DATA_TYPE_ARRAY = 5;
 
 StorageIndexer *indexer;
 
@@ -91,7 +100,7 @@ StorageIndexer *indexer;
     
 }
 
-+ (void) getItem:(NSString *)ID
+- (void) getItem:(NSString *)ID
              key:(NSString*)key
             type:(nonnull NSNumber *)type
          mmkvMap:(NSDictionary *)mmkvMap

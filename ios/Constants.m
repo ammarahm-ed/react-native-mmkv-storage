@@ -7,9 +7,8 @@
 
 #import "Constants.h"
 
- 
 
-@implementation Constants: NSObject 
+@implementation Constants : NSObject
 
 const int DATA_TYPE_STRING = 1;
 
