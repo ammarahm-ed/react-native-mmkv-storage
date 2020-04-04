@@ -42,6 +42,7 @@ NSString *storeData = @"mmkvIdData";
     
     [properties setValue:[NSNumber numberWithBool:encrypted] forKey:@"encrypted"];
     
+    
     [properties setValue:alias forKey:@"alias"];
     
     

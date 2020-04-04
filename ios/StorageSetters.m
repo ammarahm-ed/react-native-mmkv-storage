@@ -5,37 +5,20 @@
 //  Created by Ammar Ahmed on 1/14/1399 AP.
 //
 
+
+
 #import <Foundation/Foundation.h>
 #import <MMKV/MMKV.h>
 
 #import <Foundation/Foundation.h>
-#import "Setters.h"
+#import "StorageSetters.h"
 #import "StorageIndexer.h"
-@implementation Setters : NSObject
 
-const int DATA_TYPE_STRING = 1;
+@implementation StorageSetters : NSObject
 
-const  int DATA_TYPE_INT = 2;
+ 
 
-const  int DATA_TYPE_BOOL = 3;
-
-const  int DATA_TYPE_MAP = 4;
-
-const  int DATA_TYPE_ARRAY = 5;
-
-StorageIndexer *indexer;
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        indexer = [[StorageIndexer init] alloc];
-    }
-    return self;
-}
-
-
-- (void)setItemAsync:(NSString *)ID
++(void)setItemAsync:(NSString *)ID
                  key:(NSString*)key
                 type:(int)type
               string:(nullable NSString *)string
@@ -50,41 +33,41 @@ StorageIndexer *indexer;
         
         MMKV *kv = [mmkvMap objectForKey:ID];
         
-       
+        
         switch (type) {
-            case DATA_TYPE_STRING:
+            case 1:
                 
                 [kv setObject:string forKey:key];
                 resolve(@YES);
-                [indexer addToStringsIndex:kv key:key];
+                [StorageIndexer addToStringsIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_INT:
+            case 2:
                 
                 [kv setInt64:number.intValue forKey:key];
                 resolve(@YES);
-                [indexer addToIntIndex:kv key:key];
+                [StorageIndexer addToIntIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_BOOL:
+            case 3:
                 
                 [kv setBool:boolean forKey:key];
                 resolve(@YES);
-                [indexer addToBoolIndex:kv key:key];
+                [StorageIndexer addToBoolIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_MAP:
+            case 4:
                 
                 [kv setObject:map forKey:key];
                 resolve(@YES);
-                [indexer addToMapIndex:kv key:key];
+                [StorageIndexer addToMapIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_ARRAY:
+            case 5:
                 
                 [kv setObject:map forKey:key];
                 resolve(@YES);
-                [indexer addToArrayIndex:kv key:key];
+                [StorageIndexer addToArrayIndex:kv key:key];
                 
                 break;
             default:
@@ -100,7 +83,7 @@ StorageIndexer *indexer;
 }
 
 
-- (void)setItem:(NSString *)ID
++(void)setItem:(NSString *)ID
             key:(NSString*)key
            type:(int)type
          string:(nullable NSString *)string
@@ -115,39 +98,39 @@ StorageIndexer *indexer;
         MMKV *kv = [mmkvMap objectForKey:ID];
         
         switch (type) {
-            case DATA_TYPE_STRING:
+            case 1:
                 
                 [kv setObject:string forKey:key];
                 callback(@[[NSNull null], @YES]);
-                [indexer addToStringsIndex:kv key:key];
+                [StorageIndexer addToStringsIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_INT:
+            case 2:
                 
                 [kv setInt64:number.intValue forKey:key];
                 callback(@[[NSNull null], @YES]);
-                [indexer addToIntIndex:kv key:key];
+                [StorageIndexer addToIntIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_BOOL:
+            case 3:
                 
                 [kv setBool:boolean forKey:key];
                 callback(@[[NSNull null], @YES]);
-                [indexer addToBoolIndex:kv key:key];
+                [StorageIndexer addToBoolIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_MAP:
+            case 4:
                 
                 [kv setObject:map forKey:key];
                 callback(@[[NSNull null], @YES]);
-                [indexer addToMapIndex:kv key:key];
+                [StorageIndexer addToMapIndex:kv key:key];
                 
                 break;
-            case DATA_TYPE_ARRAY:
+            case 5:
                 
                 [kv setObject:map forKey:key];
                 callback(@[[NSNull null], @YES]);
-                [indexer addToArrayIndex:kv key:key];
+                [StorageIndexer addToArrayIndex:kv key:key];
                 break;
             default:
                 break;

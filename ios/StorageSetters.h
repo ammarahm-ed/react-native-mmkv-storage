@@ -13,12 +13,10 @@
 #endif
 
 #import <Foundation/Foundation.h>
-#import "Getters.h"
-#import "Constants.h"
 
-@interface Setters : NSObject
+@interface StorageSetters : NSObject
 
-- (void)setItemAsync:(nonnull NSString *)ID
++(void)setItemAsync:(nonnull NSString *)ID
                  key:(nonnull NSString*)key
                 type:(int)type
               string:(nullable NSString *)string
@@ -29,7 +27,7 @@
              resolve:(nonnull RCTPromiseResolveBlock)resolve
             rejecter:(nonnull RCTPromiseRejectBlock)reject;
 
-- (void) setItem:(nonnull NSString *)ID
++(void) setItem:(nonnull NSString *)ID
              key:(nonnull NSString*)key
             type:(int)type
           string:(nullable NSString *)string

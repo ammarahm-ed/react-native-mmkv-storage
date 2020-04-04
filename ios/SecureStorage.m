@@ -16,7 +16,6 @@
 NSString *serviceName;
 
 
-
 - (void) setSecureKey: (NSString *)key value:(NSString *)value
               options: (NSDictionary *)options
              callback:(RCTResponseSenderBlock)callback
@@ -62,8 +61,6 @@ NSString *serviceName;
             
             if (callback != NULL) {
                 callback(@[[NSNull null], value]);
-                
-                callback(@[[NSNull null], value]);
             }
             
             return value;
@@ -73,8 +70,6 @@ NSString *serviceName;
         if (callback != NULL) {
             callback(@[exception.reason, [NSNull null]]);
         }
-        
-        
         return NULL;
     }
     
@@ -88,7 +83,7 @@ NSString *serviceName;
         [self handleAppUninstallation];
         BOOL exists = [self searchKeychainCopyMatchingExists:key];
         if (exists) {
-            if (callback != null) {
+            if (callback != NULL) {
                 callback(@[[NSNull null], @true]);
             }
             
@@ -96,7 +91,7 @@ NSString *serviceName;
         } else {
             
             
-            if (callback != null) {
+            if (callback != NULL) {
                 callback(@[[NSNull null], @false]);
             }
             return false;
@@ -108,7 +103,7 @@ NSString *serviceName;
         }
         
         
-        return NULL
+        return NULL;
     }
 }
 - (void) removeSecureKey:(NSString *)key

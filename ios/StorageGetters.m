@@ -16,34 +16,16 @@
 
 #import <MMKV/MMKV.h>
 #import <Foundation/Foundation.h>
-#import "Getters.h"
+#import "StorageGetters.h"
 #import "StorageIndexer.h"
 
-@implementation Getters : NSObject
-
-const int DATA_TYPE_STRING = 1;
-
-const  int DATA_TYPE_INT = 2;
-
-const  int DATA_TYPE_BOOL = 3;
-
-const  int DATA_TYPE_MAP = 4;
-
-const  int DATA_TYPE_ARRAY = 5;
-
-StorageIndexer *indexer;
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        indexer = [[StorageIndexer init] alloc];
-    }
-    return self;
-}
+@implementation StorageGetters : NSObject
 
 
-- (void) getItemAsync:(NSString *)ID
+
+
+
++ (void) getItemAsync:(NSString *)ID
                   key:(NSString*)key
                  type:(nonnull NSNumber *)type
               mmkvMap:(NSDictionary *)mmkvMap
@@ -59,15 +41,15 @@ StorageIndexer *indexer;
             
             
             switch (type.integerValue) {
-                case DATA_TYPE_STRING:
+                case 1:
                     
                     resolve([kv getObjectOfClass:NSString.class forKey:key]);
                     break;
-                case DATA_TYPE_INT:
+                case 2:
                     
                     resolve([NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]]);
                     break;
-                case DATA_TYPE_BOOL:
+                case 3:
                     
                     if ([kv getBoolForKey:key]) {
                         resolve(@YES);
@@ -75,11 +57,11 @@ StorageIndexer *indexer;
                         resolve(@NO);
                     }
                     break;
-                case DATA_TYPE_MAP:
+                case 4:
                     
                     resolve([kv getObjectOfClass:NSDictionary.class forKey:key]);
                     break;
-                case DATA_TYPE_ARRAY:
+                case 5:
                     
                     resolve([kv getObjectOfClass:NSDictionary.class forKey:key]);
                     break;
@@ -100,7 +82,7 @@ StorageIndexer *indexer;
     
 }
 
-- (void) getItem:(NSString *)ID
++(void) getItem:(NSString *)ID
              key:(NSString*)key
             type:(nonnull NSNumber *)type
          mmkvMap:(NSDictionary *)mmkvMap
@@ -113,15 +95,15 @@ StorageIndexer *indexer;
         
         if ([kv containsKey:key]) {
             switch (type.integerValue) {
-                case DATA_TYPE_STRING:
+                case 1:
                     
                     callback(@[[NSNull null], [kv getObjectOfClass:NSString.class forKey:key]]);
                     break;
-                case DATA_TYPE_INT:
+                case 2:
                     
                     callback(@[[NSNull null], [NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]]]);
                     break;
-                case DATA_TYPE_BOOL:
+                case 3:
                     
                     if ([kv getBoolForKey:key]) {
                         callback(@[[NSNull null], @YES]);
@@ -129,11 +111,11 @@ StorageIndexer *indexer;
                         callback(@[[NSNull null], @NO]);
                     }
                     break;
-                case DATA_TYPE_MAP:
+                case 4:
                     callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
                     
                     break;
-                case DATA_TYPE_ARRAY:
+                case 5:
                     
                     callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
                     
@@ -156,7 +138,7 @@ StorageIndexer *indexer;
 }
 
 
-- (void) getMultipleItemsAsync:(NSString *)ID key:(NSArray*)keys
++(void) getMultipleItemsAsync:(NSString *)ID key:(NSArray*)keys
                        mmkvMap:(NSDictionary *)mmkvMap
                        resolve:(RCTPromiseResolveBlock)resolve
                       rejecter:(RCTPromiseRejectBlock)reject
@@ -195,7 +177,7 @@ StorageIndexer *indexer;
     
 }
 
-- (void)getMultipleItems:(NSString *)ID key:(NSArray*)keys
++(void)getMultipleItems:(NSString *)ID key:(NSArray*)keys
                  mmkvMap:(NSDictionary *)mmkvMap
                 callback:(RCTResponseSenderBlock)callback
 {
@@ -245,29 +227,29 @@ StorageIndexer *indexer;
         MMKV *kv = [mmkvMap objectForKey:ID];
         
         switch (type.integerValue) {
-            case DATA_TYPE_STRING:
+            case 1:
                 
-                resolve([indexer getAllStrings:kv]);
-                
-                break;
-            case DATA_TYPE_INT:
-                
-                resolve([indexer getAllInts:kv]);
+                resolve([StorageIndexer getAllStrings:kv]);
                 
                 break;
-            case DATA_TYPE_BOOL:
+            case 2:
                 
-                resolve([indexer getAllBooleans:kv]);
-                
-                break;
-            case DATA_TYPE_MAP:
-                
-                resolve([indexer getAllMaps:kv]);
+                resolve([StorageIndexer getAllInts:kv]);
                 
                 break;
-            case DATA_TYPE_ARRAY:
+            case 3:
                 
-                resolve([indexer getAllArrays:kv]);
+                resolve([StorageIndexer getAllBooleans:kv]);
+                
+                break;
+            case 4:
+                
+                resolve([StorageIndexer getAllMaps:kv]);
+                
+                break;
+            case 5:
+                
+                resolve([StorageIndexer getAllArrays:kv]);
                 
                 break;
             default:
@@ -294,28 +276,28 @@ StorageIndexer *indexer;
         MMKV *kv = [mmkvMap objectForKey:ID];
         
         switch (type.integerValue) {
-            case DATA_TYPE_STRING:
+            case 1:
                 
-                callback(@[[NSNull null], [indexer getAllStrings:kv]]);
-                
-                break;
-            case DATA_TYPE_INT:
-                
-                callback(@[[NSNull null], [indexer getAllInts:kv]]);
+                callback(@[[NSNull null], [StorageIndexer getAllStrings:kv]]);
                 
                 break;
-            case DATA_TYPE_BOOL:
+            case 2:
                 
-                callback(@[[NSNull null], [indexer getAllBooleans:kv]]);
-                
-                break;
-            case DATA_TYPE_MAP:
-                callback(@[[NSNull null], [indexer getAllMaps:kv]]);
+                callback(@[[NSNull null], [StorageIndexer getAllInts:kv]]);
                 
                 break;
-            case DATA_TYPE_ARRAY:
+            case 3:
+                 
+                callback(@[[NSNull null], [StorageIndexer getAllBooleans:kv]]);
                 
-                callback(@[[NSNull null], [indexer getAllArrays:kv]]);
+                break;
+            case 4:
+                callback(@[[NSNull null], [StorageIndexer getAllMaps:kv]]);
+                
+                break;
+            case 5:
+                
+                callback(@[[NSNull null], [StorageIndexer getAllArrays:kv]]);
                 
                 break;
             default:

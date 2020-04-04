@@ -2,10 +2,8 @@
 #import <MMKV/MMKV.h>
 #import "SecureStorage.h"
 #import "IDStore.h"
-#import "StorageIndexer.h"
-#import "Getters.h"
-#import "Setters.h"
-
+#import "StorageGetters.h"
+#import "StorageSetters.h"
 
 
 @implementation MMKVStorage
@@ -33,9 +31,6 @@ static dispatch_queue_t RCTGetMethodQueue()
 MMKV *mmkv;
 SecureStorage *secureStorage;
 IDStore *IdStore;
-StorageIndexer *indexer;
-Setters *setters;
-Getters *getters;
 NSMutableDictionary *mmkvMap;
 NSString *defaultStorage = @"default";
 
@@ -53,10 +48,8 @@ RCT_EXPORT_MODULE()
         [MMKV initialize];
         secureStorage = [[SecureStorage alloc]init];
         IdStore = [[IDStore alloc] initWithMMKV:[MMKV mmkvWithID:@"mmkvIdStore"]];
-        indexer = [[StorageIndexer alloc] init];
         mmkvMap = [NSMutableDictionary dictionary];
-        setters = [[Setters init] alloc];
-        getters = [[Getters init] alloc];
+    
     }
     
     return self;
@@ -67,19 +60,14 @@ RCT_EXPORT_MODULE()
     return NO;
 }
 
-#pragma mark setupLibraryWithInstanceIDAndEncryption
-RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
+#pragma mark setupWithEncryption
+RCT_EXPORT_METHOD(setupWithEncryption:(NSString *)ID
                   mode:(nonnull NSNumber *)mode
-                  alias:(NSString *)alias
                   cryptKey:(NSString *)cryptKey
+                  alias:(nullable NSString *)alias
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     MMKV *kv;
-    
-    if ([ID isEqualToString:@"default"]) {
-        callback(@[@"default ID is reserved", [NSNull null] ]);
-        return;
-    }
     
     NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
     if ([mode isEqualToNumber:@1]) {
@@ -88,8 +76,10 @@ RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
         kv = [MMKV mmkvWithID:ID cryptKey:key mode:MMKVMultiProcess];
     }
     
-    if ([IdStore exists:ID]) {
+    if (![IdStore exists:ID]) {
+        
         [IdStore add:ID encrypted:true alias:alias];
+        
         [kv setBool:true forKey:ID];
         [mmkvMap setObject:kv forKey:ID];
         callback(@[[NSNull null]  , @YES ]);
@@ -97,35 +87,52 @@ RCT_EXPORT_METHOD(setupLibraryWithInstanceIDAndEncryption:(NSString *)ID
         
         if ([kv containsKey:ID]) {
             [mmkvMap setObject:kv forKey:ID];
+            
             callback(@[[NSNull null]  , @YES ]);
         } else {
             
-         [self encryptionHandler:ID mode:mode callback:callback];
+            [self encryptionHandler:ID mode:mode callback:callback];
             
         }
     }
 }
 
 
-#pragma mark setupLibraryWithInstanceID
-RCT_EXPORT_METHOD(setupLibraryWithInstanceID:(NSString *)ID
+#pragma mark setup
+RCT_EXPORT_METHOD(setup:(NSString *)ID
                   mode:(nonnull NSNumber *)mode
                   callback:(RCTResponseSenderBlock)callback
                   ) {
-
-    if ([IdStore exists:ID]) {
-        MMKV *kv;
-        if ([mode isEqualToNumber:@1]) {
-               kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
-           } else {
-               kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
-           }
-         [mmkvMap setObject:kv forKey:ID];
+    
+    MMKV *kv;
+    if ([mode isEqualToNumber:@1]) {
+        kv = [MMKV mmkvWithID:ID mode:MMKVSingleProcess];
+    } else {
+        kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
+    }
+    
+    if (![IdStore exists:ID]) {
+        
+        [mmkvMap setObject:kv forKey:ID];
+        [kv setBool:true forKey:ID];
         [IdStore add:ID encrypted:false alias:NULL];
         callback(@[[NSNull null], @YES]);
     } else {
         
+        
+        
+        if ([kv containsKey:ID]) {
+            [mmkvMap setObject:kv forKey:ID];
+            
+            callback(@[[NSNull null]  , @YES ]);
+        } else {
+            
+            [self encryptionHandler:ID mode:mode callback:callback];
+            
+        }
+        
         [self encryptionHandler:ID mode:mode callback:callback];
+        
         
     }
 }
@@ -143,8 +150,9 @@ RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(getCurrentMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    NSArray *ids = [mmkvMap allKeys];
-    resolve(ids);
+    //NSArray *ids = [mmkvMap allKeys];
+   
+    resolve([IdStore getAll]);
 }
 
 #pragma mark setStringAsync
@@ -154,7 +162,7 @@ RCT_EXPORT_METHOD(setStringAsync:(NSString *)ID
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
-    [setters setItemAsync:ID key:key  type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap resolve:resolve rejecter:reject];
+    [StorageSetters setItemAsync:ID key:key  type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap resolve:resolve rejecter:reject];
 }
 
 #pragma mark setString
@@ -164,7 +172,7 @@ RCT_EXPORT_METHOD(setString:(NSString *)ID
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     
-    [setters setItem:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap callback:callback];
+    [StorageSetters setItem:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark getItemAsync
@@ -175,7 +183,7 @@ RCT_EXPORT_METHOD(getItemAsync:(NSString *)ID
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
     
-    [getters getItemAsync:ID key:key type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
+    [StorageGetters getItemAsync:ID key:key type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -185,7 +193,7 @@ RCT_EXPORT_METHOD(getItem:(NSString *)ID
                   type:(nonnull NSNumber *)type
                   callback:(RCTResponseSenderBlock)callback) {
     
-    [getters getItem:ID key:key type:type mmkvMap:mmkvMap callback:callback];
+    [StorageGetters getItem:ID key:key type:type mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark setIntAsync
@@ -194,7 +202,7 @@ RCT_EXPORT_METHOD(setIntAsync:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
-    [setters setItemAsync:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
+    [StorageSetters setItemAsync:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
 }
 
 #pragma mark setInt
@@ -203,7 +211,7 @@ RCT_EXPORT_METHOD(setInt:(NSString *)ID key:(NSString*)key
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     
-    [setters setItem:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  callback:callback];
+    [StorageSetters setItem:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -214,7 +222,7 @@ RCT_EXPORT_METHOD(setBoolAsync:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
-    [setters setItemAsync:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
+    [StorageSetters setItemAsync:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
     
 }
 
@@ -223,7 +231,7 @@ RCT_EXPORT_METHOD(setBool:(NSString *)ID key:(NSString*)key
                   value:(BOOL *)value
                   callback:(RCTResponseSenderBlock)callback
                   ) {
-    [setters setItem:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  callback:callback];
+    [StorageSetters setItem:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -238,7 +246,7 @@ RCT_EXPORT_METHOD(setMapAsync:(NSString *)ID key:(NSString*)key
     if (isArray) {
         type = DATA_TYPE_ARRAY;
     }
-    [setters setItemAsync:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
+    [StorageSetters setItemAsync:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
     
 }
 
@@ -252,7 +260,7 @@ RCT_EXPORT_METHOD(setMap:(NSString *)ID key:(NSString*)key
     if (isArray) {
         type = DATA_TYPE_ARRAY;
     }
-    [setters setItem:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  callback:callback];
+    [StorageSetters setItem:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  callback:callback];
     
 }
 
@@ -262,7 +270,7 @@ RCT_EXPORT_METHOD(getMultipleItemsAsync:(NSString *)ID key:(NSArray*)keys
                   rejecter:(RCTPromiseRejectBlock)reject
                   ) {
     
-    [getters getMultipleItemsAsync:ID key:keys mmkvMap:mmkvMap resolve:resolve rejecter:reject];
+    [StorageGetters getMultipleItemsAsync:ID key:keys mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -271,7 +279,7 @@ RCT_EXPORT_METHOD(getMultipleItems:(NSString *)ID key:(NSArray*)keys
                   callback:(RCTResponseSenderBlock)callback
                   ) {
     
-    [getters getMultipleItems:ID key:keys mmkvMap:mmkvMap callback:callback];
+    [StorageGetters getMultipleItems:ID key:keys mmkvMap:mmkvMap callback:callback];
     
 }
 
@@ -384,7 +392,7 @@ RCT_EXPORT_METHOD(getAllItemsForTypeAsync:(NSString *)ID
                   resolve:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    [getters getAllItemsForTypeAsync:ID type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
+    [StorageGetters getAllItemsForTypeAsync:ID type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
     
 }
 
@@ -393,7 +401,7 @@ RCT_EXPORT_METHOD(getAllItemsForType:(NSString *)ID
                   type:(nonnull NSNumber *)type
                   callback:(RCTResponseSenderBlock)callback) {
     
-    [getters getAllItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
+    [StorageGetters getAllItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
 }
 
 #pragma mark encrypt
@@ -407,6 +415,7 @@ RCT_EXPORT_METHOD(encrypt:(NSString *)ID
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         [IdStore add:ID encrypted:true alias:alias];
+        
         MMKV *kv = [mmkvMap objectForKey:ID];
         [kv setBool:true forKey:ID];
         NSData *key = [cryptKey dataUsingEncoding:NSUTF8StringEncoding];
@@ -425,7 +434,7 @@ RCT_EXPORT_METHOD(decrypt:(NSString *)ID
                   ) {
     
     if ([[mmkvMap allKeys] containsObject:ID]) {
-  
+        
         [IdStore add:ID encrypted:false alias:NULL];
         MMKV *kv = [mmkvMap objectForKey:ID];
         [kv setBool:true forKey:ID];
@@ -462,22 +471,22 @@ RCT_EXPORT_METHOD(changeEncryptionKey:(NSString *)ID
 }
 
 #pragma mark setSecureKey
-RCT_EXPORT_METHOD(setSecureKey: (NSString *)key value:(NSString *)value
+RCT_EXPORT_METHOD(setSecureKey: (NSString *)alias value:(NSString *)value
                   options: (NSDictionary *)options
                   callback:(RCTResponseSenderBlock)callback
                   )
 {
     
-    [secureStorage setSecureKey:key value:value options:options callback:callback];
+    [secureStorage setSecureKey:alias value:value options:options callback:callback];
     
 }
 
 #pragma mark getSecureKey
-RCT_EXPORT_METHOD(getSecureKey:(NSString *)key
+RCT_EXPORT_METHOD(getSecureKey:(NSString *)alias
                   callback:(RCTResponseSenderBlock)callback)
 {
     
-    [secureStorage getSecureKey:key callback:callback];
+    [secureStorage getSecureKey:alias callback:callback];
     
     
 }
@@ -519,10 +528,13 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
                 } else {
                     kv = [MMKV mmkvWithID:ID  cryptKey:cryptKey mode:MMKVMultiProcess ];
                 }
+         
+             [mmkvMap setObject:kv forKey:ID];
                 if (callback != NULL) {
-                    callback(@[[NSNull null]  , @YES ]);
+                    
+                    callback(@[[NSNull null]  ,@YES  ]);
                 }
-                [mmkvMap setObject:kv forKey:defaultStorage];
+              
                 
             } else {
                 if (callback != NULL) {
@@ -539,7 +551,7 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
         } else {
             kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
         }
-       [mmkvMap setObject:kv forKey:defaultStorage];
+        [mmkvMap setObject:kv forKey:ID];
     }
     
     

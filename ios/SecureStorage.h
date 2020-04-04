@@ -7,13 +7,15 @@
 
 #import <Foundation/Foundation.h>
 
-@interface SecureStorage: NSObject
+@interface SecureStorage: NSObject 
+
+
 
 - (void) setSecureKey: (nonnull NSString *)key value:(nonnull NSString *)value
               options: (nonnull NSDictionary *)options
              callback:(nullable RCTResponseSenderBlock)callback;
 - (nullable NSString *) getSecureKey:(nonnull NSString *)key
-             callback:(nullable RCTResponseSenderBlock)callback;
+                            callback:(nullable RCTResponseSenderBlock)callback;
 - (bool) secureKeyExists:(nonnull NSString *)key
                 callback:(nullable RCTResponseSenderBlock)callback;
 - (void) removeSecureKey:(nonnull NSString *)key
