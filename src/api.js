@@ -1,3 +1,8 @@
+import generatePassword from "react-native-mmkv-storage/src/keygen";
+import { stringToHex } from "react-native-mmkv-storage/src/helpers";
+import MMKVStorage from "react-native-mmkv-storage";
+import encryption from "react-native-mmkv-storage/src/encryption";
+import indexer from "react-native-mmkv-storage/src/indexer";
 
 
 const DATA_TYPES = Object.freeze({
@@ -8,11 +13,20 @@ const DATA_TYPES = Object.freeze({
     ARRAY:5
 });
 
+
+
 export default class API {
-  constructor({id = "default", mmkv }) {
+  constructor({id = "default", mmkv,alias,aliasPrefix,key }) {
     
     this.MMKV = mmkv;
     this.instanceID = id;
+    this.alias = alias;
+    this.aliasPrefix = aliasPrefix
+    this.key = key;
+    let options = {id:this.instanceID, mmkv:this.MMKV, alias:this.alias, aliasPrefix:this.aliasPrefix,key:this.key}
+    this.encryption = new encryption(options);
+    this.indexer = new indexer(options);
+ 
   }
   /**
    * Set a string value to storage for a given key.
@@ -117,26 +131,7 @@ export default class API {
     return await this.MMKV.clearStore(this.instanceID);
   }
 
-  /**
-   * get all keys in storage.
-   *
-   */
-
-  async getKeysAsync() {
-    return await this.MMKV.getKeysAsync(this.instanceID);
-  }
-
-  
-
-  /**
-   * Check if a key exists in storage.
-   *
-   * @param {String} key
-   */
-
-  async hasKeyAsync(key) {
-    return await this.MMKV.hasKeyAsync(this.instanceID, key);
-  }
+ 
 
   /**
    * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
@@ -269,25 +264,6 @@ export default class API {
     return this.MMKV.getItem(this.instanceID, key,DATA_TYPES.MAP, callback);
   }
 
-  /**
-   * get all keys in storage.
-   * @param {Function} callback
-   */
-
-  getKeys(callback) {
-    return this.MMKV.getKeys(this.instanceID, callback);
-  }
-
-  /**
-   * Check if a key exists in storage.
-   *
-   * @param {String} key
-   * @param {Function} callback
-   */
-
-  hasKey(key, callback) {
-    return this.MMKV.hasKey(this.instanceID, key, callback);
-  }
 
   /**
    * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
@@ -331,18 +307,21 @@ export default class API {
     });
   }
 
-  async getAllMMKVInstanceIDs() {
+  async getCurrentMMKVInstanceIDs() {
 
 
-  return await this.MMKV.getAllMMKVInstanceIDs();
+  return await this.MMKV.getCurrentMMKVInstanceIDs()
 
 
   }
 
+  async getAllMMKVInstanceIDs() {
 
+
+    return await this.MMKV.getAllMMKVInstanceIDs()
   
-
-
+  
+    }
 
 
 }

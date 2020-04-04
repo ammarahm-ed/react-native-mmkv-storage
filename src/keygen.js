@@ -1,16 +1,15 @@
-const specials = '_.][?)(&$/{}';
+const specials = '_ABCDEFGHI';
 const lowercase = 'abcdefghijklmnopqrstuvwxyz';
 const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const numbers = '0123456789';
 
-const all = specials + lowercase + uppercase + numbers;
+const all = lowercase + uppercase + numbers;
 
 export default function generatePassword() {
   let password = '';
 
-  password += pick(password, specials, 1, 3);
-  password += pick(password, lowercase, 1, 3);
-  password += pick(password, uppercase, 1, 3);
+  password += pick(password, lowercase, 1, 5);
+  password += pick(password, uppercase, 1, 5);
   password += pick(password, all, 10);
 
   return shuffle(password);

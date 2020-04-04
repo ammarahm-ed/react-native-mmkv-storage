@@ -3,19 +3,19 @@ declare function MMKVStorage(): any;
 export default MMKVStorage;
 
 declare module MMKVStorage {
-  
+
   export const MODES = {
-    SINGLE_PROCESS:1,
-    MULTI_PROCESS:2
+    SINGLE_PROCESS: 1,
+    MULTI_PROCESS: 2
   }
   export const ACCESSIBLE = {
-    WHEN_UNLOCKED                      : 'AccessibleWhenUnlocked',
-    AFTER_FIRST_UNLOCK                 : 'AccessibleAfterFirstUnlock',
-    ALWAYS                             : 'AccessibleAlways',
-    WHEN_PASSCODE_SET_THIS_DEVICE_ONLY : 'AccessibleWhenPasscodeSetThisDeviceOnly',
-    WHEN_UNLOCKED_THIS_DEVICE_ONLY     : 'AccessibleWhenUnlockedThisDeviceOnly',
+    WHEN_UNLOCKED: 'AccessibleWhenUnlocked',
+    AFTER_FIRST_UNLOCK: 'AccessibleAfterFirstUnlock',
+    ALWAYS: 'AccessibleAlways',
+    WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: 'AccessibleWhenPasscodeSetThisDeviceOnly',
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'AccessibleWhenUnlockedThisDeviceOnly',
     AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: 'AccessibleAfterFirstUnlockThisDeviceOnly',
-    ALWAYS_THIS_DEVICE_ONLY            : 'AccessibleAlwaysThisDeviceOnly',
+    ALWAYS_THIS_DEVICE_ONLY: 'AccessibleAlwaysThisDeviceOnly',
   }
 
 
@@ -103,24 +103,7 @@ declare module MMKVStorage {
      */
     async  getMultipleItemsAsync(keys: Array<string>): Promise<Array<object>>;
 
-    /**
-     * Get all keys from storage.
-     *
-     */
-    async  getKeysAsync(): Promise<Array<string>>;
 
-
-    /**
-     * Check if a key exists in storage.
-     *
-     * @param {String} key
-     */
-    async   hasKeyAsync(key: string): Promise<boolean>;
-
-    /**
-     * Clear the storage.
-     *
-     */
     async  clearStore(): Promise;
     /**
      * Remove an item from storage for a given key.
@@ -222,25 +205,216 @@ declare module MMKVStorage {
     getMultipleItems(keys: Array<string>, callback: Function): Array<object>;
 
     /**
-    * Get all keys from storage.
-     * @param {Function} callback 
-    *
-    */
-    getKeys(callback: Function): Promise<Array<string>>;
+     * 
+     * Get all MMKV Instance IDs.
+     * 
+     */
+    async getAllMMKVInstanceIDs(): Promise<object>;
 
 
     /**
-    * Check if a key exists in storage.
-    *
-    * @param {String} key
-     * @param {Function} callback 
-    */
-    hasKey(key: string, callback: Function): boolean;
+     * 
+     * Get all MMKV Instance IDs that are currently loaded
+     * 
+     */
 
+    async getCurrentMMKVInstanceIDs():Promise<Array<string>>;
 
-    async getAllMMKVInstanceIDs():Promise<Array<string>>;
+    encryption: encryption;
+
+    indexer: indexer;
 
   }
+
+
+  class indexer {
+
+
+    /**
+   * Get all keys from storage.
+   *
+   */
+    async getKeys(): Promise<Array<string>>;
+
+
+    /**
+     * Check if a key exists in storage.
+     *
+     * @param {String} key
+     */
+    async hasKey(key: string): Promise<boolean>;
+
+
+    strings: {
+
+      /**
+      * Get all keys from strings index;
+      *
+      */
+      async getKeys(): Promise<Array<string>>;
+
+
+      /**
+       * Check if a key exists in strings index;
+       *
+       * @param {String} key
+       */
+      async hasKey(key: string): Promise<boolean>;
+
+
+
+      /**
+       * Get all strings in the strings index
+       *
+       */
+      async getAll(): Promise<Array<>>;
+
+    }
+
+    numbers: {
+
+      /**
+      * Get all keys from numbers index;
+      *
+      */
+      async getKeys(): Promise<Array<string>>;
+
+
+      /**
+       * Check if a key exists in numbers index;
+       *
+       * @param {String} key
+       */
+      async hasKey(key: string): Promise<boolean>;
+
+
+
+      /**
+       * Get all numbers in the numbers index;
+       *
+       */
+      async getAll(): Promise<Array<>>;
+    }
+
+    booleans: {
+      /**
+         * Get all keys from booleans index
+         *
+         */
+      async getKeys(): Promise<Array<string>>;
+
+
+      /**
+       * Check if a key exists in booleans index
+       *
+       * @param {String} key
+       */
+      async hasKey(key: string): Promise<boolean>;
+
+
+
+      /**
+       * Get all booleans in the booleans index
+       *
+       */
+      async getAll(): Promise<Array<>>;
+
+
+      maps: {
+
+        /**
+          * Get all keys from maps index
+          *
+          */
+        async getKeys(): Promise<Array<string>>;
+
+
+        /**
+         * Check if a key exists in maps index
+         *
+         * @param {String} key
+         */
+        async hasKey(key: string): Promise<boolean>;
+
+
+
+        /**
+         * Get all items in the maps index
+         *
+         */
+        async getAll(): Promise<Array<>>;
+      }
+
+      arrays: {
+
+        /**
+           * Get all keys from array index
+           *
+           */
+        async getKeys(): Promise<Array<string>>;
+
+
+        /**
+         * Check if a key exists in array index
+         *
+         * @param {String} key
+         */
+        async hasKey(key: string): Promise<boolean>;
+
+
+
+        /**
+         * Get all arrays in the array index
+         *
+         */
+        async getAll(): Promise<Array<>>;
+      }
+
+    }
+
+
+
+  }
+
+  class encryption {
+
+
+    /**
+    * You can encrypt an MMKV instance anytime, even after it is created.
+    * 
+    * Calling this without a key will generate a key itself & store it in secure storage.
+    * If no parameters are provided, a key is generated and securely stored in the storage with the default alias for later use.
+    * 
+    * @param {string} key; Provide a custom key to encrypt the storage.
+    * @param {boolean} secureKeyStorage Store the key in secure storage.
+    * @param {string}  alias Provide a custom alias to store the key with in secure storage
+    * @returns An object with alias and key
+    */
+    encrypt(key: string, secureKeyStorage: boolean, alias: string): Object<>;
+
+    /**
+     * You can decrypt an encrypted MMKV instance anytime, even after it is created.
+     * Decrypting the storage will delete the key you encrypted it with
+     * 
+     */
+    decrypt(): null;
+
+
+    /**
+     * Change the encryption key incase the old one has been compromised.
+     * @param {string} key; Provide a custom key to encrypt the storage.
+     * @param {boolean} secureKeyStorage Store the key in secure storage.
+     * @param {string}  alias Provide a custom alias to store the key with in secure storage
+     */
+
+    changeEncryptionKey(key: string, secureKeyStorage: boolean, alias: string): Object;
+
+
+
+  }
+
+
+
 
   export class Loader {
 
@@ -276,7 +450,7 @@ declare module MMKVStorage {
      * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
      */
 
-    encryptWithCustomKey(key: string,secureKeyStorage:boolean,alias:string): this;
+    encryptWithCustomKey(key: string, secureKeyStorage: boolean, alias: string): this;
 
 
     /**
@@ -291,35 +465,7 @@ declare module MMKVStorage {
 
     setProcessingMode(mode: number): this;
 
-    /**
-     * You can encrypt an MMKV instance anytime, even after it is created.
-     * 
-     * Calling this without a key will generate a key itself & store it in secure storage.
-     * If no parameters are provided, a key is generated and securely stored in the storage with the default alias for later use.
-     * 
-     * @param {string} key; Provide a custom key to encrypt the storage.
-     * @param {boolean} secureKeyStorage Store the key in secure storage.
-     * @param {string}  alias Provide a custom alias to store the key with in secure storage
-     * @returns An object with alias and key
-     */
-    encrypt(key: string, secureKeyStorage: boolean, alias: string): Object<>;
 
-    /**
-     * You can decrypt an encrypted MMKV instance anytime, even after it is created.
-     * Decrypting the storage will delete the key you encrypted it with
-     * 
-     */
-    decrypt(): null;
-
-
-    /**
-     * Change the encryption key incase the old one has been compromised.
-     * @param {string} key; Provide a custom key to encrypt the storage.
-     * @param {boolean} secureKeyStorage Store the key in secure storage.
-     * @param {string}  alias Provide a custom alias to store the key with in secure storage
-     */
-
-    changeEncryptionKey(key: string, secureKeyStorage: boolean, alias: string): Object;
 
     /**
      * Finally after setting all the options, call this to create the instance.
