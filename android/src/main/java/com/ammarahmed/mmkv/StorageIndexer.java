@@ -2,13 +2,18 @@ package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.tencent.mmkv.MMKV;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class StorageIndexer {
@@ -37,18 +42,92 @@ public class StorageIndexer {
 
     }
 
-    public Set<String> getStringsIndex(MMKV kv) {
+    public Set<String> getTypeIndex(String ID, int type, Map<String, MMKV> mmkvMap, @Nullable Promise promise) {
 
-        Set<String> stringsIndex = new HashSet<>();
-        stringsIndex = kv.decodeStringSet("stringsIndex", stringsIndex);
 
-        if (stringsIndex != null) {
-            return stringsIndex;
+        Set<String> index = new HashSet<>();
+
+        if (mmkvMap.containsKey(ID)) {
+            final MMKV kv = mmkvMap.get(ID);
+
+
+            switch (type) {
+
+                case Constants.DATA_TYPE_STRING:
+
+                    index = kv.decodeStringSet("stringsIndex", index);
+
+
+
+                    break;
+                case Constants.DATA_TYPE_INT:
+
+                    index = kv.decodeStringSet("intIndex", index);
+
+                    break;
+                case Constants.DATA_TYPE_BOOL:
+
+                    index = kv.decodeStringSet("boolIndex", index);
+
+
+                    break;
+                case Constants.DATA_TYPE_MAP:
+                    index = kv.decodeStringSet("mapIndex", index);
+
+
+                    break;
+
+                case Constants.DATA_TYPE_ARRAY:
+                    index = kv.decodeStringSet("arrayIndex", index);
+
+
+                    break;
+
+
+            }
+
+            if (promise != null) {
+
+                WritableArray array = Arguments.fromJavaArgs(index.toArray());
+
+                promise.resolve(array);
+
+
+            }
+
+            return index;
+
         } else {
+
+            if (promise != null) {
+                promise.reject("database not initilaized with id " + ID);
+            }
+
             return null;
+
         }
 
+
+
+
     }
+
+    public void typeIndexerHasKey(String ID,String key,int type,Map<String, MMKV> mmkvMap, Promise promise) {
+
+
+        Set<String> index = getTypeIndex(ID,type,mmkvMap,null);
+
+        if (index == null) {
+            promise.resolve(null);
+        }
+
+        promise.resolve(index.contains(key));
+
+
+    }
+
+
+
 
     public WritableArray getAllStrings(MMKV kv) {
 
@@ -92,18 +171,6 @@ public class StorageIndexer {
 
     }
 
-    public Set<String> getMapIndex(MMKV kv) {
-
-        Set<String> stringsIndex = new HashSet<>();
-        stringsIndex = kv.decodeStringSet("mapIndex", stringsIndex);
-
-        if (stringsIndex != null) {
-            return stringsIndex;
-        } else {
-            return null;
-        }
-
-    }
 
     public WritableArray getAllMaps(MMKV kv) {
 
@@ -118,7 +185,7 @@ public class StorageIndexer {
 
             WritableArray child = Arguments.createArray();
             child.pushString(string);
-            Bundle bundle = kv.decodeParcelable(string,Bundle.class);
+            Bundle bundle = kv.decodeParcelable(string, Bundle.class);
             WritableMap map = Arguments.fromBundle(bundle);
             child.pushMap(map);
             array.pushArray(child);
@@ -148,18 +215,6 @@ public class StorageIndexer {
 
     }
 
-    public Set<String> getArrayIndex(MMKV kv) {
-
-        Set<String> stringsIndex = new HashSet<>();
-        stringsIndex = kv.decodeStringSet("arrayIndex", stringsIndex);
-
-        if (stringsIndex != null) {
-            return stringsIndex;
-        } else {
-            return null;
-        }
-
-    }
 
     public WritableArray getAllArrays(MMKV kv) {
 
@@ -174,7 +229,7 @@ public class StorageIndexer {
 
             WritableArray child = Arguments.createArray();
             child.pushString(string);
-            Bundle bundle = kv.decodeParcelable(string,Bundle.class);
+            Bundle bundle = kv.decodeParcelable(string, Bundle.class);
             WritableMap map = Arguments.fromBundle(bundle);
             child.pushArray(map.getArray(string));
             array.pushArray(child);
@@ -184,7 +239,6 @@ public class StorageIndexer {
         return array;
 
     }
-
 
 
     public void addToIntIndex(MMKV kv, String key) {
@@ -206,18 +260,6 @@ public class StorageIndexer {
 
     }
 
-    public Set<String> getIntIndex(MMKV kv) {
-
-        Set<String> stringsIndex = new HashSet<>();
-        stringsIndex = kv.decodeStringSet("intIndex", stringsIndex);
-
-        if (stringsIndex != null) {
-            return stringsIndex;
-        } else {
-            return null;
-        }
-
-    }
 
     public WritableArray getAllInts(MMKV kv) {
 
@@ -261,18 +303,6 @@ public class StorageIndexer {
 
     }
 
-    public Set<String> getBoolIndex(MMKV kv) {
-
-        Set<String> stringsIndex = new HashSet<>();
-        stringsIndex = kv.decodeStringSet("boolIndex", stringsIndex);
-
-        if (stringsIndex != null) {
-            return stringsIndex;
-        } else {
-            return null;
-        }
-
-    }
 
     public WritableArray getAllBooleans(MMKV kv) {
 
@@ -295,13 +325,5 @@ public class StorageIndexer {
         return array;
 
     }
-
-
-
-
-
-
-
-
 
 }
