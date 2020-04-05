@@ -22,9 +22,7 @@ MMKV supports concurrent read-read and read-write access between processes.
 - **Full encryption support**<br/>
   The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels, it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs. 
 - **Simple indexer and data querying**<br/>
-  For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast. You can get one type of data in a simple function easily.
-
-- **All read/write occur on seperate dispatchQueue Thread**<br/>
+  For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
 
 ## Contact & Support
 - Create a GitHub issue for bug reports, feature requests, or questions
