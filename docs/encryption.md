@@ -10,24 +10,29 @@ Encrypt an already created instance of MMKV.
 
 | Name             | Required | Type    | Description                                                                           |
 | ---------------- | -------- | ------- | ------------------------------------------------------------------------------------- |
-| cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
+| cryptKey         | no      | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
 
 ```js
 // A simple MMKV Instance();
 
-MMKV = new MMKVStorage.Loader().
+MMKV = await new MMKVStorage.Loader().
 .default()
 .initialize()
-.getInstance();
 
 
-MMKV.encrypt("encryptionKey", true, "mycustomalias");
+await MMKV.encrypt();
 
-// or if you handle the storage of key yourself
+// or if you want to provide your own key
 
-MMKV.encrypt("encryptionKey");
+await MMKV.encrypt("encryptionKey");
+
+// if you dont want to store it
+
+MMKV.encrypt("encryptionKey", false);
+
+
 ```
 
 ## decrypt
@@ -37,16 +42,17 @@ Removes encryption from an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = new MMKVStorage()
+MMKV = await new MMKVStorage()
   .Loader()
   .default()
   .withEncryption()
   .initialize()
-  .getInstance();
 
 // Remove encryption from an encrypted instance of MMKV.
 
-MMKV.decrypt();
+await MMKV.decrypt();
+
+
 ```
 
 !> Once you have decrypted an already created instance, the loader will not encrypt it when you reload the your app. If you want to encrypt again, you will now call `encrypt()`. Only new created instances are encrypted with the loader class. Once you modify that, it will have no effect. 
@@ -74,11 +80,20 @@ MMKV = new MMKVStorage()
   .initialize()
   .getInstance();
 
-MMKV.changeEncryptionKey("encryptionKey", true, "mycustomalias");
 
-// or if you handle the storage of key yourself
 
-MMKV.changeEncryptionKey("encryptionKey");
+await MMKV.changeEncryptionKey();
+
+// or if you want to provide your own key
+
+await MMKV.changeEncryptionKey("encryptionKey");
+
+// if you dont want to store it
+
+MMKV.changeEncryptionKey("encryptionKey", false);
+
+
+
 ```
 
 
