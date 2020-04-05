@@ -1,5 +1,9 @@
 ## react-native-mmkv-storage
 [![NPM](https://img.shields.io/npm/v/react-native-mmkv-storage.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage/blob/master/LICENSE)
+[![License: MIT](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
+
+
 > An efficient, small mobile key-value storage framework for React Native
 
 ## What it is
