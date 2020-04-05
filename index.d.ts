@@ -390,14 +390,14 @@ declare module MMKVStorage {
     * @param {string}  alias Provide a custom alias to store the key with in secure storage
     * @returns An object with alias and key
     */
-    encrypt(key: string, secureKeyStorage: boolean, alias: string): Object<>;
+    async encrypt(key: string, secureKeyStorage: boolean, alias: string): Promise<>;
 
     /**
      * You can decrypt an encrypted MMKV instance anytime, even after it is created.
      * Decrypting the storage will delete the key you encrypted it with
      * 
      */
-    decrypt(): null;
+    async decrypt(): Promise<>;
 
 
     /**
@@ -407,7 +407,7 @@ declare module MMKVStorage {
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
      */
 
-    changeEncryptionKey(key: string, secureKeyStorage: boolean, alias: string): Object;
+    async changeEncryptionKey(key: string, secureKeyStorage: boolean, alias: string): Promise<>;
 
 
 
@@ -472,12 +472,8 @@ declare module MMKVStorage {
      * 
      */
 
-    initialize(): this;
+    async initialize(): Promise<API>;
 
-    /**
-     * Get the instance of current MMKV Storage Instance.
-     */
-    getInstance(): API;
 
 
   }
