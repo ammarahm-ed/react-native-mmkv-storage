@@ -16,4 +16,11 @@ public class Constants {
     public static final String SKS_KEY_FILENAME = "SKS_KEY_FILE";
     public static final String SKS_DATA_FILENAME = "SKS_DATA_FILE";
 
+
+    public static final int DATA_TYPE_STRING = 1;
+    public static final int DATA_TYPE_INT = 2;
+    public static final int DATA_TYPE_BOOL = 3;
+    public static final int DATA_TYPE_MAP = 4;
+    public static final int DATA_TYPE_ARRAY = 5;
+
 }
