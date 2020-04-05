@@ -16,9 +16,9 @@ export default class indexer {
     this.arrays = new arrayIndex({ id: id, mmkv: mmkv });
   }
   async getKeys() {
-    return await this.MMKV.getKeysAsync(this.instanceID);
+    return await this.MMKV.getKeys(this.instanceID);
   }
   async hasKey(key) {
-    return await this.MMKV.hasKeyAsync(this.instanceID, key);
+    return await this.MMKV.hasKey(this.instanceID, key);
   }
 }
