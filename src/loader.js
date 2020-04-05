@@ -1,15 +1,16 @@
 import { NativeModules } from "react-native";
-import { stringToHex } from "./helpers";
+
 import generatePassword from "./keygen";
 import API from "./api";
 import MMKVStorage from "react-native-mmkv-storage";
+import { stringToHex, ACCESSIBLE } from "./utils";
 
 export default class Loader {
   constructor() {
     this.instanceID = "default";
     this.initWithEncryption = false;
     this.secureKeyStorage = false;
-    this.accessibleModeForSecureKey = null;
+    this.accessibleMode = ACCESSIBLE.WHEN_UNLOCKED
     this.processingMode = MMKVStorage.MODES.SINGLE_PROCESS
     this.aliasPrefix = "com.MMKV.";
     this.alias = null;
@@ -17,6 +18,7 @@ export default class Loader {
     this.MMKV = NativeModules.MMKVStorage;
     this.initialized = false;
     this.error = null;
+  
 
   }
 
@@ -38,6 +40,10 @@ export default class Loader {
     this.alias = stringToHex(this.aliasPrefix + this.instanceID);
     this.secureKeyStorage = true;
     return this;
+  }
+
+  setAccessibleIOS(accessible) {
+    this.accessibleMode = accessible;
   }
 
   encryptWithCustomKey(key, secureKeyStorage, alias) {
@@ -106,7 +112,7 @@ export default class Loader {
             this.MMKV.setSecureKey(
               this.alias,
               this.key,
-              { accessible: MMKVStorage.ACCESSIBLE.WHEN_UNLOCKED },
+              { accessible: this.accessibleMode },
               (error,result) => {
                 if (error) {
                   this.error = error;
@@ -173,7 +179,7 @@ export default class Loader {
     if (this.error) {
       throw new Error(this.error);
   }
-  let options = {id:this.instanceID, mmkv:this.MMKV, alias:this.alias, aliasPrefix:this.aliasPrefix,key:this.key}
+  let options = {id:this.instanceID, mmkv:this.MMKV, alias:this.alias, aliasPrefix:this.aliasPrefix,key:this.key,accessibleMode:this.accessibleMode}
 
     let instance = new API(options);
     
