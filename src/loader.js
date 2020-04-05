@@ -18,7 +18,7 @@ export default class Loader {
     this.MMKV = NativeModules.MMKVStorage;
     this.initialized = false;
     this.error = null;
-  
+
 
   }
 
@@ -67,27 +67,27 @@ export default class Loader {
     return this;
   }
 
-  initialize() {
+  async initialize() {
+    return new Promise((resolve, reject) => {
 
-    if (this.initWithEncryption) {
-    
-      if (this.secureKeyStorage) {
-        this.MMKV.secureKeyExists(this.alias, (error,exists) => {
-       
-          if (error) {
-            this.error = error;
-            return this;
-          }
+      if (this.initWithEncryption) {
 
-          if (exists) {
-            this.MMKV.getSecureKey(this.alias, (error,value )=> {
-           
-              if (error) {
-                this.error = error;
-                return this;
-              }
-              if (value) {
-                
+        if (this.secureKeyStorage) {
+          this.MMKV.secureKeyExists(this.alias, (error, exists) => {
+
+            if (error) {
+              reject(error);
+            }
+
+            if (exists) {
+              this.MMKV.getSecureKey(this.alias, (error, value) => {
+
+                if (error) {
+                  reject(error)
+                  return;
+                }
+                if (value) {
+
                   this.MMKV.setupWithEncryption(
                     this.instanceID,
                     this.processingMode,
@@ -95,76 +95,76 @@ export default class Loader {
                     this.alias,
                     (error, result) => {
                       if (error) {
-                        this.error = error;
-                        return this;
+                        reject(error);
+                        return;
                       }
-                   
+                      resolve(this.getInstance());
+
                     }
                   );
-               
-              }
-            });
-          } else {
-           
-            if (this.key == null || this.key.length < 3)
-              throw new Error("Key is null or too short");
-           
-            this.MMKV.setSecureKey(
-              this.alias,
-              this.key,
-              { accessible: this.accessibleMode },
-              (error,result) => {
-                if (error) {
-                  this.error = error;
-                 
                 }
-              
+              });
+            } else {
+
+              if (this.key == null || this.key.length < 3)
+                throw new Error("Key is null or too short");
+
+              this.MMKV.setSecureKey(
+                this.alias,
+                this.key,
+                { accessible: this.accessibleMode },
+                (error, result) => {
+                  if (error) {
+                    reject(error);
+
+                  }
+
                   this.MMKV.setupWithEncryption(
                     this.instanceID,
                     this.processingMode,
                     this.key,
                     this.alias,
-                    (error,result) =>{
+                    (error, result) => {
                       if (error) {
-                        this.error = error;
-                        return this;
+                        reject(error);
+                        return;
                       }
-                    
+                      resolve(this.getInstance());
+
                     }
                   );
-              }
-            );
-          }
-        });
+                }
+              );
+            }
+          });
+        } else {
+          if (this.key == null || this.key.length < 3)
+            throw new Error("Key is null or too short");
+
+          this.MMKV.setupWithEncryption(this.instanceID, this.processingMode, this.key, this.alias, (error, result) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve(this.getInstance());
+
+          });
+        }
       } else {
-        if (this.key == null || this.key.length < 3)
-          throw new Error("Key is null or too short");
-         
-            this.MMKV.setupWithEncryption(this.instanceID,this.processingMode, this.key,this.alias, (error,result) =>{
-              if (error) {
-                this.error = error;
-                return this;
-              }
-              
-            });
-         
-      }
-    } else {
-    
         this.MMKV.setup(
           this.instanceID,
           this.processingMode,
-          (error,result) => {
+          (error, result) => {
             if (error) {
-              this.error = error;
-              return this;
+              reject(error);
             }
-         
+            resolve(this.getInstance());
           }
         );
-    
-    }
-    return this;
+
+      }
+
+    })
   }
 
   generateKey() {
@@ -173,16 +173,17 @@ export default class Loader {
     return this;
   }
 
-
-
   getInstance() {
+
     if (this.error) {
       throw new Error(this.error);
-  }
-  let options = {id:this.instanceID, mmkv:this.MMKV, alias:this.alias, aliasPrefix:this.aliasPrefix,key:this.key,accessibleMode:this.accessibleMode}
+    }
+    let options = { id: this.instanceID, mmkv: this.MMKV, alias: this.alias, aliasPrefix: this.aliasPrefix, key: this.key, accessibleMode: this.accessibleMode }
 
     let instance = new API(options);
-    
+
     return instance;
+
+
   }
 }
