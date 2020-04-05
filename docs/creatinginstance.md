@@ -97,11 +97,28 @@ const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
 And if you want the library to store the encryption key you provided, you can choose to do so too.
 
 ```js
+
+
+
 const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
   .default()
   .withEncryption()
   .withCustomKey("encryptionKey", true)
   .initialize()
-```
 
+
+```
+If you want to set your own custom alias for the key that is stored in the secure storage you can set it also. 
+
+```js
+
+
+
+const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
+  .default()
+  .withEncryption()
+  .withCustomKey("encryptionKey", true, 'myCustomAlias')
+  .initialize()
+
+```
 
