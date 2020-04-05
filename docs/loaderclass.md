@@ -30,7 +30,7 @@ MMKV.default();
 
 ## initialize
 
-Initialize the MMKV Instance with the selected properties.
+Initialize the MMKV Instance with the selected properties. On promise resolve it will return an MMKV Instance that you can use.
 
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
@@ -41,21 +41,9 @@ const MMKV = new MMKVStorage.Loader();
 MMKV.default().initialize();
 ```
 
-**Returns:** `this`
+**Returns:** `Promise<API>`
 
-## getInstance
 
-Gets the initialized MMKV instance. Always call it after calling `initialize()`.
-
-```js
-import MMKVStorage from "react-native-mmkv-storage";
-
-const MMKV = new MMKVStorage.Loader();
-
-MMKV = MMKV.default();
-```
-
-**Returns:** `this`
 
 ## withInstanceID
 
@@ -150,13 +138,12 @@ Now you know about the loader class, lets create a MMKV Instance with an ID.
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().
+MMKV = await new MMKVStorage.Loader().
 .withInstanceID('mmkvInstanceID')
 .setProcessingMode(MMKVStorage.MODES.MULTI_PROCESS)
 .withEncryption()
 .encryptWithCustomKey('encryptionKey',true, 'customAlias')
 .initialize()
-.getInstance();
 
 // then use it
 

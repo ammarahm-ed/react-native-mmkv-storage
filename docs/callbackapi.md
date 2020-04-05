@@ -7,10 +7,9 @@ First we create a default MMKV Instance
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().
+MMKV = await new MMKVStorage.Loader().
 .default()
 .initialize()
-.getInstance();
 
 ```
 
