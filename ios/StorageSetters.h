@@ -16,16 +16,6 @@
 
 @interface StorageSetters : NSObject
 
-+(void)setItemAsync:(nonnull NSString *)ID
-                 key:(nonnull NSString*)key
-                type:(int)type
-              string:(nullable NSString *)string
-             boolean:(bool)boolean
-              number:(nullable NSNumber *)number
-                 map:(nullable NSDictionary *)map
-             mmkvMap:(nullable NSDictionary *)mmkvMap
-             resolve:(nonnull RCTPromiseResolveBlock)resolve
-            rejecter:(nonnull RCTPromiseRejectBlock)reject;
 
 +(void) setItem:(nonnull NSString *)ID
              key:(nonnull NSString*)key
