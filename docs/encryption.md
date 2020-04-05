@@ -22,15 +22,15 @@ MMKV = await new MMKVStorage.Loader().
 .initialize()
 
 
-await MMKV.encrypt();
+await MMKV.encryption.encrypt();
 
 // or if you want to provide your own key
 
-await MMKV.encrypt("encryptionKey");
+await MMKV.encryption.encrypt("encryptionKey");
 
 // if you dont want to store it
 
-MMKV.encrypt("encryptionKey", false);
+MMKV.encryption.encrypt("encryptionKey", false);
 
 
 ```
@@ -50,7 +50,7 @@ MMKV = await new MMKVStorage()
 
 // Remove encryption from an encrypted instance of MMKV.
 
-await MMKV.decrypt();
+await MMKV.encryption.decrypt();
 
 
 ```
@@ -82,15 +82,15 @@ MMKV = new MMKVStorage()
 
 
 
-await MMKV.changeEncryptionKey();
+await MMKV.encryption.changeEncryptionKey();
 
 // or if you want to provide your own key
 
-await MMKV.changeEncryptionKey("encryptionKey");
+await MMKV.encryption.changeEncryptionKey("encryptionKey");
 
 // if you dont want to store it
 
-MMKV.changeEncryptionKey("encryptionKey", false);
+MMKV.encryption.changeEncryptionKey("encryptionKey", false);
 
 ```
 
