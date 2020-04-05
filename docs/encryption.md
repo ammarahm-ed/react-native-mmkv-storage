@@ -92,8 +92,6 @@ await MMKV.changeEncryptionKey("encryptionKey");
 
 MMKV.changeEncryptionKey("encryptionKey", false);
 
-
-
 ```
 
 

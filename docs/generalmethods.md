@@ -44,18 +44,18 @@ Clear the memory cache of an instance.
 await MMKV.clearMemoryCache();
 ```
 
-## getAllInstances
+## getAllMMKVInstances
 
 Returns a list of all the MMKV Instance IDs created.
 
 ```js
-let allInstances = await MMKV.getAllInstances();
+let allInstances = await MMKV.getAllInstanceIDs();
 ```
 
-## getInitializerInstances
+## getCurrentMMKVInstances
 
 get the currently initialized instance IDs.
 
 ```js
-let intializedInstances = await MMKV.clearMemoryCache();
+let intializedInstances = await MMKV.getCurrentMMKVInstanceIDs()
 ```
