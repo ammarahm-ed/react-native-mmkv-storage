@@ -3,14 +3,13 @@
 
 export function promisify(fn) {
 
-  return function(...args) {
+  return function (...args) {
 
-    return new Promise((resolve,reject) => {
+    return new Promise((resolve, reject) => {
 
+      fn(...args, (error, result) => {
 
-      fn(...args,(error,result) => {
-
-        if (error){
+        if (error) {
           reject(error);
         } else {
           resolve(result);
@@ -25,18 +24,18 @@ export function promisify(fn) {
 
 
 export const ACCESSIBLE = {
-  WHEN_UNLOCKED                      : 'AccessibleWhenUnlocked',
-  AFTER_FIRST_UNLOCK                 : 'AccessibleAfterFirstUnlock',
-  ALWAYS                             : 'AccessibleAlways',
-  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY : 'AccessibleWhenPasscodeSetThisDeviceOnly',
-  WHEN_UNLOCKED_THIS_DEVICE_ONLY     : 'AccessibleWhenUnlockedThisDeviceOnly',
+  WHEN_UNLOCKED: 'AccessibleWhenUnlocked',
+  AFTER_FIRST_UNLOCK: 'AccessibleAfterFirstUnlock',
+  ALWAYS: 'AccessibleAlways',
+  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: 'AccessibleWhenPasscodeSetThisDeviceOnly',
+  WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'AccessibleWhenUnlockedThisDeviceOnly',
   AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: 'AccessibleAfterFirstUnlockThisDeviceOnly',
-  ALWAYS_THIS_DEVICE_ONLY            : 'AccessibleAlwaysThisDeviceOnly',
+  ALWAYS_THIS_DEVICE_ONLY: 'AccessibleAlwaysThisDeviceOnly',
 }
 
 export const MODES = {
-  SINGLE_PROCESS:1,
-  MULTI_PROCESS:2
+  SINGLE_PROCESS: 1,
+  MULTI_PROCESS: 2
 }
 
 export const DATA_TYPES = Object.freeze({
