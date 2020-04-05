@@ -121,15 +121,11 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
         
         if ([kv containsKey:ID]) {
             [mmkvMap setObject:kv forKey:ID];
-            
             callback(@[[NSNull null]  , @YES ]);
+            
         } else {
-            
             [self encryptionHandler:ID mode:mode callback:callback];
-            
         }
-        
-        [self encryptionHandler:ID mode:mode callback:callback];
         
     }
 }
@@ -138,8 +134,7 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
 RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    NSArray *ids = [[IdStore getAll] allKeys];
-    resolve(ids);
+    resolve([IdStore getAll]);
 }
 
 
@@ -534,6 +529,12 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
             kv = [MMKV mmkvWithID:ID mode:MMKVMultiProcess];
         }
         [mmkvMap setObject:kv forKey:ID];
+        
+        if (callback != NULL) {
+                         
+          callback(@[[NSNull null]  ,@YES  ]);
+       }
+                    
     }
     
     
