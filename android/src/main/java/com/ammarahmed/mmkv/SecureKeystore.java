@@ -2,9 +2,19 @@ package com.ammarahmed.mmkv;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
+
+import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.uimanager.IllegalViewOperationException;
+import com.securepreferences.SecurePreferences;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +26,9 @@ import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -27,6 +39,190 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 public class SecureKeystore {
+
+    private SharedPreferences prefs;
+    private SecureKeystore rnKeyStore;
+    private boolean useKeystore() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
+    private ReactApplicationContext reactContext;
+    public SecureKeystore(ReactApplicationContext reactApplicationContext) {
+
+        reactContext = reactApplicationContext;
+        if (!useKeystore()) {
+            prefs = new SecurePreferences(reactApplicationContext, (String) null, "e4b001df9a082298dd090bb7455c45d92fbd5ddd.xml");
+        }
+    }
+
+    public static boolean isRTL(Locale locale) {
+
+        final int directionality = Character.getDirectionality(locale.getDisplayName().charAt(0));
+        return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
+                directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
+    }
+
+
+    public void setSecureKey(String key, String value, @Nullable ReadableMap options, Callback callback) {
+
+
+        if (useKeystore()) {
+
+            try {
+                Locale initialLocale = Locale.getDefault();
+                if (isRTL(initialLocale)) {
+                    Locale.setDefault(Locale.ENGLISH);
+                    setCipherText(reactContext, key, value);
+                    callback.invoke(false, true);
+                    Locale.setDefault(initialLocale);
+                } else {
+                    setCipherText(reactContext, key, value);
+                    callback.invoke(false, true);
+                }
+            } catch (Exception e) {
+                callback.invoke(e.getMessage(), false);
+            }
+
+        } else {
+            try {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(key, value);
+                editor.apply();
+                callback.invoke(false, true);
+            } catch (Exception e) {
+                callback.invoke(e.getMessage(), false);
+            }
+        }
+    }
+
+
+    public String getSecureKey(String key, Callback callback) {
+        if (useKeystore()) {
+            try {
+                String value = getPlainText(reactContext, key);
+
+                if (callback != null) {
+                    callback.invoke(null, value);
+                }
+
+                return value;
+
+
+
+
+            } catch (FileNotFoundException fnfe) {
+
+                if (callback != null) {
+                    callback.invoke(fnfe.getMessage(),null);
+                }
+
+                return null;
+
+
+
+            } catch (Exception e) {
+
+                if (callback != null) {
+                    callback.invoke(e.getMessage(),null);
+                }
+
+                return null;
+
+            }
+        } else {
+            try {
+                String value = prefs.getString(key, null);
+                if (callback != null) {
+                    callback.invoke(null, value);
+                }
+
+                return value;
+
+            } catch (IllegalViewOperationException e) {
+                if (callback != null) {
+                    callback.invoke(e.getMessage(),null);
+                }
+
+                return null;
+            }
+        }
+    }
+
+    public boolean secureKeyExists(String key, @Nullable  Callback callback) {
+        if (useKeystore()) {
+            try {
+
+                boolean exists = exists(reactContext, key);
+                if (callback != null) {
+                    callback.invoke(null, exists);
+                }
+                return exists;
+
+
+
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.invoke(e.getMessage(), null);
+                }
+                return false;
+
+            }
+        } else {
+            try {
+                boolean exists = prefs.contains(key);
+
+                if (callback != null) {
+                    callback.invoke(null, exists);
+                }
+                return exists;
+
+
+            } catch (IllegalViewOperationException e) {
+                if (callback != null) {
+                    callback.invoke(e.getMessage(), null);
+                }
+                return false;
+            }
+        }
+    }
+
+
+    public void removeSecureKey(String key, Callback callback) {
+        ArrayList<Boolean> fileDeleted = new ArrayList<Boolean>();
+        if (useKeystore()) {
+            try {
+                for (String filename : new String[]{
+                        Constants.SKS_DATA_FILENAME + key,
+                        Constants.SKS_KEY_FILENAME + key,
+                }) {
+                    fileDeleted.add(reactContext.deleteFile(filename));
+                }
+                if (!fileDeleted.get(0) || !fileDeleted.get(1)) {
+                    callback.invoke("404: Key not found", null);
+                } else {
+                    callback.invoke(null, true);
+
+                }
+            } catch (Exception e) {
+                callback.invoke(e.getMessage(), null);
+            }
+        } else {
+            try {
+                if (prefs.getString(key, null) == null) {
+                    callback.invoke("404: Key not found", null);
+                } else {
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove(key).apply();
+                    callback.invoke(null, true);
+                }
+            } catch (Exception e) {
+                callback.invoke(e.getMessage(), null);
+            }
+        }
+    }
+
+
+
+
 
     private PublicKey getOrCreatePublicKey(Context context, String alias) throws GeneralSecurityException, IOException {
         KeyStore keyStore = KeyStore.getInstance(getKeyStore());
