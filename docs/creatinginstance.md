@@ -19,11 +19,8 @@ MMKV.default();
 
 // Initialize it
 
-MMKV.initialize();
+await MMKV.initialize();
 
-// Load the instance to make API Calls
-
-MMKV = MMKV.getInstance();
 
 // Then make are read/write requests
 
@@ -37,10 +34,9 @@ let string = await MMKV.getStringAsync("string");
 or you can simply initialize it in a single statement following builder pattern
 
 ```js
-const MMKV = new MMKVStorage.Loader()
+const MMKV = await new MMKVStorage.Loader()
   .default()
-  .initialize()
-  .getInstance();
+  .initialize();
 
 // Then make are read/write requests
 
@@ -54,10 +50,9 @@ let string = await MMKV.getStringAsync("string");
 The library allows you to create as many instances of MMKV as you might need giving a unique ID to each instance.
 
 ```js
-const MMKVwithID = new MMKVStorage.Loader()
+const MMKVwithID = await new MMKVStorage.Loader()
   .withInstanceID("mmkvWithID")
   .initialize()
-  .getInstance();
 
 // Then make are read/write requests
 
@@ -71,19 +66,17 @@ let string = await MMKV.getStringAsync("string");
 You can also encrypt MMKV Instance when you initialize it. By default the library generates a strong encryption key and saves it in Keychain on iOS and Android Keystore on Android for continuious usage
 
 ```js
-const MMKVwithEncryption = new MMKVStorage.Loader()
+const MMKVwithEncryption = await new MMKVStorage.Loader()
   .default()
   .withEncryption()
   .initialize()
-  .getInstance();
 
 // OR if you are initializing with an instance ID
 
-const MMKVwithEncryptionAndID = new MMKVStorage.Loader()
+const MMKVwithEncryptionAndID = await new MMKVStorage.Loader()
   .withInstanceID("mmkvWithEncryptionAndID")
   .withEncryption()
   .initialize()
-  .getInstance();
 ```
 
 
@@ -94,23 +87,21 @@ const MMKVwithEncryptionAndID = new MMKVStorage.Loader()
 While the library can handle the encryption itself, you can choose to provide your own custom encryption key etc. For example, you maybe want to encrypt the storage with a token or user password.
 
 ```js
-const MMKVwithEncryptionKey = new MMKVStorage.Loader()
+const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
   .default()
   .withEncryption()
   .withCustomKey("encryptionKey")
   .initialize()
-  .getInstance();
 ```
 
 And if you want the library to store the encryption key you provided, you can choose to do so too.
 
 ```js
-const MMKVwithEncryptionKey = new MMKVStorage.Loader()
+const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
   .default()
   .withEncryption()
   .withCustomKey("encryptionKey", true)
   .initialize()
-  .getInstance();
 ```
 
 
