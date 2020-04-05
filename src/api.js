@@ -27,7 +27,7 @@ export default class API {
   }
 
   async getStringAsync(key) {
-    return promisify(this.getString)(key, DATA_TYPES.STRING);
+    return promisify(this.getString)(key);
   }
 
   setIntAsync(key, value) {
@@ -35,7 +35,7 @@ export default class API {
   }
 
   getIntAsync(key) {
-    return promisify(this.getInt)(key, DATA_TYPES.NUMBER);
+    return promisify(this.getInt)(key);
   }
 
   setBoolAsync(key, value) {
@@ -47,7 +47,7 @@ export default class API {
   }
 
   getMapAsync(key) {
-    return promisify(this.getMap)(key, DATA_TYPES.MAP);
+    return promisify(this.getMap)(key);
   }
 
   async getMultipleItemsAsync(keys) {
