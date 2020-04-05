@@ -4,7 +4,7 @@
 #import "IDStore.h"
 #import "StorageGetters.h"
 #import "StorageSetters.h"
-
+#import "StorageIndexer.h"
 
 @implementation MMKVStorage
 
@@ -49,7 +49,7 @@ RCT_EXPORT_MODULE()
         secureStorage = [[SecureStorage alloc]init];
         IdStore = [[IDStore alloc] initWithMMKV:[MMKV mmkvWithID:@"mmkvIdStore"]];
         mmkvMap = [NSMutableDictionary dictionary];
-    
+        
     }
     
     return self;
@@ -119,8 +119,6 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
         callback(@[[NSNull null], @YES]);
     } else {
         
-        
-        
         if ([kv containsKey:ID]) {
             [mmkvMap setObject:kv forKey:ID];
             
@@ -133,7 +131,6 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
         
         [self encryptionHandler:ID mode:mode callback:callback];
         
-        
     }
 }
 
@@ -141,7 +138,7 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
 RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    NSMutableDictionary *ids = [IdStore getAll];
+    NSArray *ids = [[IdStore getAll] allKeys];
     resolve(ids);
 }
 
@@ -150,8 +147,6 @@ RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(getCurrentMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    //NSArray *ids = [mmkvMap allKeys];
-   
     resolve([IdStore getAll]);
 }
 
@@ -325,6 +320,59 @@ RCT_EXPORT_METHOD(hasKey:(NSString *)ID key:(NSString*)key
 
 
 
+
+#pragma mark getTypeIndex
+RCT_EXPORT_METHOD(getTypeIndex:(NSString *)ID
+                  type:(nonnull NSNumber *)type
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        resolve([StorageIndexer getIndex:kv type:type.intValue]);
+        
+    } else {
+        
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+}
+
+
+#pragma mark typeIndexerHasKey
+RCT_EXPORT_METHOD(typeIndexerHasKey:(NSString *)ID key:(NSString*)key
+                  type:(nonnull NSNumber *)type
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject
+                  ) {
+    
+    if ([[mmkvMap allKeys] containsObject:ID]) {
+        
+        MMKV *kv = [mmkvMap objectForKey:ID];
+        NSArray *index = [StorageIndexer getIndex:kv type:type.intValue];
+        
+        if (index == NULL) {
+            resolve(@NO);
+            
+            return;
+        }
+        
+        if ([index containsObject:key]) {
+            resolve(@YES);
+        } else {
+            resolve(@NO);
+        }
+        
+    } else {
+        
+        reject(@"cannot_get", @"database not initialized for the given ID", nil);
+    }
+}
+
+
+
+
 #pragma mark removeItem
 RCT_EXPORT_METHOD(removeItem:(NSString *)ID key:(NSString*)key
                   resolve:(RCTPromiseResolveBlock)resolve
@@ -386,6 +434,9 @@ RCT_EXPORT_METHOD(clearMemoryCache:(NSString *)ID resolve:(RCTPromiseResolveBloc
     
 }
 
+
+
+
 #pragma mark getAllItemsForTypeAsync
 RCT_EXPORT_METHOD(getAllItemsForTypeAsync:(NSString *)ID
                   type:(nonnull NSNumber *)type
@@ -403,6 +454,10 @@ RCT_EXPORT_METHOD(getAllItemsForType:(NSString *)ID
     
     [StorageGetters getAllItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
 }
+
+
+
+
 
 #pragma mark encrypt
 RCT_EXPORT_METHOD(encrypt:(NSString *)ID
@@ -528,13 +583,13 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
                 } else {
                     kv = [MMKV mmkvWithID:ID  cryptKey:cryptKey mode:MMKVMultiProcess ];
                 }
-         
-             [mmkvMap setObject:kv forKey:ID];
+                
+                [mmkvMap setObject:kv forKey:ID];
                 if (callback != NULL) {
                     
                     callback(@[[NSNull null]  ,@YES  ]);
                 }
-              
+                
                 
             } else {
                 if (callback != NULL) {
