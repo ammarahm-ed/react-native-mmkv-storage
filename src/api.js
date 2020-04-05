@@ -62,8 +62,6 @@ export default class API {
     return promisify(this.getArray)(key);
   }
 
-
-
   setString = (key, value, callback) => {
     return this.MMKV.setString(this.instanceID, key, value, callback);
   }

@@ -7,10 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		65F538282433255800BBC461 /* SecureStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F538202433255700BBC461 /* SecureStorage.m */; };
-		65F538292433255800BBC461 /* MMKVStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F538222433255800BBC461 /* MMKVStorage.m */; };
-		65F5382A2433255800BBC461 /* StorageIndexer.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F538232433255800BBC461 /* StorageIndexer.m */; };
-		65F5382B2433255800BBC461 /* IDStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 65F538242433255800BBC461 /* IDStore.m */; };
+		768238A52170840D00A83AC5 /* MMKV.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 768238A42170840D00A83AC5 /* MMKV.framework */; };
+		B3E7B58A1CC2AC0600A0062D /* RNFastStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,14 +25,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNFastStorage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNFastStorage.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		65F538202433255700BBC461 /* SecureStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecureStorage.m; sourceTree = "<group>"; };
-		65F538212433255700BBC461 /* IDStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDStore.h; sourceTree = "<group>"; };
-		65F538222433255800BBC461 /* MMKVStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMKVStorage.m; sourceTree = "<group>"; };
-		65F538232433255800BBC461 /* StorageIndexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageIndexer.m; sourceTree = "<group>"; };
-		65F538242433255800BBC461 /* IDStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDStore.m; sourceTree = "<group>"; };
-		65F538252433255800BBC461 /* MMKVStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMKVStorage.h; sourceTree = "<group>"; };
-		65F538262433255800BBC461 /* StorageIndexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageIndexer.h; sourceTree = "<group>"; };
-		65F538272433255800BBC461 /* SecureStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecureStorage.h; sourceTree = "<group>"; };
+		768238A42170840D00A83AC5 /* MMKV.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = MMKV.framework; sourceTree = "<group>"; };
+		B3E7B5881CC2AC0600A0062D /* RNFastStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNFastStorage.h; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNFastStorage.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +35,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				768238A52170840D00A83AC5 /* MMKV.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,14 +53,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				65F538212433255700BBC461 /* IDStore.h */,
-				65F538242433255800BBC461 /* IDStore.m */,
-				65F538252433255800BBC461 /* MMKVStorage.h */,
-				65F538222433255800BBC461 /* MMKVStorage.m */,
-				65F538272433255800BBC461 /* SecureStorage.h */,
-				65F538202433255700BBC461 /* SecureStorage.m */,
-				65F538262433255800BBC461 /* StorageIndexer.h */,
-				65F538232433255800BBC461 /* StorageIndexer.m */,
+				768238A42170840D00A83AC5 /* MMKV.framework */,
+				B3E7B5881CC2AC0600A0062D /* RNFastStorage.h */,
+				B3E7B5891CC2AC0600A0062D /* RNFastStorage.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -74,9 +63,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* MMKVStorage */ = {
+		58B511DA1A9E6C8500147676 /* RNFastStorage */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "MMKVStorage" */;
+			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNFastStorage" */;
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
@@ -86,7 +75,7 @@
 			);
 			dependencies = (
 			);
-			name = MMKVStorage;
+			name = RNFastStorage;
 			productName = RCTDataManager;
 			productReference = 134814201AA4EA6300B7C361 /* libRNFastStorage.a */;
 			productType = "com.apple.product-type.library.static";
@@ -105,12 +94,11 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "MMKVStorage" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNFastStorage" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 			);
 			mainGroup = 58B511D21A9E6C8500147676;
@@ -118,7 +106,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* MMKVStorage */,
+				58B511DA1A9E6C8500147676 /* RNFastStorage */,
 			);
 		};
 /* End PBXProject section */
@@ -128,10 +116,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65F5382A2433255800BBC461 /* StorageIndexer.m in Sources */,
-				65F538292433255800BBC461 /* MMKVStorage.m in Sources */,
-				65F5382B2433255800BBC461 /* IDStore.m in Sources */,
-				65F538282433255800BBC461 /* SecureStorage.m in Sources */,
+				B3E7B58A1CC2AC0600A0062D /* RNFastStorage.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,7 +247,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "MMKVStorage" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "RNFastStorage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,
@@ -271,7 +256,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "MMKVStorage" */ = {
+		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNFastStorage" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,
