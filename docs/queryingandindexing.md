@@ -159,7 +159,7 @@ Get all the keys in the number indexer for all stored items.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let keys = await MMKV.indexer.strings.getKeys();
+let keys = await MMKV.indexer.numbers.getKeys();
 });
 ```
 
@@ -209,7 +209,7 @@ Check if any boolean exists for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-MMKV.indexer.strings.hasKey('your key').then(result => {
+MMKV.indexer.booleans.hasKey('your key').then(result => {
   if (result) {
     // if true do this.
   } else {
@@ -293,7 +293,7 @@ Get all the keys in the objects indexer for all stored items.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let keys = await MMKV.indexer.objects.getKeys();
+let keys = await MMKV.indexer.maps.getKeys();
 });
 ```
 **Returns**
@@ -306,7 +306,7 @@ Get all objects stored in the storage.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-let numbers = await MMKV.indexer.objects.getAll();
+let numbers = await MMKV.indexer.maps.getAll();
 
 });
 ```
@@ -340,7 +340,7 @@ Check if any array exists for a given key.
 ```jsx
 import MMKV from "react-native-mmkv-storage";
 
-MMKV.indexer.strings.hasKey('your key').then(result => {
+MMKV.indexer.arrays.hasKey('your key').then(result => {
   if (result) {
     // if true do this.
   } else {

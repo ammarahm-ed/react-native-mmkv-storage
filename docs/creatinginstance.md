@@ -19,7 +19,7 @@ MMKV.default();
 
 // Initialize it
 
-await MMKV.initialize();
+await MMKV.initialize(); // Returns an MMKV Instance on promise resolved
 
 
 // Then make are read/write requests
