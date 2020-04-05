@@ -147,18 +147,10 @@ RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(getCurrentMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    resolve([IdStore getAll]);
+    resolve([mmkvMap allKeys]);
+    
 }
 
-#pragma mark setStringAsync
-RCT_EXPORT_METHOD(setStringAsync:(NSString *)ID
-                  key:(NSString*)key
-                  value:(NSString*)value
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-                  ) {
-    [StorageSetters setItemAsync:ID key:key  type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap resolve:resolve rejecter:reject];
-}
 
 #pragma mark setString
 RCT_EXPORT_METHOD(setString:(NSString *)ID
@@ -170,17 +162,6 @@ RCT_EXPORT_METHOD(setString:(NSString *)ID
     [StorageSetters setItem:ID key:key type:DATA_TYPE_STRING string:value boolean:false number:NULL map:NULL mmkvMap:mmkvMap callback:callback];
 }
 
-#pragma mark getItemAsync
-RCT_EXPORT_METHOD(getItemAsync:(NSString *)ID
-                  key:(NSString*)key
-                  type:(nonnull NSNumber *)type
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    
-    [StorageGetters getItemAsync:ID key:key type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
-    
-}
 
 #pragma mark getItem
 RCT_EXPORT_METHOD(getItem:(NSString *)ID
@@ -189,16 +170,9 @@ RCT_EXPORT_METHOD(getItem:(NSString *)ID
                   callback:(RCTResponseSenderBlock)callback) {
     
     [StorageGetters getItem:ID key:key type:type mmkvMap:mmkvMap callback:callback];
+    
 }
 
-#pragma mark setIntAsync
-RCT_EXPORT_METHOD(setIntAsync:(NSString *)ID key:(NSString*)key
-                  value:(nonnull NSNumber*)value
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-                  ) {
-    [StorageSetters setItemAsync:ID key:key type:DATA_TYPE_INT string:NULL boolean:false number:value map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
-}
 
 #pragma mark setInt
 RCT_EXPORT_METHOD(setInt:(NSString *)ID key:(NSString*)key
@@ -211,16 +185,6 @@ RCT_EXPORT_METHOD(setInt:(NSString *)ID key:(NSString*)key
 }
 
 
-#pragma mark setBoolAsync
-RCT_EXPORT_METHOD(setBoolAsync:(NSString *)ID key:(NSString*)key
-                  value:(BOOL *)value
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-                  ) {
-    [StorageSetters setItemAsync:ID key:key type:DATA_TYPE_BOOL string:NULL boolean:value number:NULL map:NULL mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
-    
-}
-
 #pragma mark setBool
 RCT_EXPORT_METHOD(setBool:(NSString *)ID key:(NSString*)key
                   value:(BOOL *)value
@@ -230,20 +194,7 @@ RCT_EXPORT_METHOD(setBool:(NSString *)ID key:(NSString*)key
     
 }
 
-#pragma mark setMapAsync
-RCT_EXPORT_METHOD(setMapAsync:(NSString *)ID key:(NSString*)key
-                  value:(NSDictionary*)value
-                  isArray:(bool)isArray
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-                  ) {
-    int type = DATA_TYPE_MAP;
-    if (isArray) {
-        type = DATA_TYPE_ARRAY;
-    }
-    [StorageSetters setItemAsync:ID key:key type:type string:NULL boolean:false number:NULL map:value mmkvMap:mmkvMap  resolve:resolve rejecter:reject];
-    
-}
+
 
 #pragma mark setMap
 RCT_EXPORT_METHOD(setMap:(NSString *)ID key:(NSString*)key
@@ -259,15 +210,6 @@ RCT_EXPORT_METHOD(setMap:(NSString *)ID key:(NSString*)key
     
 }
 
-#pragma mark getMultipleItemsAsync
-RCT_EXPORT_METHOD(getMultipleItemsAsync:(NSString *)ID key:(NSArray*)keys
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject
-                  ) {
-    
-    [StorageGetters getMultipleItemsAsync:ID key:keys mmkvMap:mmkvMap resolve:resolve rejecter:reject];
-    
-}
 
 #pragma mark getMultipleItems
 RCT_EXPORT_METHOD(getMultipleItems:(NSString *)ID key:(NSArray*)keys
@@ -435,28 +377,13 @@ RCT_EXPORT_METHOD(clearMemoryCache:(NSString *)ID resolve:(RCTPromiseResolveBloc
 }
 
 
-
-
-#pragma mark getAllItemsForTypeAsync
-RCT_EXPORT_METHOD(getAllItemsForTypeAsync:(NSString *)ID
-                  type:(nonnull NSNumber *)type
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
-    [StorageGetters getAllItemsForTypeAsync:ID type:type mmkvMap:mmkvMap resolve:resolve rejecter:reject];
-    
-}
-
-#pragma mark getAllItemsForType
-RCT_EXPORT_METHOD(getAllItemsForType:(NSString *)ID
+#pragma mark getItemsForType
+RCT_EXPORT_METHOD(getItemsForType:(NSString *)ID
                   type:(nonnull NSNumber *)type
                   callback:(RCTResponseSenderBlock)callback) {
     
-    [StorageGetters getAllItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
+    [StorageGetters getItemsForType:ID type:type mmkvMap:mmkvMap callback:callback];
 }
-
-
-
 
 
 #pragma mark encrypt
