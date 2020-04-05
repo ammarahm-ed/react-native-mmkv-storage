@@ -1,6 +1,6 @@
 import encryption from "react-native-mmkv-storage/src/encryption";
 import { promisify } from "react-native-mmkv-storage/src/utils";
-import indexer from "react-native-mmkv-storage/src/indexer";
+import indexer from "react-native-mmkv-storage/src/indexer/indexer";
 import { DATA_TYPES, ACCESSIBLE } from "./utils";
 
 export default class API {
@@ -16,113 +16,93 @@ export default class API {
       alias: this.alias,
       aliasPrefix: this.aliasPrefix,
       key: this.key,
-      accessibleMode:accessibleMode
+      accessibleMode: accessibleMode
     };
     this.encryption = new encryption(options);
     this.indexer = new indexer(options);
   }
 
   setStringAsync(key, value) {
-    return promisify(this.setString)(this.instanceID, key, value);
+    return promisify(this.setString)(key, value);
   }
 
   async getStringAsync(key) {
-    return promisify(this.setString)(this.instanceID, key, DATA_TYPES.STRING);
+    return promisify(this.getString)(key, DATA_TYPES.STRING);
   }
 
   setIntAsync(key, value) {
-    return promisify(this.setInt)(this.instanceID, key, value);
+    return promisify(this.setInt)(key, value);
   }
 
   getIntAsync(key) {
-    return promisify(this.setString)(this.instanceID, key, DATA_TYPES.NUMBER);
+    return promisify(this.getInt)(key, DATA_TYPES.NUMBER);
   }
 
   setBoolAsync(key, value) {
-    return promisify(this.setBool)(this.instanceID, key, value);
+    return promisify(this.setBool)(key, value);
   }
 
   setMapAsync(key, value) {
-    return promisify(this.setMap)(this.instanceID, key, value);
+    return promisify(this.setMap)(key, value);
   }
 
   getMapAsync(key) {
-    return promisify(this.setString)(this.instanceID, key, DATA_TYPES.MAP);
-  }
-
-  async removeItem(key) {
-    return await this.MMKV.removeItem(this.instanceID, key);
-  }
-
-  async clearStore() {
-    return await this.MMKV.clearStore(this.instanceID);
+    return promisify(this.getMap)(key, DATA_TYPES.MAP);
   }
 
   async getMultipleItemsAsync(keys) {
-    return promisify(this.getMultipleItems)(this.instanceID, keys, value);
+    return promisify(this.getMultipleItems)(keys, value);
   }
 
   async setArrayAsync(key, array) {
-    if (!Array.isArray(array))
-      throw new Error("Provided value is not an array");
-    let data = {};
-    data[key] = array.slice();
-
-    return await this.MMKV.setMapAsync(this.instanceID, key, data, true);
+    return promisify(this.getArray)(key, array)
   }
 
   async getArrayAsync(key) {
-    let data = await this.MMKV.getItemAsync(
-      this.instanceID,
-      key,
-      DATA_TYPES.ARRAY
-    );
-    if (data) {
-      return data[key].slice();
-    } else {
-      return [];
-    }
+    return promisify(this.getArray)(key);
   }
 
-  setString(key, value, callback) {
+
+
+  setString = (key, value, callback) => {
     return this.MMKV.setString(this.instanceID, key, value, callback);
   }
 
-  getString(key, callback) {
+  getString = (key, callback) => {
     return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.STRING, callback);
   }
 
-  setInt(key, value, callback) {
+  setInt = (key, value, callback) => {
     return this.MMKV.setInt(this.instanceID, key, value, callback);
   }
 
-  getInt(key, callback) {
+  getInt = (key, callback) => {
     return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.NUMBER, callback);
   }
 
-  setBool(key, value, callback) {
+  setBool = (key, value, callback) => {
 
     return this.MMKV.setBool(this.instanceID, key, value, callback);
   }
 
-  getBool(key, callback) {
+  getBool = (key, callback) => {
     return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.BOOL, callback);
   }
 
-  setMap(key, value, callback) {
-  
+  setMap = (key, value, callback) => {
+
     return this.MMKV.setMap(this.instanceID, key, value, false, callback);
   }
 
-  getMap(key, callback) {
+  getMap = (key, callback) => {
     return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.MAP, callback);
   }
 
-  getMultipleItems(keys, callback) {
+  getMultipleItems = (keys, callback) => {
     return this.MMKV.getMultipleItems(this.instanceID, keys, callback);
   }
 
-  setArray(key, array, callback) {
+  setArray = (key, array, callback) => {
     if (!Array.isArray(array))
       throw new Error("Provided value is not an array");
     let data = {};
@@ -131,12 +111,17 @@ export default class API {
     return this.MMKV.setMap(this.instanceID, key, data, true, callback);
   }
 
-  getArray(key, callback) {
-    this.MMKV.getItem(this.instanceID, key, DATA_TYPES.ARRAY, (data) => {
+  getArray = (key, callback) => {
+    this.MMKV.getItem(this.instanceID, key, DATA_TYPES.ARRAY, (error, data) => {
+
+      if (error) {
+        return callback(error, null);
+      }
+
       if (data) {
-        return callback(data[key].slice());
+        return callback(null, data[key].slice());
       } else {
-        return callback([]);
+        return callback(null, []);
       }
     });
   }
@@ -148,4 +133,14 @@ export default class API {
   async getAllMMKVInstanceIDs() {
     return await this.MMKV.getAllMMKVInstanceIDs();
   }
+
+  async removeItem(key) {
+    return await this.MMKV.removeItem(this.instanceID, key);
+  }
+
+  async clearStore() {
+    return await this.MMKV.clearStore(this.instanceID);
+  }
+
+
 }
