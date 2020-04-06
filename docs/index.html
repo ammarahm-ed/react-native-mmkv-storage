@@ -32,10 +32,17 @@
     nav.app-nav li ul {
       min-width: 100px;
     }
-    .cover {
-
-      background-color: black !important ;
+    p {
+      color:#34495e !important;
     }
+    section.cover .anchor span {
+      color:#3399ff;
+    }
+   section.cover p {
+
+     color:white !important;
+   }
+    
    
 
   </style>
@@ -55,7 +62,8 @@
       maxLevel: 4,
       subMaxLevel: 2,
       name: 'react-native-mmkv-storage',
-      
+      themeColor:'#3399ff',
+      textColor:'#333',
       search: {
         noData: {
           '/': 'No results!'
@@ -64,7 +72,9 @@
         placeholder: {
           '/': 'Search'
         }
+        
       },
+    
       
       formatUpdated: '{MM}/{DD} {HH}:{mm}',
 
