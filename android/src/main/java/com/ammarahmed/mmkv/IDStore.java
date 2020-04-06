@@ -28,21 +28,21 @@ public class IDStore {
     public void add(String ID, boolean encrypted, @Nullable String alias) {
 
         boolean hasKey = store.containsKey("mmkvIdStore");
-        HashMap<String,Object> IdStore =  new HashMap<>();
+        HashMap<String, Object> IdStore = new HashMap<>();
         if (hasKey) {
-            Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore",Bundle.class);
-           IdStore =  (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
+            Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore", Bundle.class);
+            IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
 
         }
 
-        HashMap<String,Object> child = new HashMap<>();
-        child.put("ID",ID);
-        child.put("encrypted",encrypted);
-        child.put(alias,alias);
-        IdStore.put(ID,child);
+        HashMap<String, Object> child = new HashMap<>();
+        child.put("ID", ID);
+        child.put("encrypted", encrypted);
+        child.put(alias, alias);
+        IdStore.put(ID, child);
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable("mmkvIdStore",IdStore);
+        bundle.putSerializable("mmkvIdStore", IdStore);
 
         store.encode("mmkvIdStore", bundle);
 
@@ -51,18 +51,18 @@ public class IDStore {
     public boolean encrypted(String ID) {
 
         boolean hasKey = store.containsKey("mmkvIdStore");
-        HashMap<String,Object> IdStore =  new HashMap<>();
+        HashMap<String, Object> IdStore = new HashMap<>();
 
         if (!hasKey) {
             return false;
         }
-        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore",Bundle.class);
-        IdStore =  (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
+        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore", Bundle.class);
+        IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
 
-        HashMap<String,Object> child = (HashMap<String, Object>) IdStore.get(ID);
+        HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(ID);
 
 
-        return  (boolean) child.get("encrypted");
+        return (boolean) child.get("encrypted");
 
 
     }
@@ -70,43 +70,36 @@ public class IDStore {
     public String getAlias(String ID) {
 
         boolean hasKey = store.containsKey("mmkvIdStore");
-        HashMap<String,Object> IdStore =  new HashMap<>();
+        HashMap<String, Object> IdStore = new HashMap<>();
 
         if (!hasKey) {
             return null;
         }
-        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore",Bundle.class);
-        IdStore =  (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
+        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore", Bundle.class);
+        IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
 
-        HashMap<String,Object> child = (HashMap<String, Object>) IdStore.get(ID);
+        HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(ID);
 
-        return  (String) child.get("alias");
+        return (String) child.get("alias");
 
     }
 
 
-    public HashMap<String,Object> getAll() {
+    public HashMap<String, Object> getAll() {
 
         boolean hasKey = store.containsKey("mmkvIdStore");
-        HashMap<String,Object> IdStore =  new HashMap<>();
+        HashMap<String, Object> IdStore = new HashMap<>();
 
         if (!hasKey) {
             return null;
         }
-        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore",Bundle.class);
-        IdStore =  (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
+        Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore", Bundle.class);
+        IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
 
 
-
-        return  IdStore;
+        return IdStore;
 
     }
-
-
-
-
-
-
 
 
     public boolean exists(String ID) {
