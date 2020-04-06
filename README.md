@@ -14,8 +14,6 @@
 
 This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way. Read about it on this blog post I wrote on [dev.to](https://dev.to/ammarahmed/best-data-storage-option-for-react-native-apps-42k)
 
-## Read the [Documentation](https://rnmmkv.now.sh/#/)
-
 
 ## Features
 
@@ -32,6 +30,15 @@ MMKV supports concurrent read-read and read-write access between processes.
   The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels, it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs. 
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
+
+
+## Links 
+  - [Documentation](https://rnmmkv.now.sh/#/)
+
+## Quickstart
+
+  - [Quickstart guide](https://rnmmkv.now.sh/#/gettingstarted)
+
 
 ## Contact & Support
 - Create a GitHub issue for bug reports, feature requests, or questions
