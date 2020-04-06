@@ -18,14 +18,6 @@ export default class Loader {
     this.MMKV = NativeModules.MMKVStorage;
     this.initialized = false;
     this.error = null;
-
-
-  }
-
-  default() {
-    this.instanceID = "default";
-    this.secureKeyStorage = false;
-    return this;
   }
 
   withInstanceID(id) {
