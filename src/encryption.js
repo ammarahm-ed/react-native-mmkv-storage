@@ -94,13 +94,13 @@ export default class encryption {
               reject(error);
               return;
             } else {
-              await this.MMKV.encrypt(key, this.alias);
+              await this.MMKV.encrypt(this.instanceID,key, this.alias);
               resolve(true);
             }
           }
         );
       } else {
-        await this.MMKV.encrypt(key, null);
+        await this.MMKV.encrypt(this.instanceID,key, null);
         resolve(true);
       }
     
