@@ -12,22 +12,6 @@ import MMKVStorage from "react-native-mmkv-storage";
 const MMKV = new MMKVStorage.Loader();
 ```
 
-Now you know how to create a loader class, lets get into the API and see how it works.
-
-## default
-
-The simplest way to create an instance is to call `default` to select the default instance and then initialize it.
-
-```js
-import MMKVStorage from "react-native-mmkv-storage";
-
-const MMKV = new MMKVStorage.Loader();
-
-MMKV.default();
-```
-
-**Returns:** `this`;
-
 ## initialize
 
 Initialize the MMKV Instance with the selected properties. On promise resolve it will return an MMKV Instance that you can use.
@@ -36,14 +20,11 @@ Initialize the MMKV Instance with the selected properties. On promise resolve it
 import MMKVStorage from "react-native-mmkv-storage";
 
 const MMKV = new MMKVStorage.Loader();
-// continuing from previous defination
 
-MMKV.default().initialize();
+MMKV.initialize();
 ```
 
 **Returns:** `Promise<API>`
-
-
 
 ## withInstanceID
 
@@ -85,8 +66,6 @@ MMKV = MMKV.withEncryption();
 
 **Returns:** `this`;
 
-
-
 ## encryptWithCustomKey
 
 You can also specify your own password to encrypt the storage.
@@ -104,9 +83,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 
 const MMKV = new MMKVStorage.Loader();
 
-MMKV = MMKV.default()
-  .withEncryption()
-  .encryptWithCustomKey("encryptionKey");
+MMKV = MMKV.withEncryption().encryptWithCustomKey("encryptionKey");
 ```
 
 **Returns:** `this`;
@@ -126,7 +103,7 @@ import MMKVStorage from "react-native-mmkv-storage";
 
 const MMKV = new MMKVStorage.Loader();
 
-MMKV = MMKV.default().setProcessingMode(MMKVStorage.MODES.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
+MMKV = MMKV.setProcessingMode(MMKVStorage.MODES.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
 ```
 
 **Returns:** `this`;

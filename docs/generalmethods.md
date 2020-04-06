@@ -7,10 +7,7 @@ First we create a default MMKV Instance
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = await new MMKVStorage.Loader().
-.default()
-.initialize()
-
+MMKV = await new MMKVStorage.Loader().initialize();
 ```
 
 ## removeItem
@@ -56,5 +53,5 @@ let allInstances = await MMKV.getAllInstanceIDs();
 get the currently initialized instance IDs.
 
 ```js
-let intializedInstances = await MMKV.getCurrentMMKVInstanceIDs()
+let intializedInstances = await MMKV.getCurrentMMKVInstanceIDs();
 ```

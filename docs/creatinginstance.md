@@ -11,15 +11,7 @@ Creating a new instance is simple and follows a builder pattern. Here is an exam
 ```js
 // Create a new Loader Class.
 
-const MMKV = new MMKVStorage.Loader();
-
-// Select the default Instance
-
-MMKV.default();
-
-// Initialize it
-
-await MMKV.initialize(); // Returns an MMKV Instance on promise resolved
+const MMKV = new MMKVStorage.Loader().initialize(); // Returns an MMKV Instance on promise resolved
 
 
 // Then make are read/write requests
@@ -29,20 +21,6 @@ await MMKV.setStringAsync("string", "string");
 let string = await MMKV.getStringAsync("string");
 
 //
-```
-
-or you can simply initialize it in a single statement following builder pattern
-
-```js
-const MMKV = await new MMKVStorage.Loader()
-  .default()
-  .initialize();
-
-// Then make are read/write requests
-
-await MMKV.setStringAsync("string", "string");
-
-let string = await MMKV.getStringAsync("string");
 ```
 
 ## MMKV Instance with ID
@@ -67,7 +45,6 @@ You can also encrypt MMKV Instance when you initialize it. By default the librar
 
 ```js
 const MMKVwithEncryption = await new MMKVStorage.Loader()
-  .default()
   .withEncryption()
   .initialize()
 
@@ -79,7 +56,6 @@ const MMKVwithEncryptionAndID = await new MMKVStorage.Loader()
   .initialize()
 ```
 
-
 !> Remember that if you encrypt an already created instance using the loader class, it will create a new MMKV instance even if the instance exists. To encrypt an already existing instance, use encrypt() method. Read in detail about Encryption API here.
 
 ## Encryption with custom key
@@ -88,7 +64,6 @@ While the library can handle the encryption itself, you can choose to provide yo
 
 ```js
 const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
-  .default()
   .withEncryption()
   .withCustomKey("encryptionKey")
   .initialize()
@@ -98,7 +73,6 @@ And if you want the library to store the encryption key you provided, you can ch
 
 ```js
 const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
-  .default()
   .withEncryption()
   .withCustomKey("encryptionKey", true)
   .initialize()
@@ -109,7 +83,6 @@ If you want to set your own custom alias for the key that is stored in the secur
 
 ```js
 const MMKVwithEncryptionKey = await new MMKVStorage.Loader()
-  .default()
   .withEncryption()
   .withCustomKey("encryptionKey", true, 'myCustomAlias')
   .initialize()
