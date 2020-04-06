@@ -3,6 +3,7 @@ package com.ammarahmed.mmkv;
 
 
 import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -13,6 +14,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.tencent.mmkv.MMKV;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -180,10 +182,10 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void getAllMMKVInstanceIDs(Promise promise) {
 
-        HashMap<String,Object> allIDs = IdStore.getAll();
+        HashMap<String, Object> allIDs = IdStore.getAll();
 
         WritableArray array = Arguments.createArray();
-        for (String string :  allIDs.keySet()) {
+        for (String string : allIDs.keySet()) {
             array.pushString(string);
         }
 
@@ -252,14 +254,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             final MMKV kv = mmkvMap.get(ID);
 
 
-
-                    String[] keys = kv.allKeys();
-                    if (keys != null) {
-                        WritableArray array = Arguments.fromJavaArgs(keys);
-                        promise.resolve(array);
-                    } else {
-                        promise.reject("Error", "database appears to be empty");
-                    }
+            String[] keys = kv.allKeys();
+            if (keys != null) {
+                WritableArray array = Arguments.fromJavaArgs(keys);
+                promise.resolve(array);
+            } else {
+                promise.reject("Error", "database appears to be empty");
+            }
 
         } else {
             promise.reject("Error", "database not initialized with given id");
@@ -335,10 +336,14 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void encrypt(String ID, String key, Promise promise) {
+    public void encrypt(String ID, String key, String alias, Promise promise) {
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
+
+            kv.encode(ID, true);
+            IdStore.add(ID, true, alias);
+
             kv.reKey(key);
 
             promise.resolve(true);
@@ -356,6 +361,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
+            kv.encode(ID, true);
+            IdStore.add(ID, false, null);
             kv.reKey(null);
             promise.resolve(true);
 
@@ -367,10 +374,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void changeEncryptionKey(String ID, String key, Promise promise) {
+    public void changeEncryptionKey(String ID, String key, String alias, Promise promise) {
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
+
+            kv.encode(ID, true);
+            IdStore.add(ID, true, alias);
             kv.reKey(key);
 
             promise.resolve(true);
