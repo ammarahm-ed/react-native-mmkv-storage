@@ -58,7 +58,6 @@ public class StorageIndexer {
                     index = kv.decodeStringSet("stringsIndex", index);
 
 
-
                     break;
                 case Constants.DATA_TYPE_INT:
 
@@ -108,14 +107,12 @@ public class StorageIndexer {
         }
 
 
-
-
     }
 
-    public void typeIndexerHasKey(String ID,String key,int type,Map<String, MMKV> mmkvMap, Promise promise) {
+    public void typeIndexerHasKey(String ID, String key, int type, Map<String, MMKV> mmkvMap, Promise promise) {
 
 
-        Set<String> index = getTypeIndex(ID,type,mmkvMap,null);
+        Set<String> index = getTypeIndex(ID, type, mmkvMap, null);
 
         if (index == null) {
             promise.resolve(null);
@@ -125,8 +122,6 @@ public class StorageIndexer {
 
 
     }
-
-
 
 
     public WritableArray getAllStrings(MMKV kv) {
