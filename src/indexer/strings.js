@@ -19,7 +19,7 @@ export default class stringsIndex {
   }
 
   async getAll() {
-    return promisify(this.MMKV.getAllItemsForType)(
+    return promisify(this.MMKV.getItemsForType)(
       this.instanceID,
       DATA_TYPES.STRING
     );

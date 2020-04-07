@@ -54,8 +54,8 @@ public class StorageGetters {
                         Bundle bundle = kv.decodeParcelable(key, Bundle.class);
                         WritableMap map = Arguments.fromBundle(bundle);
                         callback.invoke(null, map);
-
                         break;
+                    
                 }
 
             } else {

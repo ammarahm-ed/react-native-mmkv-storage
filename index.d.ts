@@ -292,6 +292,7 @@ declare module MMKVStorage {
        *
        */
       getAll(): Promise<Array<>>;
+    };
 
       maps: {
         /**
@@ -334,7 +335,7 @@ declare module MMKVStorage {
          */
         getAll(): Promise<Array<>>;
       };
-    };
+    
   }
 
   class encryption {
