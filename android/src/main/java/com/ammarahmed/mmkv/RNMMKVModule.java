@@ -219,7 +219,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void setMap(final String ID, final String key, final ReadableMap value, final boolean isArray, @Nullable final Callback callback) {
 
-        storageSetters.setItem(ID, key, Constants.DATA_TYPE_STRING, null, 0, false, value, isArray, mmkvMap, callback);
+        storageSetters.setItem(ID, key, Constants.DATA_TYPE_MAP, null, 0, false, value, isArray, mmkvMap, callback);
 
     }
 
@@ -287,7 +287,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     }
 
-
+    @ReactMethod
     public void typeIndexerHasKey(final String ID, String key, int type, Promise promise) {
 
         indexer.typeIndexerHasKey(ID, key, type, mmkvMap, promise);
