@@ -19,15 +19,13 @@ public class StorageGetters {
     public StorageGetters(StorageIndexer indexer) {
 
 
-       storageIndexer = indexer;
+        storageIndexer = indexer;
 
 
     }
 
 
-
-
-    public void getItem(String ID, String key, int type,  Map<String, MMKV>  mmkvMap, Callback callback) {
+    public void getItem(String ID, String key, int type, Map<String, MMKV> mmkvMap, Callback callback) {
 
 
         if (mmkvMap.containsKey(ID)) {
@@ -35,39 +33,35 @@ public class StorageGetters {
 
             if (kv.containsKey(key)) {
 
-            switch (type) {
+                switch (type) {
 
-                case Constants.DATA_TYPE_STRING:
+                    case Constants.DATA_TYPE_STRING:
 
-                    callback.invoke(null,kv.decodeString(key));
+                        callback.invoke(null, kv.decodeString(key));
 
-                    break;
-                case Constants.DATA_TYPE_INT:
+                        break;
+                    case Constants.DATA_TYPE_INT:
 
-                    callback.invoke(kv.decodeInt(key));
-                    break;
-                case Constants.DATA_TYPE_BOOL:
+                        callback.invoke(kv.decodeInt(key));
+                        break;
+                    case Constants.DATA_TYPE_BOOL:
 
-                    callback.invoke( null, kv.decodeBool(key));
+                        callback.invoke(null, kv.decodeBool(key));
 
-                    break;
-                case Constants.DATA_TYPE_MAP:
-                case Constants.DATA_TYPE_ARRAY:
-                    Bundle bundle = kv.decodeParcelable(key, Bundle.class);
-                    WritableMap map = Arguments.fromBundle(bundle);
-                    callback.invoke( null, map);
+                        break;
+                    case Constants.DATA_TYPE_MAP:
+                    case Constants.DATA_TYPE_ARRAY:
+                        Bundle bundle = kv.decodeParcelable(key, Bundle.class);
+                        WritableMap map = Arguments.fromBundle(bundle);
+                        callback.invoke(null, map);
 
-                    break;
-
-
-            }
+                        break;
+                }
 
             } else {
 
-                callback.invoke("Value for key does not exist",null);
+                callback.invoke("Value for key does not exist", null);
             }
-
-
 
 
         } else {
@@ -79,33 +73,31 @@ public class StorageGetters {
     }
 
 
-    public void getMultipleItems(final String ID, final ReadableArray keys, Map<String, MMKV>  mmkvMap, final Callback callback) {
+    public void getMultipleItems(final String ID, final ReadableArray keys, Map<String, MMKV> mmkvMap, final Callback callback) {
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
 
 
+            WritableArray args = Arguments.createArray();
 
-                    WritableArray args = Arguments.createArray();
+            for (int i = 0; i < keys.size(); i++) {
+                String key = keys.getString(i);
+                if (kv.containsKey(key)) {
+                    Bundle bundle = kv.decodeParcelable(key, Bundle.class);
+                    WritableMap value = Arguments.fromBundle(bundle);
+                    WritableArray item = Arguments.createArray();
+                    item.pushString(key);
+                    item.pushMap(value);
+                    args.pushArray(item);
+                } else {
+                    WritableArray item = Arguments.createArray();
+                    item.pushString(key);
+                    item.pushMap(null);
+                }
 
-                    for (int i = 0; i < keys.size(); i++) {
-                        String key = keys.getString(i);
-                        if (kv.containsKey(key)) {
-                            Bundle bundle = kv.decodeParcelable(key, Bundle.class);
-                            WritableMap value = Arguments.fromBundle(bundle);
-                            WritableArray item = Arguments.createArray();
-                            item.pushString(key);
-                            item.pushMap(value);
-                            args.pushArray(item);
-                        } else {
-                            WritableArray item = Arguments.createArray();
-                            item.pushString(key);
-                            item.pushMap(null);
-                        }
-
-                    }
-                    callback.invoke(null, args);
-
+            }
+            callback.invoke(null, args);
 
 
         } else {
@@ -114,16 +106,10 @@ public class StorageGetters {
         }
 
 
-
     }
 
 
-
-
-
-
-
-    public void getItemsForType(String ID, int type,  Map<String, MMKV>  mmkvMap, Callback callback) {
+    public void getItemsForType(String ID, int type, Map<String, MMKV> mmkvMap, Callback callback) {
 
 
         if (mmkvMap.containsKey(ID)) {
@@ -135,24 +121,24 @@ public class StorageGetters {
                 case Constants.DATA_TYPE_STRING:
 
 
-                    callback.invoke(null,storageIndexer.getAllStrings(kv) );
+                    callback.invoke(null, storageIndexer.getAllStrings(kv));
 
                     break;
                 case Constants.DATA_TYPE_INT:
-                    callback.invoke(null,storageIndexer.getAllInts(kv) );
+                    callback.invoke(null, storageIndexer.getAllInts(kv));
 
                     break;
                 case Constants.DATA_TYPE_BOOL:
 
-                    callback.invoke(null,storageIndexer.getAllBooleans(kv) );
+                    callback.invoke(null, storageIndexer.getAllBooleans(kv));
                     break;
                 case Constants.DATA_TYPE_MAP:
 
-                    callback.invoke(null,storageIndexer.getAllMaps(kv) );
+                    callback.invoke(null, storageIndexer.getAllMaps(kv));
                     break;
                 case Constants.DATA_TYPE_ARRAY:
 
-                    callback.invoke(null,storageIndexer.getAllArrays(kv) );
+                    callback.invoke(null, storageIndexer.getAllArrays(kv));
 
                     break;
 

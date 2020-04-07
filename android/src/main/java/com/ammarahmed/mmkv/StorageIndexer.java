@@ -8,11 +8,15 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.tencent.mmkv.MMKV;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,7 +60,6 @@ public class StorageIndexer {
                 case Constants.DATA_TYPE_STRING:
 
                     index = kv.decodeStringSet("stringsIndex", index);
-
 
 
                     break;
@@ -108,14 +111,12 @@ public class StorageIndexer {
         }
 
 
-
-
     }
 
-    public void typeIndexerHasKey(String ID,String key,int type,Map<String, MMKV> mmkvMap, Promise promise) {
+    public void typeIndexerHasKey(String ID, String key, int type, Map<String, MMKV> mmkvMap, Promise promise) {
 
 
-        Set<String> index = getTypeIndex(ID,type,mmkvMap,null);
+        Set<String> index = getTypeIndex(ID, type, mmkvMap, null);
 
         if (index == null) {
             promise.resolve(null);
@@ -125,8 +126,6 @@ public class StorageIndexer {
 
 
     }
-
-
 
 
     public WritableArray getAllStrings(MMKV kv) {
@@ -231,7 +230,11 @@ public class StorageIndexer {
             child.pushString(string);
             Bundle bundle = kv.decodeParcelable(string, Bundle.class);
             WritableMap map = Arguments.fromBundle(bundle);
-            child.pushArray(map.getArray(string));
+
+            List<Object> subChild = Arguments.toList(map.getArray(string));
+
+            child.pushArray(Arguments.fromList(subChild));
+
             array.pushArray(child);
 
         }

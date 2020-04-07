@@ -42,10 +42,13 @@ public class SecureKeystore {
 
     private SharedPreferences prefs;
     private SecureKeystore rnKeyStore;
+
     private boolean useKeystore() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
+
     private ReactApplicationContext reactContext;
+
     public SecureKeystore(ReactApplicationContext reactApplicationContext) {
 
         reactContext = reactApplicationContext;
@@ -107,22 +110,19 @@ public class SecureKeystore {
                 return value;
 
 
-
-
             } catch (FileNotFoundException fnfe) {
 
                 if (callback != null) {
-                    callback.invoke(fnfe.getMessage(),null);
+                    callback.invoke(fnfe.getMessage(), null);
                 }
 
                 return null;
 
 
-
             } catch (Exception e) {
 
                 if (callback != null) {
-                    callback.invoke(e.getMessage(),null);
+                    callback.invoke(e.getMessage(), null);
                 }
 
                 return null;
@@ -139,7 +139,7 @@ public class SecureKeystore {
 
             } catch (IllegalViewOperationException e) {
                 if (callback != null) {
-                    callback.invoke(e.getMessage(),null);
+                    callback.invoke(e.getMessage(), null);
                 }
 
                 return null;
@@ -147,7 +147,7 @@ public class SecureKeystore {
         }
     }
 
-    public boolean secureKeyExists(String key, @Nullable  Callback callback) {
+    public boolean secureKeyExists(String key, @Nullable Callback callback) {
         if (useKeystore()) {
             try {
 
@@ -156,7 +156,6 @@ public class SecureKeystore {
                     callback.invoke(null, exists);
                 }
                 return exists;
-
 
 
             } catch (Exception e) {
@@ -219,9 +218,6 @@ public class SecureKeystore {
             }
         }
     }
-
-
-
 
 
     private PublicKey getOrCreatePublicKey(Context context, String alias) throws GeneralSecurityException, IOException {

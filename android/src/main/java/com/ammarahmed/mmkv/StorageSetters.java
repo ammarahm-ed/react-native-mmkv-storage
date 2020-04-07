@@ -60,6 +60,7 @@ public class StorageSetters {
                         indexer.addToMapIndex(kv, key);
                     }
                     break;
+
                 default:
                     break;
             }
