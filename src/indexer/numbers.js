@@ -1,4 +1,4 @@
-import { DATA_TYPES } from "../utils";
+import { DATA_TYPES, promisify } from "../utils";
 
 export default class numbersIndex {
   constructor({ id = "default", mmkv, alias, aliasPrefix, key }) {
@@ -17,7 +17,7 @@ export default class numbersIndex {
   }
 
   async getAll() {
-    return promisify(this.MMKV.getAllItemsForType)(
+    return promisify(this.MMKV.getItemsForType)(
       this.instanceID,
       DATA_TYPES.NUMBER
     );

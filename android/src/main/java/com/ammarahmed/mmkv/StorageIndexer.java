@@ -215,6 +215,51 @@ public class StorageIndexer {
     }
 
 
+    public void removeKeyFromIndexer(String ID, Map<String, MMKV> mmkvMap, String key) {
+
+
+        Set<String> index = getTypeIndex(ID, Constants.DATA_TYPE_STRING, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+
+            return;
+        }
+        index = getTypeIndex(ID, Constants.DATA_TYPE_INT, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_BOOL, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_ARRAY, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_MAP, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+
+            return;
+        }
+    }
+
+
+
     public WritableArray getAllArrays(MMKV kv) {
 
         Set<String> stringsIndex = new HashSet<>();

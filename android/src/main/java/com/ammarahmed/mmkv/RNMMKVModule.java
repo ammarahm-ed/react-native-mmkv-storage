@@ -34,6 +34,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private SecureKeystore secureKeystore;
 
+
     private StorageSetters storageSetters;
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
@@ -52,6 +53,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         storageGetters = new StorageGetters(indexer);
 
         storageSetters = new StorageSetters(indexer);
+
     }
 
 
@@ -323,6 +325,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
             if (kv.containsKey(key)) {
                 kv.removeValueForKey(key);
+                indexer.removeKeyFromIndexer(ID,mmkvMap,key);
                 promise.resolve(key);
             } else {
                 promise.resolve(true);
@@ -395,6 +398,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void clearStore(final String ID, final Promise promise) {
+
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);

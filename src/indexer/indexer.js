@@ -3,7 +3,7 @@ import numbersIndex from "./numbers";
 import boolIndex from "./booleans";
 import mapsIndex from "./maps";
 import arrayIndex from "./arrays";
-
+ 
 export default class indexer {
 
   constructor({ id = "default", mmkv }) {
