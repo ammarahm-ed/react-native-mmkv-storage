@@ -49,6 +49,57 @@ NSString *arrayIndexKey = @"arrayIndex";
     
 }
 
++ (void) removeKeyFromIndexer:(MMKV *)kv
+                          key:(NSString *)key
+{
+    
+    NSMutableArray *index = [self getIndex:kv type:1];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:stringsIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:2];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:intIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:3];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:boolIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:4];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:mapIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:5];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:arrayIndexKey];
+        return;
+    }
+
+}
+
 
 +(void)addToStringsIndex:(MMKV *)kv key:(NSString *)key {
     

@@ -319,13 +319,14 @@ RCT_EXPORT_METHOD(removeItem:(NSString *)ID key:(NSString*)key
     if ([[mmkvMap allKeys] containsObject:ID]) {
         
         MMKV *kv = [mmkvMap objectForKey:ID];
-        
         if ([kv containsKey:key]) {
             [kv removeValueForKey:key];
+            [StorageIndexer removeKeyFromIndexer:kv key:key];
+            resolve(@YES);
         } else {
             resolve(@NO);
         }
-        resolve(@YES);
+     
     } else {
         
         reject(@"cannot_get", @"database not initialized for the given ID", nil);
