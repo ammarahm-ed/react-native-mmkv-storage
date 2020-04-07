@@ -2,6 +2,8 @@
 package com.ammarahmed.mmkv;
 
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
@@ -322,10 +324,15 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
+            //Log.d("REMOVE","HERE RE" + ID  + key + String.valueOf(kv.containsKey(key)) );
 
-            if (kv.containsKey(key)) {
+            if (kv.contains(key)) {
+                Log.d("REMOVE","HERE REMO");
                 kv.removeValueForKey(key);
+
                 indexer.removeKeyFromIndexer(ID,mmkvMap,key);
+                Log.d("REMOVE","HERE REMOVI");
+
                 promise.resolve(key);
             } else {
                 promise.resolve(true);

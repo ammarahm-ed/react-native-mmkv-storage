@@ -1,6 +1,7 @@
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -220,8 +221,14 @@ public class StorageIndexer {
 
         Set<String> index = getTypeIndex(ID, Constants.DATA_TYPE_STRING, mmkvMap, null);
 
-        if (index != null && index.contains(key)) {
+
+        final MMKV kv = mmkvMap.get(ID);
+
+        if (index != null && index.contains(key)){
+            Log.d("REMOVE","HERE REMOVINGG");
             index.remove(key);
+
+            kv.encode("stringsIndex", index);
 
             return;
         }
@@ -229,7 +236,7 @@ public class StorageIndexer {
 
         if (index != null && index.contains(key)) {
             index.remove(key);
-
+            kv.encode("intIndex", index);
             return;
         }
 
@@ -237,7 +244,7 @@ public class StorageIndexer {
 
         if (index != null && index.contains(key)) {
             index.remove(key);
-
+            kv.encode("boolIndex", index);
             return;
         }
 
@@ -245,7 +252,7 @@ public class StorageIndexer {
 
         if (index != null && index.contains(key)) {
             index.remove(key);
-
+            kv.encode("arrayIndex", index);
             return;
         }
 
@@ -253,7 +260,7 @@ public class StorageIndexer {
 
         if (index != null && index.contains(key)) {
             index.remove(key);
-
+            kv.encode("mapIndex", index);
             return;
         }
     }
