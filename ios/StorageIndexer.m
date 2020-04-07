@@ -49,6 +49,57 @@ NSString *arrayIndexKey = @"arrayIndex";
     
 }
 
++ (void) removeKeyFromIndexer:(MMKV *)kv
+                          key:(NSString *)key
+{
+    
+    NSMutableArray *index = [self getIndex:kv type:1];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:stringsIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:2];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:intIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:3];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:boolIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:4];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:mapIndexKey];
+        return;
+    }
+    
+    index = [self getIndex:kv type:5];
+    
+    if (index != NULL && [index containsObject:key]) {
+        
+        [index removeObject:key];
+        [kv setObject:index forKey:arrayIndexKey];
+        return;
+    }
+    
+}
+
 
 +(void)addToStringsIndex:(MMKV *)kv key:(NSString *)key {
     
@@ -56,16 +107,13 @@ NSString *arrayIndexKey = @"arrayIndex";
     
     if ([kv containsKey:stringsIndexKey]) {
         stringsIndex = [kv getObjectOfClass:NSMutableArray.class forKey:stringsIndexKey];
+    }
+    if (![stringsIndex containsObject:key]){
         [stringsIndex  addObject:key];
         [kv setObject:stringsIndex forKey:stringsIndexKey];
-    } else {
-        
-        [stringsIndex addObject:key];
-        [kv setObject:stringsIndex forKey:stringsIndexKey];
-        
     }
+    
 }
-
 
 
 + (nullable NSMutableArray *)getAllStrings:(MMKV *)kv {
@@ -90,23 +138,17 @@ NSString *arrayIndexKey = @"arrayIndex";
     
 }
 
-
-
-
-
 +(void)addToBoolIndex:(MMKV *)kv key:(NSString *)key {
     
     NSMutableArray *boolIndex = [NSMutableArray array];
     
     if ([kv containsKey:boolIndexKey]) {
         boolIndex = [kv getObjectOfClass:NSMutableArray.class forKey:boolIndexKey];
+        
+    }
+    if (![boolIndex containsObject:key]) {
         [boolIndex  addObject:key];
         [kv setObject:boolIndex forKey:boolIndexKey];
-    } else {
-        
-        [boolIndex addObject:key];
-        [kv setObject:boolIndex forKey:boolIndexKey];
-        
     }
 }
 
@@ -147,14 +189,12 @@ NSString *arrayIndexKey = @"arrayIndex";
     
     if ([kv containsKey:intIndexKey]) {
         intIndex = [kv getObjectOfClass:NSMutableArray.class forKey:intIndexKey];
+    }
+    if (![intIndex containsObject:key]) {
         [intIndex  addObject:key];
         [kv setObject:intIndex forKey:intIndexKey];
-    } else {
-        
-        [intIndex addObject:key];
-        [kv setObject:intIndex forKey:intIndexKey];
-        
     }
+    
 }
 
 
@@ -187,13 +227,11 @@ NSString *arrayIndexKey = @"arrayIndex";
     
     if ([kv containsKey:mapIndexKey]) {
         mapIndex = [kv getObjectOfClass:NSMutableArray.class forKey:mapIndexKey];
+    }
+    
+    if (![mapIndex containsObject:key]) {
         [mapIndex  addObject:key];
         [kv setObject:mapIndex forKey:mapIndexKey];
-    } else {
-        
-        [mapIndex addObject:key];
-        [kv setObject:mapIndex forKey:mapIndexKey];
-        
     }
 }
 
@@ -227,13 +265,11 @@ NSString *arrayIndexKey = @"arrayIndex";
     
     if ([kv containsKey:arrayIndexKey]) {
         arrayIndex = [kv getObjectOfClass:NSMutableArray.class forKey:arrayIndexKey];
+        
+    }
+    if (![arrayIndex containsObject:key]) {
         [arrayIndex  addObject:key];
         [kv setObject:arrayIndex forKey:arrayIndexKey];
-    } else {
-        
-        [arrayIndex addObject:key];
-        [kv setObject:arrayIndex forKey:arrayIndexKey];
-        
     }
 }
 

@@ -35,5 +35,8 @@
 
 + (nullable NSMutableArray *)getAllArrays:(nonnull MMKV *)kv;
 
++ (void) removeKeyFromIndexer:(nonnull MMKV *)kv
+                          key:(nonnull NSString *)key;
+
 @end
 
