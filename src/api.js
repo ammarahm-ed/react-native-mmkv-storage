@@ -42,6 +42,10 @@ export default class API {
     return promisify(this.setBool)(key, value);
   }
 
+  getBoolAsync(key) {
+    return promisify(this.getBool)(key);
+  }
+
   setMapAsync(key, value) {
     return promisify(this.setMap)(key, value);
   }
@@ -55,7 +59,9 @@ export default class API {
   }
 
   async setArrayAsync(key, array) {
-    return promisify(this.getArray)(key, array)
+
+    return promisify(this.setArray)(key, array)
+
   }
 
   async getArrayAsync(key) {
