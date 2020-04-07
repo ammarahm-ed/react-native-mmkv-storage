@@ -1,6 +1,7 @@
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -213,6 +214,57 @@ public class StorageIndexer {
 
 
     }
+
+
+    public void removeKeyFromIndexer(String ID, Map<String, MMKV> mmkvMap, String key) {
+
+
+        Set<String> index = getTypeIndex(ID, Constants.DATA_TYPE_STRING, mmkvMap, null);
+
+
+        final MMKV kv = mmkvMap.get(ID);
+
+        if (index != null && index.contains(key)){
+            Log.d("REMOVE","HERE REMOVINGG");
+            index.remove(key);
+
+            kv.encode("stringsIndex", index);
+
+            return;
+        }
+        index = getTypeIndex(ID, Constants.DATA_TYPE_INT, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+            kv.encode("intIndex", index);
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_BOOL, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+            kv.encode("boolIndex", index);
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_ARRAY, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+            kv.encode("arrayIndex", index);
+            return;
+        }
+
+        index = getTypeIndex(ID, Constants.DATA_TYPE_MAP, mmkvMap, null);
+
+        if (index != null && index.contains(key)) {
+            index.remove(key);
+            kv.encode("mapIndex", index);
+            return;
+        }
+    }
+
 
 
     public WritableArray getAllArrays(MMKV kv) {
