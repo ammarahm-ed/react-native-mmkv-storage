@@ -17,8 +17,7 @@ Encrypt an already created instance of MMKV.
 ```js
 // A simple MMKV Instance();
 
-MMKV = await new MMKVStorage.Loader().initialize()
-
+MMKV = await new MMKVStorage.Loader().initialize();
 
 await MMKV.encryption.encrypt();
 
@@ -29,8 +28,6 @@ await MMKV.encryption.encrypt("encryptionKey");
 // if you dont want to store it
 
 MMKV.encryption.encrypt("encryptionKey", false);
-
-
 ```
 
 ## decrypt

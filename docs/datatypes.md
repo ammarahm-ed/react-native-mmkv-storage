@@ -30,7 +30,6 @@ margin:20px;
   </p>
 </div>
 
-
 <div
 style="
 width:100px;
@@ -112,5 +111,3 @@ flex-direction: column;
 </div>
 
 </div>
-
-

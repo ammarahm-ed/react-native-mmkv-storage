@@ -7,8 +7,7 @@ First we create a default MMKV Instance
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = await new MMKVStorage.Loader().initialize()
-
+MMKV = await new MMKVStorage.Loader().initialize();
 ```
 
 ## setString
@@ -281,7 +280,7 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 ```js
 import MMKV from "react-native-mmkv-storage";
 
-MMKV.getMultipleItems(["foo", "bar", "loo"], objects => console.log(objects));
+MMKV.getMultipleItems(["foo", "bar", "loo"], (objects) => console.log(objects));
 
 MMKV.getMultipleItems(["foo", "bar", "loo"], (error, result) => {
   if (error) {
