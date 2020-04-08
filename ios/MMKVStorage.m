@@ -134,7 +134,7 @@ RCT_EXPORT_METHOD(setup:(NSString *)ID
 RCT_EXPORT_METHOD(getAllMMKVInstanceIDs:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject ) {
     
-    resolve([IdStore getAll]);
+    resolve([[IdStore getAll] allKeys]);
 }
 
 
