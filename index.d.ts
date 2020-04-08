@@ -2,22 +2,27 @@ declare function MMKVStorage(): any;
 
 export default MMKVStorage;
 
+type ACCESSIBLE = {
+  WHEN_UNLOCKED: string;
+  AFTER_FIRST_UNLOCK: string;
+  ALWAYS: string;
+  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
+  WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
+  AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
+  ALWAYS_THIS_DEVICE_ONLY: string;
+};
+
+type MODES = {
+  SINGLE_PROCESS: number;
+  MULTI_PROCESS: number;
+};
+
 declare module MMKVStorage {
-  export const MODES = {
-    SINGLE_PROCESS: 1,
-    MULTI_PROCESS: 2,
-  };
-  export const ACCESSIBLE = {
-    WHEN_UNLOCKED: "AccessibleWhenUnlocked",
-    AFTER_FIRST_UNLOCK: "AccessibleAfterFirstUnlock",
-    ALWAYS: "AccessibleAlways",
-    WHEN_PASSCODE_SET_THIS_DEVICE_ONLY:
-      "AccessibleWhenPasscodeSetThisDeviceOnly",
-    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "AccessibleWhenUnlockedThisDeviceOnly",
-    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY:
-      "AccessibleAfterFirstUnlockThisDeviceOnly",
-    ALWAYS_THIS_DEVICE_ONLY: "AccessibleAlwaysThisDeviceOnly",
-  };
+  export const MODES: MODES;
+
+  export const ACCESSIBLE: ACCESSIBLE;
+
+  const myVar: string;
 
   class API {
     /**
@@ -27,12 +32,12 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    async setStringAsync(key: string, value: string): Promise<boolean>;
+    setStringAsync(key: string, value: string): Promise<boolean>;
     /**
      * Get a string value for a given key.
      * @param {String} key
      */
-    async getStringAsync(key: string): Promise<string>;
+    getStringAsync(key: string): Promise<string>;
 
     /**
      * Set a number value to storage for a given key.
@@ -41,13 +46,13 @@ declare module MMKVStorage {
      * @param {number} value
      *
      */
-    async setIntAsync(key: string, value: number): Promise<boolean>;
+    setIntAsync(key: string, value: number): Promise<boolean>;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      */
-    async getIntAsync(key: string): Promise<number>;
+    getIntAsync(key: string): Promise<number>;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -56,13 +61,13 @@ declare module MMKVStorage {
      * @param {boolean} value
      *
      */
-    async setBoolAsync(key: string, value: boolean): Promise<boolean>;
+    setBoolAsync(key: string, value: boolean): Promise<boolean>;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      */
-    async getBoolAsync(key: string): Promise<boolean>;
+    getBoolAsync(key: string): Promise<boolean>;
 
     /**
      * Set an Object to storage for a given key.
@@ -72,24 +77,24 @@ declare module MMKVStorage {
      *
      */
 
-    async setMapAsync(key: string, value: object): Promise<boolean>;
+    setMapAsync(key: string, value: object): Promise<boolean>;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      */
-    async getMapAsync(key: string): Promise<object>;
+    getMapAsync(key: string): Promise<object>;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      */
-    async setArrayAsync(key: string, value: Array<*>): Promise<boolean>;
+    setArrayAsync(key: string, value: Array<*>): Promise<boolean>;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      */
 
-    async getArrayAsync(key: string): Promise<Array<*>>;
+    getArrayAsync(key: string): Promise<Array<*>>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -98,15 +103,15 @@ declare module MMKVStorage {
      *
      * @param {Array} keys
      */
-    async getMultipleItemsAsync(keys: Array<string>): Promise<Array<object>>;
+    getMultipleItemsAsync(keys: Array<string>): Promise<Array<object>>;
 
-    async clearStore(): Promise;
+    clearStore(): Promise<boolean>;
     /**
      * Remove an item from storage for a given key.
      *
      * @param {String} key
      */
-    async removeItem(key: string): Promise;
+    removeItem(key: string): Promise<boolean>;
 
     // NON ASYNC CALLS
 
@@ -202,7 +207,7 @@ declare module MMKVStorage {
      * Get all MMKV Instance IDs.
      *
      */
-    async getAllMMKVInstanceIDs(): Promise<object>;
+    getAllMMKVInstanceIDs(): Promise<object>;
 
     /**
      *
@@ -210,7 +215,7 @@ declare module MMKVStorage {
      *
      */
 
-    async getCurrentMMKVInstanceIDs(): Promise<Array<string>>;
+    getCurrentMMKVInstanceIDs(): Promise<Array<string>>;
 
     encryption: encryption;
 
@@ -222,14 +227,14 @@ declare module MMKVStorage {
      * Get all keys from storage.
      *
      */
-    async getKeys(): Promise<Array<string>>;
+    getKeys(): Promise<Array<string>>;
 
     /**
      * Check if a key exists in storage.
      *
      * @param {String} key
      */
-    async hasKey(key: string): Promise<boolean>;
+    hasKey(key: string): Promise<boolean>;
 
     strings: {
       /**
@@ -249,7 +254,7 @@ declare module MMKVStorage {
        * Get all strings in the strings index
        *
        */
-      getAll(): Promise<Array<>>;
+      getAll(): Promise<Array<[]>>;
     };
 
     numbers: {
@@ -270,7 +275,7 @@ declare module MMKVStorage {
        * Get all numbers in the numbers index;
        *
        */
-      getAll(): Promise<Array<>>;
+      getAll(): Promise<Array<[]>>;
     };
 
     booleans: {
@@ -291,51 +296,50 @@ declare module MMKVStorage {
        * Get all booleans in the booleans index
        *
        */
-      getAll(): Promise<Array<>>;
+      getAll(): Promise<Array<[]>>;
     };
 
-      maps: {
-        /**
-         * Get all keys from maps index
-         *
-         */
-        getKeys(): Promise<Array<string>>;
+    maps: {
+      /**
+       * Get all keys from maps index
+       *
+       */
+      getKeys(): Promise<Array<string>>;
 
-        /**
-         * Check if a key exists in maps index
-         *
-         * @param {String} key
-         */
-        hasKey(key: string): Promise<boolean>;
+      /**
+       * Check if a key exists in maps index
+       *
+       * @param {String} key
+       */
+      hasKey(key: string): Promise<boolean>;
 
-        /**
-         * Get all items in the maps index
-         *
-         */
-        getAll(): Promise<Array<>>;
-      };
+      /**
+       * Get all items in the maps index
+       *
+       */
+      getAll(): Promise<Array<[]>>;
+    };
 
-      arrays: {
-        /**
-         * Get all keys from array index
-         *
-         */
-        getKeys(): Promise<Array<string>>;
+    arrays: {
+      /**
+       * Get all keys from array index
+       *
+       */
+      getKeys(): Promise<Array<string>>;
 
-        /**
-         * Check if a key exists in array index
-         *
-         * @param {String} key
-         */
-        hasKey(key: string): Promise<boolean>;
+      /**
+       * Check if a key exists in array index
+       *
+       * @param {String} key
+       */
+      hasKey(key: string): Promise<boolean>;
 
-        /**
-         * Get all arrays in the array index
-         *
-         */
-        getAll(): Promise<Array<>>;
-      };
-    
+      /**
+       * Get all arrays in the array index
+       *
+       */
+      getAll(): Promise<Array<[]>>;
+    };
   }
 
   class encryption {
@@ -350,18 +354,18 @@ declare module MMKVStorage {
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
      * @returns An object with alias and key
      */
-    async encrypt(
+    encrypt(
       key: string,
       secureKeyStorage: boolean,
       alias: string
-    ): Promise<>;
+    ): Promise<boolean>;
 
     /**
      * You can decrypt an encrypted MMKV instance anytime, even after it is created.
      * Decrypting the storage will delete the key you encrypted it with
      *
      */
-    async decrypt(): Promise<>;
+    decrypt(): Promise<boolean>;
 
     /**
      * Change the encryption key incase the old one has been compromised.
@@ -370,11 +374,11 @@ declare module MMKVStorage {
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
      */
 
-    async changeEncryptionKey(
+    changeEncryptionKey(
       key: string,
       secureKeyStorage: boolean,
       alias: string
-    ): Promise<>;
+    ): Promise<boolean>;
   }
 
   export class Loader {
@@ -426,6 +430,6 @@ declare module MMKVStorage {
      *
      */
 
-    async initialize(): Promise<API>;
+    initialize(): Promise<API>;
   }
 }
