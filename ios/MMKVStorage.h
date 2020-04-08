@@ -5,7 +5,7 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
-@interface RNFastStorage : NSObject <RCTBridgeModule>
+@interface MMKVStorage : NSObject <RCTBridgeModule>
 
 @end
   

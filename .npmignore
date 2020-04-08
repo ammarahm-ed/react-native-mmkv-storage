@@ -31,6 +31,9 @@ DerivedData
 project.xcworkspace
       
 
+# Docs
+docs/
+
 # Android/IntelliJ
 #
 build/

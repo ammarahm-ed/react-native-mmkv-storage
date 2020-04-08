@@ -1,12 +1,8 @@
-<div align="center">
-<h1>react-native-mmkv-storage</h1>
-</div>
+## react-native-mmkv-storage
 
-
-[![](https://img.shields.io/npm/v/react-native-mmkv-storage.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
+[![NPM](https://img.shields.io/npm/v/react-native-mmkv-storage.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage/blob/master/LICENSE)
-[![](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
-
+[![License: MIT](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
 
 > An efficient, small mobile key-value storage framework for React Native
 
@@ -14,6 +10,7 @@
 
 This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way. Read about it on this blog post I wrote on [dev.to](https://dev.to/ammarahmed/best-data-storage-option-for-react-native-apps-42k)
 
+See the [Quick start](gettingstarted.md) guide for more details.
 
 ## Features
 
@@ -31,25 +28,18 @@ This library aims to provide a fast & reliable solution for you data storage nee
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
 
-
-## Links 
-  - [Documentation](https://rnmmkv.now.sh/#/)
-
-## Quickstart
-
-  - [Quickstart guide](https://rnmmkv.now.sh/#/gettingstarted)
-
-
 ## Contact & Support
+
 - Create a GitHub issue for bug reports, feature requests, or questions
 - Follow [@ammarahm-ed](https://github.com/ammarahm-ed) for announcements
 - Add a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/) or ❤️ tweet to support the project!
 
 ## RoadMap
+
 You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/1)
 
-
 ## I want to contribute
+
 That is awesome news! There is alot happening at a very fast pace in this library right now. Every little help is precious. You can contribute in many ways:
 
 - Suggest code improvements on native iOS and Android
@@ -58,6 +48,7 @@ That is awesome news! There is alot happening at a very fast pace in this librar
 - I am always open to new ideas
 
 ## License
+
 This library is licensed under the [MIT license](https://github.com/ammarahm-ed/react-native-mmkv-storage/blob/master/LICENSE).
 
 Copyright © Ammar Ahmed ([@ammarahm-ed](https://github.com/ammarahm-ed))
