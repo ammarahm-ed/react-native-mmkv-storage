@@ -42,7 +42,7 @@ public class StorageGetters {
                         break;
                     case Constants.DATA_TYPE_INT:
 
-                        callback.invoke(kv.decodeInt(key));
+                        callback.invoke(null, kv.decodeInt(key));
                         break;
                     case Constants.DATA_TYPE_BOOL:
 
