@@ -46,7 +46,7 @@ This library aims to provide a fast & reliable solution for you data storage nee
 - Add a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/) or ❤️ tweet to support the project!
 
 ## RoadMap
-You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/1)
+You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/13)
 
 
 ## I want to contribute
