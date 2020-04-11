@@ -1,9 +1,7 @@
 import { NativeModules } from "react-native";
-
 import generatePassword from "./keygen";
 import API from "./api";
-import MMKVStorage from "react-native-mmkv-storage";
-import { stringToHex, ACCESSIBLE } from "./utils";
+import { stringToHex, ACCESSIBLE, MODES } from "./utils";
 
 export default class Loader {
   constructor() {
@@ -11,7 +9,7 @@ export default class Loader {
     this.initWithEncryption = false;
     this.secureKeyStorage = false;
     this.accessibleMode = ACCESSIBLE.WHEN_UNLOCKED
-    this.processingMode = MMKVStorage.MODES.SINGLE_PROCESS
+    this.processingMode = MODES.SINGLE_PROCESS
     this.aliasPrefix = "com.MMKV.";
     this.alias = null;
     this.key = null;

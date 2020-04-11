@@ -1,6 +1,3 @@
-
-
-
 export function promisify(fn) {
 
   return function (...args) {
