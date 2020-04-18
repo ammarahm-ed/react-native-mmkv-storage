@@ -4,6 +4,7 @@
   - [Creating an MMKV Instance](creatinginstance.md)
   - [Working with Encryption](workingwithencryption.md)
   - [Supported Data Types](datatypes.md)
+  - [Redux persist support](redux-persist.md)
 
 - API Reference
 
