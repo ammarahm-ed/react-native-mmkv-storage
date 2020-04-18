@@ -31,7 +31,7 @@ This library aims to provide a fast & reliable solution for you data storage nee
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
 
-- **Support redux-persist**<br/>
+- **Supports redux-persist**<br/>
   Support for redux persist is also added starting from v0.3.2.
 
 
