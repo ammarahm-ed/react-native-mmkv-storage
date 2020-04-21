@@ -14,18 +14,20 @@
  * @param  {...any} args Arguments for the native function
  */
 
+import { currentInstancesStatus } from "./initializer";
+
 export function handleAction(action, callback, ...args) {
-  if (this.initialized) {
+  if (currentInstancesStatus[this.instanceID]) {
    return action(...args, callback);
   
   } else {
     initialize(this.options, (err, result) => {
       if (err) {
-        this.initialized = false;
+        currentInstancesStatus[this.instanceID] = false
        return callback(err, null);
        
       }
-     this.initialized = true;
+      currentInstancesStatus[this.instanceID] = true;
      return action(...args, callback);
     
     });
@@ -35,17 +37,17 @@ export function handleAction(action, callback, ...args) {
 
 export async function handleActionAsync(action,...args) {
 
-  if (this.initialized) {
+  if (currentInstancesStatus[this.instanceID]) {
     return await action(...args);
    
    } else {
      initialize(this.options, (err, result) => {
        if (err) {
-         this.initialized = false;
+        currentInstancesStatus[this.instanceID] = false
         return await action(...args);
         
        }
-      this.initialized = true;
+       currentInstancesStatus[this.instanceID] = true;
       return await action(...args);
      
      });

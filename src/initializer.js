@@ -1,3 +1,7 @@
+
+export const currentInstancesStatus = {};
+
+
 /**
  *
  * Initialize function is used to create
