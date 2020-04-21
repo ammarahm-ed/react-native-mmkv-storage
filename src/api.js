@@ -1,25 +1,24 @@
 import encryption from "react-native-mmkv-storage/src/encryption";
-import { promisify } from "react-native-mmkv-storage/src/utils";
 import indexer from "react-native-mmkv-storage/src/indexer/indexer";
-import { DATA_TYPES, ACCESSIBLE } from "./utils";
+import { promisify } from "react-native-mmkv-storage/src/utils";
+import { DATA_TYPES } from "./utils";
+import { handleAction, handleActionAsync } from "./handlers";
 
 export default class API {
-  constructor({ id = "default", mmkv, alias, aliasPrefix, key, accessibleMode = ACCESSIBLE.WHEN_UNLOCKED }) {
-    this.MMKV = mmkv;
-    this.instanceID = id;
-    this.alias = alias;
-    this.aliasPrefix = aliasPrefix;
-    this.key = key;
-    let options = {
-      id: this.instanceID,
-      mmkv: this.MMKV,
-      alias: this.alias,
-      aliasPrefix: this.aliasPrefix,
-      key: this.key,
-      accessibleMode: accessibleMode
-    };
-    this.encryption = new encryption(options);
-    this.indexer = new indexer(options);
+  constructor(args) {
+    this.MMKV = args.mmkv;
+    this.instanceID = args.id;
+    this.initWithEncryption = args.initWithEncryption;
+    this.accessibleMode = args.accessibleMode;
+    this.processingMode = args.processingMode;
+    this.secureKeyStorage = args.secureKeyStorage;
+    this.alias = args.alias;
+    this.aliasPrefix = args.aliasPrefix;
+    this.key = args.key;
+    this.initialized = false;
+    this.options = args;
+    this.encryption = new encryption(args);
+    this.indexer = new indexer(args);
   }
 
   setStringAsync(key, value) {
@@ -59,9 +58,7 @@ export default class API {
   }
 
   async setArrayAsync(key, array) {
-
-    return promisify(this.setArray)(key, array)
-
+    return promisify(this.setArray)(key, array);
   }
 
   async getArrayAsync(key) {
@@ -69,42 +66,90 @@ export default class API {
   }
 
   setString = (key, value, callback) => {
-    return this.MMKV.setString(this.instanceID, key, value, callback);
-  }
+    handleAction(
+      this.MMKV.setString,
+      callback,
+      this.instanceID,
+      key,
+      value
+    ).call(this);
+  };
 
   getString = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.STRING, callback);
-  }
+    handleAction(
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.STRING
+    ).call(this);
+  };
 
   setInt = (key, value, callback) => {
-    return this.MMKV.setInt(this.instanceID, key, value, callback);
-  }
+    handleAction(this.MMKV.setInt, callback, this.instanceID, key, value).call(
+      this
+    );
+  };
 
   getInt = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.NUMBER, callback);
-  }
+    handleAction(
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.NUMBER
+    ).call(this);
+  };
 
   setBool = (key, value, callback) => {
-
-    return this.MMKV.setBool(this.instanceID, key, value, callback);
-  }
+    handleAction(this.MMKV.setBool, 
+      callback, 
+      this.instanceID, 
+      key, 
+      value).call(
+      this
+    );
+  };
 
   getBool = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.BOOL, callback);
-  }
+    handleAction(
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.BOOL
+    ).call(this);
+  };
 
   setMap = (key, value, callback) => {
-
-    return this.MMKV.setMap(this.instanceID, key, value, false, callback);
-  }
+    handleAction(
+      this.MMKV.setMap,
+      callback,
+      this.instanceID,
+      key,
+      data,
+      false
+    ).call(this);
+  };
 
   getMap = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.MAP, callback);
-  }
+    handleAction(
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.MAP
+    ).call(this);
+  };
 
   getMultipleItems = (keys, callback) => {
-    return this.MMKV.getMultipleItems(this.instanceID, keys, callback);
-  }
+    handleAction(
+      this.MMKV.getMultipleItems,
+      callback,
+      this.instanceID,
+      keys
+    ).call(this);
+  };
 
   setArray = (key, array, callback) => {
     if (!Array.isArray(array))
@@ -112,23 +157,36 @@ export default class API {
     let data = {};
     data[key] = array.slice();
 
-    return this.MMKV.setMap(this.instanceID, key, data, true, callback);
-  }
+    handleAction(
+      this.MMKV.setMap,
+      callback,
+      this.instanceID,
+      key,
+      data,
+      true
+    ).call(this);
+  };
 
   getArray = (key, callback) => {
-    this.MMKV.getItem(this.instanceID, key, DATA_TYPES.ARRAY, (error, data) => {
+    handleAction(
+      this.MMKV.getItem,
+      (error, data) => {
+        if (error) {
+          callback(error, null);
+          return;
+        }
 
-      if (error) {
-        return callback(error, null);
-      }
-
-      if (data) {
-        return callback(null, data[key].slice());
-      } else {
-        return callback(null, []);
-      }
-    });
-  }
+        if (data) {
+          callback(null, data[key].slice());
+        } else {
+          callback(null, []);
+        }
+      },
+      this.instanceID,
+      key,
+      DATA_TYPES.ARRAY
+    ).call(this);
+  };
 
   async getCurrentMMKVInstanceIDs() {
     return await this.MMKV.getCurrentMMKVInstanceIDs();
@@ -139,12 +197,11 @@ export default class API {
   }
 
   async removeItem(key) {
-    return await this.MMKV.removeItem(this.instanceID, key);
+   return await handleActionAsync(this.MMKV.removeItem,this.instanceID, key).call(this);
   }
 
   async clearStore() {
-    return await this.MMKV.clearStore(this.instanceID);
+   return await handleActionAsync(this.MMKV.clearStore,this.instanceID, key).call(this);
+    
   }
-
-
 }
