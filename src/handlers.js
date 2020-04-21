@@ -14,15 +14,42 @@
  * @param  {...any} args Arguments for the native function
  */
 
-export function handleAction(initialized, options, action, callback, ...args) {
-  if (initialized) {
-    return action(...args, callback);
+export function handleAction(action, callback, ...args) {
+  if (this.initialized) {
+   return action(...args, callback);
+  
   } else {
-    initialize(options, (err, result) => {
+    initialize(this.options, (err, result) => {
       if (err) {
-        return callback(err, null);
+        this.initialized = false;
+       return callback(err, null);
+       
       }
-      return action(...args, callback);
+     this.initialized = true;
+     return action(...args, callback);
+    
     });
   }
+}
+
+
+export async function handleActionAsync(action,...args) {
+
+  if (this.initialized) {
+    return await action(...args);
+   
+   } else {
+     initialize(this.options, (err, result) => {
+       if (err) {
+         this.initialized = false;
+        return await action(...args);
+        
+       }
+      this.initialized = true;
+      return await action(...args);
+     
+     });
+   }
+
+
 }
