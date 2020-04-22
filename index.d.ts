@@ -398,14 +398,22 @@ declare module MMKVStorage {
     withEncryption(): this;
 
     /**
-     * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
-     * You must call withEncryption() to use this.
-     * To store your key for later use call withSecureKeyStorage() too.
+     * Set accessible mode for secure storage on ios devices
      *
-     * @param {string} key the key to encrypt the storage with
-     * @param {boolean} secureKeyStorage Should the key be stored securely.
-     * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
+     * @param accessible MMKVStorage.ACCESSIBLE
      */
+
+    setAccessibleMode(accessible: ACCESSIBLE): this;
+
+    /**
+    * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
+    * You must call withEncryption() to use this.
+    * To store your key for later use call withSecureKeyStorage() too.
+    *
+    * @param {string} key the key to encrypt the storage with
+    * @param {boolean} secureKeyStorage Should the key be stored securely.
+    * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
+    */
 
     encryptWithCustomKey(
       key: string,
