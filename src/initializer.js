@@ -15,7 +15,7 @@ export const currentInstancesStatus = {};
 export function initialize(options, callback) {
   if (options.initWithEncryption) {
     if (options.secureKeyStorage) {
-      options.MMKV.secureKeyExists(options.alias, (error, exists) => {
+      options.mmkv.secureKeyExists(options.alias, (error, exists) => {
         if (error) {
           callback(error, null);
         }
@@ -44,13 +44,13 @@ export function initialize(options, callback) {
  */
 
 function initWithEncryptionUsingOldKey(options, callback) {
-  options.MMKV.getSecureKey(options.alias, (error, value) => {
+  options.mmkv.getSecureKey(options.alias, (error, value) => {
     if (error) {
       callback(error, null);
       return;
     }
     if (value) {
-      options.MMKV.setupWithEncryption(
+      options.mmkv.setupWithEncryption(
         options.instanceID,
         options.processingMode,
         value,
@@ -80,7 +80,7 @@ function initWithEncryptionUsingNewKey(options, callback) {
   if (options.key == null || options.key.length < 3)
     throw new Error("Key is null or too short");
 
-  options.MMKV.setSecureKey(
+    options.mmkv.setSecureKey(
     options.alias,
     options.key,
     { accessible: options.accessibleMode },
@@ -88,7 +88,7 @@ function initWithEncryptionUsingNewKey(options, callback) {
       if (error) {
         callback(error, null);
       }
-      options.MMKV.setupWithEncryption(
+      options.mmkv.setupWithEncryption(
         options.instanceID,
         options.processingMode,
         options.key,
@@ -119,7 +119,7 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
   if (options.key == null || options.key.length < 3)
     throw new Error("Key is null or too short");
 
-  options.MMKV.setupWithEncryption(
+    options.mmkv.setupWithEncryption(
     options.instanceID,
     options.processingMode,
     options.key,
@@ -144,13 +144,15 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
  */
 
 function initWithoutEncryption(options, callback) {
-  options.MMKV.setup(
+
+  options.mmkv.setup(
     options.instanceID,
     options.processingMode,
     (error, result) => {
       if (error) {
         callback(error, null);
       }
+    
       callback(null, true);
     }
   );
