@@ -1,43 +1,28 @@
-import { initialize } from "./initializer";
+import { initialize, currentInstancesStatus } from "./initializer";
 import generatePassword from "./keygen";
 import { stringToHex } from "./utils";
 import { handleActionAsync } from "react-native-mmkv-storage/src/handlers";
 
 function encryptStorage(
+  options,
   key,
   secureKeyStorage = true,
   alias,
   accessibleMode,
   callback
 ) {
-  if (accessibleMode) {
-    this.accessibleMode = accessibleMode;
-  }
-
-  this.alias = stringToHex(this.aliasPrefix + this.instanceID);
-  if (key) {
-    this.key = key;
-  } else {
-    this.key = generatePassword();
-  }
-
+  
   if (secureKeyStorage) {
-    if (alias) {
-      if (alias) {
-        this.alias = stringToHex(this.aliasPrefix + alias);
-      } else {
-        this.alias = stringToHex(this.aliasPrefix + this.instanceID);
-      }
-    }
-    this.MMKV.setSecureKey(
-      this.alias,
-      this.key,
-      { accessible: this.accessibleMode },
+   
+    options.mmkv.setSecureKey(
+      alias,
+      key,
+      { accessible: accessibleMode },
       (error, result) => {
         if (error) {
           return;
         } else {
-          this.MMKV.encrypt(this.instanceID, key, this.alias)
+          options.mmkv.encrypt(options.instanceID, key, alias)
             .then((r) => {
               callback(null, r);
             })
@@ -48,7 +33,7 @@ function encryptStorage(
       }
     );
   } else {
-    this.MMKV.encrypt(this.instanceID, key, null)
+    options.mmkv.encrypt(options.instanceID, key, null)
       .then((r) => {
         callback(null, r);
       })
@@ -61,7 +46,7 @@ function encryptStorage(
 export default class encryption {
   constructor(args) {
     this.MMKV = args.mmkv;
-    this.instanceID = args.id;
+    this.instanceID = args.instanceID;
     this.alias = args.alias;
     this.aliasPrefix = args.aliasPrefix;
     this.key = args.key;
@@ -71,14 +56,40 @@ export default class encryption {
   }
 
   async encrypt(key, secureKeyStorage = true, alias, accessibleMode) {
+   
+    if (accessibleMode) {
+      this.accessibleMode = accessibleMode;
+    }
+  
+    this.alias = stringToHex(this.aliasPrefix + this.instanceID);
+    if (key) {
+      this.key = key;
+    } else {
+      this.key = generatePassword();
+    }
+    if (secureKeyStorage) {
+      if (alias) {
+        if (alias) {
+          this.alias = stringToHex(this.aliasPrefix + alias);
+        } else {
+          this.alias = stringToHex(this.aliasPrefix + this.instanceID);
+        }
+      }
+    }
+
     return new Promise((resolve, reject) => {
-      if (!currentInstancesStatus[this.instanceID]) {
-        encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
+      if (currentInstancesStatus[this.instanceID]) {
+        encryptStorage(
+          this.options,
+          this.key, 
+          secureKeyStorage, 
+          this.alias, 
+          this.accessibleMode, (e, r) => {
           if (e) {
             reject(e);
           }
           resolve(r);
-        }).call(this);
+        })
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
@@ -86,24 +97,25 @@ export default class encryption {
           }
           currentInstancesStatus[this.instanceID] = true;
           encryptStorage(
-            key,
-            secureKeyStorage,
-            alias,
-            accessibleMode,
+            this.options,
+            this.key, 
+            secureKeyStorage, 
+            this.alias, 
+            this.accessibleMode,
             (e, r) => {
               if (e) {
                 reject(e);
               }
               resolve(r);
             }
-          ).call(this);
+          )
         });
       }
     });
   }
 
   async decrypt() {
-    return await handleActionAsync(this.MMKV.decrypt, this.instanceID);
+    return await handleActionAsync(this.options,this.MMKV.decrypt, this.instanceID);
   }
 
   async changeEncryptionKey(
@@ -111,15 +123,41 @@ export default class encryption {
     secureKeyStorage = true,
     alias,
     accessibleMode
-  ) {
+  ) { 
+
+    if (accessibleMode) {
+      this.accessibleMode = accessibleMode;
+    }
+    this.alias = stringToHex(this.aliasPrefix + this.instanceID);
+    if (key) {
+      this.key = key;
+    } else {
+      this.key = generatePassword();
+    }
+    if (secureKeyStorage) {
+      if (alias) {
+        if (alias) {
+          this.alias = stringToHex(this.aliasPrefix + alias);
+        } else {
+          this.alias = stringToHex(this.aliasPrefix + this.instanceID);
+        }
+      }
+    }
+
     return new Promise(async (resolve, reject) => {
-      if (!currentInstancesStatus[this.instanceID]) {
-        encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
+      if (currentInstancesStatus[this.instanceID]) {
+        encryptStorage(
+          this.options,
+          this.key, 
+          secureKeyStorage, 
+          this.alias, 
+          this.accessibleMode, (e, r) => {
           if (e) {
             reject(e);
           }
           resolve(r);
-        }).call(this);
+        })
+
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
@@ -127,17 +165,18 @@ export default class encryption {
           }
           currentInstancesStatus[this.instanceID] = true;
           encryptStorage(
-            key,
-            secureKeyStorage,
-            alias,
-            accessibleMode,
+            this.options,
+            this.key, 
+            secureKeyStorage, 
+            this.alias, 
+            this.accessibleMode,
             (e, r) => {
               if (e) {
                 reject(e);
               }
               resolve(r);
             }
-          ).call(this);
+          )
         });
       }
     });
