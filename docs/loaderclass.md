@@ -106,6 +106,36 @@ const MMKV = new MMKVStorage.Loader();
 MMKV = MMKV.setProcessingMode(MMKVStorage.MODES.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
 ```
 
+## setAccessibleMode (iOS only)
+
+Choose the accessibility mode for secure key storage (IOS ONLY);
+
+**Arguments**
+
+| Name       | Required | Type                   | Description                   |
+| ---------- | -------- | ---------------------- | ----------------------------- |
+| accessible | yes      | MMKVStorage.ACCESSIBLE | Choose the accessibility mode |
+
+```js
+import MMKVStorage from "react-native-mmkv-storage";
+
+const MMKV = new MMKVStorage.Loader();
+
+MMKV = MMKV.setAccessibleMode(MMKVStorage.ACCESSIBLE.WHEN_UNLOCKED);
+```
+
+```ts
+type ACCESSIBLE = {
+  WHEN_UNLOCKED: string;
+  AFTER_FIRST_UNLOCK: string;
+  ALWAYS: string;
+  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
+  WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
+  AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
+  ALWAYS_THIS_DEVICE_ONLY: string;
+};
+```
+
 **Returns:** `this`;
 
 ## Putting it together
@@ -115,7 +145,7 @@ Now you know about the loader class, lets create a MMKV Instance with an ID.
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = await new MMKVStorage.Loader().
+MMKV = new MMKVStorage.Loader().
 .withInstanceID('mmkvInstanceID')
 .setProcessingMode(MMKVStorage.MODES.MULTI_PROCESS)
 .withEncryption()

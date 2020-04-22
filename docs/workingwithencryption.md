@@ -9,7 +9,7 @@ Lets suppose you have this MMKV instance created during first app startup.
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-const MMKV = await new MMKVStorage().initialize();
+const MMKV = new MMKVStorage().initialize();
 ```
 
 Now later you might want to encrypt it somwhere during the lifecycle of an app. So you can then simply do this:
@@ -63,7 +63,7 @@ Remember that whenever you encrypt your storage, a strongpassword is automatical
 Lets say you created an MMKV Instance with encryption and you did not store the password so.
 
 ```js
-const MMKV = await new MMKVStorage.Loader()
+const MMKV = new MMKVStorage.Loader()
   .withEncryption()
   .encryptWithCustomKey("mykey", false)
   .initialize();
@@ -80,7 +80,7 @@ When the app starts again on next start up. You will need to update the value of
 So on next app startup:
 
 ```js
-const MMKV = await new MMKVStorage.Loader()
+const MMKV = new MMKVStorage.Loader()
   .withEncryption()
   .encryptWithCustomKey("newkey", false)
   .initialize();

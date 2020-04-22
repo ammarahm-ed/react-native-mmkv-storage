@@ -7,7 +7,7 @@ First we create a default MMKV Instance
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = await new MMKVStorage.Loader().initialize();
+MMKV = new MMKVStorage.Loader().initialize();
 ```
 
 ## removeItem

@@ -17,7 +17,7 @@ Encrypt an already created instance of MMKV.
 ```js
 // A simple MMKV Instance();
 
-MMKV = await new MMKVStorage.Loader().initialize();
+MMKV = new MMKVStorage.Loader().initialize();
 
 await MMKV.encryption.encrypt();
 
@@ -37,7 +37,7 @@ Removes encryption from an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = await new MMKVStorage().Loader().withEncryption().initialize();
+MMKV = new MMKVStorage().Loader().withEncryption().initialize();
 
 // Remove encryption from an encrypted instance of MMKV.
 
