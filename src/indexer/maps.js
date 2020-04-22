@@ -1,4 +1,4 @@
-import { DATA_TYPES, promisify } from "../utils";
+import { DATA_TYPES } from "../utils";
 
 export default class mapsIndex {
   constructor({ id = "default", mmkv, alias, aliasPrefix, key }) {
@@ -7,21 +7,37 @@ export default class mapsIndex {
   }
 
   async getKeys() {
-    return await this.MMKV.getTypeIndex(this.instanceID, DATA_TYPES.MAP);
+    return await handleActionAsync(
+      this.MMKV.getTypeIndex,
+      this.instanceID,
+      DATA_TYPES.MAP
+    );
   }
 
   async hasKey(key) {
-    return await this.MMKV.typeIndexerHasKey(
+    return await handleActionAsync(
+      this.MMKV.typeIndexerHasKey,
       this.instanceID,
       key,
       DATA_TYPES.MAP
     );
   }
 
+
   async getAll() {
-    return promisify(this.MMKV.getItemsForType)(
-      this.instanceID,
-      DATA_TYPES.MAP
-    );
+    return new Promise((resolve, reject) => {
+      handleAction(
+        this.MMKV.getItemsForType,
+        (error, result) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(result);
+        },
+        this.instanceID,
+        DATA_TYPES.MAP
+      );
+    });
   }
 }
