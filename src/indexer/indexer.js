@@ -6,21 +6,22 @@ import arrayIndex from "./arrays";
 import { handleActionAsync } from "../handlers";
 export default class indexer {
   constructor(args) {
-    this.MMKV = mmkv;
-    this.instanceID = id;
+    this.MMKV = args.mmkv;
+    this.instanceID = args.instanceID;
     this.options = args;
-    this.strings = new stringsIndex({ id: args.id, mmkv: args.mmkv });
-    this.numbers = new numbersIndex({ id: args.id, mmkv: args.mmkv });
-    this.booleans = new boolIndex({ id: args.id, mmkv: args.mmkv });
-    this.maps = new mapsIndex({ id: args.id, mmkv: args.mmkv });
-    this.arrays = new arrayIndex({ id: args.id, mmkv: args.mmkv });
+    this.strings = new stringsIndex(args);
+    this.numbers = new numbersIndex(args);
+    this.booleans = new boolIndex(args);
+    this.maps = new mapsIndex(args);
+    this.arrays = new arrayIndex(args);
+  
   }
 
   async getKeys() {
-    return await handleActionAsync(this.MMKV.getKeys, this.instanceID);
+    return await handleActionAsync(this.options,this.MMKV.getKeys, this.instanceID);
   }
 
   async hasKey(key) {
-    return await handleActionAsync(this.MMKV.hasKey, this.instanceID, key);
+    return await handleActionAsync(this.options,this.MMKV.hasKey, this.instanceID, key);
   }
 }
