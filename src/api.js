@@ -54,7 +54,7 @@ export default class API {
   }
 
   async getMultipleItemsAsync(keys) {
-    return promisify(this.getMultipleItems)(keys, value);
+    return promisify(this.getMultipleItems)(keys);
   }
 
   async setArrayAsync(key, array) {
@@ -66,7 +66,6 @@ export default class API {
   }
 
   setString = (key, value, callback) => {
-  
     handleAction(
       this.options,
       this.MMKV.setString,
@@ -74,7 +73,7 @@ export default class API {
       this.instanceID,
       key,
       value
-    )
+    );
   };
 
   getString = (key, callback) => {
@@ -85,17 +84,18 @@ export default class API {
       this.instanceID,
       key,
       DATA_TYPES.STRING
-    )
+    );
   };
 
   setInt = (key, value, callback) => {
     handleAction(
       this.options,
-      this.MMKV.setInt, 
-      callback, 
-      this.instanceID, 
-      key, 
-      value)
+      this.MMKV.setInt,
+      callback,
+      this.instanceID,
+      key,
+      value
+    );
   };
 
   getInt = (key, callback) => {
@@ -106,17 +106,18 @@ export default class API {
       this.instanceID,
       key,
       DATA_TYPES.NUMBER
-    )
+    );
   };
 
   setBool = (key, value, callback) => {
     handleAction(
       this.options,
-      this.MMKV.setBool, 
-      callback, 
-      this.instanceID, 
-      key, 
-      value);
+      this.MMKV.setBool,
+      callback,
+      this.instanceID,
+      key,
+      value
+    );
   };
 
   getBool = (key, callback) => {
@@ -127,7 +128,7 @@ export default class API {
       this.instanceID,
       key,
       DATA_TYPES.BOOL
-    )
+    );
   };
 
   setMap = (key, value, callback) => {
@@ -139,7 +140,7 @@ export default class API {
       key,
       value,
       false
-    )
+    );
   };
 
   getMap = (key, callback) => {
@@ -150,7 +151,7 @@ export default class API {
       this.instanceID,
       key,
       DATA_TYPES.MAP
-    )
+    );
   };
 
   getMultipleItems = (keys, callback) => {
@@ -160,7 +161,7 @@ export default class API {
       callback,
       this.instanceID,
       keys
-    )
+    );
   };
 
   setArray = (key, array, callback) => {
@@ -177,7 +178,7 @@ export default class API {
       key,
       data,
       true
-    )
+    );
   };
 
   getArray = (key, callback) => {
@@ -199,7 +200,7 @@ export default class API {
       this.instanceID,
       key,
       DATA_TYPES.ARRAY
-    )
+    );
   };
 
   async getCurrentMMKVInstanceIDs() {
@@ -211,13 +212,20 @@ export default class API {
   }
 
   async removeItem(key) {
-   return await handleActionAsync(
-    this.options, 
-    this.MMKV.removeItem,this.instanceID, key)
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.removeItem,
+      this.instanceID,
+      key
+    );
   }
 
   async clearStore() {
-   return await handleActionAsync(this.options,this.MMKV.clearStore,this.instanceID, key)
-    
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.clearStore,
+      this.instanceID,
+      key
+    );
   }
 }
