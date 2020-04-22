@@ -430,6 +430,6 @@ declare module MMKVStorage {
      *
      */
 
-    initialize(): Promise<API>;
+    initialize(): API;
   }
 }

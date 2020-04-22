@@ -1,6 +1,4 @@
-
 export const currentInstancesStatus = {};
-
 
 /**
  *
@@ -80,7 +78,7 @@ function initWithEncryptionUsingNewKey(options, callback) {
   if (options.key == null || options.key.length < 3)
     throw new Error("Key is null or too short");
 
-    options.mmkv.setSecureKey(
+  options.mmkv.setSecureKey(
     options.alias,
     options.key,
     { accessible: options.accessibleMode },
@@ -119,7 +117,7 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
   if (options.key == null || options.key.length < 3)
     throw new Error("Key is null or too short");
 
-    options.mmkv.setupWithEncryption(
+  options.mmkv.setupWithEncryption(
     options.instanceID,
     options.processingMode,
     options.key,
@@ -144,7 +142,6 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
  */
 
 function initWithoutEncryption(options, callback) {
-
   options.mmkv.setup(
     options.instanceID,
     options.processingMode,
@@ -152,7 +149,7 @@ function initWithoutEncryption(options, callback) {
       if (error) {
         callback(error, null);
       }
-    
+
       callback(null, true);
     }
   );

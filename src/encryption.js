@@ -11,9 +11,7 @@ function encryptStorage(
   accessibleMode,
   callback
 ) {
-  
   if (secureKeyStorage) {
-   
     options.mmkv.setSecureKey(
       alias,
       key,
@@ -22,7 +20,8 @@ function encryptStorage(
         if (error) {
           return;
         } else {
-          options.mmkv.encrypt(options.instanceID, key, alias)
+          options.mmkv
+            .encrypt(options.instanceID, key, alias)
             .then((r) => {
               callback(null, r);
             })
@@ -33,7 +32,8 @@ function encryptStorage(
       }
     );
   } else {
-    options.mmkv.encrypt(options.instanceID, key, null)
+    options.mmkv
+      .encrypt(options.instanceID, key, null)
       .then((r) => {
         callback(null, r);
       })
@@ -56,11 +56,10 @@ export default class encryption {
   }
 
   async encrypt(key, secureKeyStorage = true, alias, accessibleMode) {
-   
     if (accessibleMode) {
       this.accessibleMode = accessibleMode;
     }
-  
+
     this.alias = stringToHex(this.aliasPrefix + this.instanceID);
     if (key) {
       this.key = key;
@@ -81,15 +80,17 @@ export default class encryption {
       if (currentInstancesStatus[this.instanceID]) {
         encryptStorage(
           this.options,
-          this.key, 
-          secureKeyStorage, 
-          this.alias, 
-          this.accessibleMode, (e, r) => {
-          if (e) {
-            reject(e);
+          this.key,
+          secureKeyStorage,
+          this.alias,
+          this.accessibleMode,
+          (e, r) => {
+            if (e) {
+              reject(e);
+            }
+            resolve(r);
           }
-          resolve(r);
-        })
+        );
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
@@ -98,9 +99,9 @@ export default class encryption {
           currentInstancesStatus[this.instanceID] = true;
           encryptStorage(
             this.options,
-            this.key, 
-            secureKeyStorage, 
-            this.alias, 
+            this.key,
+            secureKeyStorage,
+            this.alias,
             this.accessibleMode,
             (e, r) => {
               if (e) {
@@ -108,14 +109,18 @@ export default class encryption {
               }
               resolve(r);
             }
-          )
+          );
         });
       }
     });
   }
 
   async decrypt() {
-    return await handleActionAsync(this.options,this.MMKV.decrypt, this.instanceID);
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.decrypt,
+      this.instanceID
+    );
   }
 
   async changeEncryptionKey(
@@ -123,8 +128,7 @@ export default class encryption {
     secureKeyStorage = true,
     alias,
     accessibleMode
-  ) { 
-
+  ) {
     if (accessibleMode) {
       this.accessibleMode = accessibleMode;
     }
@@ -148,16 +152,17 @@ export default class encryption {
       if (currentInstancesStatus[this.instanceID]) {
         encryptStorage(
           this.options,
-          this.key, 
-          secureKeyStorage, 
-          this.alias, 
-          this.accessibleMode, (e, r) => {
-          if (e) {
-            reject(e);
+          this.key,
+          secureKeyStorage,
+          this.alias,
+          this.accessibleMode,
+          (e, r) => {
+            if (e) {
+              reject(e);
+            }
+            resolve(r);
           }
-          resolve(r);
-        })
-
+        );
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
@@ -166,9 +171,9 @@ export default class encryption {
           currentInstancesStatus[this.instanceID] = true;
           encryptStorage(
             this.options,
-            this.key, 
-            secureKeyStorage, 
-            this.alias, 
+            this.key,
+            secureKeyStorage,
+            this.alias,
             this.accessibleMode,
             (e, r) => {
               if (e) {
@@ -176,7 +181,7 @@ export default class encryption {
               }
               resolve(r);
             }
-          )
+          );
         });
       }
     });

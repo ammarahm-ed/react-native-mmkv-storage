@@ -1,11 +1,11 @@
-const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const numbers = '0123456789';
+const lowercase = "abcdefghijklmnopqrstuvwxyz";
+const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numbers = "0123456789";
 
 const all = lowercase + uppercase + numbers;
 
 export default function generatePassword() {
-  let password = '';
+  let password = "";
 
   password += pick(password, lowercase, 1, 5);
   password += pick(password, uppercase, 1, 5);
@@ -15,7 +15,8 @@ export default function generatePassword() {
 }
 
 function pick(exclusions, string, min, max) {
-  var n, chars = '';
+  var n,
+    chars = "";
 
   if (max === undefined) {
     n = min;
@@ -36,15 +37,18 @@ function pick(exclusions, string, min, max) {
 }
 
 function shuffle(string) {
-  var array = string.split('');
-  var tmp, current, top = array.length;
+  var array = string.split("");
+  var tmp,
+    current,
+    top = array.length;
 
-  if (top) while (--top) {
-    current = Math.floor(Math.random() * (top + 1));
-    tmp = array[current];
-    array[current] = array[top];
-    array[top] = tmp;
-  }
+  if (top)
+    while (--top) {
+      current = Math.floor(Math.random() * (top + 1));
+      tmp = array[current];
+      array[current] = array[top];
+      array[top] = tmp;
+    }
 
-  return array.join('');
+  return array.join("");
 }

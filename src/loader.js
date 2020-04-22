@@ -9,8 +9,8 @@ export default class Loader {
     this.instanceID = "default";
     this.initWithEncryption = false;
     this.secureKeyStorage = false;
-    this.accessibleMode = ACCESSIBLE.WHEN_UNLOCKED
-    this.processingMode = MODES.SINGLE_PROCESS
+    this.accessibleMode = ACCESSIBLE.WHEN_UNLOCKED;
+    this.processingMode = MODES.SINGLE_PROCESS;
     this.aliasPrefix = "com.MMKV.";
     this.alias = null;
     this.key = null;
@@ -21,7 +21,6 @@ export default class Loader {
 
   withInstanceID(id) {
     this.instanceID = id;
-
     return this;
   }
 
@@ -48,40 +47,31 @@ export default class Loader {
         this.alias = stringToHex(this.aliasPrefix + this.instanceID);
       }
     }
-
     return this;
   }
 
   setProcessingMode(mode) {
     this.processingMode = mode;
-
     return this;
   }
 
- initialize() {
-
-  currentInstancesStatus[this.instanceID] = false;
-  
-  return this.getInstance();
- }
+  initialize() {
+    currentInstancesStatus[this.instanceID] = false;
+    return this.getInstance();
+  }
 
   generateKey() {
     this.key = generatePassword();
-
     return this;
   }
 
   getInstance() {
-
     if (this.error) {
       throw new Error(this.error);
     }
     let options = this;
-
     let instance = new API(options);
 
     return instance;
-
-
   }
 }
