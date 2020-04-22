@@ -17,8 +17,8 @@ export default class API {
     this.key = args.key;
     this.initialized = false;
     this.options = args;
-    this.encryption = new encryption(args);
-    this.indexer = new indexer(args);
+    this.encryption = new encryption(this.options);
+    this.indexer = new indexer(this.options);
   }
 
   setStringAsync(key, value) {
@@ -102,11 +102,7 @@ export default class API {
   };
 
   setBool = (key, value, callback) => {
-    handleAction(this.MMKV.setBool, 
-      callback, 
-      this.instanceID, 
-      key, 
-      value).call(
+    handleAction(this.MMKV.setBool, callback, this.instanceID, key, value).call(
       this
     );
   };
@@ -197,11 +193,18 @@ export default class API {
   }
 
   async removeItem(key) {
-   return await handleActionAsync(this.MMKV.removeItem,this.instanceID, key).call(this);
+    return await handleActionAsync(
+      this.MMKV.removeItem,
+      this.instanceID,
+      key
+    ).call(this);
   }
 
   async clearStore() {
-   return await handleActionAsync(this.MMKV.clearStore,this.instanceID, key).call(this);
-    
+    return await handleActionAsync(
+      this.MMKV.clearStore,
+      this.instanceID,
+      key
+    ).call(this);
   }
 }
