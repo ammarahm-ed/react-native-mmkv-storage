@@ -14,7 +14,7 @@ export default class Loader {
     this.aliasPrefix = "com.MMKV.";
     this.alias = null;
     this.key = null;
-    this.MMKV = NativeModules.MMKVStorage;
+    this.mmkv = NativeModules.MMKVStorage;
     this.initialized = false;
     this.error = null;
   }
@@ -76,7 +76,7 @@ export default class Loader {
     if (this.error) {
       throw new Error(this.error);
     }
-    let options = { id: this.instanceID, mmkv: this.MMKV, alias: this.alias, aliasPrefix: this.aliasPrefix, key: this.key, accessibleMode: this.accessibleMode }
+    let options = this;
 
     let instance = new API(options);
 
