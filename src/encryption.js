@@ -3,8 +3,13 @@ import generatePassword from "./keygen";
 import { stringToHex } from "./utils";
 import { handleActionAsync } from "react-native-mmkv-storage/src/handlers";
 
-function encryptStorage(key, secureKeyStorage = true, alias, accessibleMode, callback) {
-
+function encryptStorage(
+  key,
+  secureKeyStorage = true,
+  alias,
+  accessibleMode,
+  callback
+) {
   if (accessibleMode) {
     this.accessibleMode = accessibleMode;
   }
@@ -32,23 +37,26 @@ function encryptStorage(key, secureKeyStorage = true, alias, accessibleMode, cal
         if (error) {
           return;
         } else {
-          await this.MMKV.encrypt(this.instanceID, key, this.alias).then(r => {
-            callback(null, r);
-          }).catch(e => {
-            callback(e, null);
-          })
+          this.MMKV.encrypt(this.instanceID, key, this.alias)
+            .then((r) => {
+              callback(null, r);
+            })
+            .catch((e) => {
+              callback(e, null);
+            });
         }
       }
     );
   } else {
-    this.MMKV.encrypt(this.instanceID, key, null).then(r => {
-      callback(null, r);
-    }).catch(e => {
-      callback(e, null)
-    })
+    this.MMKV.encrypt(this.instanceID, key, null)
+      .then((r) => {
+        callback(null, r);
+      })
+      .catch((e) => {
+        callback(e, null);
+      });
   }
 }
-
 
 export default class encryption {
   constructor(args) {
@@ -64,7 +72,6 @@ export default class encryption {
 
   async encrypt(key, secureKeyStorage = true, alias, accessibleMode) {
     return new Promise((resolve, reject) => {
-
       if (!currentInstancesStatus[this.instanceID]) {
         encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
           if (e) {
@@ -72,31 +79,40 @@ export default class encryption {
           }
           resolve(r);
         }).call(this);
-
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
             return;
           }
           currentInstancesStatus[this.instanceID] = true;
-          encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
-            if (e) {
-              reject(e);
+          encryptStorage(
+            key,
+            secureKeyStorage,
+            alias,
+            accessibleMode,
+            (e, r) => {
+              if (e) {
+                reject(e);
+              }
+              resolve(r);
             }
-            resolve(r);
-          }).call(this);
+          ).call(this);
         });
       }
-    })
+    });
   }
 
   async decrypt() {
     return await handleActionAsync(this.MMKV.decrypt, this.instanceID);
   }
 
-  async changeEncryptionKey(key, secureKeyStorage = true, alias, accessibleMode) {
+  async changeEncryptionKey(
+    key,
+    secureKeyStorage = true,
+    alias,
+    accessibleMode
+  ) {
     return new Promise(async (resolve, reject) => {
-
       if (!currentInstancesStatus[this.instanceID]) {
         encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
           if (e) {
@@ -104,23 +120,26 @@ export default class encryption {
           }
           resolve(r);
         }).call(this);
-
       } else {
         initialize(this.options, (e, r) => {
           if (e) {
             return;
           }
           currentInstancesStatus[this.instanceID] = true;
-          encryptStorage(key, secureKeyStorage, alias, accessibleMode, (e, r) => {
-            if (e) {
-              reject(e);
+          encryptStorage(
+            key,
+            secureKeyStorage,
+            alias,
+            accessibleMode,
+            (e, r) => {
+              if (e) {
+                reject(e);
+              }
+              resolve(r);
             }
-            resolve(r);
-          }).call(this);
+          ).call(this);
         });
       }
-    })
-
-
+    });
   }
 }
