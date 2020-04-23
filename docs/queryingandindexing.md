@@ -7,8 +7,7 @@ First we create a default MMKV Instance
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
 
-MMKV = await new MMKVStorage.Loader().initialize()
-
+MMKV = new MMKVStorage.Loader().initialize();
 ```
 
 # Instance Indexer
@@ -25,9 +24,7 @@ Check if any data exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.hasKey("your key").then(result => {
+MMKV.indexer.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -44,7 +41,6 @@ MMKV.indexer.hasKey("your key").then(result => {
 Get all the keys in the storage for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.getKeys();
 });
@@ -67,9 +63,7 @@ Check if any data exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.strings.hasKey("your key").then(result => {
+MMKV.indexer.strings.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -86,7 +80,6 @@ MMKV.indexer.strings.hasKey("your key").then(result => {
 Get all the keys in the Storage indexer for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.strings.getKeys();
 });
@@ -100,7 +93,6 @@ let keys = await MMKV.indexer.strings.getKeys();
 Get all strings in the storage.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let strings = await MMKV.indexer.strings.getAll();
 
@@ -115,7 +107,7 @@ The Array returned has the following structure:
 ```js
 [
   [key, data],
-  [key, data]
+  [key, data],
 ];
 ```
 
@@ -135,9 +127,7 @@ Check if any number exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.numbers.hasKey("your key").then(result => {
+MMKV.indexer.numbers.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -154,7 +144,6 @@ MMKV.indexer.numbers.hasKey("your key").then(result => {
 Get all the keys in the number indexer for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.numbers.getKeys();
 });
@@ -168,7 +157,6 @@ let keys = await MMKV.indexer.numbers.getKeys();
 Get all numbers stored in the storage.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let numbers = await MMKV.indexer.numbers.getAll();
 
@@ -183,16 +171,15 @@ The Array returned has the following structure:
 ```js
 [
   [key, data],
-  [key, data]
+  [key, data],
 ];
 ```
 
 The first item in each array is the `key` for the data, and the second item is object itself.
 
-
 # Boolean Indexer
-Index of all the booleans in storage.
 
+Index of all the booleans in storage.
 
 ##### hasKey
 
@@ -204,9 +191,7 @@ Check if any boolean exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.booleans.hasKey('your key').then(result => {
+MMKV.indexer.booleans.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -218,30 +203,30 @@ MMKV.indexer.booleans.hasKey('your key').then(result => {
 **Returns**
 `Promise<boolean>`
 
-
 ##### getKeys
+
 Get all the keys in the boolean indexer for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.booleans.getKeys();
 });
 ```
+
 **Returns**
 `Promise<boolean>`
 
 ##### getAll
+
 Get all booleans stored in the storage.
 
-
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let booleans = await MMKV.indexer.booleans.getAll();
 
 });
 ```
+
 **Returns**
 `Promise<Array<>>`
 
@@ -250,14 +235,15 @@ The Array returned has the following structure:
 ```js
 [
   [key, data],
-  [key, data]
+  [key, data],
 ];
 ```
+
 The first item in each array is the `key` for the data, and the second item is object itself.
 
 # Map Indexer
-Index of all the objects in storage.
 
+Index of all the objects in storage.
 
 ##### hasKey
 
@@ -269,9 +255,7 @@ Check if any objects exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.maps.hasKey('your key').then(result => {
+MMKV.indexer.maps.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -283,30 +267,30 @@ MMKV.indexer.maps.hasKey('your key').then(result => {
 **Returns**
 `Promise<boolean>`
 
-
 ##### getKeys
+
 Get all the keys in the objects indexer for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.maps.getKeys();
 });
 ```
+
 **Returns**
 `Promise<boolean>`
 
 ##### getAll
+
 Get all objects stored in the storage.
 
-
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let numbers = await MMKV.indexer.maps.getAll();
 
 });
 ```
+
 **Returns**
 `Promise<Array<>>`
 
@@ -315,15 +299,15 @@ The Array returned has the following structure:
 ```js
 [
   [key, data],
-  [key, data]
+  [key, data],
 ];
 ```
+
 The first item in each array is the `key` for the data, and the second item is object itself.
 
-
 # Arrays Indexer
-Index of all the arrays in storage.
 
+Index of all the arrays in storage.
 
 ##### hasKey
 
@@ -335,9 +319,7 @@ Check if any array exists for a given key.
 | key | String |
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
-
-MMKV.indexer.arrays.hasKey('your key').then(result => {
+MMKV.indexer.arrays.hasKey("your key").then((result) => {
   if (result) {
     // if true do this.
   } else {
@@ -349,30 +331,30 @@ MMKV.indexer.arrays.hasKey('your key').then(result => {
 **Returns**
 `Promise<boolean>`
 
-
 ##### getKeys
+
 Get all the keys in the array indexer for all stored items.
 
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let keys = await MMKV.indexer.arrays.getKeys();
 });
 ```
+
 **Returns**
 `Promise<boolean>`
 
 ##### getAll
+
 Get all arrays stored in the storage.
 
-
 ```jsx
-import MMKV from "react-native-mmkv-storage";
 
 let numbers = await MMKV.indexer.arrays.getAll();
 
 });
 ```
+
 **Returns**
 `Promise<Array<>>`
 
@@ -381,7 +363,8 @@ The Array returned has the following structure:
 ```js
 [
   [key, data],
-  [key, data]
+  [key, data],
 ];
 ```
+
 The first item in each array is the `key` for the data, and the second item is object itself.

@@ -1,25 +1,24 @@
 import encryption from "react-native-mmkv-storage/src/encryption";
-import { promisify } from "react-native-mmkv-storage/src/utils";
 import indexer from "react-native-mmkv-storage/src/indexer/indexer";
-import { DATA_TYPES, ACCESSIBLE } from "./utils";
+import { promisify } from "react-native-mmkv-storage/src/utils";
+import { DATA_TYPES } from "./utils";
+import { handleAction, handleActionAsync } from "./handlers";
 
 export default class API {
-  constructor({ id = "default", mmkv, alias, aliasPrefix, key, accessibleMode = ACCESSIBLE.WHEN_UNLOCKED }) {
-    this.MMKV = mmkv;
-    this.instanceID = id;
-    this.alias = alias;
-    this.aliasPrefix = aliasPrefix;
-    this.key = key;
-    let options = {
-      id: this.instanceID,
-      mmkv: this.MMKV,
-      alias: this.alias,
-      aliasPrefix: this.aliasPrefix,
-      key: this.key,
-      accessibleMode: accessibleMode
-    };
-    this.encryption = new encryption(options);
-    this.indexer = new indexer(options);
+  constructor(args) {
+    this.MMKV = args.mmkv;
+    this.instanceID = args.instanceID;
+    this.initWithEncryption = args.initWithEncryption;
+    this.accessibleMode = args.accessibleMode;
+    this.processingMode = args.processingMode;
+    this.secureKeyStorage = args.secureKeyStorage;
+    this.alias = args.alias;
+    this.aliasPrefix = args.aliasPrefix;
+    this.key = args.key;
+    this.initialized = false;
+    this.options = args;
+    this.encryption = new encryption(this.options);
+    this.indexer = new indexer(this.options);
   }
 
   setStringAsync(key, value) {
@@ -55,13 +54,11 @@ export default class API {
   }
 
   async getMultipleItemsAsync(keys) {
-    return promisify(this.getMultipleItems)(keys, value);
+    return promisify(this.getMultipleItems)(keys);
   }
 
   async setArrayAsync(key, array) {
-
-    return promisify(this.setArray)(key, array)
-
+    return promisify(this.setArray)(key, array);
   }
 
   async getArrayAsync(key) {
@@ -69,42 +66,103 @@ export default class API {
   }
 
   setString = (key, value, callback) => {
-    return this.MMKV.setString(this.instanceID, key, value, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.setString,
+      callback,
+      this.instanceID,
+      key,
+      value
+    );
+  };
 
   getString = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.STRING, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.STRING
+    );
+  };
 
   setInt = (key, value, callback) => {
-    return this.MMKV.setInt(this.instanceID, key, value, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.setInt,
+      callback,
+      this.instanceID,
+      key,
+      value
+    );
+  };
 
   getInt = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.NUMBER, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.NUMBER
+    );
+  };
 
   setBool = (key, value, callback) => {
-
-    return this.MMKV.setBool(this.instanceID, key, value, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.setBool,
+      callback,
+      this.instanceID,
+      key,
+      value
+    );
+  };
 
   getBool = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.BOOL, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.BOOL
+    );
+  };
 
   setMap = (key, value, callback) => {
-
-    return this.MMKV.setMap(this.instanceID, key, value, false, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.setMap,
+      callback,
+      this.instanceID,
+      key,
+      value,
+      false
+    );
+  };
 
   getMap = (key, callback) => {
-    return this.MMKV.getItem(this.instanceID, key, DATA_TYPES.MAP, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.getItem,
+      callback,
+      this.instanceID,
+      key,
+      DATA_TYPES.MAP
+    );
+  };
 
   getMultipleItems = (keys, callback) => {
-    return this.MMKV.getMultipleItems(this.instanceID, keys, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.getMultipleItems,
+      callback,
+      this.instanceID,
+      keys
+    );
+  };
 
   setArray = (key, array, callback) => {
     if (!Array.isArray(array))
@@ -112,23 +170,38 @@ export default class API {
     let data = {};
     data[key] = array.slice();
 
-    return this.MMKV.setMap(this.instanceID, key, data, true, callback);
-  }
+    handleAction(
+      this.options,
+      this.MMKV.setMap,
+      callback,
+      this.instanceID,
+      key,
+      data,
+      true
+    );
+  };
 
   getArray = (key, callback) => {
-    this.MMKV.getItem(this.instanceID, key, DATA_TYPES.ARRAY, (error, data) => {
+    handleAction(
+      this.options,
+      this.MMKV.getItem,
+      (error, data) => {
+        if (error) {
+          callback(error, null);
+          return;
+        }
 
-      if (error) {
-        return callback(error, null);
-      }
-
-      if (data) {
-        return callback(null, data[key].slice());
-      } else {
-        return callback(null, []);
-      }
-    });
-  }
+        if (data) {
+          callback(null, data[key].slice());
+        } else {
+          callback(null, []);
+        }
+      },
+      this.instanceID,
+      key,
+      DATA_TYPES.ARRAY
+    );
+  };
 
   async getCurrentMMKVInstanceIDs() {
     return await this.MMKV.getCurrentMMKVInstanceIDs();
@@ -139,12 +212,19 @@ export default class API {
   }
 
   async removeItem(key) {
-    return await this.MMKV.removeItem(this.instanceID, key);
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.removeItem,
+      this.instanceID,
+      key
+    );
   }
 
   async clearStore() {
-    return await this.MMKV.clearStore(this.instanceID);
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.clearStore,
+      this.instanceID,
+    );
   }
-
-
 }

@@ -1,27 +1,46 @@
-import { DATA_TYPES, promisify } from "../utils";
-
+import { handleAction, handleActionAsync } from "../handlers";
+import { DATA_TYPES } from "../utils";
 export default class stringsIndex {
-  constructor({ id = "default", mmkv }) {
-    this.MMKV = mmkv;
-    this.instanceID = id;
+  constructor(args) {
+    this.MMKV = args.mmkv;
+    this.instanceID = args.instanceID;
+    this.options = args;
   }
 
   async getKeys() {
-    return await this.MMKV.getTypeIndex(this.instanceID, DATA_TYPES.STRING);
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.getTypeIndex,
+      this.instanceID,
+      DATA_TYPES.STRING
+    )
   }
 
   async hasKey(key) {
-    return await this.MMKV.typeIndexerHasKey(
+    return await handleActionAsync(
+      this.options,
+      this.MMKV.typeIndexerHasKey,
       this.instanceID,
       key,
       DATA_TYPES.STRING
-    );
+      )
   }
 
   async getAll() {
-    return promisify(this.MMKV.getItemsForType)(
-      this.instanceID,
-      DATA_TYPES.STRING
-    );
+    return new Promise((resolve, reject) => {
+      handleAction(
+        this.options,
+        this.MMKV.getItemsForType,
+        (error, result) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(result);
+        },
+        this.instanceID,
+        DATA_TYPES.STRING
+        )
+    });
   }
 }

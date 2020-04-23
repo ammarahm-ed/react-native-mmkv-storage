@@ -88,13 +88,13 @@ declare module MMKVStorage {
      * @param {String} key
      * @param {Array} array
      */
-    setArrayAsync(key: string, value: Array<*>): Promise<boolean>;
+    setArrayAsync(key: string, value: Array<any>): Promise<boolean>;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      */
 
-    getArrayAsync(key: string): Promise<Array<*>>;
+    getArrayAsync(key: string): Promise<Array<any>>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -183,14 +183,14 @@ declare module MMKVStorage {
      * @param {Array} array
      * @param {Function} callback
      */
-    setArray(key: string, value: Array<*>, callback: Function): boolean;
+    setArray(key: string, value: Array<any>, callback: Function): boolean;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      * @param {Function} callback
      */
 
-    getArray(key: string, callback: Function): Array<*>;
+    getArray(key: string, callback: Function): Array<any>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -398,14 +398,22 @@ declare module MMKVStorage {
     withEncryption(): this;
 
     /**
-     * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
-     * You must call withEncryption() to use this.
-     * To store your key for later use call withSecureKeyStorage() too.
+     * Set accessible mode for secure storage on ios devices
      *
-     * @param {string} key the key to encrypt the storage with
-     * @param {boolean} secureKeyStorage Should the key be stored securely.
-     * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
+     * @param accessible MMKVStorage.ACCESSIBLE
      */
+
+    setAccessibleMode(accessible: ACCESSIBLE): this;
+
+    /**
+    * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
+    * You must call withEncryption() to use this.
+    * To store your key for later use call withSecureKeyStorage() too.
+    *
+    * @param {string} key the key to encrypt the storage with
+    * @param {boolean} secureKeyStorage Should the key be stored securely.
+    * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
+    */
 
     encryptWithCustomKey(
       key: string,
@@ -430,6 +438,6 @@ declare module MMKVStorage {
      *
      */
 
-    initialize(): Promise<API>;
+    initialize(): API;
   }
 }
