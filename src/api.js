@@ -225,7 +225,6 @@ export default class API {
       this.options,
       this.MMKV.clearStore,
       this.instanceID,
-      key
     );
   }
 }
