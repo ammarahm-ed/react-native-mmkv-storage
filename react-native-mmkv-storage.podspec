@@ -6,7 +6,7 @@ Pod::Spec.new do |s|
   s.name          = package["name"]
   s.version       = package["version"]
   s.summary       = package["description"]
-  s.homepage      = "https://github.com/FidMe/react-native-mmkv-storage"
+  s.homepage      = "https://github.com/ammarahm-ed/react-native-mmkv-storage"
   s.license       = package["license"]
   s.authors       = package["author"]
   s.platform      = :ios, "9.0"
