@@ -21,6 +21,14 @@ export default class API {
     this.indexer = new indexer(this.options);
   }
 
+  setItem(key,value) {
+    return promisify(this.setString)(key, value);
+  }
+
+  getItem(key) {
+    return promisify(this.getString)(key);
+  }
+
   setStringAsync(key, value) {
     return promisify(this.setString)(key, value);
   }

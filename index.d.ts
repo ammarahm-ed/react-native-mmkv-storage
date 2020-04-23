@@ -25,6 +25,25 @@ declare module MMKVStorage {
   const myVar: string;
 
   class API {
+
+
+     /**
+     * Set a string value to storage for a given key. 
+     * This method is added for redux-persist support. It is similar to setStringAsync()
+     *
+     * @param {String} key
+     * @param {String} value
+     *
+     */
+    setItem(key: string, value: string): Promise<boolean>;
+    /**
+     * Get a string value for a given key.
+     * This method is added for redux-persist support. It is similar to setStringAsync()
+     * @param {String} key
+     */
+    getItem(key: string): Promise<string>;
+
+
     /**
      * Set a string value to storag for a given key.
      *

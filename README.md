@@ -8,7 +8,7 @@
 [![](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
 
 
-> An efficient, small mobile key-value storage framework for React Native
+> An efficient, small & encrypted mobile key-value storage framework for React Native
 
 ## What it is
 
@@ -30,6 +30,10 @@ This library aims to provide a fast & reliable solution for you data storage nee
   The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels (API 22 and below), it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs.
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
+
+- **Supports redux-persist**<br/>
+  Support for redux persist is also added starting from v0.3.2.
+
 
 
 ## Links 
