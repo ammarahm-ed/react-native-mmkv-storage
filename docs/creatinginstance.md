@@ -59,7 +59,7 @@ const MMKVwithEncryptionAndID = new MMKVStorage.Loader()
 
 ## Encryption with custom key
 
-While the library can handle the encryption itself, you can choose to provide your own custom encryption key etc. For example, you maybe want to encrypt the storage with a token or user password. This is stored in secure storage by default.
+While the library can handle the encryption itself, you can choose to provide your own custom encryption key etc. For example, you maybe want to encrypt the storage with a token or user password.
 
 ```js
 const MMKVwithEncryptionKey = new MMKVStorage.Loader()
@@ -68,12 +68,12 @@ const MMKVwithEncryptionKey = new MMKVStorage.Loader()
   .initialize();
 ```
 
-And if you do not want the library to store your key in secure storage then.
+And if you want to store this key in secure storage.
 
 ```js
 const MMKVwithEncryptionKey = new MMKVStorage.Loader()
   .withEncryption()
-  .encryptWithCustomKey("encryptionKey",false)
+  .encryptWithCustomKey("encryptionKey",true)
   .initialize();
 ```
 

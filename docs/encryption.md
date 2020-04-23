@@ -25,9 +25,9 @@ await MMKV.encryption.encrypt();
 
 await MMKV.encryption.encrypt("encryptionKey");
 
-// if you dont want to store it
+// if you want to store it
 
-MMKV.encryption.encrypt("encryptionKey", false);
+MMKV.encryption.encrypt("encryptionKey", true);
 ```
 
 ## decrypt
@@ -69,9 +69,9 @@ await MMKV.encryption.changeEncryptionKey();
 
 await MMKV.encryption.changeEncryptionKey("encryptionKey");
 
-// if you dont want to store it
+// if you  want to store it
 
-MMKV.encryption.changeEncryptionKey("encryptionKey", false);
+MMKV.encryption.changeEncryptionKey("encryptionKey", true);
 ```
 
 !> After changing the encryption key, you will need to change your key or provide a key in the loader method above or it will throw error and not load the database.

@@ -2,7 +2,7 @@ import { NativeModules } from "react-native";
 import generatePassword from "./keygen";
 import API from "./api";
 import { stringToHex, ACCESSIBLE, MODES } from "./utils";
-import { currentInstancesStatus } from "./initializer";
+import { currentInstancesStatus, initialize } from "./initializer";
 
 export default class Loader {
   constructor() {
@@ -21,6 +21,7 @@ export default class Loader {
 
   withInstanceID(id) {
     this.instanceID = id;
+
     return this;
   }
 
@@ -47,11 +48,13 @@ export default class Loader {
         this.alias = stringToHex(this.aliasPrefix + this.instanceID);
       }
     }
+
     return this;
   }
 
   setProcessingMode(mode) {
     this.processingMode = mode;
+
     return this;
   }
 
@@ -62,6 +65,7 @@ export default class Loader {
 
   generateKey() {
     this.key = generatePassword();
+
     return this;
   }
 
@@ -70,6 +74,7 @@ export default class Loader {
       throw new Error(this.error);
     }
     let options = this;
+
     let instance = new API(options);
 
     return instance;
