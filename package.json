@@ -14,7 +14,7 @@
     "asyncstorage",
     "async-storage",
     "mmkv-database",
-    "enrypted-storage",
+    "encrypted-storage",
     "encryption",
     "mmkv",
     "android",
@@ -22,7 +22,10 @@
     "key-value-storage",
     "database",
     "fast",
-    "storage"
+    "storage",
+    "persis-storage",
+    "redux-persist-storage"
+
   ],
   "repository": {
     "type": "git",
