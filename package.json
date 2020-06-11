@@ -25,7 +25,6 @@
     "storage",
     "persis-storage",
     "redux-persist-storage"
-
   ],
   "repository": {
     "type": "git",
