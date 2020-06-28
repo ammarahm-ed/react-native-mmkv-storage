@@ -37,7 +37,7 @@ Removes encryption from an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = new MMKVStorage().Loader().withEncryption().initialize();
+MMKV = new MMKVStorage.Loader().withEncryption().initialize();
 
 // Remove encryption from an encrypted instance of MMKV.
 
@@ -61,7 +61,7 @@ Change the encryption key of an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = new MMKVStorage().Loader().withEncryption().initialize().getInstance();
+MMKV = new MMKVStorage.Loader().withEncryption().initialize();
 
 await MMKV.encryption.changeEncryptionKey();
 
