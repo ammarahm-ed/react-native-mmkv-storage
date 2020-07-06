@@ -42,7 +42,7 @@ repositories {
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.tencent:mmkv-static:1.2.0'
+    implementation 'com.tencent:mmkv-static:1.2.1'
     implementation "com.scottyab:secure-preferences-lib:0.1.4"
 }
   
