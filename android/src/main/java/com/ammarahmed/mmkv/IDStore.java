@@ -3,16 +3,8 @@ package com.ammarahmed.mmkv;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
-
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.tencent.mmkv.MMKV;
-
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class IDStore {
 
@@ -105,10 +97,12 @@ public class IDStore {
     public boolean exists(String ID) {
         boolean hasKey = store.containsKey("mmkvIdStore");
         if (hasKey) {
-            Set<String> IdStore = new HashSet<>();
-            IdStore = store.decodeStringSet("mmkvIdStore", IdStore);
+            HashMap<String, Object> IdStore = new HashMap<>();
+            Bundle mmkvIdStore = store.decodeParcelable("mmkvIdStore", Bundle.class);
+            IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
 
-            return IdStore.contains(ID);
+
+            return IdStore.containsKey(ID);
 
         } else {
 

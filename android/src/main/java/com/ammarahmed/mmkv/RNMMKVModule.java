@@ -106,12 +106,10 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             mmkvMap.put(ID, kv);
             callback.invoke(null, true);
         } else {
-
             if (kv.containsKey(ID)) {
                 mmkvMap.put(ID, kv);
                 callback.invoke(null, true);
             } else {
-
                 encryptionHandler(ID, mode, callback);
             }
         }
