@@ -18,7 +18,15 @@ const  int DATA_TYPE_MAP = 4;
 
 const  int DATA_TYPE_ARRAY = 5;
 
-
+static dispatch_queue_t RCTGetMethodQueue()
+{
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("MMKVStorage.Queue", DISPATCH_QUEUE_SERIAL);
+    });
+    return queue;
+}
 
 MMKV *mmkv;
 SecureStorage *secureStorage;
@@ -30,7 +38,7 @@ RCT_EXPORT_MODULE()
 
 - (dispatch_queue_t)methodQueue
 {
-    return dispatch_get_main_queue();
+    return RCTGetMethodQueue();
 }
 
 - (id)init
@@ -49,7 +57,7 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-    return NO;
+    return YES;
 }
 
 #pragma mark setupWithEncryption
@@ -535,5 +543,4 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
 }
 
 @end
-
 
