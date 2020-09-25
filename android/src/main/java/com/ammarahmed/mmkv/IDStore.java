@@ -30,7 +30,7 @@ public class IDStore {
         HashMap<String, Object> child = new HashMap<>();
         child.put("ID", ID);
         child.put("encrypted", encrypted);
-        child.put(alias, alias);
+        child.put("alias", alias);
         IdStore.put(ID, child);
 
         Bundle bundle = new Bundle();
