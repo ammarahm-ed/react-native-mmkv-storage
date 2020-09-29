@@ -53,7 +53,7 @@ function initWithEncryptionUsingOldKey(options, callback) {
         options.processingMode,
         value,
         options.alias,
-        (error, result) => {
+        (error) => {
           if (error) {
             callback(error, null);
             return;
@@ -82,7 +82,7 @@ function initWithEncryptionUsingNewKey(options, callback) {
     options.alias,
     options.key,
     { accessible: options.accessibleMode },
-    (error, result) => {
+    (error) => {
       if (error) {
         callback(error, null);
       }
@@ -91,7 +91,7 @@ function initWithEncryptionUsingNewKey(options, callback) {
         options.processingMode,
         options.key,
         options.alias,
-        (error, result) => {
+        (error) => {
           if (error) {
             callback(error, null);
             return;
@@ -122,7 +122,7 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
     options.processingMode,
     options.key,
     options.alias,
-    (error, result) => {
+    (error) => {
       if (error) {
         callback(error, null);
         return;
@@ -145,7 +145,7 @@ function initWithoutEncryption(options, callback) {
   options.mmkv.setup(
     options.instanceID,
     options.processingMode,
-    (error, result) => {
+    (error) => {
       if (error) {
         callback(error, null);
       }
