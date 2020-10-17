@@ -14,5 +14,5 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/**/*.{h,m}"
   s.requires_arc  = true
   s.dependency 'React'
-  s.dependency 'MMKV', '1.2.3'
+  s.dependency 'MMKV', '1.2.2'
 end
