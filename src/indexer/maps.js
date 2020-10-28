@@ -32,10 +32,7 @@ export default class mapsIndex {
         this.options,
         this.MMKV.getItemsForType,
         (error, result) => {
-          if (error) {
-            reject(error);
-            return;
-          }
+          
           resolve(result);
         },
         this.instanceID,

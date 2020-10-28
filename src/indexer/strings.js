@@ -32,10 +32,7 @@ export default class stringsIndex {
         this.options,
         this.MMKV.getItemsForType,
         (error, result) => {
-          if (error) {
-            reject(error);
-            return;
-          }
+          
           resolve(result);
         },
         this.instanceID,

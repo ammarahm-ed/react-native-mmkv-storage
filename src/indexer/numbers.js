@@ -31,10 +31,7 @@ export default class numbersIndex {
       handleAction(
         this.options,
         this.MMKV.getItemsForType,(error,result) => {
-        if (error) {
-          reject(error);
-          return;
-        }
+       
         resolve(result);
       },this.instanceID,DATA_TYPES.NUMBER)
 
