@@ -31,13 +31,16 @@ public class StorageGetters {
         if (mmkvMap.containsKey(ID)) {
             final MMKV kv = mmkvMap.get(ID);
 
+            String string;
+
             if (kv.containsKey(key)) {
 
                 switch (type) {
 
                     case Constants.DATA_TYPE_STRING:
 
-                        callback.invoke(null, kv.decodeString(key));
+                        string = kv.decodeString(key);
+                        callback.invoke(null, string != null? string : null);
 
                         break;
                     case Constants.DATA_TYPE_INT:
@@ -53,7 +56,7 @@ public class StorageGetters {
                     case Constants.DATA_TYPE_ARRAY:
                         Bundle bundle = kv.decodeParcelable(key, Bundle.class);
                         WritableMap map = Arguments.fromBundle(bundle);
-                        callback.invoke(null, map);
+                        callback.invoke(null, map != null ? map : null);
                         break;
                     
                 }

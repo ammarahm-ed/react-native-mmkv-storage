@@ -34,16 +34,20 @@
         
         
         MMKV *kv = [mmkvMap objectForKey:ID];
+        NSString *string;
+        NSDictionary *dic;
+        NSNumber *num;
         
         if ([kv containsKey:key]) {
             switch (type.integerValue) {
                 case 1:
+                    string =[kv getObjectOfClass:NSString.class forKey:key];
                     
-                    callback(@[[NSNull null], [kv getObjectOfClass:NSString.class forKey:key]]);
+                    callback(@[[NSNull null], string? string : [NSNull null]]);
                     break;
                 case 2:
-                    
-                    callback(@[[NSNull null], [NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]]]);
+                    num =[NSNumber numberWithUnsignedLongLong:[kv getInt64ForKey:key]];
+                    callback(@[[NSNull null],num? num : [NSNull null] ]);
                     break;
                 case 3:
                     
@@ -54,12 +58,14 @@
                     }
                     break;
                 case 4:
-                    callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
+                    dic =  [kv getObjectOfClass:NSDictionary.class forKey:key];
+                    callback(@[[NSNull null],dic? dic : [NSNull null]]);
                     
                     break;
                 case 5:
                     
-                    callback(@[[NSNull null], [kv getObjectOfClass:NSDictionary.class forKey:key]]);
+                     dic =  [kv getObjectOfClass:NSDictionary.class forKey:key];
+                     callback(@[[NSNull null],dic? dic : [NSNull null]]);
                     
                     break;
                 default:
@@ -78,6 +84,7 @@
         
     }
 }
+
 
 
 +(void)getMultipleItems:(NSString *)ID key:(NSArray*)keys
