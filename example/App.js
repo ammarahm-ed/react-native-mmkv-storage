@@ -9,7 +9,7 @@ import {
 
 import MMKV from 'react-native-mmkv-storage';
 
-const MMKVStorage = new MMKV.Loader().initialize();
+const MMKVStorage = new MMKV.Loader().withEncryption().initialize();
 
 const App = () => {
   const [stringValue, setStringValue] = useState('');
@@ -18,24 +18,24 @@ const App = () => {
 
   useEffect(() => {
     (async () => {
-      let map =  await MMKVStorage.getMapAsync('map');
+      let map = await MMKVStorage.getMapAsync('map');
       setMapValue(map);
       await MMKVStorage.removeItem('map');
-      await  MMKVStorage.setMapAsync('map', {
+      await MMKVStorage.setMapAsync('map', {
         name: 'AAA',
         date: Date.now(),
       });
-     let randomString = await MMKVStorage.getStringAsync('random-string');
-     setStringValue(randomString);
-     await MMKVStorage.setStringAsync(
-      'random-string',
-      Math.random().toString(36).substring(7),
-    );
-    let array = await MMKVStorage.getArrayAsync('array');
-    setArrayValue(array);
-    await MMKVStorage.setArrayAsync('array', new Array(16).fill());
-    await  MMKVStorage.indexer.hasKey('map').then(console.log);
-    })
+      let randomString = await MMKVStorage.getStringAsync('random-string');
+      setStringValue(randomString);
+      await MMKVStorage.setStringAsync(
+        'random-string',
+        Math.random().toString(36).substring(7),
+      );
+      let array = await MMKVStorage.getArrayAsync('array');
+      setArrayValue(array);
+      await MMKVStorage.setArrayAsync('array', new Array(16).fill());
+      await MMKVStorage.indexer.hasKey('map').then(console.log);
+    })();
   }, []);
 
   return (
@@ -47,9 +47,9 @@ const App = () => {
           style={styles.scrollView}>
           <Text>Previous value: {stringValue}</Text>
           <Text>
-            Map value: {mapValue.name} {mapValue.date}
+            Map value: {mapValue?.name} {mapValue?.date}
           </Text>
-          <Text>Array Length: {arrayValue.length}</Text>
+          <Text>Array Length: {arrayValue?.length}</Text>
         </ScrollView>
       </SafeAreaView>
     </>
