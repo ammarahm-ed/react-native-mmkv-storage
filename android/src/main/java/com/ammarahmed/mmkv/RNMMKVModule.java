@@ -187,6 +187,12 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         HashMap<String, Object> allIDs = IdStore.getAll();
 
         WritableArray array = Arguments.createArray();
+
+        if (allIDs == null) {
+            promise.resolve(array);
+            return;
+        }
+
         for (String string : allIDs.keySet()) {
             array.pushString(string);
         }
