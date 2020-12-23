@@ -184,12 +184,12 @@ NSString *serviceName;
 }
 
 - (BOOL)createKeychainValue:(NSString *)value forIdentifier:(NSString *)identifier options: (NSDictionary * __nullable)options {
-    CFStringRef accessible = accessibleValue(options);
+    CFStringRef accessibleVal = _accessibleValue(options);
     NSMutableDictionary *dictionary = [self newSearchDictionary:identifier];
     
     NSData *valueData = [value dataUsingEncoding:NSUTF8StringEncoding];
     [dictionary setObject:valueData forKey:(id)kSecValueData];
-    dictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessible;
+    dictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessibleVal;
     
     OSStatus status = SecItemAdd((CFDictionaryRef)dictionary, NULL);
     
@@ -201,12 +201,12 @@ NSString *serviceName;
 
 - (BOOL)updateKeychainValue:(NSString *)password forIdentifier:(NSString *)identifier options:(NSDictionary * __nullable)options {
     
-    CFStringRef accessible = accessibleValue(options);
+    CFStringRef accessibleVal = _accessibleValue(options);
     NSMutableDictionary *searchDictionary = [self newSearchDictionary:identifier];
     NSMutableDictionary *updateDictionary = [[NSMutableDictionary alloc] init];
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
     [updateDictionary setObject:passwordData forKey:(id)kSecValueData];
-    updateDictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessible;
+    updateDictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessibleVal;
     OSStatus status = SecItemUpdate((CFDictionaryRef)searchDictionary,
                                     (CFDictionaryRef)updateDictionary);
     
@@ -255,7 +255,7 @@ NSError * secureKeyStoreError(NSString *errMsg)
 
 
 
-CFStringRef accessibleValue(NSDictionary *options)
+CFStringRef _accessibleValue(NSDictionary *options)
 {
     if (options && options[@"accessible"] != nil) {
         NSDictionary *keyMap = @{
