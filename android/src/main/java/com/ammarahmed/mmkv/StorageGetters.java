@@ -91,7 +91,7 @@ public class StorageGetters {
                     WritableMap value = Arguments.fromBundle(bundle);
                     WritableArray item = Arguments.createArray();
                     item.pushString(key);
-                    item.pushMap(value);
+                    item.pushMap(value != null? value : null);
                     args.pushArray(item);
                 } else {
                     WritableArray item = Arguments.createArray();

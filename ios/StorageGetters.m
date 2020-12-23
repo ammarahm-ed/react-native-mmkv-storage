@@ -106,7 +106,7 @@
                 NSDictionary* dic = [kv getObjectOfClass:NSDictionary.class forKey:key];
                 NSMutableArray * array = [NSMutableArray array];
                 [array addObject:key];
-                [array addObject:dic];
+                [array addObject:dic? dic : [NSNull null]];
                 [objects addObject:array];
                 
             } else {
