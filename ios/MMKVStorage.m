@@ -48,7 +48,7 @@ RCT_EXPORT_MODULE()
          NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
          NSString *libraryPath = (NSString *) [paths firstObject];
          NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-         [MMKV initializeMMKV:rootDir];
+        [MMKV initializeMMKV:rootDir groupDir:libraryPath logLevel:MMKVLogNone];
         
         secureStorage = [[SecureStorage alloc]init];
         IdStore = [[IDStore alloc] initWithMMKV:[MMKV mmkvWithID:@"mmkvIdStore"]];
