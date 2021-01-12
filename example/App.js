@@ -9,7 +9,10 @@ import {
 
 import MMKV from 'react-native-mmkv-storage';
 
-const MMKVStorage = new MMKV.Loader().withEncryption().initialize();
+const MMKVStorage = new MMKV.Loader()
+  .withEncryption()
+  .setProcessingMode(MMKV.MODES.MULTI_PROCESS)
+  .initialize();
 
 const App = () => {
   const [stringValue, setStringValue] = useState('');
