@@ -16,7 +16,7 @@ function encryptStorage(
       alias,
       key,
       { accessible: accessibleMode },
-      (error, result) => {
+      (error) => {
         if (error) {
           return;
         } else {
@@ -92,7 +92,7 @@ export default class encryption {
           }
         );
       } else {
-        initialize(this.options, (e, r) => {
+        initialize(this.options, (e) => {
           if (e) {
             return;
           }
@@ -164,7 +164,7 @@ export default class encryption {
           }
         );
       } else {
-        initialize(this.options, (e, r) => {
+        initialize(this.options, (e) => {
           if (e) {
             return;
           }

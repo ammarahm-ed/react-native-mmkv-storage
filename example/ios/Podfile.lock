@@ -67,9 +67,9 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MMKV (1.2.3):
-    - MMKVCore (~> 1.2.3)
-  - MMKVCore (1.2.3)
+  - MMKV (1.2.5):
+    - MMKVCore (~> 1.2.5)
+  - MMKVCore (1.2.5)
   - OpenSSL-Universal (1.0.2.20):
     - OpenSSL-Universal/Static (= 1.0.2.20)
   - OpenSSL-Universal/Static (1.0.2.20)
@@ -239,8 +239,8 @@ PODS:
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
   - React-jsinspector (0.63.3)
-  - react-native-mmkv-storage (0.3.7):
-    - MMKV (= 1.2.3)
+  - react-native-mmkv-storage (0.4.1):
+    - MMKV (= 1.2.5)
     - React
   - React-RCTActionSheet (0.63.3):
     - React-Core/RCTActionSheetHeaders (= 0.63.3)
@@ -445,8 +445,8 @@ SPEC CHECKSUMS:
   FlipperKit: ab353d41aea8aae2ea6daaf813e67496642f3d7d
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  MMKV: 5351abd616fb26406f7025dbc686658b43ade021
-  MMKVCore: cfdf65c5c285b58f85dae0cd31ddfa2f41668e54
+  MMKV: 6c208ddcb4c197e564f72f3f73ef3b0c792e091c
+  MMKVCore: d9aa23fc6fb698c671c403ec593cdfe7d184e310
   OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
   RCTTypeSafety: edf4b618033c2f1c5b7bc3d90d8e085ed95ba2ab
@@ -458,7 +458,7 @@ SPEC CHECKSUMS:
   React-jsi: df07aa95b39c5be3e41199921509bfa929ed2b9d
   React-jsiexecutor: b56c03e61c0dd5f5801255f2160a815f4a53d451
   React-jsinspector: 8e68ffbfe23880d3ee9bafa8be2777f60b25cbe2
-  react-native-mmkv-storage: b20693700cd6bcd93d8aeb4888382398f83912f8
+  react-native-mmkv-storage: 7db8b5a8271c2cd22758ea01595af105fa211ec1
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
   React-RCTAnimation: 1befece0b5183c22ae01b966f5583f42e69a83c2
   React-RCTBlob: 0b284339cbe4b15705a05e2313a51c6d8b51fa40
@@ -474,4 +474,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 217325c7bfacda53ee737e2ac880d044427eb901
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0

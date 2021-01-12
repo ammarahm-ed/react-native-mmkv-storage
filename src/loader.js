@@ -2,7 +2,7 @@ import { NativeModules } from "react-native";
 import generatePassword from "./keygen";
 import API from "./api";
 import { stringToHex, ACCESSIBLE, MODES } from "./utils";
-import { currentInstancesStatus, initialize } from "./initializer";
+import { currentInstancesStatus } from "./initializer";
 
 export default class Loader {
   constructor() {
