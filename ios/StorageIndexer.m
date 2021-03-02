@@ -135,7 +135,7 @@ NSString *arrayIndexKey = @"arrayIndex";
     [kv getObjectOfClass:NSMutableArray.class forKey:stringsIndexKey];
     
     if (stringsIndex == NULL)
-        return NULL;
+        return [NSMutableArray array];
     
     NSMutableArray *array = [NSMutableArray array];
     
@@ -170,7 +170,7 @@ NSString *arrayIndexKey = @"arrayIndex";
     boolIndex = [kv getObjectOfClass:NSMutableArray.class forKey:boolIndexKey];
     
     if (boolIndex == NULL)
-        return NULL;
+        return [NSMutableArray array];
     
     NSMutableArray *array = [NSMutableArray array];
     
@@ -211,7 +211,7 @@ NSString *arrayIndexKey = @"arrayIndex";
     intIndex = [kv getObjectOfClass:NSMutableArray.class forKey:intIndexKey];
     
     if (intIndex == NULL)
-        return NULL;
+        return [NSMutableArray array];
     
     NSMutableArray *array = [NSMutableArray array];
     
@@ -247,7 +247,7 @@ NSString *arrayIndexKey = @"arrayIndex";
     mapIndex = [kv getObjectOfClass:NSMutableArray.class forKey:mapIndexKey];
     
     if (mapIndex == NULL)
-        return NULL;
+        return [NSMutableArray array];
     
     NSMutableArray *array = [NSMutableArray array];
     
@@ -283,7 +283,7 @@ NSString *arrayIndexKey = @"arrayIndex";
     arrayIndex = [kv getObjectOfClass:NSMutableArray.class forKey:arrayIndexKey];
     
     if (arrayIndex == NULL)
-        return NULL;
+        return [NSMutableArray array];
     
     NSMutableArray *array = [NSMutableArray array];
     
