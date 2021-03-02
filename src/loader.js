@@ -35,6 +35,7 @@ export default class Loader {
 
   setAccessibleIOS(accessible) {
     this.accessibleMode = accessible;
+    return this;
   }
 
   encryptWithCustomKey(key, secureKeyStorage, alias) {

@@ -422,7 +422,7 @@ declare module MMKVStorage {
      * @param accessible MMKVStorage.ACCESSIBLE
      */
 
-    setAccessibleMode(accessible: ACCESSIBLE): this;
+    setAccessibleIOS(accessible: ACCESSIBLE): this;
 
     /**
     * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
