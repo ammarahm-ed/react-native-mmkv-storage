@@ -376,7 +376,8 @@ declare module MMKVStorage {
     encrypt(
       key: string,
       secureKeyStorage: boolean,
-      alias: string
+      alias: string,
+      accessibleMode:ACCESSIBLE
     ): Promise<boolean>;
 
     /**
@@ -396,7 +397,8 @@ declare module MMKVStorage {
     changeEncryptionKey(
       key: string,
       secureKeyStorage: boolean,
-      alias: string
+      alias: string,
+      accessibleMode:ACCESSIBLE
     ): Promise<boolean>;
   }
 
