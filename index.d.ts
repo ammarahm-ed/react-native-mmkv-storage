@@ -371,6 +371,7 @@ declare module MMKVStorage {
      * @param {string} key; Provide a custom key to encrypt the storage.
      * @param {boolean} secureKeyStorage Store the key in secure storage.
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
+     * @param {ACCESSIBLE}  accessibleMode Set accessible mode for secure storage on ios devices
      * @returns An object with alias and key
      */
     encrypt(
@@ -392,6 +393,7 @@ declare module MMKVStorage {
      * @param {string} key; Provide a custom key to encrypt the storage.
      * @param {boolean} secureKeyStorage Store the key in secure storage.
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
+     * @param {ACCESSIBLE}  accessibleMode Set accessible mode for secure storage on ios devices
      */
 
     changeEncryptionKey(
