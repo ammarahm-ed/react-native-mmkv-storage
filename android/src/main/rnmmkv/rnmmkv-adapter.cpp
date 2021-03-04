@@ -736,7 +736,7 @@ JNIEXPORT void JNICALL
 Java_com_ammarahmed_mmkv_RNMMKVModule_nativeInstall(JNIEnv *env, jobject clazz, jlong jsi, jstring rootPath) {
     rPath = j_string_to_string(env, rootPath);
     MMKV::initializeMMKV(rPath);
-    createInstance("mmkvIDStore",MMKV_SINGLE_PROCESS,"","");
     auto runtime = reinterpret_cast<jsi::Runtime*>(jsi);
     install(*runtime);
+    createInstance("mmkvIDStore",MMKV_SINGLE_PROCESS,"","");
 }

@@ -27,21 +27,22 @@ android {
       targetSdkVersion safeExtGet('targetSdkVersion', 28)
 
 
-  externalNativeBuild {
+    externalNativeBuild {
         cmake {
             cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
- 
+
   }
 
- externalNativeBuild {
+  externalNativeBuild {
       cmake {
-          path "CMakeLists.txt"
+          path "./src/main/rnmmkv/CMakeLists.txt"
           version "3.10.2"
       }
   } 
+  
 
   lintOptions {
     abortOnError false

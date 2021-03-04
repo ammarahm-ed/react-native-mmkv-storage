@@ -18,7 +18,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     private SecureKeystore secureKeystore;
 
     static {
-        System.loadLibrary("cpp");
+        System.loadLibrary("rnmmkv");
     }
 
     private native void nativeInstall(long jsi, String rootPath);

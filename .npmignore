@@ -50,7 +50,6 @@ buck-out/
 # Other
 
 example/
-MMKV/
 CMakeLists.txt
 cpp/
       
