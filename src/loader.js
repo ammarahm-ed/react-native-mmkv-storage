@@ -1,52 +1,56 @@
-import { NativeModules } from "react-native";
-import generatePassword from "./keygen";
-import API from "./api";
-import { stringToHex, ACCESSIBLE, MODES } from "./utils";
-import { currentInstancesStatus } from "./initializer";
+import generatePassword from './keygen';
+import API from './api';
+import {stringToHex, ACCESSIBLE, MODES, options} from './utils';
+import {currentInstancesStatus} from './initializer';
+import { handleAction } from 'react-native-mmkv-storage/src/handlers';
 
 export default class Loader {
   constructor() {
-    this.instanceID = "default";
-    this.initWithEncryption = false;
-    this.secureKeyStorage = false;
-    this.accessibleMode = ACCESSIBLE.WHEN_UNLOCKED;
-    this.processingMode = MODES.SINGLE_PROCESS;
-    this.aliasPrefix = "com.MMKV.";
-    this.alias = null;
-    this.key = null;
-    this.mmkv = NativeModules.MMKVStorage;
-    this.initialized = false;
-    this.error = null;
+    this.options = {
+      instanceID: 'default',
+      initWithEncryption: false,
+      secureKeyStorage: false,
+      accessibleMode: ACCESSIBLE.WHEN_UNLOCKED,
+      processingMode: MODES.SINGLE_PROCESS,
+      aliasPrefix: 'com.MMKV.',
+      alias: null,
+      key: null,
+      initialized: false,
+    };
   }
 
   withInstanceID(id) {
-    this.instanceID = id;
+    this.options.instanceID = id;
 
     return this;
   }
 
   withEncryption() {
-    this.initWithEncryption = true;
-    this.key = generatePassword();
-    this.alias = stringToHex(this.aliasPrefix + this.instanceID);
-    this.secureKeyStorage = true;
+    this.options.initWithEncryption = true;
+    this.options.key = generatePassword();
+    this.options.alias = stringToHex(
+      this.options.aliasPrefix + this.options.instanceID,
+    );
+    this.options.secureKeyStorage = true;
     return this;
   }
 
   setAccessibleIOS(accessible) {
-    this.accessibleMode = accessible;
+    this.options.accessibleMode = accessible;
     return this;
   }
 
   encryptWithCustomKey(key, secureKeyStorage, alias) {
-    this.key = key;
-    this.secureKeyStorage = false;
+    this.options.key = key;
+    this.options.secureKeyStorage = false;
     if (secureKeyStorage) {
-      this.secureKeyStorage = true;
+      this.options.secureKeyStorage = true;
       if (alias) {
-        this.alias = stringToHex(this.aliasPrefix + alias);
+        this.options.alias = stringToHex(this.options.aliasPrefix + alias);
       } else {
-        this.alias = stringToHex(this.aliasPrefix + this.instanceID);
+        this.options.alias = stringToHex(
+          this.options.aliasPrefix + this.options.instanceID,
+        );
       }
     }
 
@@ -54,30 +58,26 @@ export default class Loader {
   }
 
   setProcessingMode(mode) {
-    this.processingMode = mode;
+    this.options.processingMode = mode;
 
     return this;
   }
 
   initialize() {
-    currentInstancesStatus[this.instanceID] = false;
+    currentInstancesStatus[this.options.instanceID] = false;
     return this.getInstance();
   }
 
   generateKey() {
-    this.key = generatePassword();
+    this.options.key = generatePassword();
 
     return this;
   }
 
   getInstance() {
-    if (this.error) {
-      throw new Error(this.error);
-    }
-    let options = this;
-
-    let instance = new API(options);
-
+    let instance = new API(this.options);
+    options[this.options.instanceID] = this.options;
+    handleAction(()=>{},() => {},this.options.instanceID);
     return instance;
   }
 }

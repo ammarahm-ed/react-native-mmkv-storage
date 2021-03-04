@@ -1,3 +1,7 @@
+import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
+import {NativeModules} from 'react-native';
+const MMKV = NativeModules.MMKVStorage;
+
 export const currentInstancesStatus = {};
 
 /**
@@ -11,9 +15,16 @@ export const currentInstancesStatus = {};
  */
 
 export function initialize(options, callback) {
-  if (options.initWithEncryption) {
+  if (IDStore.exists(options.instanceID)) {
+    if (IDStore.encrypted(options.instanceID)) {
+      options.alias = IDStore.getAlias(options.instanceID);
+      initWithEncryptionUsingOldKey(options, callback);
+    } else {
+      initWithoutEncryption(options, callback);
+    }
+  } else if (options.initWithEncryption) {
     if (options.secureKeyStorage) {
-      options.mmkv.secureKeyExists(options.alias, (error, exists) => {
+      MMKV.secureKeyExists(options.alias, (error, exists) => {
         if (error) {
           callback(error, null);
         }
@@ -42,24 +53,18 @@ export function initialize(options, callback) {
  */
 
 function initWithEncryptionUsingOldKey(options, callback) {
-  options.mmkv.getSecureKey(options.alias, (error, value) => {
+  MMKV.getSecureKey(options.alias, (error, key) => {
     if (error) {
       callback(error, null);
       return;
     }
-    if (value) {
-      options.mmkv.setupWithEncryption(
+    if (key) {
+      setupWithEncryption(
         options.instanceID,
         options.processingMode,
-        value,
+        key,
         options.alias,
-        (error) => {
-          if (error) {
-            callback(error, null);
-            return;
-          }
-          callback(null, true);
-        }
+        callback,
       );
     }
   });
@@ -76,30 +81,25 @@ function initWithEncryptionUsingOldKey(options, callback) {
 
 function initWithEncryptionUsingNewKey(options, callback) {
   if (options.key == null || options.key.length < 3)
-    throw new Error("Key is null or too short");
+    throw new Error('Key is null or too short');
 
-  options.mmkv.setSecureKey(
+  MMKV.setSecureKey(
     options.alias,
     options.key,
-    { accessible: options.accessibleMode },
+    {accessible: options.accessibleMode},
     (error) => {
       if (error) {
         callback(error, null);
       }
-      options.mmkv.setupWithEncryption(
+
+      setupWithEncryption(
         options.instanceID,
         options.processingMode,
         options.key,
         options.alias,
-        (error) => {
-          if (error) {
-            callback(error, null);
-            return;
-          }
-          callback(null, true);
-        }
+        callback,
       );
-    }
+    },
   );
 }
 
@@ -115,20 +115,14 @@ function initWithEncryptionUsingNewKey(options, callback) {
 
 function initWithEncryptionWithoutSecureStorage(options, callback) {
   if (options.key == null || options.key.length < 3)
-    throw new Error("Key is null or too short");
+    throw new Error('Key is null or too short');
 
-  options.mmkv.setupWithEncryption(
+  setupWithEncryption(
     options.instanceID,
     options.processingMode,
     options.key,
     options.alias,
-    (error) => {
-      if (error) {
-        callback(error, null);
-        return;
-      }
-      callback(null, true);
-    }
+    callback,
   );
 }
 
@@ -142,15 +136,62 @@ function initWithEncryptionWithoutSecureStorage(options, callback) {
  */
 
 function initWithoutEncryption(options, callback) {
-  options.mmkv.setup(
-    options.instanceID,
-    options.processingMode,
-    (error) => {
+  setup(options.instanceID, options.processingMode, callback);
+}
+
+function setup(id, mode, callback) {
+  global.setupMMKVInstance(id, mode, '', '');
+  if (!IDStore.exists(id)) {
+    global.setBoolMMKV(id, true, id);
+    IDStore.add(id, false, null);
+    callback(null, true);
+  } else {
+    if (global.containsKeyMMKV(id, id)) {
+      callback(null, true);
+    } else {
+      encryptionHandler(id, mode, callback);
+    }
+  }
+}
+
+function setupWithEncryption(id, mode, key, alias, callback) {
+  global.setupMMKVInstance(id, mode, key, '');
+
+  if (!IDStore.exists(id)) {
+    global.setBoolMMKV(id, true, id);
+    IDStore.add(id, true, alias);
+    callback(null, true);
+  } else {
+    if (global.containsKeyMMKV(id, id)) {
+      callback(null, true);
+    } else {
+      encryptionHandler(id, mode, callback);
+    }
+  }
+}
+
+function encryptionHandler(id, mode, callback) {
+  alias = IDStore.getAlias(id);
+  if (IDStore.encrypted(id)) {
+    MMKV.secureKeyExists(alias, (error, exists) => {
       if (error) {
         callback(error, null);
       }
-
-      callback(null, true);
-    }
-  );
+      if (exists) {
+        MMKV.getSecureKey(alias, (error, key) => {
+          if (error) {
+            callback(error, null);
+            return;
+          }
+          if (key) {
+            global.setupMMKVInstance(id, mode, key, '');
+            callback(null, true);
+          }
+        });
+      }
+    });
+  } else {
+    global.setupMMKVInstance(id, mode, '', '');
+    callback(null, true);
+  }
 }

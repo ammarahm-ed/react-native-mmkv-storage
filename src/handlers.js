@@ -14,27 +14,32 @@
  * @param  {...any} args Arguments for the native function
  */
 
-import { currentInstancesStatus, initialize } from "./initializer";
+import {options} from 'react-native-mmkv-storage/src/utils';
+import {currentInstancesStatus, initialize} from './initializer';
 
-export function handleAction(options, action, callback, ...args) {
-  if (currentInstancesStatus[options.instanceID]) {
-    return action(...args, callback);
+export function handleAction(cb, action, ...args) {
+  let id = args[args.length - 1];
+  if (currentInstancesStatus[id]) {
+    cb && cb(null, action(...args));
+    return action(...args);
   } else {
-    initialize(options, (err) => {
+    let opts = options[id];
+    initialize(opts, (err) => {
       if (err) {
-        currentInstancesStatus[options.instanceID] = false;
-        return callback(err, null);
+        currentInstancesStatus[id] = false;
+        error = true;
       }
-      currentInstancesStatus[options.instanceID] = true;
-
-      return action(...args, callback);
+      currentInstancesStatus[id] = true;
+      cb && cb(null, action(...args));
     });
+    return action(...args);
   }
 }
 
-export async function handleActionAsync(options, action, ...args) {
+export async function handleActionAsync(action, ...args) {
+  let id = args[args.length - 1];
   return new Promise(async (resolve, reject) => {
-    if (currentInstancesStatus[options.instanceID]) {
+    if (currentInstancesStatus[id]) {
       try {
         let result = await action(...args);
         resolve(result);
@@ -42,13 +47,14 @@ export async function handleActionAsync(options, action, ...args) {
         reject(e);
       }
     } else {
-      initialize(options, async (err) => {
+      let opts = options[id];
+      initialize(opts, async (err) => {
         if (err) {
-          currentInstancesStatus[options.instanceID] = false;
+          currentInstancesStatus[id] = false;
           return reject(err);
         }
 
-        currentInstancesStatus[options.instanceID] = true;
+        currentInstancesStatus[id] = true;
         try {
           let result = await action(...args);
           resolve(result);

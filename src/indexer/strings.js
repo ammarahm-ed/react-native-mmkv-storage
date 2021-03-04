@@ -1,5 +1,6 @@
-import { handleAction, handleActionAsync } from "../handlers";
-import { DATA_TYPES } from "../utils";
+import {handleAction, handleActionAsync} from '../handlers';
+
+const INDEX_TYPE = 'stringIndex';
 export default class stringsIndex {
   constructor(args) {
     this.MMKV = args.mmkv;
@@ -9,35 +10,43 @@ export default class stringsIndex {
 
   async getKeys() {
     return await handleActionAsync(
-      this.options,
-      this.MMKV.getTypeIndex,
+      global.getIndexMMKV,
+      INDEX_TYPE,
       this.instanceID,
-      DATA_TYPES.STRING
-    )
+    );
   }
 
   async hasKey(key) {
-    return await handleActionAsync(
-      this.options,
-      this.MMKV.typeIndexerHasKey,
+    let keys = await handleActionAsync(
+      global.getIndexMMKV,
+      INDEX_TYPE,
       this.instanceID,
-      key,
-      DATA_TYPES.STRING
-      )
+    );
+    return keys.indexOf(key) > -1;
   }
 
   async getAll() {
     return new Promise((resolve, reject) => {
       handleAction(
-        this.options,
-        this.MMKV.getItemsForType,
         (error, result) => {
-          
-          resolve(result);
+          if (!result) {
+            resolve([]);
+            return;
+          }
+          let items = [];
+          for (let i = 0; i < result.length; i++) {
+            let item = [];
+            item[0] = result[i];
+            item[1] = global.getStringMMKV(result[i], this.instanceID);
+
+            items.push(item);
+          }
+          resolve(items);
         },
+        global.getIndexMMKV,
+        INDEX_TYPE,
         this.instanceID,
-        DATA_TYPES.STRING
-        )
+      );
     });
   }
 }

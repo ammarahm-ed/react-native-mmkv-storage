@@ -38,6 +38,8 @@ export const DATA_TYPES = Object.freeze({
   ARRAY: 5
 });
 
+export const options = {};
+
 export const stringToHex = (input) => {
   let str = ""
   for (const char of input) {

@@ -1,5 +1,5 @@
-import { DATA_TYPES } from "../utils";
 import { handleActionAsync, handleAction } from "react-native-mmkv-storage/src/handlers";
+const INDEX_TYPE = "numberIndex"
 export default class numbersIndex {
   constructor(args) {
     this.MMKV = args.mmkv;
@@ -8,35 +8,42 @@ export default class numbersIndex {
   }
   async getKeys() {
     return await handleActionAsync(
-      this.options,
-      this.MMKV.getTypeIndex,
+      global.getIndexMMKV,
+      INDEX_TYPE,
       this.instanceID,
-      DATA_TYPES.NUMBER
-    )
+    );
   }
 
   async hasKey(key) {
-    return await handleActionAsync(
-      this.options,
-      this.MMKV.typeIndexerHasKey,
+    let keys = await handleActionAsync(
+      global.getIndexMMKV,
+      INDEX_TYPE,
       this.instanceID,
-      key,
-      DATA_TYPES.NUMBER
-    )
+    );
+    return keys.indexOf(key) > -1;
   }
 
   async getAll() {
-    return new Promise((resolve,reject) => {
-
+    return new Promise((resolve, reject) => {
       handleAction(
-        this.options,
-        this.MMKV.getItemsForType,(error,result) => {
-       
-        resolve(result);
-      },this.instanceID,DATA_TYPES.NUMBER)
-
-
-    })
- 
+        (error, result) => {
+          if (!result) {
+            resolve([]);
+            return;
+          }
+          let items = [];
+          for (let i = 0; i < result.length; i++) {
+            let item = [];
+            item[0] = result[i];
+            item[1] = global.getNumberMMKV(result[i], this.instanceID);
+            items.push(item);
+          }
+          resolve(items);
+        },
+        global.getIndexMMKV,
+        INDEX_TYPE,
+        this.instanceID,
+      );
+    });
   }
 }
