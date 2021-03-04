@@ -21,7 +21,7 @@ This library aims to provide a fast & reliable solution for you data storage nee
   Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI to give you huge performance gains.
 - **Simple and lightweight**<br/>
   (~ 50K Android/30K iOS) and even smaller when packaged.
-- **Fast and Efficient (0.001ms Read/Write Speed) **<br/>
+- **Fast and Efficient (0.001ms Read/Write Speed)**<br/>
   MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
   You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
 - **Multi-Process Support**<br/>
@@ -36,14 +36,12 @@ This library aims to provide a fast & reliable solution for you data storage nee
   Support for redux persist is also added starting from v0.3.2.
 
 
-
 ## Links 
   - [Documentation](https://rnmmkv.now.sh/#/)
 
 ## Quickstart
 
   - [Quickstart guide](https://rnmmkv.now.sh/#/gettingstarted)
-
 
 ## Contact & Support
 - Create a GitHub issue for bug reports, feature requests, or questions
@@ -52,7 +50,6 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 ## RoadMap
 You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/13)
-
 
 ## I want to contribute
 That is awesome news! There is alot happening at a very fast pace in this library right now. Every little help is precious. You can contribute in many ways:
