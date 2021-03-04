@@ -141,13 +141,13 @@ declare module MMKVStorage {
      * @param {String} value
      * @param {Function} callback
      */
-    setString(key: string, value: string, callback: Function): boolean;
+    setString(key: string, value: string, callback?: Function): null;
     /**
      * Get a string value for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getString(key: string, callback: Function): string | null;
+    getString(key: string, callback?: Function): string | null;
 
     /**
      * Set a number value to storage for a given key.
@@ -156,14 +156,14 @@ declare module MMKVStorage {
      * @param {number} value
      * @param {Function} callback
      */
-    setInt(key: string, value: number, callback: Function): boolean;
+    setInt(key: string, value: number, callback?: Function): null;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      * @param {Function} callback
      */
-    getInt(key: string, callback: Function): number | null;
+    getInt(key: string, callback?: Function): number | null;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -172,14 +172,14 @@ declare module MMKVStorage {
      * @param {boolean} value
      * @param {Function} callback
      */
-    setBool(key: string, value: boolean, callback: Function): boolean;
+    setBool(key: string, value: boolean, callback?: Function): null;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getBool(key: string, callback: Function): boolean | null;
+    getBool(key: string, callback?: Function): boolean | null;
 
     /**
      * Set an Object to storage for a given key.
@@ -189,27 +189,27 @@ declare module MMKVStorage {
      * @param {Function} callback
      */
 
-    setMap(key: string, value: object, callback: Function): boolean;
+    setMap(key: string, value: object, callback?: Function): null;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getMap(key: string, callback: Function): object | null;
+    getMap(key: string, callback?: Function): object | null;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      * @param {Function} callback
      */
-    setArray(key: string, value: Array<any>, callback: Function): boolean;
+    setArray(key: string, value: Array<any>, callback?: Function): null;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      * @param {Function} callback
      */
 
-    getArray(key: string, callback: Function): Array<any> | null;
+    getArray(key: string, callback?: Function): Array<any> | null;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -219,7 +219,7 @@ declare module MMKVStorage {
      * @param {Array} keys
      * @param {Function} callback
      */
-    getMultipleItems(keys: Array<string>, callback: Function): Array<object>;
+    getMultipleItems(keys: Array<string>, callback?: Function): Array<object>;
 
     /**
      *
