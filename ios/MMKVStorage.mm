@@ -216,7 +216,6 @@ RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
 
 static void install(jsi::Runtime & jsiRuntime)
 {
-    // MMKV.set(key: string, value: string | number | bool)
     
     auto initializeMMKV = Function::createFromHostFunction(jsiRuntime,
                                                            PropNameID::forAscii(jsiRuntime,
