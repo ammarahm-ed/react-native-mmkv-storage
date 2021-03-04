@@ -39,17 +39,6 @@ RCT_EXPORT_MODULE()
     return RCTGetMethodQueue();
 }
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        secureStorage = [[SecureStorage alloc]init];
-        mmkvInstances = [NSMutableDictionary dictionary];
-    }
-    
-    return self;
-}
-
 + (BOOL)requiresMainQueueSetup
 {
     return YES;
@@ -756,11 +745,15 @@ static void install(jsi::Runtime & jsiRuntime)
 {
     _bridge = bridge;
     _setBridgeOnMainQueue = RCTIsMainQueue();
-    
+    secureStorage = [[SecureStorage alloc]init];
+    mmkvInstances = [NSMutableDictionary dictionary];   
+
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
     if (!cxxBridge.runtime) {
         return;
     }
+    
+  
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *libraryPath = (NSString *) [paths firstObject];
