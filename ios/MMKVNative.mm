@@ -1,5 +1,4 @@
-#import "MMKVStorage.h"
-#import "SecureStorage.h"
+#import "MMKVNative.h"
 #import "YeetJSIUtils.h"
 
 #import <React/RCTBridge+Private.h>
@@ -12,15 +11,12 @@ using namespace facebook;
 using namespace jsi;
 using namespace std;
 
-
-
-@implementation MMKVStorage
+@implementation MMKVNative
 @synthesize bridge = _bridge;
 @synthesize methodQueue = _methodQueue;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 
-SecureStorage *secureStorage;
 
 RCT_EXPORT_MODULE()
 
@@ -141,51 +137,6 @@ void removeKeyFromIndexer(MMKV *kv, NSString* key) {
         [kv setObject:index forKey:@"arrayIndex"];
         return;
     }
-}
-
-
-
-
-
-
-
-
-#pragma mark setSecureKey
-RCT_EXPORT_METHOD(setSecureKey: (NSString *)alias value:(NSString *)value
-                  options: (NSDictionary *)options
-                  callback:(RCTResponseSenderBlock)callback
-                  )
-{
-    
-    [secureStorage setSecureKey:alias value:value options:options callback:callback];
-    
-}
-
-#pragma mark getSecureKey
-RCT_EXPORT_METHOD(getSecureKey:(NSString *)alias
-                  callback:(RCTResponseSenderBlock)callback)
-{
-    
-    [secureStorage getSecureKey:alias callback:callback];
-    
-    
-}
-
-#pragma mark secureKeyExists
-RCT_EXPORT_METHOD(secureKeyExists:(NSString *)key
-                  callback:(RCTResponseSenderBlock)callback)
-{
-    
-    [secureStorage secureKeyExists:key callback:callback];
-    
-}
-#pragma mark removeSecureKey
-RCT_EXPORT_METHOD(removeSecureKey:(NSString *)key
-                  callback:(RCTResponseSenderBlock)callback)
-{
-    
-    [secureStorage removeSecureKey:key callback:callback];
-    
 }
 
 
@@ -736,8 +687,6 @@ static void install(jsi::Runtime & jsiRuntime)
     if (!cxxBridge.runtime) {
         return;
     }
-    
-    secureStorage = [[SecureStorage alloc]init];
     mmkvInstances = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -750,4 +699,5 @@ static void install(jsi::Runtime & jsiRuntime)
 }
 
 @end
+
 

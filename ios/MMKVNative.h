@@ -5,7 +5,10 @@
 #import <React/RCTBridgeModule.h>
 #endif
 
-@interface MMKVStorage : NSObject <RCTBridgeModule>
+@interface MMKVNative : NSObject <RCTBridgeModule>
+
+@property (nonatomic, assign) BOOL setBridgeOnMainQueue;
 
 @end
   
+
