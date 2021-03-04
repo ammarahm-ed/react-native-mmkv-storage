@@ -18,7 +18,7 @@ This library aims to provide a fast & reliable solution for you data storage nee
 ## Features
 
 - **Written in C++ using JSI**<br/>
-  Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI to give you huge performance gains.
+  Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI making it the fastest storage option for React Native.
 - **Simple and lightweight**<br/>
   (~ 50K Android/30K iOS) and even smaller when packaged.
 - **Fast and Efficient (0.001ms Read/Write Speed)**<br/>
