@@ -20,24 +20,10 @@ using namespace std;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 
-static dispatch_queue_t RCTGetMethodQueue()
-{
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("MMKVStorage.Queue", DISPATCH_QUEUE_SERIAL);
-    });
-    return queue;
-}
-
 SecureStorage *secureStorage;
 
 RCT_EXPORT_MODULE()
 
-- (dispatch_queue_t)methodQueue
-{
-    return RCTGetMethodQueue();
-}
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -745,15 +731,14 @@ static void install(jsi::Runtime & jsiRuntime)
 {
     _bridge = bridge;
     _setBridgeOnMainQueue = RCTIsMainQueue();
-    secureStorage = [[SecureStorage alloc]init];
-    mmkvInstances = [NSMutableDictionary dictionary];   
-
+    
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
     if (!cxxBridge.runtime) {
         return;
     }
     
-  
+    secureStorage = [[SecureStorage alloc]init];
+    mmkvInstances = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *libraryPath = (NSString *) [paths firstObject];
