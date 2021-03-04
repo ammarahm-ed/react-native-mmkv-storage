@@ -1,6 +1,3 @@
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
 
 buildscript {
   repositories {
@@ -16,6 +13,10 @@ buildscript {
   }
 }
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 apply plugin: 'com.android.library'
 
 android {
@@ -24,25 +25,51 @@ android {
   defaultConfig {
       minSdkVersion safeExtGet('minSdkVersion', 16)
       targetSdkVersion safeExtGet('targetSdkVersion', 28)
+
+
+    /*   externalNativeBuild {
+        cmake {
+            cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+ */
   }
+
+ /*  externalNativeBuild {
+      cmake {
+          path "CMakeLists.txt"
+          version "3.10.2"
+      }
+  } */
+
+  
+   sourceSets {
+        main {
+            jniLibs.srcDirs = ['./libs']
+        }
+    }
+  
+
   lintOptions {
     abortOnError false
     warning 'InvalidPackage'
   }
+
 }
 
 repositories {
   mavenCentral()
+  jcenter()
+  google()
   maven {
    url 'https://maven.google.com'
   }
-  jcenter()
   maven { url "https://jitpack.io" }
 }
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.tencent:mmkv-static:1.2.7'
     implementation "com.scottyab:secure-preferences-lib:0.1.4"
 }
   
