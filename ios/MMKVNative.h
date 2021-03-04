@@ -3,6 +3,7 @@
 #import "RCTBridgeModule.h"
 #else
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 #endif
 
 @interface MMKVNative : NSObject <RCTBridgeModule>
