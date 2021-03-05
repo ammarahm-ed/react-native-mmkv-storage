@@ -22,11 +22,11 @@ export default class API {
   }
 
   setItem(key, value) {
-    return setStringAsync(key, value);
+    return this.setStringAsync(key, value);
   }
 
   getItem(key) {
-    return getStringAsync(key);
+    return this.getStringAsync(key);
   }
 
   setStringAsync(key, value) {
