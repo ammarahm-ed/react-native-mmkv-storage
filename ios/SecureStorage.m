@@ -240,11 +240,11 @@ NSString *serviceName;
 
 - (void)handleAppUninstallation
 {
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"RnSksIsAppInstalled"]) {
-        [self clearSecureKeyStore];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"RnSksIsAppInstalled"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+   // if (![[NSUserDefaults standardUserDefaults] boolForKey:@"RnSksIsAppInstalled"]) {
+   //     [self clearSecureKeyStore];
+   //     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"RnSksIsAppInstalled"];
+   //     [[NSUserDefaults standardUserDefaults] synchronize];
+   // }
 }
 
 NSError * secureKeyStoreError(NSString *errMsg)
