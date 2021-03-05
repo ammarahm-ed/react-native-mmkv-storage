@@ -50,6 +50,4 @@ buck-out/
 # Other
 
 example/
-CMakeLists.txt
-cpp/
       
