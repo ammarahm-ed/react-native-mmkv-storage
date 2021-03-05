@@ -1,4 +1,5 @@
-const STORE_ID = 'mmkvIDStore';
+import {Platfrom} from "react-native";
+const STORE_ID = Platfrom.OS === "ios" ? "mmkvIdStore" : 'mmkvIDStore';
 
 /**
  *	Store instance properties that we will use later to

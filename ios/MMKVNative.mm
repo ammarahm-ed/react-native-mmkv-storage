@@ -694,7 +694,7 @@ static void install(jsi::Runtime & jsiRuntime)
     NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
     rPath = rootDir;
     [MMKV initializeMMKV:rootDir];
-    createInstance(@"mmkvIDStore", MMKVSingleProcess, @"", @"");
+    createInstance(@"mmkvIdStore", MMKVSingleProcess, @"", @"");
     install(*(jsi::Runtime *)cxxBridge.runtime);
 }
 
