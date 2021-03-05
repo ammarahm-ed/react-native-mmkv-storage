@@ -242,8 +242,8 @@ NSString *serviceName;
 {
    // if (![[NSUserDefaults standardUserDefaults] boolForKey:@"RnSksIsAppInstalled"]) {
    //     [self clearSecureKeyStore];
-    //    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"RnSksIsAppInstalled"];
-    //    [[NSUserDefaults standardUserDefaults] synchronize];
+     //[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"IsAppInstalled"];
+     [[NSUserDefaults standardUserDefaults] synchronize];
    // }
 }
 
