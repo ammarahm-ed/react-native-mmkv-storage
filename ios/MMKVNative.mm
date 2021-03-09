@@ -694,8 +694,29 @@ static void install(jsi::Runtime & jsiRuntime)
     NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
     rPath = rootDir;
     [MMKV initializeMMKV:rootDir];
-    createInstance(@"mmkvIdStore", MMKVSingleProcess, @"", @"");
+    
+    MMKV *kv = [MMKV mmkvWithID:@"mmkvIdStore"];
+        [mmkvInstances setObject:kv forKey:@"mmkvIdStore"];
+        if ([kv containsKey:@"mmkvIdData"]) {
+            NSMutableDictionary* oldStore = [kv getObjectOfClass:NSMutableDictionary.class forKey:@"mmkvIdData"];
+            NSArray *keys = [oldStore allKeys];
+            for (int i=0;i < keys.count;i++) {
+                NSMutableDictionary* entry = [oldStore objectForKey:keys[i]];
+                NSError *error;
+                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:entry
+                                                                   options:0
+                                                                     error:&error];
+                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                [kv setString:jsonString forKey:keys[i]];
+            }
+        [kv removeValueForKey:@"mmkvIdData"];
+        }
+    
     install(*(jsi::Runtime *)cxxBridge.runtime);
+    
+   
+ 
+    
 }
 
 @end
