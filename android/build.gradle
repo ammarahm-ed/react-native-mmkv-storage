@@ -20,6 +20,7 @@ def safeExtGet(prop, fallback) {
 apply plugin: 'com.android.library'
 
 android {
+  defaultPublishConfig "SharedCppRelease"
   compileSdkVersion safeExtGet('compileSdkVersion', 28)
   buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
   defaultConfig {
@@ -39,9 +40,18 @@ android {
   externalNativeBuild {
       cmake {
           path "./src/main/rnmmkv/CMakeLists.txt"
-          version "3.10.2"
+          version "3.8.0+"
       }
   } 
+
+     buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            jniDebuggable true
+        }
+    }
   
 
   lintOptions {
@@ -49,6 +59,14 @@ android {
     warning 'InvalidPackage'
   }
 
+  flavorDimensions "stl_mode"
+  productFlavors {
+        SharedCpp {
+            dimension "stl_mode"
+            ext.artifactIdSuffix = ''
+            
+        }
+    }
 }
 
 repositories {
@@ -64,5 +82,6 @@ repositories {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "com.scottyab:secure-preferences-lib:0.1.4"
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
   
