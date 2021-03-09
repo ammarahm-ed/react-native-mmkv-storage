@@ -14,7 +14,7 @@ const MMKV = new MMKVStorage.Loader();
 
 ## initialize
 
-Initialize the MMKV Instance with the selected properties. On promise resolve it will return an MMKV Instance that you can use.
+Initialize the MMKV Instance with the selected properties. Returns an MMKV Instance that you can use.
 
 ```js
 import MMKVStorage from "react-native-mmkv-storage";
@@ -24,7 +24,7 @@ const MMKV = new MMKVStorage.Loader();
 MMKV.initialize();
 ```
 
-**Returns:** `Promise<API>`
+**Returns:** `API`
 
 ## withInstanceID
 
