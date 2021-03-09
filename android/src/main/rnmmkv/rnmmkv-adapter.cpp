@@ -735,9 +735,13 @@ void install(Runtime &jsiRuntime)
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_ammarahmed_mmkv_RNMMKVModule_nativeInstall(JNIEnv *env, jobject clazz, jlong jsi, jstring rootPath) {
-    rPath = j_string_to_string(env, rootPath);
-    MMKV::initializeMMKV(rPath);
-    auto runtime = reinterpret_cast<jsi::Runtime*>(jsi);
-    install(*runtime);
-    createInstance("mmkvIDStore",MMKV_SINGLE_PROCESS,"","");
+
+        rPath = j_string_to_string(env, rootPath);
+        MMKV::initializeMMKV(rPath);
+        auto runtime = reinterpret_cast<jsi::Runtime*>(jsi);
+        if (runtime) {
+            install(*runtime);
+        }
+        createInstance("mmkvIDStore",MMKV_SINGLE_PROCESS,"","");
+ 
 }
