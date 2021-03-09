@@ -2,6 +2,7 @@
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -36,21 +37,27 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         super(reactContext);
         this.reactContext = reactContext;
         secureKeystore = new SecureKeystore(reactContext);
-
+        
     }
+
 
 
     @Override
     public void initialize() {
         super.initialize();
-        nativeInstall(
-                this.getReactApplicationContext().getJavaScriptContextHolder().get(),
-                this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
-        );
-        migrate();
+        if (this.getReactApplicationContext().getJavaScriptContextHolder().get() != 0) {
+            nativeInstall(
+                    this.getReactApplicationContext().getJavaScriptContextHolder().get(),
+                    this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
+            );
+            migrate();
 
+        } else {
+            Log.e("RNMMKVModule","JSI Runtime is not available in debug mode");
+        }
 
     }
+
 
     public void migrate() {
         MMKV.initialize(reactContext);
