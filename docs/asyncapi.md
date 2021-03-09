@@ -1,6 +1,6 @@
-# Promise API
+# Async API
 
-A promise based api is provided.
+A promise or `async/await` based api is available. When the application loads, your first call to get/set data should be asynchronous because we will init the database in the first call.
 
 First we create a default MMKV Instance
 
@@ -196,9 +196,10 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 **Arguments**
 
 
-| Name | Type          |
-|------|---------------|
-| keys | Array of Keys |
+| Name | Type                                   |
+|------|----------------------------------------|
+| keys | Array of Keys                          |
+| type | "string","bool","number","map","array" |
 
 ```js
 let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);

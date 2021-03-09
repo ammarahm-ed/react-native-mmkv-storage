@@ -1,6 +1,6 @@
 # Callback API
 
-A simple callback API is also available for even better performance boost.
+Synchronous calls is 5 to 8 times faster than Asynchronous calls. However at the very start of your app lifecycle, you cannot use Synchronous API with return values, only callbacks. A callback function can be optionally provided in case you need some value at the very beginning of app load, usually you won't need to.
 
 First we create a default MMKV Instance
 
@@ -23,7 +23,9 @@ Sets a string value in storage for the given key.
 | callback | Function |
 
 ``` js
-MMKV.setString("string", "string", (error, result) => {
+
+// WITH CALLBACK
+ MMKV.setString("string", "string", (error, result) => {
     if (error) {
         console.log(error);
         return;
@@ -31,6 +33,10 @@ MMKV.setString("string", "string", (error, result) => {
 
     console.log(result);
 });
+
+// WITHOUT CALLBACK
+MMKV.setString("string", "string");
+
 ```
 
 ## getString
@@ -53,6 +59,11 @@ MMKV.getString("string", (error, result) => {
 
     console.log(result); // Logs 'string';
 });
+
+// WITHOUT CALLBACK
+
+let string = MMKV.getString("string");
+
 ```
 
 **Returns**
@@ -79,6 +90,10 @@ MMKV.setInt("number", 10, (error, result) => {
 
     console.log(result); //Logs true;
 });
+
+// WITHOUT CALLBACK
+MMKV.setInt("number", 10);
+
 ```
 
 **Returns**
@@ -104,8 +119,11 @@ MMKV.getInt("number", (error, result) => {
 
     console.log(result); // logs 10;
 });
-```
 
+// WITHOUT CALLBACK
+let number =  MMKV.getInt("number");
+
+```
 **Returns**
  `number`
 
@@ -130,6 +148,11 @@ MMKV.setBool("boolean", true, (error, result) => {
 
     console.log(result); // logs true;
 });
+
+// WITHOUT CALLBACK
+
+MMKV.setBool("boolean", true);
+
 ```
 
 **Returns**
@@ -155,6 +178,12 @@ MMKV.getBool("boolean", (error, result) => {
 
     console.log(result); // logs true;
 });
+
+
+// WITHOUT CALLBACK
+
+let boolean = MMKV.getBool("boolean");
+
 ```
 
 **Returns**
@@ -186,10 +215,15 @@ MMKV.setMap("object", object, (error, result) => {
 
     console.log(result); // logs true;
 });
+
+// WITHOUT CALLBACK
+
+MMKV.setMap("object", object);
+
 ```
 
 **Returns**
- `boolean`
+ `null`
 
 #
 
@@ -215,6 +249,12 @@ MMKV.getMap("object", (error, result) => {
 
     console.log(object); // logs object
 });
+
+
+// WITHOUT CALLBACK 
+
+let object = MMKV.getMap("object");
+
 ```
 
 **Returns**
@@ -243,10 +283,15 @@ MMKV.setArray("array", array, (error, result) => {
 
     console.log(result); // logs true
 });
+
+
+// WITHOUT CALLBACK
+
+MMKV.setArray("array", array);
 ```
 
 **Returns**
- `boolean`
+ `null`
 
 ## getArray
 
@@ -260,8 +305,7 @@ Sets an array to storage for the given key.
 | callback | Function |
 
 ``` js
-MMKV.getArray("array"
-    array => console.log(array));
+
 MMKV.getArray("array", (error, result) => {
 
     if (error) {
@@ -274,6 +318,11 @@ MMKV.getArray("array", (error, result) => {
     console.log(array) // logs array
 
 });
+
+// WITHOUT CALLBACK
+
+let array = MMKV.getArray("array");
+
 ```
 
 **Returns**
@@ -285,15 +334,14 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 
 **Arguments**
 
-| Name     | Type          |
-|----------|---------------|
-| keys     | Array of Keys |
-| callback | Function      |
+| Name     | Type                                   |
+|----------|----------------------------------------|
+| keys     | Array of Keys                          |
+| type     | "string","bool","number","map","array" |
+| callback | Function                               |
 
 ``` js
 import MMKV from "react-native-mmkv-storage";
-
-MMKV.getMultipleItems(["foo", "bar", "loo"], (objects) => console.log(objects));
 
 MMKV.getMultipleItems(["foo", "bar", "loo"], (error, result) => {
     if (error) {
@@ -305,6 +353,11 @@ MMKV.getMultipleItems(["foo", "bar", "loo"], (error, result) => {
 
     console.log(objects); // logs objects
 });
+
+// WITHOUT CALLBACK
+
+let items = MMKV.getMultipleItems(["foo", "bar", "loo"]);
+
 ```
 
 **Returns**
