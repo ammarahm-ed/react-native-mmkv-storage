@@ -92,9 +92,6 @@ MMKV.setInt("number", 10, (error, result) => {
 MMKV.setInt("number", 10);
 ```
 
-**Returns**
-`boolean`
-
 ## getInt
 
 Gets a number value for a given key.
@@ -149,9 +146,6 @@ MMKV.setBool("boolean", true, (error, result) => {
 
 MMKV.setBool("boolean", true);
 ```
-
-**Returns**
-`boolean`
 
 ## getBool
 
@@ -214,11 +208,6 @@ MMKV.setMap("object", object, (error, result) => {
 MMKV.setMap("object", object);
 ```
 
-**Returns**
-`null`
-
-#
-
 ## getMap
 
 Gets an object from storage.
@@ -278,9 +267,6 @@ MMKV.setArray("array", array, (error, result) => {
 
 MMKV.setArray("array", array);
 ```
-
-**Returns**
-`null`
 
 ## getArray
 
