@@ -15,6 +15,7 @@ MMKV = new MMKVStorage.Loader().initialize();
 Sets a string value in storage for the given key.
 
 **Arguments**
+
 | Name  | Type   |
 |-------|--------|
 | key   | String |
@@ -32,6 +33,7 @@ await MMKV.setStringAsync("string", "string");
 Gets a string value for a given key.
 
 **Arguments**
+
 | Name | Type   |
 |------|--------|
 | key  | String |
@@ -48,6 +50,7 @@ let string = await MMKV.getStringAsync("string");
 Sets a number value in storage for the given key.
 
 **Arguments**
+
 | Name  | Type   |
 |-------|--------|
 | key   | String |
@@ -65,6 +68,7 @@ await MMKV.setIntAsync("number", 10);
 Gets a number value for a given key.
 
 **Arguments**
+
 | Name | Type   |
 |------|--------|
 | key  | String |
@@ -81,6 +85,7 @@ let number = await MMKV.getIntAsync("number");
 Sets a boolean value in storage for the given key.
 
 **Arguments**
+
 | Name  | Type    |
 |-------|---------|
 | key   | String  |
@@ -98,6 +103,7 @@ await MMKV.setBoolAsync("myBooleanValue", false);
 Gets a boolean value for a given key.
 
 **Arguments**
+
 | Name | Type   |
 |------|--------|
 | key  | String |
@@ -114,6 +120,7 @@ let boolean = await MMKV.getBoolAsync("myBooleanValue");
 Sets an object to storage for the given key.
 
 **Arguments**
+
 | Name  | Type   |
 |-------|--------|
 | key   | String |
@@ -133,6 +140,7 @@ await MMKV.setMapAsync("myobject", myObject);
 Gets an object from storage.
 
 **Arguments**
+
 | Name | Type   |
 |------|--------|
 | key  | String |
@@ -149,6 +157,7 @@ let object = await MMKV.getMapAsync("object");
 Sets an array to storage for the given key.
 
 **Arguments**
+
 | Name  | Type   |
 |-------|--------|
 | key   | String |
@@ -168,6 +177,7 @@ await MMKV.setArrayAsync("array", array);
 Sets an array to storage for the given key.
 
 **Arguments**
+
 | Name | Type   |
 |------|--------|
 | key  | String |
@@ -184,6 +194,8 @@ let myArray = await MMKV.getArrayAsync("array");
 Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
 
 **Arguments**
+
+
 | Name | Type          |
 |------|---------------|
 | keys | Array of Keys |

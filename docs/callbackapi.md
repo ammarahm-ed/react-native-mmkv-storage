@@ -15,6 +15,7 @@ MMKV = new MMKVStorage.Loader().initialize();
 Sets a string value in storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -37,6 +38,7 @@ MMKV.setString("string", "string", (error, result) => {
 Gets a string value for a given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -61,6 +63,7 @@ MMKV.getString("string", (error, result) => {
 Sets a number value in storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -86,6 +89,7 @@ MMKV.setInt("number", 10, (error, result) => {
 Gets a number value for a given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -110,6 +114,7 @@ MMKV.getInt("number", (error, result) => {
 Sets a boolean value in storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -135,6 +140,7 @@ MMKV.setBool("boolean", true, (error, result) => {
 Gets a boolean value for a given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -159,6 +165,7 @@ MMKV.getBool("boolean", (error, result) => {
 Sets an object to storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -191,6 +198,7 @@ MMKV.setMap("object", object, (error, result) => {
 Gets an object from storage.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -217,6 +225,7 @@ MMKV.getMap("object", (error, result) => {
 Sets an array to storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -244,6 +253,7 @@ MMKV.setArray("array", array, (error, result) => {
 Sets an array to storage for the given key.
 
 **Arguments**
+
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
@@ -274,6 +284,7 @@ MMKV.getArray("array", (error, result) => {
 Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
 
 **Arguments**
+
 | Name     | Type          |
 |----------|---------------|
 | keys     | Array of Keys |
