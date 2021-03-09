@@ -17,7 +17,7 @@ Sets a string value in storage for the given key.
 **Arguments**
 
 | Name  | Type   |
-|-------|--------|
+| ----- | ------ |
 | key   | String |
 | value | String |
 
@@ -35,7 +35,7 @@ Gets a string value for a given key.
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | key  | String |
 
 ```js
@@ -52,7 +52,7 @@ Sets a number value in storage for the given key.
 **Arguments**
 
 | Name  | Type   |
-|-------|--------|
+| ----- | ------ |
 | key   | String |
 | value | Number |
 
@@ -70,7 +70,7 @@ Gets a number value for a given key.
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | key  | String |
 
 ```js
@@ -87,7 +87,7 @@ Sets a boolean value in storage for the given key.
 **Arguments**
 
 | Name  | Type    |
-|-------|---------|
+| ----- | ------- |
 | key   | String  |
 | value | boolean |
 
@@ -105,7 +105,7 @@ Gets a boolean value for a given key.
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | key  | String |
 
 ```js
@@ -122,7 +122,7 @@ Sets an object to storage for the given key.
 **Arguments**
 
 | Name  | Type   |
-|-------|--------|
+| ----- | ------ |
 | key   | String |
 | value | Object |
 
@@ -142,7 +142,7 @@ Gets an object from storage.
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | key  | String |
 
 ```js
@@ -159,7 +159,7 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name  | Type   |
-|-------|--------|
+| ----- | ------ |
 | key   | String |
 | value | Array  |
 
@@ -179,7 +179,7 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | key  | String |
 
 ```js
@@ -195,14 +195,16 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 
 **Arguments**
 
-
 | Name | Type                                   |
-|------|----------------------------------------|
+| ---- | -------------------------------------- |
 | keys | Array of Keys                          |
 | type | "string","bool","number","map","array" |
 
 ```js
-let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);
+let multipleItems = await MMKV.getMultipleItemsAsync(
+  ["foo", "bar", "loo"],
+  "map"
+);
 ```
 
 **Returns**

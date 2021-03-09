@@ -4,7 +4,7 @@ Synchronous calls is 5 to 8 times faster than Asynchronous calls. However at the
 
 First we create a default MMKV Instance
 
-``` js
+```js
 import MMKVStorage from "react-native-mmkv-storage";
 
 MMKV = new MMKVStorage.Loader().initialize();
@@ -17,26 +17,24 @@ Sets a string value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | value    | String   |
 | callback | Function |
 
-``` js
-
+```js
 // WITH CALLBACK
- MMKV.setString("string", "string", (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+MMKV.setString("string", "string", (error, result) => {
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result);
+  console.log(result);
 });
 
 // WITHOUT CALLBACK
 MMKV.setString("string", "string");
-
 ```
 
 ## getString
@@ -46,28 +44,27 @@ Gets a string value for a given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | callback | Function |
 
-``` js
+```js
 MMKV.getString("string", (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // Logs 'string';
+  console.log(result); // Logs 'string';
 });
 
 // WITHOUT CALLBACK
 
 let string = MMKV.getString("string");
-
 ```
 
 **Returns**
- `string`
+`string`
 
 ## setInt
 
@@ -76,28 +73,27 @@ Sets a number value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | value    | Number   |
 | callback | Function |
 
-``` js
+```js
 MMKV.setInt("number", 10, (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); //Logs true;
+  console.log(result); //Logs true;
 });
 
 // WITHOUT CALLBACK
 MMKV.setInt("number", 10);
-
 ```
 
 **Returns**
- `boolean`
+`boolean`
 
 ## getInt
 
@@ -106,26 +102,26 @@ Gets a number value for a given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | callback | Function |
 
-``` js
+```js
 MMKV.getInt("number", (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // logs 10;
+  console.log(result); // logs 10;
 });
 
 // WITHOUT CALLBACK
-let number =  MMKV.getInt("number");
-
+let number = MMKV.getInt("number");
 ```
+
 **Returns**
- `number`
+`number`
 
 ## setBool
 
@@ -134,29 +130,28 @@ Sets a boolean value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | value    | boolean  |
 | callback | Function |
 
-``` js
+```js
 MMKV.setBool("boolean", true, (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // logs true;
+  console.log(result); // logs true;
 });
 
 // WITHOUT CALLBACK
 
 MMKV.setBool("boolean", true);
-
 ```
 
 **Returns**
- `boolean`
+`boolean`
 
 ## getBool
 
@@ -165,29 +160,27 @@ Gets a boolean value for a given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | callback | Function |
 
-``` js
+```js
 MMKV.getBool("boolean", (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // logs true;
+  console.log(result); // logs true;
 });
-
 
 // WITHOUT CALLBACK
 
 let boolean = MMKV.getBool("boolean");
-
 ```
 
 **Returns**
- `boolean`
+`boolean`
 
 ## setMap
 
@@ -196,34 +189,33 @@ Sets an object to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | value    | Object   |
 | callback | Function |
 
-``` js
+```js
 let object = {
-    foo: "foo",
-    bar: "bar",
+  foo: "foo",
+  bar: "bar",
 };
 
 MMKV.setMap("object", object, (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // logs true;
+  console.log(result); // logs true;
 });
 
 // WITHOUT CALLBACK
 
 MMKV.setMap("object", object);
-
 ```
 
 **Returns**
- `null`
+`null`
 
 #
 
@@ -234,31 +226,29 @@ Gets an object from storage.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | callback | Function |
 
-``` js
+```js
 MMKV.getMap("object", (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    let object = result;
+  let object = result;
 
-    console.log(object); // logs object
+  console.log(object); // logs object
 });
 
-
-// WITHOUT CALLBACK 
+// WITHOUT CALLBACK
 
 let object = MMKV.getMap("object");
-
 ```
 
 **Returns**
- `object`
+`object`
 
 ## setArray
 
@@ -267,23 +257,22 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | value    | Array    |
 | callback | Function |
 
-``` js
+```js
 let array = ["foo", "bar"];
 
 MMKV.setArray("array", array, (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    console.log(result); // logs true
+  console.log(result); // logs true
 });
-
 
 // WITHOUT CALLBACK
 
@@ -291,7 +280,7 @@ MMKV.setArray("array", array);
 ```
 
 **Returns**
- `null`
+`null`
 
 ## getArray
 
@@ -300,33 +289,29 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-|----------|----------|
+| -------- | -------- |
 | key      | String   |
 | callback | Function |
 
-``` js
-
+```js
 MMKV.getArray("array", (error, result) => {
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    if (error) {
-        console.log(error)
-        return;
-    }
+  let array = result;
 
-    let array = result;
-
-    console.log(array) // logs array
-
+  console.log(array); // logs array
 });
 
 // WITHOUT CALLBACK
 
 let array = MMKV.getArray("array");
-
 ```
 
 **Returns**
- `Array<>`
+`Array<>`
 
 ## getMultipleItems
 
@@ -335,37 +320,36 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 **Arguments**
 
 | Name     | Type                                   |
-|----------|----------------------------------------|
+| -------- | -------------------------------------- |
 | keys     | Array of Keys                          |
 | type     | "string","bool","number","map","array" |
 | callback | Function                               |
 
-``` js
+```js
 import MMKV from "react-native-mmkv-storage";
 
-MMKV.getMultipleItems(["foo", "bar", "loo"], (error, result) => {
-    if (error) {
-        console.log(error);
-        return;
-    }
+MMKV.getMultipleItems(["foo", "bar", "loo"], "map", (error, result) => {
+  if (error) {
+    console.log(error);
+    return;
+  }
 
-    let objects = result;
+  let objects = result;
 
-    console.log(objects); // logs objects
+  console.log(objects); // logs objects
 });
 
 // WITHOUT CALLBACK
 
-let items = MMKV.getMultipleItems(["foo", "bar", "loo"]);
-
+let items = MMKV.getMultipleItems(["foo", "bar", "loo"], "map");
 ```
 
 **Returns**
- `Array<[]>`
+`Array<[]>`
 
 The Array returned has the following structure:
 
-``` js
+```js
 [
     ["foo", Object < any > ],
     ["bar", Object < any > ]
@@ -377,4 +361,4 @@ The first item in each array is the `key` for the object, and the second item is
 If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
 
 **Returns**
- `Promise<boolean>`
+`Promise<boolean>`
