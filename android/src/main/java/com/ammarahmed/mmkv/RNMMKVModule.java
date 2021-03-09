@@ -32,14 +32,12 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     private native void nativeInstall(long jsi, String rootPath);
 
 
-
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         secureKeystore = new SecureKeystore(reactContext);
 
     }
-
 
 
     @Override
@@ -50,8 +48,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
         );
         migrate();
-
-
 
 
     }
@@ -65,22 +61,22 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             Bundle mmkvIdStore = kv.decodeParcelable("mmkvIdStore", Bundle.class);
             IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
             Set<String> keys = IdStore.keySet();
-            for (String key: keys) {
+            for (String key : keys) {
                 Object entry = IdStore.get(key);
                 Gson gson = new Gson();
                 String json = gson.toJson(entry);
-                kv.putString(key,json);
+                kv.putString(key, json);
                 HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(key);
 
                 if ((boolean) child.get("encrypted")) {
                     String alias = (String) child.get("alias");
                     if (secureKeystore.secureKeyExists(alias, null)) {
-                        String cKey = secureKeystore.getSecureKey(alias,null);
-                        MMKV kvv = MMKV.mmkvWithID(key,MMKV.SINGLE_PROCESS_MODE,cKey);
+                        String cKey = secureKeystore.getSecureKey(alias, null);
+                        MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE, cKey);
                         writeToJSON(kvv);
                     }
                 } else {
-                    MMKV kvv = MMKV.mmkvWithID(key,MMKV.SINGLE_PROCESS_MODE);
+                    MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE);
                     writeToJSON(kvv);
                 }
 
@@ -98,7 +94,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
                 WritableMap map = Arguments.fromBundle(bundle);
                 String obj = gson.toJson(map.toHashMap());
-                kvv.putString(string,obj);
+                kvv.putString(string, obj);
             }
         }
         Set<String> arrayIndex = new HashSet<>();
@@ -110,13 +106,21 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
                 List<Object> subChild = Arguments.toList(map.getArray(string));
                 String obj = gson.toJson(subChild);
-                kvv.putString(string,obj);
+                kvv.putString(string, obj);
             }
         }
 
+
         Set<String> intIndex = new HashSet<>();
-        intIndex = kvv.decodeStringSet("intIndex", intIndex);
-        kvv.encode("numberIndex",intIndex);
+        if (intIndex != null) {
+            intIndex = kvv.decodeStringSet("intIndex", intIndex);
+            for (String key : intIndex) {
+                int val = kvv.decodeInt(key);
+                double d = val;
+                kvv.encode(key, d);
+            }
+            kvv.encode("numberIndex", intIndex);
+        }
 
 
     }
