@@ -24,7 +24,9 @@
     "fast",
     "storage",
     "persis-storage",
-    "redux-persist-storage"
+    "secure-storage",
+    "redux-persist-storage",
+    "react-native-mmkv-storage"
   ],
   "repository": {
     "type": "git",
