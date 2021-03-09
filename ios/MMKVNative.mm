@@ -4,7 +4,7 @@
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
 #import <jsi/jsi.h>
-
+#import "SecureStorage.h"
 #import <MMKV/MMKV.h>
 
 using namespace facebook;
@@ -16,7 +16,7 @@ using namespace std;
 @synthesize methodQueue = _methodQueue;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
-
+SecureStorage* _secureStorage;
 
 RCT_EXPORT_MODULE()
 
@@ -102,12 +102,12 @@ void removeKeyFromIndexer(MMKV *kv, NSString* key) {
         return;
     }
     
-    index = getIndex(kv, @"intIndex");
+    index = getIndex(kv, @"numberIndex");
     
     if (index != NULL && [index containsObject:key]) {
         
         [index removeObject:key];
-        [kv setObject:index forKey:@"indIndex"];
+        [kv setObject:index forKey:@"numberIndex"];
         return;
     }
     
@@ -687,38 +687,87 @@ static void install(jsi::Runtime & jsiRuntime)
     if (!cxxBridge.runtime) {
         return;
     }
+ 
     mmkvInstances = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
     NSString *libraryPath = (NSString *) [paths firstObject];
     NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
     rPath = rootDir;
+    _secureStorage = [[SecureStorage alloc] init];
     [MMKV initializeMMKV:rootDir];
+    install(*(jsi::Runtime *)cxxBridge.runtime);
+    [self migrate];
     
+}
+
+- (void)migrate {
     MMKV *kv = [MMKV mmkvWithID:@"mmkvIdStore"];
         [mmkvInstances setObject:kv forKey:@"mmkvIdStore"];
         if ([kv containsKey:@"mmkvIdData"]) {
             NSMutableDictionary* oldStore = [kv getObjectOfClass:NSMutableDictionary.class forKey:@"mmkvIdData"];
             NSArray *keys = [oldStore allKeys];
+            
             for (int i=0;i < keys.count;i++) {
-                NSMutableDictionary* entry = [oldStore objectForKey:keys[i]];
+                NSString* storageKey =keys[i];
+                NSMutableDictionary* entry = [oldStore objectForKey:storageKey];
                 NSError *error;
                 NSData *jsonData = [NSJSONSerialization dataWithJSONObject:entry
                                                                    options:0
                                                                      error:&error];
                 NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-                [kv setString:jsonString forKey:keys[i]];
+                [kv setString:jsonString forKey:storageKey];
+                
+                if ([[entry valueForKey:@"encrypted"] boolValue]) {
+                    NSString *alias = [entry valueForKey:@"alias"] ;
+                    if ([_secureStorage searchKeychainCopyMatchingExists:alias]) {
+                        NSString* key = [_secureStorage searchKeychainCopyMatching:alias];
+                        if (key != nil) {
+                            NSData *cryptKey = [key dataUsingEncoding:NSUTF8StringEncoding];
+                            MMKV * kvv = [MMKV mmkvWithID:storageKey cryptKey:cryptKey mode:MMKVSingleProcess];
+                            [self writeToJson:kvv];
+                        }
+                       
+                    };
+                } else {
+                    MMKV * kvv = [MMKV mmkvWithID:storageKey mode:MMKVSingleProcess];
+                    [self writeToJson:kvv];
+                }
             }
+            
         [kv removeValueForKey:@"mmkvIdData"];
-        }
-    
-    install(*(jsi::Runtime *)cxxBridge.runtime);
-    
-   
- 
+    }
     
 }
 
+- (void)writeToJson:(MMKV *)kv {
+    NSArray* mapIndex = getIndex(kv, @"mapIndex");
+    for (NSString *key in mapIndex) {
+        NSDictionary *data = [kv getObjectOfClass:NSDictionary.class forKey:key];
+        NSError *error;
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                           options:0
+                                                             error:&error];
+        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        [kv setString:jsonString forKey:key];
+       }
+    
+    NSArray* arrayIndex = getIndex(kv, @"arrayIndex");
+    for (NSString *key in arrayIndex) {
+        NSMutableArray *data =
+               [kv getObjectOfClass:NSMutableArray.class forKey:key];
+        NSError *error;
+      
+        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                           options:0
+                                                             error:&error];
+        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        [kv setString:jsonString forKey:key];
+      }
+    
+    NSArray* intIndex = [kv getObjectOfClass:NSMutableArray.class forKey:@"intIndex"];
+    [kv setObject:intIndex forKey:@"numberIndex"];
+    [kv removeValueForKey:@"intIndex"];
+}
+
 @end
-
-
