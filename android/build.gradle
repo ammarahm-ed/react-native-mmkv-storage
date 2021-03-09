@@ -59,12 +59,21 @@ android {
     warning 'InvalidPackage'
   }
 
+  packagingOptions {
+    pickFirst '**/*.so'
+    }
+
+
   flavorDimensions "stl_mode"
   productFlavors {
-        SharedCpp {
+         SharedCpp {
             dimension "stl_mode"
             ext.artifactIdSuffix = ''
-            
+            externalNativeBuild {
+                cmake {
+                    arguments = ["-DANDROID_STL=c++_shared"]
+                }
+            }
         }
     }
 }
