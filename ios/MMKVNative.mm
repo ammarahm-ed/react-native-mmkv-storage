@@ -742,32 +742,45 @@ static void install(jsi::Runtime & jsiRuntime)
 
 - (void)writeToJson:(MMKV *)kv {
     NSArray* mapIndex = getIndex(kv, @"mapIndex");
-    for (NSString *key in mapIndex) {
-        NSDictionary *data = [kv getObjectOfClass:NSDictionary.class forKey:key];
-        NSError *error;
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
-                                                           options:0
-                                                             error:&error];
-        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        [kv setString:jsonString forKey:key];
-       }
+    if (mapIndex != nil) {
+        for (NSString *key in mapIndex) {
+            NSDictionary *data = [kv getObjectOfClass:NSDictionary.class forKey:key];
+            NSError *error;
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                               options:0
+                                                                 error:&error];
+            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            [kv setString:jsonString forKey:key];
+           }
+    }
+   
     
     NSArray* arrayIndex = getIndex(kv, @"arrayIndex");
-    for (NSString *key in arrayIndex) {
-        NSMutableArray *data =
-               [kv getObjectOfClass:NSMutableArray.class forKey:key];
-        NSError *error;
-      
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
-                                                           options:0
-                                                             error:&error];
-        NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-        [kv setString:jsonString forKey:key];
-      }
+    if (arrayIndex != nil) {
+        for (NSString *key in arrayIndex) {
+            NSMutableArray *data =
+                   [kv getObjectOfClass:NSMutableArray.class forKey:key];
+            NSError *error;
+          
+            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                               options:0
+                                                                 error:&error];
+            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+            [kv setString:jsonString forKey:key];
+          }
+    }
+   
     
     NSArray* intIndex = [kv getObjectOfClass:NSMutableArray.class forKey:@"intIndex"];
-    [kv setObject:intIndex forKey:@"numberIndex"];
-    [kv removeValueForKey:@"intIndex"];
+    if (intIndex != nil) {
+        for (NSString *key in intIndex) {
+            int64_t intVal = [kv getInt64ForKey:key];
+            [kv setDouble:double(intVal) forKey:key];
+          }
+        [kv setObject:intIndex forKey:@"numberIndex"];
+        [kv removeValueForKey:@"intIndex"];
+    }
+  
 }
 
 @end
