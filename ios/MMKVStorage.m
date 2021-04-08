@@ -41,7 +41,7 @@ RCT_EXPORT_MODULE()
     return RCTGetMethodQueue();
 }
 
-- (id)init
+- (id)init:(NSString *)appID bundleURL:(NSURL *)bundleURL
 {
     self = [super init];
     if (self) {

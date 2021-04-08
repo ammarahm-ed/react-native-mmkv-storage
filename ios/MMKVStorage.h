@@ -4,8 +4,11 @@
 #else
 #import <React/RCTBridgeModule.h>
 #endif
+#import <React/RCTBridgeDelegate.h>
 
-@interface MMKVStorage : NSObject <RCTBridgeModule>
+@interface MMKVStorage : NSObject <RCTBridgeModule, RCTBridgeDelegate>
+
+- (instancetype)init:(NSString *)appID bundleURL:(NSURL *)bundleURL;
 
 @end
   
