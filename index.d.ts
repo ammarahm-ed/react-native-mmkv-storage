@@ -17,6 +17,8 @@ type MODES = {
   MULTI_PROCESS: number;
 };
 
+type Callback<T> = (error: Error | null, result: T | null) => void;
+
 declare module MMKVStorage {
   export const MODES: MODES;
 
@@ -25,10 +27,8 @@ declare module MMKVStorage {
   const myVar: string;
 
   class API {
-
-
-     /**
-     * Set a string value to storage for a given key. 
+    /**
+     * Set a string value to storage for a given key.
      * This method is added for redux-persist support. It is similar to setStringAsync()
      *
      * @param {String} key
@@ -43,7 +43,6 @@ declare module MMKVStorage {
      */
     getItem(key: string): Promise<string>;
 
-
     /**
      * Set a string value to storag for a given key.
      *
@@ -56,7 +55,7 @@ declare module MMKVStorage {
      * Get a string value for a given key.
      * @param {String} key
      */
-    getStringAsync(key: string): Promise<string>;
+    getStringAsync(key: string): Promise<string | null>;
 
     /**
      * Set a number value to storage for a given key.
@@ -71,7 +70,7 @@ declare module MMKVStorage {
      * Get a number value for a given key
      * @param {String} key
      */
-    getIntAsync(key: string): Promise<number>;
+    getIntAsync(key: string): Promise<number | null>;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -86,7 +85,7 @@ declare module MMKVStorage {
      * Get a boolean value for a given key.
      * @param {String} key
      */
-    getBoolAsync(key: string): Promise<boolean>;
+    getBoolAsync(key: string): Promise<boolean | null>;
 
     /**
      * Set an Object to storage for a given key.
@@ -101,7 +100,7 @@ declare module MMKVStorage {
      * Get an Object from storage for a given key.
      * @param {String} key
      */
-    getMapAsync(key: string): Promise<object>;
+    getMapAsync<T extends object>(key: string): Promise<T | null>;
     /**
      * Set an array to the db.
      * @param {String} key
@@ -113,7 +112,7 @@ declare module MMKVStorage {
      * @param {String} key
      */
 
-    getArrayAsync(key: string): Promise<Array<any>>;
+    getArrayAsync<T extends any>(key: string): Promise<Array<T> | null>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -122,7 +121,9 @@ declare module MMKVStorage {
      *
      * @param {Array} keys
      */
-    getMultipleItemsAsync(keys: Array<string>): Promise<Array<object>>;
+    getMultipleItemsAsync<T extends object>(
+      keys: Array<string>
+    ): Promise<Array<T>>;
 
     clearStore(): Promise<boolean>;
     /**
@@ -139,77 +140,83 @@ declare module MMKVStorage {
      *
      * @param {String} key
      * @param {String} value
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
-    setString(key: string, value: string, callback: Function): boolean;
+    setString(key: string, value: string, callback?: Callback<boolean>): null;
     /**
      * Get a string value for a given key.
      * @param {String} key
-     * @param {Function} callback
+     * @param {Callback<string>} callback
      */
-    getString(key: string, callback: Function): string;
+    getString(key: string, callback?: Callback<string>): string | null;
 
     /**
      * Set a number value to storage for a given key.
      *
      * @param {String} key
      * @param {number} value
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
-    setInt(key: string, value: number, callback: Function): boolean;
+    setInt(key: string, value: number, callback?: Callback<boolean>): null;
 
     /**
      * Get a number value for a given key
      * @param {String} key
-     * @param {Function} callback
+     * @param {Callback<number>} callback
      */
-    getInt(key: string, callback: Function): number;
+    getInt(key: string, callback?: Callback<number>): number | null;
 
     /**
      * Set a boolean value to storag for a given key.
      *
      * @param {String} key
      * @param {boolean} value
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
-    setBool(key: string, value: boolean, callback: Function): boolean;
+    setBool(key: string, value: boolean, callback?: Callback<boolean>): null;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
-    getBool(key: string, callback: Function): boolean;
+    getBool(key: string, callback?: Callback<boolean>): boolean | null;
 
     /**
      * Set an Object to storage for a given key.
      *
      * @param {String} key
      * @param {Object} value
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
 
-    setMap(key: string, value: object, callback: Function): boolean;
+    setMap(key: string, value: object, callback?: Callback<boolean>): null;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
-     * @param {Function} callback
+     * @param {Callback<object>} callback
      */
-    getMap(key: string, callback: Function): object;
+    getMap<T extends object>(key: string, callback?: Callback<T>): T | null;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
-     * @param {Function} callback
+     * @param {Callback<boolean>} callback
      */
-    setArray(key: string, value: Array<any>, callback: Function): boolean;
+    setArray(
+      key: string,
+      value: Array<any>,
+      callback?: Callback<boolean>
+    ): null;
     /**
      * get an array from the storage for give key.
      * @param {String} key
-     * @param {Function} callback
+     * @param {Array<any>} callback
      */
-
-    getArray(key: string, callback: Function): Array<any>;
+    getArray<T extends any>(
+      key: string,
+      callback?: Callback<Array<T>>
+    ): Array<T> | null;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -217,9 +224,12 @@ declare module MMKVStorage {
      * **Will not work if a key as a String value.**
      *
      * @param {Array} keys
-     * @param {Function} callback
+     * @param {Array<object>} callback
      */
-    getMultipleItems(keys: Array<string>, callback: Function): Array<object>;
+    getMultipleItems<T extends object>(
+      keys: Array<string>,
+      callback?: Callback<Array<T>>
+    ): Array<T>;
 
     /**
      *
@@ -371,12 +381,14 @@ declare module MMKVStorage {
      * @param {string} key; Provide a custom key to encrypt the storage.
      * @param {boolean} secureKeyStorage Store the key in secure storage.
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
+     * @param {ACCESSIBLE}  accessibleMode Set accessible mode for secure storage on ios devices
      * @returns An object with alias and key
      */
     encrypt(
       key: string,
       secureKeyStorage: boolean,
-      alias: string
+      alias: string,
+      accessibleMode: ACCESSIBLE
     ): Promise<boolean>;
 
     /**
@@ -391,12 +403,14 @@ declare module MMKVStorage {
      * @param {string} key; Provide a custom key to encrypt the storage.
      * @param {boolean} secureKeyStorage Store the key in secure storage.
      * @param {string}  alias Provide a custom alias to store the key with in secure storage
+     * @param {ACCESSIBLE}  accessibleMode Set accessible mode for secure storage on ios devices
      */
 
     changeEncryptionKey(
       key: string,
       secureKeyStorage: boolean,
-      alias: string
+      alias: string,
+      accessibleMode: ACCESSIBLE
     ): Promise<boolean>;
   }
 
@@ -422,17 +436,17 @@ declare module MMKVStorage {
      * @param accessible MMKVStorage.ACCESSIBLE
      */
 
-    setAccessibleMode(accessible: ACCESSIBLE): this;
+    setAccessibleIOS(accessible: ACCESSIBLE): this;
 
     /**
-    * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
-    * You must call withEncryption() to use this.
-    * To store your key for later use call withSecureKeyStorage() too.
-    *
-    * @param {string} key the key to encrypt the storage with
-    * @param {boolean} secureKeyStorage Should the key be stored securely.
-    * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
-    */
+     * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
+     * You must call withEncryption() to use this.
+     * To store your key for later use call withSecureKeyStorage() too.
+     *
+     * @param {string} key the key to encrypt the storage with
+     * @param {boolean} secureKeyStorage Should the key be stored securely.
+     * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
+     */
 
     encryptWithCustomKey(
       key: string,

@@ -1,6 +1,3 @@
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
 
 buildscript {
   repositories {
@@ -16,33 +13,84 @@ buildscript {
   }
 }
 
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
 apply plugin: 'com.android.library'
 
 android {
+  defaultPublishConfig "SharedCppRelease"
   compileSdkVersion safeExtGet('compileSdkVersion', 28)
   buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
   defaultConfig {
       minSdkVersion safeExtGet('minSdkVersion', 16)
       targetSdkVersion safeExtGet('targetSdkVersion', 28)
+
+
+    externalNativeBuild {
+        cmake {
+            cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
+    }
+
   }
+
+  externalNativeBuild {
+      cmake {
+          path "./src/main/rnmmkv/CMakeLists.txt"
+          version "3.8.0+"
+      }
+  } 
+
+     buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            jniDebuggable true
+        }
+    }
+  
+
   lintOptions {
     abortOnError false
     warning 'InvalidPackage'
   }
+
+  packagingOptions {
+    pickFirst '**/*.so'
+    }
+
+
+  flavorDimensions "stl_mode"
+  productFlavors {
+         SharedCpp {
+            dimension "stl_mode"
+            ext.artifactIdSuffix = ''
+            externalNativeBuild {
+                cmake {
+                    arguments = ["-DANDROID_STL=c++_shared"]
+                }
+            }
+        }
+    }
 }
 
 repositories {
   mavenCentral()
+  jcenter()
+  google()
   maven {
    url 'https://maven.google.com'
   }
-  jcenter()
   maven { url "https://jitpack.io" }
 }
 
 dependencies {
     implementation 'com.facebook.react:react-native:+'
-    implementation 'com.tencent:mmkv-static:1.2.6'
     implementation "com.scottyab:secure-preferences-lib:0.1.4"
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
   

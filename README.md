@@ -17,9 +17,11 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 ## Features
 
+- **Written in C++ using JSI**<br/>
+  Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI making it the fastest storage option for React Native.
 - **Simple and lightweight**<br/>
   (~ 50K Android/30K iOS) and even smaller when packaged.
-- **Fast and Efficient**<br/>
+- **Fast and Efficient (0.0002s Read/Write Speed)**<br/>
   MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
   You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
 - **Multi-Process Support**<br/>
@@ -30,10 +32,8 @@ This library aims to provide a fast & reliable solution for you data storage nee
   The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels (API 22 and below), it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs.
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
-
 - **Supports redux-persist**<br/>
   Support for redux persist is also added starting from v0.3.2.
-
 
 
 ## Links 
@@ -43,7 +43,6 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
   - [Quickstart guide](https://rnmmkv.now.sh/#/gettingstarted)
 
-
 ## Contact & Support
 - Create a GitHub issue for bug reports, feature requests, or questions
 - Follow [@ammarahm-ed](https://github.com/ammarahm-ed) for announcements
@@ -51,7 +50,6 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 ## RoadMap
 You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/13)
-
 
 ## I want to contribute
 That is awesome news! There is alot happening at a very fast pace in this library right now. Every little help is precious. You can contribute in many ways:

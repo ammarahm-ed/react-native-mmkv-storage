@@ -14,9 +14,11 @@ See the [Quick start](gettingstarted.md) guide for more details.
 
 ## Features
 
+- **Written in C++ using JSI**<br/>
+  Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI making it the fastest storage option for React Native.
 - **Simple and lightweight**<br/>
   (~ 50K Android/30K iOS) and even smaller when packaged.
-- **Fast and Efficient**<br/>
+- **Fast and Efficient (0.0002s Read/Write Speed)**<br/>
   MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
   You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
 - **Multi-Process Support**<br/>

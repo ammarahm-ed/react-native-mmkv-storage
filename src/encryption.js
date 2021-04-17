@@ -1,7 +1,10 @@
-import { initialize, currentInstancesStatus } from "./initializer";
-import generatePassword from "./keygen";
-import { stringToHex } from "./utils";
-import { handleActionAsync } from "react-native-mmkv-storage/src/handlers";
+import {initialize, currentInstancesStatus} from './initializer';
+import generatePassword from './keygen';
+import {stringToHex} from './utils';
+import {handleActionAsync} from 'react-native-mmkv-storage/src/handlers';
+import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
+import {NativeModules} from 'react-native';
+const MMKV = NativeModules.MMKVStorage;
 
 function encryptStorage(
   options,
@@ -9,43 +12,29 @@ function encryptStorage(
   secureKeyStorage = true,
   alias,
   accessibleMode,
-  callback
+  callback,
 ) {
   if (secureKeyStorage) {
-    options.mmkv.setSecureKey(
-      alias,
-      key,
-      { accessible: accessibleMode },
-      (error) => {
-        if (error) {
-          return;
-        } else {
-          options.mmkv
-            .encrypt(options.instanceID, key, alias)
-            .then((r) => {
-              callback(null, r);
-            })
-            .catch((e) => {
-              callback(e, null);
-            });
-        }
+    MMKV.setSecureKey(alias, key, {accessible: accessibleMode}, (error) => {
+      if (error) {
+        return;
+      } else {
+        global.encryptMMKV(key, options.instanceID);
+        global.setBoolMMKV(options.instanceID, true, options.instanceID);
+        IDStore.add(options.instanceID, true, alias);
+        callback(null, true);
       }
-    );
+    });
   } else {
-    options.mmkv
-      .encrypt(options.instanceID, key, null)
-      .then((r) => {
-        callback(null, r);
-      })
-      .catch((e) => {
-        callback(e, null);
-      });
+    global.encryptMMKV(key, options.instanceID);
+    global.setBoolMMKV(options.instanceID, true, options.instanceID);
+    IDStore.add(options.instanceID, true, null);
+    callback(null, true);
   }
 }
 
 export default class encryption {
   constructor(args) {
-    this.MMKV = args.mmkv;
     this.instanceID = args.instanceID;
     this.alias = args.alias;
     this.aliasPrefix = args.aliasPrefix;
@@ -89,7 +78,7 @@ export default class encryption {
               reject(e);
             }
             resolve(r);
-          }
+          },
         );
       } else {
         initialize(this.options, (e) => {
@@ -108,7 +97,7 @@ export default class encryption {
                 reject(e);
               }
               resolve(r);
-            }
+            },
           );
         });
       }
@@ -116,18 +105,17 @@ export default class encryption {
   }
 
   async decrypt() {
-    return await handleActionAsync(
-      this.options,
-      this.MMKV.decrypt,
-      this.instanceID
-    );
+    await handleActionAsync(global.decryptMMKV, this.instanceID);
+    global.setBoolMMKV(options.instanceID, false, options.instanceID);
+    IDStore.add(options.instanceID, true, null);
+    return true;
   }
 
   async changeEncryptionKey(
     key,
     secureKeyStorage = true,
     alias,
-    accessibleMode
+    accessibleMode,
   ) {
     if (accessibleMode) {
       this.accessibleMode = accessibleMode;
@@ -161,7 +149,7 @@ export default class encryption {
               reject(e);
             }
             resolve(r);
-          }
+          },
         );
       } else {
         initialize(this.options, (e) => {
@@ -180,7 +168,7 @@ export default class encryption {
                 reject(e);
               }
               resolve(r);
-            }
+            },
           );
         });
       }

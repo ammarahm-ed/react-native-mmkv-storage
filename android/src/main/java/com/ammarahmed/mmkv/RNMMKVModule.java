@@ -1,7 +1,7 @@
 
 package com.ammarahmed.mmkv;
 
-
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -11,296 +11,131 @@ import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.google.gson.Gson;
 import com.tencent.mmkv.MMKV;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
 
 public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
-
-    public StorageIndexer indexer;
-
-    private IDStore IdStore;
-
-    private Map<String, MMKV> mmkvMap = new HashMap<String, MMKV>();
-
-    private StorageGetters storageGetters;
-
     private SecureKeystore secureKeystore;
 
+    static {
+        System.loadLibrary("rnmmkv");
+    }
 
-    private StorageSetters storageSetters;
+    private native void nativeInstall(long jsi, String rootPath);
+
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
-
         this.reactContext = reactContext;
-
-        MMKV.initialize(getReactApplicationContext());
-
-        IdStore = new IDStore(MMKV.mmkvWithID("mmkvIDStore"));
-
-        indexer = new StorageIndexer(reactContext);
-
         secureKeystore = new SecureKeystore(reactContext);
+        
+    }
 
-        storageGetters = new StorageGetters(indexer);
 
-        storageSetters = new StorageSetters(indexer);
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        if (this.getReactApplicationContext().getJavaScriptContextHolder().get() != 0) {
+            nativeInstall(
+                    this.getReactApplicationContext().getJavaScriptContextHolder().get(),
+                    this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
+            );
+            migrate();
+
+        } else {
+            Log.e("RNMMKVModule","JSI Runtime is not available in debug mode");
+        }
 
     }
 
+
+    public void migrate() {
+        MMKV.initialize(reactContext);
+        MMKV kv = MMKV.mmkvWithID("mmkvIDStore");
+        boolean hasKey = kv.containsKey("mmkvIdStore");
+        HashMap<String, Object> IdStore = new HashMap<>();
+        if (hasKey) {
+            Bundle mmkvIdStore = kv.decodeParcelable("mmkvIdStore", Bundle.class);
+            IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
+            Set<String> keys = IdStore.keySet();
+            for (String key : keys) {
+                Object entry = IdStore.get(key);
+                Gson gson = new Gson();
+                String json = gson.toJson(entry);
+                kv.putString(key, json);
+                HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(key);
+
+                if ((boolean) child.get("encrypted")) {
+                    String alias = (String) child.get("alias");
+                    if (secureKeystore.secureKeyExists(alias, null)) {
+                        String cKey = secureKeystore.getSecureKey(alias, null);
+                        MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE, cKey);
+                        writeToJSON(kvv);
+                    }
+                } else {
+                    MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE);
+                    writeToJSON(kvv);
+                }
+
+            }
+            kv.removeValueForKey("mmkvIdStore");
+        }
+    }
+
+    public void writeToJSON(MMKV kvv) {
+        Gson gson = new Gson();
+        Set<String> mapIndex = new HashSet<>();
+        mapIndex = kvv.decodeStringSet("mapIndex", mapIndex);
+        if (mapIndex != null) {
+            for (String string : mapIndex) {
+                Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
+                WritableMap map = Arguments.fromBundle(bundle);
+                String obj = gson.toJson(map.toHashMap());
+                kvv.putString(string, obj);
+            }
+        }
+        Set<String> arrayIndex = new HashSet<>();
+        arrayIndex = kvv.decodeStringSet("arrayIndex", arrayIndex);
+        if (arrayIndex != null) {
+            for (String string : arrayIndex) {
+                Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
+                WritableMap map = Arguments.fromBundle(bundle);
+
+                List<Object> subChild = Arguments.toList(map.getArray(string));
+                String obj = gson.toJson(subChild);
+                kvv.putString(string, obj);
+            }
+        }
+
+
+        Set<String> intIndex = new HashSet<>();
+        if (intIndex != null) {
+            intIndex = kvv.decodeStringSet("intIndex", intIndex);
+            for (String key : intIndex) {
+                int val = kvv.decodeInt(key);
+                double d = val;
+                kvv.encode(key, d);
+            }
+            kvv.encode("numberIndex", intIndex);
+        }
+
+
+    }
 
     @Override
     public String getName() {
         return "MMKVStorage";
     }
-
-
-    @ReactMethod
-    public void setup(String ID, int mode, Callback callback) {
-
-        if (ID == null) return;
-
-        MMKV kv = MMKV.mmkvWithID(ID, mode);
-
-        if (!IdStore.exists(ID)) {
-
-            mmkvMap.put(ID, kv);
-            kv.encode(ID, true);
-            IdStore.add(ID, false, null);
-            callback.invoke(null, true);
-
-        } else {
-
-            if (kv.containsKey(ID)) {
-                mmkvMap.put(ID, kv);
-                callback.invoke(null, true);
-            } else {
-
-                encryptionHandler(ID, mode, callback);
-            }
-
-
-        }
-
-    }
-
-
-    @ReactMethod
-    public void setupWithEncryption(String ID, int mode, String cryptKey, @Nullable String alias, Callback callback) {
-
-        MMKV kv = MMKV.mmkvWithID(ID, mode, cryptKey);
-
-        if (!IdStore.exists(ID)) {
-            IdStore.add(ID, true, alias);
-            kv.encode(ID, true);
-            mmkvMap.put(ID, kv);
-            callback.invoke(null, true);
-        } else {
-            if (kv.containsKey(ID)) {
-                mmkvMap.put(ID, kv);
-                callback.invoke(null, true);
-            } else {
-                encryptionHandler(ID, mode, callback);
-            }
-        }
-
-
-    }
-
-
-    public void encryptionHandler(String ID, int mode, @Nullable Callback callback) {
-
-        MMKV kv = null;
-
-        String alias = IdStore.getAlias(ID);
-
-        if (IdStore.encrypted(ID)) {
-
-
-            if (secureKeystore.secureKeyExists(alias, null)) {
-
-
-                String cryptKey = secureKeystore.getSecureKey(alias, null);
-
-
-                kv = MMKV.mmkvWithID(ID, mode, cryptKey);
-
-                mmkvMap.put(ID, kv);
-                if (callback != null) {
-
-                    callback.invoke(null, true);
-                }
-
-
-            } else {
-                callback.invoke("Wrong password or storage corrupt", null);
-            }
-
-
-        } else {
-
-            kv = MMKV.mmkvWithID(ID, mode);
-            mmkvMap.put(ID, kv);
-            if (callback != null) {
-
-                callback.invoke(null, true);
-            }
-
-
-        }
-
-
-    }
-
-
-    @ReactMethod
-    public void getCurrentMMKVInstanceIDs(Promise promise) {
-
-        WritableArray array = Arguments.createArray();
-        Set<String> strings = mmkvMap.keySet();
-
-        for (String string : strings) {
-
-            array.pushString(string);
-
-        }
-
-        promise.resolve(array);
-
-
-    }
-
-
-    @ReactMethod
-    public void getAllMMKVInstanceIDs(Promise promise) {
-
-        HashMap<String, Object> allIDs = IdStore.getAll();
-
-        WritableArray array = Arguments.createArray();
-
-        if (allIDs == null) {
-            promise.resolve(array);
-            return;
-        }
-
-        for (String string : allIDs.keySet()) {
-            array.pushString(string);
-        }
-
-        promise.resolve(array);
-
-
-    }
-
-
-    @ReactMethod
-    public void setString(final String ID, final String key, final String value, @Nullable final Callback callback) {
-
-        storageSetters.setItem(ID, key, Constants.DATA_TYPE_STRING, value, 0, false, null, false, mmkvMap, callback);
-    }
-
-
-    @ReactMethod
-    public void setBool(final String ID, final String key, final boolean value, @Nullable final Callback callback) {
-        storageSetters.setItem(ID, key, Constants.DATA_TYPE_BOOL, null, 0, value, null, false, mmkvMap, callback);
-    }
-
-
-    @ReactMethod
-    public void setInt(final String ID, final String key, final int value, @Nullable final Callback callback) {
-
-        storageSetters.setItem(ID, key, Constants.DATA_TYPE_INT, null, value, false, null, false, mmkvMap, callback);
-
-    }
-
-
-    @ReactMethod
-    public void setMap(final String ID, final String key, final ReadableMap value, final boolean isArray, @Nullable final Callback callback) {
-
-        storageSetters.setItem(ID, key, Constants.DATA_TYPE_MAP, null, 0, false, value, isArray, mmkvMap, callback);
-
-    }
-
-
-    @ReactMethod
-    public void getItem(final String ID, final String key, final int type, final Callback callback) {
-
-
-        storageGetters.getItem(ID, key, type, mmkvMap, callback);
-    }
-
-
-    @ReactMethod
-    public void hasKey(final String ID, final String key, final Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-
-            promise.resolve(kv.containsKey(key));
-
-        } else {
-            promise.reject("Error", "database not initialized with given id");
-        }
-
-    }
-
-
-    @ReactMethod
-    public void getKeys(final String ID, final Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-
-
-            String[] keys = kv.allKeys();
-            if (keys != null) {
-                WritableArray array = Arguments.fromJavaArgs(keys);
-                promise.resolve(array);
-            } else {
-                promise.reject("Error", "database appears to be empty");
-            }
-
-        } else {
-            promise.reject("Error", "database not initialized with given id");
-        }
-    }
-
-
-    @ReactMethod
-    public void getMultipleItems(final String ID, final ReadableArray keys, final Callback callback) {
-
-        storageGetters.getMultipleItems(ID, keys, mmkvMap, callback);
-
-    }
-
-    @ReactMethod
-    public void getItemsForType(final String ID, final int type, final Callback callback) {
-        storageGetters.getItemsForType(ID, type, mmkvMap, callback);
-    }
-
-    @ReactMethod
-    public void getTypeIndex(final String ID, final int type, Promise promise) {
-
-        indexer.getTypeIndex(ID, type, mmkvMap, promise);
-
-    }
-
-    @ReactMethod
-    public void typeIndexerHasKey(final String ID, String key, int type, Promise promise) {
-
-        indexer.typeIndexerHasKey(ID, key, type, mmkvMap, promise);
-    }
-
 
     @ReactMethod
     public void setSecureKey(String key, String value, @Nullable ReadableMap options, Callback callback) {
@@ -322,121 +157,5 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         secureKeystore.removeSecureKey(key, callback);
     }
 
-
-    @ReactMethod
-    public void removeItem(final String ID, final String key, final Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-            //Log.d("REMOVE","HERE RE" + ID  + key + String.valueOf(kv.containsKey(key)) );
-
-            if (kv.contains(key)) {
-                Log.d("REMOVE","HERE REMO");
-                kv.removeValueForKey(key);
-
-                indexer.removeKeyFromIndexer(ID,mmkvMap,key);
-                Log.d("REMOVE","HERE REMOVI");
-
-                promise.resolve(key);
-            } else {
-                promise.resolve(true);
-            }
-
-
-        } else {
-            promise.reject("Error", "database not initialized with given id");
-        }
-    }
-
-
-    @ReactMethod
-    public void encrypt(String ID, String key, String alias, Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-
-            kv.encode(ID, true);
-            IdStore.add(ID, true, alias);
-
-            kv.reKey(key);
-
-            promise.resolve(true);
-
-        } else {
-
-            promise.reject("Error", "database not initialized with given id");
-
-        }
-
-    }
-
-    @ReactMethod
-    public void decrypt(String ID, Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-            kv.encode(ID, true);
-            IdStore.add(ID, false, null);
-            kv.reKey(null);
-            promise.resolve(true);
-
-        } else {
-
-            promise.reject("Error", "database not initialized with given id");
-        }
-
-    }
-
-    @ReactMethod
-    public void changeEncryptionKey(String ID, String key, String alias, Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-
-            kv.encode(ID, true);
-            IdStore.add(ID, true, alias);
-            kv.reKey(key);
-
-            promise.resolve(true);
-
-        } else {
-
-            promise.reject("Error", "database not initialized with given id");
-        }
-
-    }
-
-
-    @ReactMethod
-    public void clearStore(final String ID, final Promise promise) {
-
-
-        if (mmkvMap.containsKey(ID)) {
-            final MMKV kv = mmkvMap.get(ID);
-            kv.clearAll();
-            kv.encode(ID, true);
-            promise.resolve(true);
-
-        } else {
-            promise.reject("Error", "database not initialized with given id");
-        }
-
-    }
-
-
-    @ReactMethod
-    public void clearMemoryCache(final String ID, final Promise promise) {
-
-        if (mmkvMap.containsKey(ID)) {
-
-            MMKV kv = mmkvMap.get(ID);
-            kv.clearMemoryCache();
-            promise.resolve(true);
-        } else {
-
-            promise.reject("Error", "database is not initialized");
-        }
-
-    }
 
 }

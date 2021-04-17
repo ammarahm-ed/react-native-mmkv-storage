@@ -19,9 +19,9 @@ Stores keys of all types in one place.
 Check if any data exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.hasKey("your key").then((result) => {
@@ -58,9 +58,9 @@ Index of all the strings in storage.
 Check if any data exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.strings.hasKey("your key").then((result) => {
@@ -122,9 +122,9 @@ Index of all the numbers in storage.
 Check if any number exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.numbers.hasKey("your key").then((result) => {
@@ -186,9 +186,9 @@ Index of all the booleans in storage.
 Check if any boolean exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.booleans.hasKey("your key").then((result) => {
@@ -250,9 +250,9 @@ Index of all the objects in storage.
 Check if any objects exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.maps.hasKey("your key").then((result) => {
@@ -314,9 +314,9 @@ Index of all the arrays in storage.
 Check if any array exists for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+| Name | Type   |
+|------|--------|
+| key  | String |
 
 ```jsx
 MMKV.indexer.arrays.hasKey("your key").then((result) => {
