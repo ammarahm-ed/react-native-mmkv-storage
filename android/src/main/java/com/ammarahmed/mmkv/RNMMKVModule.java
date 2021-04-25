@@ -1,3 +1,4 @@
+
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
@@ -30,7 +32,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         System.loadLibrary("rnmmkv");
     }
 
-    private native void nativeInstall(long jsi, String rootPath);
+    private static native void nativeInstall(long jsi, String rootPath);
 
     private native void destroy();
 
@@ -41,25 +43,24 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         
     }
 
+    public static void installLib(JavaScriptContextHolder reactContext, String rootPath) {
 
-
-    @Override
-    public void initialize() {
-        super.initialize();
-        if (this.getReactApplicationContext().getJavaScriptContextHolder().get() != 0) {
+        if (reactContext.get() != 0) {
             nativeInstall(
-                    this.getReactApplicationContext().getJavaScriptContextHolder().get(),
-                    this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
+                    reactContext.get(),
+                    rootPath
             );
-            migrate();
-
         } else {
             Log.e("RNMMKVModule","JSI Runtime is not available in debug mode");
         }
 
     }
 
-
+    @Override
+    public void initialize() {
+        super.initialize();
+        migrate();
+    }
 
     public void migrate() {
         MMKV.initialize(reactContext);
