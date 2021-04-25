@@ -20,7 +20,6 @@ def safeExtGet(prop, fallback) {
 apply plugin: 'com.android.library'
 
 android {
-  defaultPublishConfig "SharedCppRelease"
   compileSdkVersion safeExtGet('compileSdkVersion', 28)
   buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
   defaultConfig {
@@ -44,14 +43,11 @@ android {
       }
   } 
 
-     buildTypes {
-        release {
-            minifyEnabled false
-        }
-        debug {
-            jniDebuggable true
-        }
+   buildTypes {
+    release {
+      minifyEnabled false
     }
+  }
   
 
   lintOptions {
@@ -59,23 +55,11 @@ android {
     warning 'InvalidPackage'
   }
 
-  packagingOptions {
-    pickFirst '**/*.so'
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
 
-
-  flavorDimensions "stl_mode"
-  productFlavors {
-         SharedCpp {
-            dimension "stl_mode"
-            ext.artifactIdSuffix = ''
-            externalNativeBuild {
-                cmake {
-                    arguments = ["-DANDROID_STL=c++_shared"]
-                }
-            }
-        }
-    }
 }
 
 repositories {
