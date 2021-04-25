@@ -11,7 +11,6 @@ using namespace std;
 static vector<MMKV *> mmkvInstances;
 
 string rPath = "";
-JNIEnv* jniEnv;
 JavaVM* vm;
 jclass mmkvclass;
 jobject mmkvobject;
@@ -31,22 +30,7 @@ static string jstring2string(JNIEnv *env, jstring str) {
 
 
 
-bool GetJniEnv(JavaVM *vm, JNIEnv **env) {
-    bool did_attach_thread = false;
-    *env = nullptr;
-    // Check if the current thread is attached to the VM
-    auto get_env_result = vm->GetEnv((void**)env, JNI_VERSION_1_6);
-    if (get_env_result == JNI_EDETACHED) {
-        if (vm->AttachCurrentThread(env, NULL) == JNI_OK) {
-            did_attach_thread = true;
-        } else {
-            // Failed to attach thread. Throw an exception if you want to.
-        }
-    } else if (get_env_result == JNI_EVERSION) {
-        // Unsupported JNI version. Throw an exception if you want to.
-    }
-    return did_attach_thread;
-}
+
 
 
 std::string j_string_to_string(JNIEnv *env, jstring jStr) {
@@ -968,9 +952,6 @@ Java_com_ammarahmed_mmkv_RNMMKVModule_nativeInstall(JNIEnv *env, jobject clazz, 
         auto runtime = reinterpret_cast<jsi::Runtime*>(jsi);
 
         mmkvobject = env->NewGlobalRef(clazz);
-
-        jniEnv = env;
-
 
         if (runtime) {
             install(*runtime);
