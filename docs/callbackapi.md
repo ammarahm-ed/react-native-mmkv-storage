@@ -1,4 +1,4 @@
-# Callback API
+# Synchronous API
 
 Synchronous calls is 8 to 10 times faster than Asynchronous calls. 
 
