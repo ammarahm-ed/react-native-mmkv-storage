@@ -1,6 +1,9 @@
 # Async API
 
-A promise or `async/await` based api is available. When the application loads, your first call to get/set data should be asynchronous because we will init the database in the first call.
+A promise or `async/await` api is available. 
+
+If you are on <=0.5.3, when the application loads, your first call to get/set data should be asynchronous because we will init the database in the first call.
+
 
 First we create a default MMKV Instance
 
