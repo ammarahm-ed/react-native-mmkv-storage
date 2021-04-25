@@ -141,13 +141,13 @@ declare module MMKVStorage {
      * @param {String} value
      * @param {Function} callback
      */
-    setString(key: string, value: string, callback?: Function): null;
+    setString(key: string, value: string, callback?: Function): boolean | undefined;
     /**
      * Get a string value for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getString(key: string, callback?: Function): string | null;
+    getString(key: string, callback?: Function): string | null | undefined;
 
     /**
      * Set a number value to storage for a given key.
@@ -156,14 +156,14 @@ declare module MMKVStorage {
      * @param {number} value
      * @param {Function} callback
      */
-    setInt(key: string, value: number, callback?: Function): null;
+    setInt(key: string, value: number, callback?: Function): boolean | undefined;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      * @param {Function} callback
      */
-    getInt(key: string, callback?: Function): number | null;
+    getInt(key: string, callback?: Function): number | null | undefined;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -172,14 +172,14 @@ declare module MMKVStorage {
      * @param {boolean} value
      * @param {Function} callback
      */
-    setBool(key: string, value: boolean, callback?: Function): null;
+    setBool(key: string, value: boolean, callback?: Function): boolean | undefined;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getBool(key: string, callback?: Function): boolean | null;
+    getBool(key: string, callback?: Function): boolean | null | undefined
 
     /**
      * Set an Object to storage for a given key.
@@ -189,27 +189,27 @@ declare module MMKVStorage {
      * @param {Function} callback
      */
 
-    setMap(key: string, value: object, callback?: Function): null;
+    setMap(key: string, value: object, callback?: Function): boolean | undefined;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      * @param {Function} callback
      */
-    getMap(key: string, callback?: Function): object | null;
+    getMap(key: string, callback?: Function): object | null | undefined;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      * @param {Function} callback
      */
-    setArray(key: string, value: Array<any>, callback?: Function): null;
+    setArray(key: string, value: Array<any>, callback?: Function): boolean | undefined;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      * @param {Function} callback
      */
 
-    getArray(key: string, callback?: Function): Array<any> | null;
+    getArray(key: string, callback?: Function): Array<any> | null | undefined;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
