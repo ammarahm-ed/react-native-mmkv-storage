@@ -152,7 +152,7 @@ export default class API {
 
   setArray = (key, value) => {
     if (!Array.isArray(value)) throw new Error('value must be an Array');
-    handleAction(
+    return handleAction(
       global.setArrayMMKV,
       key,
       JSON.stringify(value),
