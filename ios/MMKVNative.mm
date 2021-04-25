@@ -612,7 +612,7 @@ static void install(jsi::Runtime & jsiRuntime)
                                                               const jsi::Value *arguments,
                                                               
                                                               size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(runtime, arguments[1].getString(
+        MMKV *kv = getInstance(convertJSIStringToNSString(runtime, arguments[0].getString(
                                                                                           runtime)));
         if (!kv)
         {
