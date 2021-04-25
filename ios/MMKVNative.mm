@@ -183,7 +183,7 @@ static void install(jsi::Runtime & jsiRuntime)
                        cryptKey,
                        path);
         
-        return Value::null();
+        return Value(true);
     });
     
     jsiRuntime.global().setProperty(jsiRuntime, "setupMMKVInstance", move(setupMMKVInstance));
@@ -212,7 +212,7 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -278,7 +278,7 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -342,7 +342,7 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -406,7 +406,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv setDouble:arguments[1].getNumber() forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     jsiRuntime.global().setProperty(jsiRuntime, "setNumberMMKV", move(setNumberMMKV));
@@ -465,7 +465,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv setBool:arguments[1].getBool() forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -529,7 +529,7 @@ static void install(jsi::Runtime & jsiRuntime)
         removeKeyFromIndexer(kv, key);
         [kv removeValueForKey:key];
         
-        return jsi::Value::null();
+        return Value(true);
     });
     jsiRuntime.global().setProperty(jsiRuntime, "removeValueMMKV", std::move(removeValueMMKV));
     
@@ -621,7 +621,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv clearAll];
         
-        return Value::null();
+        return Value(true);
     });
     jsiRuntime.global().setProperty(jsiRuntime, "clearMMKV", std::move(clearMMKV));
     
@@ -699,7 +699,7 @@ static void install(jsi::Runtime & jsiRuntime)
                                                                                    runtime));
         [_secureStorage setSecureKey:alias value:key options:@{@"accessible":accValue}];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -764,7 +764,7 @@ static void install(jsi::Runtime & jsiRuntime)
         NSString* alias = convertJSIStringToNSString(runtime, arguments[0].getString(
                                                                                    runtime));
         [_secureStorage removeSecureKey:alias];
-        return Value::null();
+        return Value(true);
     });
     
     
