@@ -35,6 +35,6 @@
   "author": "Ammar Ahmed for @ammarahm-ed",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.56.3"
+    "react-native": "*"
   }
 }

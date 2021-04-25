@@ -11,20 +11,21 @@
  * @param  {...any} args Arguments for the native function
  */
 
-import {options} from 'react-native-mmkv-storage/src/utils';
-import {currentInstancesStatus, initialize} from './initializer';
+import { options } from 'react-native-mmkv-storage/src/utils';
+import { currentInstancesStatus, initialize } from './initializer';
 
 export function handleAction(action, ...args) {
   let id = args[args.length - 1];
   if (currentInstancesStatus[id]) {
     if (!action) return;
     return action(...args);
-  } else {
-    let opts = options[id];
-    initialize(opts);
-    currentInstancesStatus[id] = true;
-    if (!action) return;
-    return action(...args);}
+  }
+  let opts = options[id];
+  initialize(opts);
+  currentInstancesStatus[id] = true;
+  if (!action) return;
+  return action(...args);
+
 }
 
 export async function handleActionAsync(action, ...args) {
@@ -32,7 +33,7 @@ export async function handleActionAsync(action, ...args) {
   return new Promise(async (resolve) => {
     if (currentInstancesStatus[id]) {
       let result = action(...args);
-        resolve(result);
+      resolve(result);
     } else {
       let opts = options[id];
       initialize(opts);

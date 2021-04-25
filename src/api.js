@@ -1,8 +1,8 @@
 import encryption from 'react-native-mmkv-storage/src/encryption';
 import indexer from 'react-native-mmkv-storage/src/indexer/indexer';
-import {promisify} from 'react-native-mmkv-storage/src/utils';
-import {handleAction, handleActionAsync} from './handlers';
-import {currentInstancesStatus} from 'react-native-mmkv-storage/src/initializer';
+import { promisify } from 'react-native-mmkv-storage/src/utils';
+import { handleAction, handleActionAsync } from './handlers';
+import { currentInstancesStatus } from 'react-native-mmkv-storage/src/initializer';
 import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
 
 export default class API {
@@ -31,49 +31,50 @@ export default class API {
 
   setStringAsync(key, value) {
     return new Promise((resolve) => {
-      this.setString(key, value, (e, v) => resolve(v));
+      resolve(this.setString(key, value))
     });
   }
 
   getStringAsync(key) {
     return new Promise((resolve) => {
-      this.getString(key, (e, v) => resolve(v));
+      resolve(this.getString(key))
     });
   }
 
   setIntAsync(key, value) {
     return new Promise((resolve) => {
-      this.setInt(key, value, (e, v) => resolve(v));
+      resolve(this.setInt(key, value))
+
     });
   }
 
   getIntAsync(key) {
     return new Promise((resolve) => {
-      this.getInt(key, (e, v) => resolve(v));
+      resolve(this.getInt(key))
     });
   }
 
   setBoolAsync(key, value) {
     return new Promise((resolve) => {
-      this.setBool(key, value, (e, v) => resolve(v));
+      resolve(this.setBool(key, value))
     });
   }
 
   getBoolAsync(key) {
     return new Promise((resolve) => {
-      this.getBool(key, (e, v) => resolve(v));
+      resolve(this.getBool(key))
     });
   }
 
   setMapAsync(key, value) {
     return new Promise((resolve) => {
-      this.setMap(key, value, (e, v) => resolve(v));
+      resolve(this.setMap(key, value));
     });
   }
 
   getMapAsync(key) {
     return new Promise((resolve) => {
-      this.getMap(key, (e, v) => resolve(v));
+      resolve(this.getMap(key))
     });
   }
 
@@ -83,44 +84,49 @@ export default class API {
 
   async setArrayAsync(key, value) {
     return new Promise((resolve) => {
-      this.setArray(key, value, (e, v) => resolve(v));
+      resolve(this.setArray(key, value))
     });
   }
 
   async getArrayAsync(key) {
     return new Promise((resolve) => {
-      this.getArray(key, (e, v) => resolve(v));
+      resolve(this.getArray(key))
     });
   }
 
-  setString = (key, value, cb) => {
-    return handleAction(cb, global.setStringMMKV, key, value, this.instanceID);
+  setString = (key, value) => {
+    return handleAction(global.setStringMMKV, key, value, this.instanceID);
   };
 
-  getString = (key, cb) => {
-    return handleAction(cb, global.getStringMMKV, key, this.instanceID);
+  getString = (key, callback) => {
+    let string = handleAction(global.getStringMMKV, key, this.instanceID);
+    callback && callback(string);
+    return string;
   };
 
-  setInt = (key, value, cb) => {
-    return handleAction(cb, global.setNumberMMKV, key, value, this.instanceID);
+  setInt = (key, value) => {
+    return handleAction(global.setNumberMMKV, key, value, this.instanceID);
   };
 
-  getInt = (key, cb) => {
-    return handleAction(cb, global.getNumberMMKV, key, this.instanceID);
+  getInt = (key, callback) => {
+    let int = handleAction(global.getNumberMMKV, key, this.instanceID)
+    callback && callback(int)
+    return int;
   };
 
-  setBool = (key, value, cb) => {
-    return handleAction(cb, global.setBoolMMKV, key, value, this.instanceID);
+  setBool = (key, value) => {
+    return handleAction(global.setBoolMMKV, key, value, this.instanceID);
   };
 
-  getBool = (key, cb) => {
-    return handleAction(cb, global.getBoolMMKV, key, this.instanceID);
+  getBool = (key, callback) => {
+    let bool = handleAction(global.getBoolMMKV, key, this.instanceID);
+    callback && callback(bool);
+    return bool
   };
 
-  setMap = (key, value, cb) => {
+  setMap = (key, value) => {
     if (typeof value !== 'object') throw new Error('value must be an object');
     return handleAction(
-      cb,
       global.setMapMMKV,
       key,
       JSON.stringify(value),
@@ -128,31 +134,25 @@ export default class API {
     );
   };
 
-  getMap = (key, cb) => {
-    const func = (v) => {
-      try {
-        return JSON.parse(v);
-      } catch (e) {
-        return null;
-      }
-    };
+  getMap = (key, callback) => {
     let map = handleAction(
-      (e, v) => {
-        if (!cb) return;
-        let map = func(v);
-        cb(e, map);
-      },
       global.getMapMMKV,
       key,
       this.instanceID,
     );
-    return func(map);
+    try {
+      map = JSON.parse(map);
+      callback && callback(map)
+      return map
+    } catch (e) {
+      callback && callback(null)
+      return null;
+    }
   };
 
-  setArray = (key, value, cb) => {
+  setArray = (key, value) => {
     if (!Array.isArray(value)) throw new Error('value must be an Array');
     handleAction(
-      cb,
       global.setArrayMMKV,
       key,
       JSON.stringify(value),
@@ -160,28 +160,23 @@ export default class API {
     );
   };
 
-  getArray = (key, cb) => {
-    const func = (v) => {
-      try {
-        return JSON.parse(v);
-      } catch (e) {
-        return null;
-      }
-    };
+  getArray = (key, callback) => {
     let array = handleAction(
-      (e, v) => {
-        if (!cb) return;
-        let array = func(v);
-        cb(e, array);
-      },
       global.getMapMMKV,
       key,
       this.instanceID,
     );
-    return func(array);
+    try {
+      array = JSON.parse(array)
+      callback && callback(array);
+      return array;
+    } catch (e) {
+      callback && callback(null);
+      return null;
+    }
   };
 
-  getMultipleItems = (keys, type = 'map', cb) => {
+  getMultipleItems = (keys, type = 'map') => {
     const func = () => {
       let items = [];
       for (let i = 0; i < keys.length; i++) {
@@ -206,7 +201,7 @@ export default class API {
                 if (__DEV__) {
                   console.warn(
                     keys[i] +
-                      'has a value that is not an object, returning null',
+                    'has a value that is not an object, returning null',
                   );
                 }
                 item[1] = null;
@@ -224,7 +219,7 @@ export default class API {
                 if (__DEV__) {
                   console.warn(
                     keys[i] +
-                      'has a value that is not an array, returning null',
+                    'has a value that is not an array, returning null',
                   );
                 }
                 item[1] = null;
@@ -242,9 +237,6 @@ export default class API {
       return items;
     };
     handleAction(
-      () => {
-        cb(e, func());
-      },
       () => null,
       keys,
       this.instanceID,

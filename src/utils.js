@@ -1,17 +1,10 @@
 export function promisify(fn) {
 
   return function (...args) {
-
-    return new Promise((resolve, reject) => {
-
-      fn(...args, (error, result) => {
-          resolve(result);
-      })
-
+    return new Promise((resolve) => {
+      resolve( fn(...args));
     })
-
   }
-
 }
 
 
