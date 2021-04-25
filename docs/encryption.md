@@ -9,7 +9,7 @@ Encrypt an already created instance of MMKV.
 **Arguments**
 
 | Name             | Required | Type    | Description                                                                           |
-| ---------------- | -------- | ------- | ------------------------------------------------------------------------------------- |
+|------------------|----------|---------|---------------------------------------------------------------------------------------|
 | cryptKey         | no       | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
@@ -53,7 +53,7 @@ Change the encryption key of an encrypted instance of MMKV.
 **Arguments**
 
 | Name             | Required | Type    | Description                                                                           |
-| ---------------- | -------- | ------- | ------------------------------------------------------------------------------------- |
+|------------------|----------|---------|---------------------------------------------------------------------------------------|
 | cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |

@@ -77,7 +77,6 @@ export default class Loader {
   getInstance() {
     let instance = new API(this.options);
     options[this.options.instanceID] = this.options;
-    handleAction(()=>{},() => {},this.options.instanceID);
     return instance;
   }
 }

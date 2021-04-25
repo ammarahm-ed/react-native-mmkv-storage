@@ -20,6 +20,7 @@ def safeExtGet(prop, fallback) {
 apply plugin: 'com.android.library'
 
 android {
+  defaultPublishConfig "SharedCppRelease"
   compileSdkVersion safeExtGet('compileSdkVersion', 28)
   buildToolsVersion safeExtGet('buildToolsVersion', '28.0.3')
   defaultConfig {
@@ -27,26 +28,28 @@ android {
       targetSdkVersion safeExtGet('targetSdkVersion', 28)
 
 
-    /*   externalNativeBuild {
+    externalNativeBuild {
         cmake {
             cppFlags "-O2 -frtti -fexceptions -Wall -fstack-protector-all"
             abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
         }
     }
- */
+
   }
 
- /*  externalNativeBuild {
+  externalNativeBuild {
       cmake {
-          path "CMakeLists.txt"
-          version "3.10.2"
+          path "./src/main/rnmmkv/CMakeLists.txt"
+          version "3.8.0+"
       }
-  } */
+  } 
 
-  
-   sourceSets {
-        main {
-            jniLibs.srcDirs = ['./libs']
+     buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            jniDebuggable true
         }
     }
   
@@ -56,6 +59,23 @@ android {
     warning 'InvalidPackage'
   }
 
+  packagingOptions {
+    pickFirst '**/*.so'
+    }
+
+
+  flavorDimensions "stl_mode"
+  productFlavors {
+         SharedCpp {
+            dimension "stl_mode"
+            ext.artifactIdSuffix = ''
+            externalNativeBuild {
+                cmake {
+                    arguments = ["-DANDROID_STL=c++_shared"]
+                }
+            }
+        }
+    }
 }
 
 repositories {
@@ -71,5 +91,6 @@ repositories {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation "com.scottyab:secure-preferences-lib:0.1.4"
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
   

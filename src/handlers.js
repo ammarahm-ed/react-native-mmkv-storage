@@ -32,8 +32,8 @@ export function handleAction(cb, action, ...args) {
       currentInstancesStatus[id] = true;
       cb && cb(null, action(...args));
     });
-    return action(...args);
-  }
+    if (!action) return;
+    return action(...args);}
 }
 
 export async function handleActionAsync(action, ...args) {

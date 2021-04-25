@@ -41,6 +41,7 @@ build/
 .gradle
 local.properties
 *.iml
+.cxx
 
 # BUCK
 buck-out/
@@ -50,7 +51,4 @@ buck-out/
 # Other
 
 example/
-MMKV/
-CMakeLists.txt
-cpp/
       

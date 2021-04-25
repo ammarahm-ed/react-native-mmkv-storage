@@ -7,12 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		650A61A5243D94A800E1AB50 /* StorageGetters.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A6199243D94A700E1AB50 /* StorageGetters.m */; };
-		650A61A6243D94A800E1AB50 /* StorageSetters.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A619A243D94A700E1AB50 /* StorageSetters.m */; };
 		650A61A7243D94A800E1AB50 /* MMKVStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A619B243D94A700E1AB50 /* MMKVStorage.m */; };
 		650A61A8243D94A800E1AB50 /* SecureStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A619C243D94A700E1AB50 /* SecureStorage.m */; };
-		650A61A9243D94A800E1AB50 /* IDStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A619E243D94A700E1AB50 /* IDStore.m */; };
-		650A61AA243D94A800E1AB50 /* StorageIndexer.m in Sources */ = {isa = PBXBuildFile; fileRef = 650A61A1243D94A700E1AB50 /* StorageIndexer.m */; };
+		656379A725F20D0600B47451 /* MMKVNative.mm in Sources */ = {isa = PBXBuildFile; fileRef = 656379A625F20D0600B47451 /* MMKVNative.mm */; };
+		656379AB25F20D1500B47451 /* YeetJSIUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 656379AA25F20D1400B47451 /* YeetJSIUtils.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,18 +27,14 @@
 
 /* Begin PBXFileReference section */
 		650A618D243D943F00E1AB50 /* libMMKVStorage.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMMKVStorage.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		650A6199243D94A700E1AB50 /* StorageGetters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageGetters.m; sourceTree = "<group>"; };
-		650A619A243D94A700E1AB50 /* StorageSetters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageSetters.m; sourceTree = "<group>"; };
 		650A619B243D94A700E1AB50 /* MMKVStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMKVStorage.m; sourceTree = "<group>"; };
 		650A619C243D94A700E1AB50 /* SecureStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecureStorage.m; sourceTree = "<group>"; };
 		650A619D243D94A700E1AB50 /* MMKVStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMKVStorage.h; sourceTree = "<group>"; };
-		650A619E243D94A700E1AB50 /* IDStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDStore.m; sourceTree = "<group>"; };
-		650A619F243D94A700E1AB50 /* StorageGetters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageGetters.h; sourceTree = "<group>"; };
-		650A61A0243D94A700E1AB50 /* StorageIndexer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageIndexer.h; sourceTree = "<group>"; };
-		650A61A1243D94A700E1AB50 /* StorageIndexer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StorageIndexer.m; sourceTree = "<group>"; };
-		650A61A2243D94A700E1AB50 /* StorageSetters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageSetters.h; sourceTree = "<group>"; };
-		650A61A3243D94A700E1AB50 /* IDStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDStore.h; sourceTree = "<group>"; };
 		650A61A4243D94A800E1AB50 /* SecureStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecureStorage.h; sourceTree = "<group>"; };
+		656379A525F20D0600B47451 /* MMKVNative.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMKVNative.h; sourceTree = "<group>"; };
+		656379A625F20D0600B47451 /* MMKVNative.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MMKVNative.mm; sourceTree = "<group>"; };
+		656379A925F20D1300B47451 /* YeetJSIUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YeetJSIUtils.h; sourceTree = "<group>"; };
+		656379AA25F20D1400B47451 /* YeetJSIUtils.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = YeetJSIUtils.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,18 +51,14 @@
 		650A6184243D943F00E1AB50 = {
 			isa = PBXGroup;
 			children = (
-				650A61A3243D94A700E1AB50 /* IDStore.h */,
-				650A619E243D94A700E1AB50 /* IDStore.m */,
+				656379A925F20D1300B47451 /* YeetJSIUtils.h */,
+				656379AA25F20D1400B47451 /* YeetJSIUtils.mm */,
+				656379A525F20D0600B47451 /* MMKVNative.h */,
+				656379A625F20D0600B47451 /* MMKVNative.mm */,
 				650A619D243D94A700E1AB50 /* MMKVStorage.h */,
 				650A619B243D94A700E1AB50 /* MMKVStorage.m */,
 				650A61A4243D94A800E1AB50 /* SecureStorage.h */,
 				650A619C243D94A700E1AB50 /* SecureStorage.m */,
-				650A619F243D94A700E1AB50 /* StorageGetters.h */,
-				650A6199243D94A700E1AB50 /* StorageGetters.m */,
-				650A61A0243D94A700E1AB50 /* StorageIndexer.h */,
-				650A61A1243D94A700E1AB50 /* StorageIndexer.m */,
-				650A61A2243D94A700E1AB50 /* StorageSetters.h */,
-				650A619A243D94A700E1AB50 /* StorageSetters.m */,
 				650A618E243D943F00E1AB50 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -139,11 +129,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				650A61A7243D94A800E1AB50 /* MMKVStorage.m in Sources */,
-				650A61A9243D94A800E1AB50 /* IDStore.m in Sources */,
-				650A61A6243D94A800E1AB50 /* StorageSetters.m in Sources */,
-				650A61AA243D94A800E1AB50 /* StorageIndexer.m in Sources */,
+				656379AB25F20D1500B47451 /* YeetJSIUtils.mm in Sources */,
+				656379A725F20D0600B47451 /* MMKVNative.mm in Sources */,
 				650A61A8243D94A800E1AB50 /* SecureStorage.m in Sources */,
-				650A61A5243D94A800E1AB50 /* StorageGetters.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

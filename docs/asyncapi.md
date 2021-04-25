@@ -1,6 +1,6 @@
-# Promise API
+# Async API
 
-A promise based api is provided.
+A promise or `async/await` based api is available. When the application loads, your first call to get/set data should be asynchronous because we will init the database in the first call.
 
 First we create a default MMKV Instance
 
@@ -15,9 +15,10 @@ MMKV = new MMKVStorage.Loader().initialize();
 Sets a string value in storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name  | Type   |
+| ----- | ------ |
+| key   | String |
 | value | String |
 
 ```js
@@ -32,9 +33,10 @@ await MMKV.setStringAsync("string", "string");
 Gets a string value for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 let string = await MMKV.getStringAsync("string");
@@ -48,9 +50,10 @@ let string = await MMKV.getStringAsync("string");
 Sets a number value in storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name  | Type   |
+| ----- | ------ |
+| key   | String |
 | value | Number |
 
 ```js
@@ -65,9 +68,10 @@ await MMKV.setIntAsync("number", 10);
 Gets a number value for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 let number = await MMKV.getIntAsync("number");
@@ -81,9 +85,10 @@ let number = await MMKV.getIntAsync("number");
 Sets a boolean value in storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name  | Type    |
+| ----- | ------- |
+| key   | String  |
 | value | boolean |
 
 ```js
@@ -98,9 +103,10 @@ await MMKV.setBoolAsync("myBooleanValue", false);
 Gets a boolean value for a given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 let boolean = await MMKV.getBoolAsync("myBooleanValue");
@@ -114,9 +120,10 @@ let boolean = await MMKV.getBoolAsync("myBooleanValue");
 Sets an object to storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name  | Type   |
+| ----- | ------ |
+| key   | String |
 | value | Object |
 
 ```js
@@ -133,9 +140,10 @@ await MMKV.setMapAsync("myobject", myObject);
 Gets an object from storage.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 let object = await MMKV.getMapAsync("object");
@@ -149,10 +157,11 @@ let object = await MMKV.getMapAsync("object");
 Sets an array to storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
-| value | Array |
+
+| Name  | Type   |
+| ----- | ------ |
+| key   | String |
+| value | Array  |
 
 ```js
 let array = ["foo", "bar"];
@@ -168,9 +177,10 @@ await MMKV.setArrayAsync("array", array);
 Sets an array to storage for the given key.
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| key | String |
+
+| Name | Type   |
+| ---- | ------ |
+| key  | String |
 
 ```js
 let myArray = await MMKV.getArrayAsync("array");
@@ -184,12 +194,17 @@ let myArray = await MMKV.getArrayAsync("array");
 Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
 
 **Arguments**
-| Name | Type |
-| ---- | -------- |
-| keys | Array of Keys |
+
+| Name | Type                                   |
+| ---- | -------------------------------------- |
+| keys | Array of Keys                          |
+| type | "string","bool","number","map","array" |
 
 ```js
-let multipleItems = await MMKV.getMultipleItemsAsync(["foo", "bar", "loo"]);
+let multipleItems = await MMKV.getMultipleItemsAsync(
+  ["foo", "bar", "loo"],
+  "map"
+);
 ```
 
 **Returns**

@@ -15,6 +15,9 @@ export const currentInstancesStatus = {};
  */
 
 export function initialize(options, callback) {
+
+ const func = () => {
+  if (!global.setupMMKVInstance) callback(true,null);
   if (IDStore.exists(options.instanceID)) {
     if (IDStore.encrypted(options.instanceID)) {
       options.alias = IDStore.getAlias(options.instanceID);
@@ -40,6 +43,15 @@ export function initialize(options, callback) {
   } else {
     initWithoutEncryption(options, callback);
   }
+ } 
+
+  if (!global.setupMMKVInstance) {
+    setTimeout(() => func(),10);
+  } else {
+   
+    func();
+  }
+
 }
 
 /**
@@ -140,7 +152,8 @@ function initWithoutEncryption(options, callback) {
 }
 
 function setup(id, mode, callback) {
-  global.setupMMKVInstance(id, mode, '', '');
+
+    global.setupMMKVInstance(id, mode, '', '');
   if (!IDStore.exists(id)) {
     global.setBoolMMKV(id, true, id);
     IDStore.add(id, false, null);
@@ -152,9 +165,13 @@ function setup(id, mode, callback) {
       encryptionHandler(id, mode, callback);
     }
   }
+
+
+  
 }
 
 function setupWithEncryption(id, mode, key, alias, callback) {
+
   global.setupMMKVInstance(id, mode, key, '');
 
   if (!IDStore.exists(id)) {
@@ -168,6 +185,7 @@ function setupWithEncryption(id, mode, key, alias, callback) {
       encryptionHandler(id, mode, callback);
     }
   }
+  
 }
 
 function encryptionHandler(id, mode, callback) {
