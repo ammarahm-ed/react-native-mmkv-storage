@@ -65,18 +65,16 @@ export default class Loader {
 
   initialize() {
     currentInstancesStatus[this.options.instanceID] = false;
-    return this.getInstance();
+    let instance = new API(this.options);
+    options[this.options.instanceID] = this.options;
+    handleAction(null,this.options.instanceID);
+    return instance
   }
 
   generateKey() {
     this.options.key = generatePassword();
-
     return this;
   }
 
-  getInstance() {
-    let instance = new API(this.options);
-    options[this.options.instanceID] = this.options;
-    return instance;
-  }
+  
 }
