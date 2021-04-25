@@ -35,7 +35,7 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setItem(key: string, value: string): Promise<boolean>;
+    setItem(key: string, value: string): Promise<null>;
     /**
      * Get a string value for a given key.
      * This method is added for redux-persist support. It is similar to setStringAsync()
@@ -51,7 +51,7 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setStringAsync(key: string, value: string): Promise<boolean>;
+    setStringAsync(key: string, value: string): Promise<null>;
     /**
      * Get a string value for a given key.
      * @param {String} key
@@ -65,7 +65,7 @@ declare module MMKVStorage {
      * @param {number} value
      *
      */
-    setIntAsync(key: string, value: number): Promise<boolean>;
+    setIntAsync(key: string, value: number): Promise<null>;
 
     /**
      * Get a number value for a given key
@@ -80,7 +80,7 @@ declare module MMKVStorage {
      * @param {boolean} value
      *
      */
-    setBoolAsync(key: string, value: boolean): Promise<boolean>;
+    setBoolAsync(key: string, value: boolean): Promise<null>;
 
     /**
      * Get a boolean value for a given key.
@@ -96,7 +96,7 @@ declare module MMKVStorage {
      *
      */
 
-    setMapAsync(key: string, value: object): Promise<boolean>;
+    setMapAsync(key: string, value: object): Promise<null>;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
@@ -107,7 +107,7 @@ declare module MMKVStorage {
      * @param {String} key
      * @param {Array} array
      */
-    setArrayAsync(key: string, value: Array<any>): Promise<boolean>;
+    setArrayAsync(key: string, value: Array<any>): Promise<null>;
     /**
      * get an array from the storage for give key.
      * @param {String} key
