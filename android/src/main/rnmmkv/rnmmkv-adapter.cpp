@@ -3,15 +3,50 @@
 
 #include "MMKV.h"
 #include "MMKVPredef.h"
-
+#include "MMBuffer.h"
 using namespace facebook;
 using namespace jsi;
 using namespace std;
 
 static vector<MMKV *> mmkvInstances;
 
-//TODO
 string rPath = "";
+JNIEnv* jniEnv;
+JavaVM* vm;
+jclass mmkvclass;
+jobject mmkvobject;
+
+
+static string jstring2string(JNIEnv *env, jstring str) {
+    if (str) {
+        const char *kstr = env->GetStringUTFChars(str, nullptr);
+        if (kstr) {
+            string result(kstr);
+            env->ReleaseStringUTFChars(str, kstr);
+            return result;
+        }
+    }
+    return "";
+}
+
+
+
+bool GetJniEnv(JavaVM *vm, JNIEnv **env) {
+    bool did_attach_thread = false;
+    *env = nullptr;
+    // Check if the current thread is attached to the VM
+    auto get_env_result = vm->GetEnv((void**)env, JNI_VERSION_1_6);
+    if (get_env_result == JNI_EDETACHED) {
+        if (vm->AttachCurrentThread(env, NULL) == JNI_OK) {
+            did_attach_thread = true;
+        } else {
+            // Failed to attach thread. Throw an exception if you want to.
+        }
+    } else if (get_env_result == JNI_EVERSION) {
+        // Unsupported JNI version. Throw an exception if you want to.
+    }
+    return did_attach_thread;
+}
 
 
 std::string j_string_to_string(JNIEnv *env, jstring jStr) {
@@ -32,6 +67,42 @@ std::string j_string_to_string(JNIEnv *env, jstring jStr) {
     return ret;
 }
 
+
+static jstring string2jstring(JNIEnv *env, const string &str) {
+    return (*env).NewStringUTF(str.c_str());
+}
+
+static jobjectArray vector2jarray(JNIEnv *env, const vector<string> &arr) {
+    if (!arr.empty()) {
+        jobjectArray result = env->NewObjectArray(arr.size(), env->FindClass("java/lang/String"), nullptr);
+        if (result) {
+            for (size_t index = 0; index < arr.size(); index++) {
+                jstring value = string2jstring(env, arr[index]);
+                env->SetObjectArrayElement(result, index, value);
+                env->DeleteLocalRef(value);
+            }
+        }
+        return result;
+    }
+    return nullptr;
+}
+
+
+static vector<string> jarray2vector(JNIEnv *env, jobjectArray array) {
+    vector<string> keys;
+    if (array) {
+        jsize size = env->GetArrayLength(array);
+        keys.reserve(size);
+        for (jsize i = 0; i < size; i++) {
+            jstring str = (jstring) env->GetObjectArrayElement(array, i);
+            if (str) {
+                keys.push_back(jstring2string(env, str));
+                env->DeleteLocalRef(str);
+            }
+        }
+    }
+    return keys;
+}
 
 static MMKV *getInstance(string ID)
 {
@@ -146,6 +217,8 @@ static void removeFromIndex(MMKV *kv, string key)
     }
 }
 
+
+
 void install(Runtime &jsiRuntime)
 {
 
@@ -194,6 +267,154 @@ void install(Runtime &jsiRuntime)
                                                               });
 
     jsiRuntime.global().setProperty(jsiRuntime, "setupMMKVInstance", move(setupMMKVInstance));
+
+
+
+
+    auto getSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                          PropNameID::forAscii(jsiRuntime,
+                                                                               "getSecureKey"),
+                                                          1,
+                                                          [](Runtime &runtime,
+                                                             const Value &thisValue,
+                                                             const Value *arguments,
+                                                             size_t count) -> Value {
+
+                                                              string alias = arguments[0].getString(
+                                                                              runtime)
+                                                                      .utf8(
+                                                                              runtime);
+
+                                                              JNIEnv *env;
+                                                              bool attached = vm->AttachCurrentThread(&env, NULL);
+                                                              mmkvclass = env->GetObjectClass(mmkvobject);
+
+                                                              jstring jstr1=string2jstring(env,alias);
+                                                              jvalue params[1];
+                                                              params[0].l = jstr1;
+                                                              jmethodID getSecureKey = env->GetMethodID(mmkvclass, "getSecureKey", "(Ljava/lang/String;)Ljava/lang/String;");
+                                                              jobject result = env->CallObjectMethodA(mmkvobject,getSecureKey,params);
+                                                              const char* str = env->GetStringUTFChars((jstring)result, NULL);
+                                                              string cryptKey = j_string_to_string(env, env->NewStringUTF(str));
+                                                              if (attached) {
+                                                                  vm->DetachCurrentThread();
+                                                              }
+                                                              return Value(runtime,
+                                                                           String::createFromUtf8(
+                                                                                   runtime,
+                                                                                   cryptKey));
+                                                          });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "getSecureKey", move(getSecureKey));
+
+    auto setSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                         PropNameID::forAscii(jsiRuntime,
+                                                                              "setSecureKey"),
+                                                         3,
+                                                         [](Runtime &runtime,
+                                                            const Value &thisValue,
+                                                            const Value *arguments,
+                                                            size_t count) -> Value {
+
+                                                             string alias = arguments[0].getString(
+                                                                             runtime)
+                                                                     .utf8(
+                                                                             runtime);
+                                                             string key = arguments[1].getString(
+                                                                             runtime)
+                                                                     .utf8(
+                                                                             runtime);
+
+
+                                                             JNIEnv *env;
+                                                             bool attached = vm->AttachCurrentThread(&env, NULL);
+                                                             mmkvclass = env->GetObjectClass(mmkvobject);
+
+                                                             jstring jstr1=string2jstring(env,alias);
+                                                             jstring jstr2=string2jstring(env,key);
+
+                                                             jvalue params[2];
+                                                             params[0].l = jstr1;
+                                                             params[1].l = jstr2;
+
+                                                             jmethodID setSecureKey = env->GetMethodID(mmkvclass, "setSecureKey", "(Ljava/lang/String;Ljava/lang/String;)V");
+                                                             env->CallVoidMethodA(mmkvobject,setSecureKey,params);
+                                                             if (attached) {
+                                                                 vm->DetachCurrentThread();
+                                                             }
+
+                                                             return Value::null();
+                                                         });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "setSecureKey", move(setSecureKey));
+
+    auto secureKeyExists = Function::createFromHostFunction(jsiRuntime,
+                                                         PropNameID::forAscii(jsiRuntime,
+                                                                              "secureKeyExists"),
+                                                         1,
+                                                         [](Runtime &runtime,
+                                                            const Value &thisValue,
+                                                            const Value *arguments,
+                                                            size_t count) -> Value {
+
+                                                             string alias = arguments[0].getString(
+                                                                             runtime)
+                                                                     .utf8(
+                                                                             runtime);
+
+                                                             JNIEnv *env;
+                                                             bool attached = vm->AttachCurrentThread(&env, NULL);
+                                                             mmkvclass = env->GetObjectClass(mmkvobject);
+
+                                                             jstring jstr1=string2jstring(env,alias);
+                                                             jvalue params[1];
+                                                             params[0].l = jstr1;
+
+                                                             jmethodID secureKeyExists = env->GetMethodID(mmkvclass, "secureKeyExists", "(Ljava/lang/String;)Z");
+                                                             bool exists = env->CallBooleanMethodA(mmkvobject,secureKeyExists,params);
+                                                             if (attached) {
+                                                             vm->DetachCurrentThread();
+                                                             }
+
+                                                             return Value(exists);
+                                                         });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "secureKeyExists", move(secureKeyExists));
+
+    auto removeSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                            PropNameID::forAscii(jsiRuntime,
+                                                                                 "removeSecureKey"),
+                                                            1,
+                                                            [](Runtime &runtime,
+                                                               const Value &thisValue,
+                                                               const Value *arguments,
+                                                               size_t count) -> Value {
+
+                                                                string alias = arguments[0].getString(
+                                                                                runtime)
+                                                                        .utf8(
+                                                                                runtime);
+
+                                                                JNIEnv *env;
+                                                                bool attached = vm->AttachCurrentThread(&env, NULL);
+                                                                mmkvclass = env->GetObjectClass(mmkvobject);
+
+                                                                jstring jstr1=string2jstring(env,alias);
+                                                                jvalue params[1];
+                                                                params[0].l = jstr1;
+
+                                                                jmethodID removeSecureKey  = env->GetMethodID(mmkvclass, "removeSecureKey", "(Ljava/lang/String;)V");
+                                                                env->CallVoidMethodA(mmkvobject,removeSecureKey,params);
+                                                                if (attached) {
+                                                                    vm->DetachCurrentThread();
+                                                                }
+
+                                                                return Value::null();
+                                                            });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "removeSecureKey", move(removeSecureKey));
+
+
 
     auto setStringMMKV = Function::createFromHostFunction(jsiRuntime,
                                                           PropNameID::forAscii(jsiRuntime,
@@ -727,10 +948,14 @@ void install(Runtime &jsiRuntime)
     jsiRuntime.global().setProperty(jsiRuntime, "decryptMMKV", std::move(decryptMMKV));
 
 
+    
+
+
 
 
 
 }
+
 
 extern "C"
 JNIEXPORT void JNICALL
@@ -738,10 +963,198 @@ Java_com_ammarahmed_mmkv_RNMMKVModule_nativeInstall(JNIEnv *env, jobject clazz, 
 
         rPath = j_string_to_string(env, rootPath);
         MMKV::initializeMMKV(rPath);
+
+        env->GetJavaVM(&vm);
         auto runtime = reinterpret_cast<jsi::Runtime*>(jsi);
+
+        mmkvobject = env->NewGlobalRef(clazz);
+
+        jniEnv = env;
+
+
         if (runtime) {
             install(*runtime);
         }
         createInstance("mmkvIDStore",MMKV_SINGLE_PROCESS,"","");
  
+}
+
+
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_ammarahmed_mmkv_MMKV_getMMKVWithID(JNIEnv *env, jclass clazz, jstring mmapID, jint mode, jstring cryptKey, jstring rootPath) {
+    MMKV *kv = nullptr;
+    if (!mmapID) {
+        return (jlong) kv;
+    }
+    string str = jstring2string(env, mmapID);
+
+    bool done = false;
+    if (cryptKey) {
+        string crypt = jstring2string(env, cryptKey);
+        if (crypt.length() > 0) {
+            if (rootPath) {
+                string path = jstring2string(env, rootPath);
+                kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, &path);
+            } else {
+                kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode) mode, &crypt, nullptr);
+            }
+            done = true;
+        }
+    }
+    if (!done) {
+        if (rootPath) {
+            string path = jstring2string(env, rootPath);
+            kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, &path);
+        } else {
+            kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode) mode, nullptr, nullptr);
+        }
+    }
+
+    return (jlong) kv;
+}
+
+
+
+
+
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_containsKey(JNIEnv *env, jobject instance, jlong handle, jstring oKey) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        return (jboolean) kv->containsKey(key);
+    }
+    return (jboolean) false;
+}
+
+extern "C"
+JNIEXPORT jbyteArray JNICALL
+Java_com_ammarahmed_mmkv_MMKV_decodeBytes(JNIEnv *env, jobject obj, jlong handle, jstring oKey) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+         mmkv::MMBuffer value = kv->getBytes(key);
+        if (value.length() > 0) {
+            jbyteArray result = env->NewByteArray(value.length());
+            env->SetByteArrayRegion(result, 0, value.length(), (const jbyte *) value.getPtr());
+            return result;
+        }
+    }
+    return nullptr;
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_ammarahmed_mmkv_MMKV_removeValueForKey(JNIEnv *env, jobject instance, jlong handle, jstring oKey) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        kv->removeValueForKey(key);
+    }
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_ammarahmed_mmkv_MMKV_decodeStringSet(JNIEnv *env, jobject, jlong handle, jstring oKey) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        vector<string> value;
+        bool hasValue = kv->getVector(key, value);
+        if (hasValue) {
+            return vector2jarray(env, value);
+        }
+    }
+    return nullptr;
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_ammarahmed_mmkv_MMKV_decodeInt(JNIEnv *env, jobject obj, jlong handle, jstring oKey, jint defaultValue) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        return (jint) kv->getInt32(key, defaultValue);
+    }
+    return defaultValue;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_checkProcessMode(JNIEnv *env, jclass clazz, jlong handle) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv) {
+        return kv->checkProcessMode();
+    }
+    return false;
+}extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_encodeString(JNIEnv *env, jobject thiz, jlong handle, jstring oKey,
+                                           jstring oValue) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        if (oValue) {
+            string value = jstring2string(env, oValue);
+            return (jboolean) kv->set(value, key);
+        } else {
+            kv->removeValueForKey(key);
+            return (jboolean) true;
+        }
+    }
+    return (jboolean) false;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_encodeDouble(JNIEnv *env, jobject thiz, jlong handle, jstring oKey,
+                                           jdouble value) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        return (jboolean) kv->set((double) value, key);
+    }
+    return (jboolean) false;
+}extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_encodeSet(JNIEnv *env, jobject thiz, jlong handle, jstring oKey,
+                                        jobjectArray arrStr) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        if (arrStr) {
+            vector<string> value = jarray2vector(env, arrStr);
+            return (jboolean) kv->set(value, key);
+        } else {
+            kv->removeValueForKey(key);
+            return (jboolean) true;
+        }
+    }
+    return (jboolean) false;
+}
+
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_ammarahmed_mmkv_MMKV_jniInitialize(JNIEnv *env, jclass clazz, jstring rootDir,
+                                            jint logLevel) {
+    if (!rootDir) {
+        return;
+    }
+
+    const char *kstr = env->GetStringUTFChars(rootDir, nullptr);
+    if (kstr) {
+        MMKV::initializeMMKV(kstr, (MMKVLogLevel) logLevel);
+        env->ReleaseStringUTFChars(rootDir, kstr);
+    }
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_ammarahmed_mmkv_RNMMKVModule_destroy(JNIEnv *env, jobject thiz) {
+    env->DeleteGlobalRef(mmkvobject);
+
 }

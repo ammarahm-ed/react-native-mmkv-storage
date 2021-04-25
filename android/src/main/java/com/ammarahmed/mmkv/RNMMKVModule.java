@@ -1,7 +1,8 @@
-
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -14,8 +15,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.google.gson.Gson;
-import com.tencent.mmkv.MMKV;
-
+import com.ammarahmed.mmkv.MMKV;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +32,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private native void nativeInstall(long jsi, String rootPath);
 
+    private native void destroy();
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -59,6 +60,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     }
 
 
+
     public void migrate() {
         MMKV.initialize(reactContext);
         MMKV kv = MMKV.mmkvWithID("mmkvIDStore");
@@ -77,8 +79,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
                 if ((boolean) child.get("encrypted")) {
                     String alias = (String) child.get("alias");
-                    if (secureKeystore.secureKeyExists(alias, null)) {
-                        String cKey = secureKeystore.getSecureKey(alias, null);
+                    if (secureKeystore.secureKeyExists(alias)) {
+                        String cKey = secureKeystore.getSecureKey(alias);
                         MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE, cKey);
                         writeToJSON(kvv);
                     }
@@ -137,25 +139,26 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         return "MMKVStorage";
     }
 
-    @ReactMethod
-    public void setSecureKey(String key, String value, @Nullable ReadableMap options, Callback callback) {
-        secureKeystore.setSecureKey(key, value, options, callback);
+    public boolean secureKeyExists(String key) {
+        return secureKeystore.secureKeyExists(key);
     }
 
-    @ReactMethod
-    public void getSecureKey(String key, Callback callback) {
-        secureKeystore.getSecureKey(key, callback);
+    public void removeSecureKey(String key) {
+        secureKeystore.removeSecureKey(key);
     }
 
-    @ReactMethod
-    public void secureKeyExists(String key, Callback callback) {
-        secureKeystore.secureKeyExists(key, callback);
+    public void setSecureKey(String key, String value) {
+        secureKeystore.setSecureKey(key, value);
     }
 
-    @ReactMethod
-    public void removeSecureKey(String key, Callback callback) {
-        secureKeystore.removeSecureKey(key, callback);
+    public String getSecureKey(String key) {
+        return secureKeystore.getSecureKey(key);
     }
 
 
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        destroy();
+    }
 }

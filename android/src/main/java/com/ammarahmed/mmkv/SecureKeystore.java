@@ -65,7 +65,7 @@ public class SecureKeystore {
     }
 
 
-    public void setSecureKey(String key, String value, @Nullable ReadableMap options, Callback callback) {
+    public void setSecureKey(String key, String value) {
 
 
         if (useKeystore()) {
@@ -75,55 +75,42 @@ public class SecureKeystore {
                 if (isRTL(initialLocale)) {
                     Locale.setDefault(Locale.ENGLISH);
                     setCipherText(reactContext, key, value);
-                    callback.invoke(false, true);
                     Locale.setDefault(initialLocale);
                 } else {
                     setCipherText(reactContext, key, value);
-                    callback.invoke(false, true);
                 }
-            } catch (Exception e) {
-                callback.invoke(e.getMessage(), false);
-            }
+            } catch (Exception e) {}
 
         } else {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString(key, value);
                 editor.apply();
-                callback.invoke(false, true);
-            } catch (Exception e) {
-                callback.invoke(e.getMessage(), false);
-            }
+            } catch (Exception e) {}
         }
     }
 
 
-    public String getSecureKey(String key, Callback callback) {
+    public String getSecureKey(String key) {
         if (useKeystore()) {
             try {
                 String value = getPlainText(reactContext, key);
 
-                if (callback != null) {
-                    callback.invoke(null, value);
-                }
+
 
                 return value;
 
 
             } catch (FileNotFoundException fnfe) {
 
-                if (callback != null) {
-                    callback.invoke(fnfe.getMessage(), null);
-                }
+
 
                 return null;
 
 
             } catch (Exception e) {
 
-                if (callback != null) {
-                    callback.invoke(e.getMessage(), null);
-                }
+
 
                 return null;
 
@@ -131,37 +118,29 @@ public class SecureKeystore {
         } else {
             try {
                 String value = prefs.getString(key, null);
-                if (callback != null) {
-                    callback.invoke(null, value);
-                }
+
 
                 return value;
 
             } catch (IllegalViewOperationException e) {
-                if (callback != null) {
-                    callback.invoke(e.getMessage(), null);
-                }
+
 
                 return null;
             }
         }
     }
 
-    public boolean secureKeyExists(String key, @Nullable Callback callback) {
+    public boolean secureKeyExists(String key) {
         if (useKeystore()) {
             try {
 
                 boolean exists = exists(reactContext, key);
-                if (callback != null) {
-                    callback.invoke(null, exists);
-                }
+
                 return exists;
 
 
             } catch (Exception e) {
-                if (callback != null) {
-                    callback.invoke(e.getMessage(), null);
-                }
+
                 return false;
 
             }
@@ -169,23 +148,18 @@ public class SecureKeystore {
             try {
                 boolean exists = prefs.contains(key);
 
-                if (callback != null) {
-                    callback.invoke(null, exists);
-                }
                 return exists;
 
 
             } catch (IllegalViewOperationException e) {
-                if (callback != null) {
-                    callback.invoke(e.getMessage(), null);
-                }
+
                 return false;
             }
         }
     }
 
 
-    public void removeSecureKey(String key, Callback callback) {
+    public void removeSecureKey(String key) {
         ArrayList<Boolean> fileDeleted = new ArrayList<Boolean>();
         if (useKeystore()) {
             try {
@@ -195,26 +169,21 @@ public class SecureKeystore {
                 }) {
                     fileDeleted.add(reactContext.deleteFile(filename));
                 }
-                if (!fileDeleted.get(0) || !fileDeleted.get(1)) {
-                    callback.invoke("404: Key not found", null);
-                } else {
-                    callback.invoke(null, true);
 
-                }
             } catch (Exception e) {
-                callback.invoke(e.getMessage(), null);
+
             }
         } else {
             try {
                 if (prefs.getString(key, null) == null) {
-                    callback.invoke("404: Key not found", null);
+
                 } else {
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.remove(key).apply();
-                    callback.invoke(null, true);
+
                 }
             } catch (Exception e) {
-                callback.invoke(e.getMessage(), null);
+
             }
         }
     }
