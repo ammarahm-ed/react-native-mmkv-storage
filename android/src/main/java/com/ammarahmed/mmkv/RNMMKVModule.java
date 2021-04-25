@@ -36,7 +36,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         System.loadLibrary("rnmmkv");
     }
 
-    private static native void nativeInstall(long jsi, String rootPath);
+    private native void nativeInstall(long jsi, String rootPath);
 
     private native void destroy();
 
@@ -49,10 +49,10 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         
     }
 
-    public static void installLib(JavaScriptContextHolder reactContext, String rootPath) {
+    public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
 
         if (reactContext.get() != 0) {
-            nativeInstall(
+            this.nativeInstall(
                     reactContext.get(),
                     rootPath
             );
@@ -66,9 +66,9 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @Override
     public void initialize() {
         super.initialize();
-        if (!libLoaded) {
-            installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
-        }
+
+        this.installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
+
         migrate();
     }
 

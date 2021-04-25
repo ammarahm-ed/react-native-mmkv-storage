@@ -10,8 +10,9 @@ import java.util.List;
 public class RNMMKVJSIModulePackage implements JSIModulePackage {
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
-        RNMMKVModule.libLoaded = false;
-        RNMMKVModule.installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
+
+        reactApplicationContext.getNativeModule(RNMMKVModule.class).installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
+
         return Collections.emptyList();
     }
 }
