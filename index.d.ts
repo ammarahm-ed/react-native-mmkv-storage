@@ -35,13 +35,13 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setItem(key: string, value: string): Promise<null>;
+    setItem(key: string, value: string): Promise<boolean | undefined>;
     /**
      * Get a string value for a given key.
      * This method is added for redux-persist support. It is similar to setStringAsync()
      * @param {String} key
      */
-    getItem(key: string): Promise<string>;
+    getItem(key: string): Promise<string | null | undefined>;
 
 
     /**
@@ -51,12 +51,12 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setStringAsync(key: string, value: string): Promise<null>;
+    setStringAsync(key: string, value: string): Promise<boolean | undefined>;
     /**
      * Get a string value for a given key.
      * @param {String} key
      */
-    getStringAsync(key: string): Promise<string | null>;
+    getStringAsync(key: string): Promise<string | null | undefined>;
 
     /**
      * Set a number value to storage for a given key.
@@ -65,13 +65,13 @@ declare module MMKVStorage {
      * @param {number} value
      *
      */
-    setIntAsync(key: string, value: number): Promise<null>;
+    setIntAsync(key: string, value: number): Promise<boolean | undefined>;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      */
-    getIntAsync(key: string): Promise<number | null>;
+    getIntAsync(key: string): Promise<number | null | undefined>;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -80,13 +80,13 @@ declare module MMKVStorage {
      * @param {boolean} value
      *
      */
-    setBoolAsync(key: string, value: boolean): Promise<null>;
+    setBoolAsync(key: string, value: boolean): Promise<boolean | undefined>;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      */
-    getBoolAsync(key: string): Promise<boolean | null>;
+    getBoolAsync(key: string): Promise<boolean | null | undefined>;
 
     /**
      * Set an Object to storage for a given key.
@@ -96,24 +96,24 @@ declare module MMKVStorage {
      *
      */
 
-    setMapAsync(key: string, value: object): Promise<null>;
+    setMapAsync(key: string, value: object): Promise<boolean | undefined>;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      */
-    getMapAsync(key: string): Promise<object | null>;
+    getMapAsync(key: string): Promise<object | null | undefined>;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      */
-    setArrayAsync(key: string, value: Array<any>): Promise<null>;
+    setArrayAsync(key: string, value: Array<any>): Promise<boolean | undefined>;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      */
 
-    getArrayAsync(key: string): Promise<Array<any> | null>;
+    getArrayAsync(key: string): Promise<Array<any> | null | undefined>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -124,13 +124,13 @@ declare module MMKVStorage {
      */
     getMultipleItemsAsync(keys: Array<string>): Promise<Array<object>>;
 
-    clearStore(): Promise<boolean>;
+    clearStore(): Promise<boolean | undefined>;
     /**
      * Remove an item from storage for a given key.
      *
      * @param {String} key
      */
-    removeItem(key: string): Promise<boolean>;
+    removeItem(key: string): Promise<boolean | undefined>;
 
     // NON ASYNC CALLS
 
