@@ -67,7 +67,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     public void initialize() {
         super.initialize();
 
-        this.installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
+        //this.installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
 
         migrate();
     }
