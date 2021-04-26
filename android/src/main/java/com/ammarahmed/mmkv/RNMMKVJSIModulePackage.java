@@ -1,4 +1,4 @@
-package com.ammarahmed.mmkv;
+package com.ammarahmed.mmkv; // Change to your android package name
 
 import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.JSIModuleSpec;
@@ -7,7 +7,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import java.util.Collections;
 import java.util.List;
 
-public class RNMMKVJSIModulePackage implements JSIModulePackage {
+//import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <-- ADD THIS
+//import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
+
+public class RNMMKVJSIModulePackage implements JSIModulePackage { // Replace with ReanimatedJSIModulePackage 
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
 
