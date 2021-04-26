@@ -100,7 +100,7 @@ export default class API {
 
   getString = (key, callback) => {
     let string = handleAction(global.getStringMMKV, key, this.instanceID);
-    callback && callback(string);
+    callback && callback(null,string);
     return string;
   };
 
@@ -110,7 +110,7 @@ export default class API {
 
   getInt = (key, callback) => {
     let int = handleAction(global.getNumberMMKV, key, this.instanceID)
-    callback && callback(int)
+    callback && callback(null,int)
     return int;
   };
 
@@ -120,7 +120,7 @@ export default class API {
 
   getBool = (key, callback) => {
     let bool = handleAction(global.getBoolMMKV, key, this.instanceID);
-    callback && callback(bool);
+    callback && callback(null,bool);
     return bool
   };
 
@@ -142,10 +142,10 @@ export default class API {
     );
     try {
       map = JSON.parse(map);
-      callback && callback(map)
+      callback && callback(null,map)
       return map
     } catch (e) {
-      callback && callback(null)
+      callback && callback(null,null)
       return null;
     }
   };
@@ -168,10 +168,10 @@ export default class API {
     );
     try {
       array = JSON.parse(array)
-      callback && callback(array);
+      callback && callback(null,array);
       return array;
     } catch (e) {
-      callback && callback(null);
+      callback && callback(null,null);
       return null;
     }
   };
