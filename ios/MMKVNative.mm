@@ -21,6 +21,7 @@ SecureStorage* _secureStorage;
 RCT_EXPORT_MODULE()
 
 
+
 + (BOOL)requiresMainQueueSetup
 {
     return YES;
@@ -30,6 +31,7 @@ MMKV *getInstance(NSString* ID)
 {
     if ([[mmkvInstances allKeys] containsObject:ID]) {
         MMKV *kv = [mmkvInstances objectForKey:ID];
+        
         
         return kv;
     } else {
@@ -181,7 +183,7 @@ static void install(jsi::Runtime & jsiRuntime)
                        cryptKey,
                        path);
         
-        return Value::null();
+        return Value(true);
     });
     
     jsiRuntime.global().setProperty(jsiRuntime, "setupMMKVInstance", move(setupMMKVInstance));
@@ -210,13 +212,15 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
     
     jsiRuntime.global().setProperty(jsiRuntime, "setStringMMKV", move(setStringMMKV));
     
+    
+  
     
     auto getStringMMKV = Function::createFromHostFunction(jsiRuntime,
                                                           PropNameID::forAscii(jsiRuntime,
@@ -274,7 +278,7 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -338,7 +342,7 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv setString:convertJSIStringToNSString(runtime, arguments[1].getString(
                                                                                  runtime)) forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -402,7 +406,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv setDouble:arguments[1].getNumber() forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     jsiRuntime.global().setProperty(jsiRuntime, "setNumberMMKV", move(setNumberMMKV));
@@ -461,7 +465,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv setBool:arguments[1].getBool() forKey:key];
         
-        return Value::null();
+        return Value(true);
     });
     
     
@@ -525,7 +529,7 @@ static void install(jsi::Runtime & jsiRuntime)
         removeKeyFromIndexer(kv, key);
         [kv removeValueForKey:key];
         
-        return jsi::Value::null();
+        return Value(true);
     });
     jsiRuntime.global().setProperty(jsiRuntime, "removeValueMMKV", std::move(removeValueMMKV));
     
@@ -617,7 +621,7 @@ static void install(jsi::Runtime & jsiRuntime)
         
         [kv clearAll];
         
-        return Value::null();
+        return Value(true);
     });
     jsiRuntime.global().setProperty(jsiRuntime, "clearMMKV", std::move(clearMMKV));
     
@@ -673,6 +677,102 @@ static void install(jsi::Runtime & jsiRuntime)
     });
     
     jsiRuntime.global().setProperty(jsiRuntime, "decryptMMKV", std::move(decryptMMKV));
+
+    // Secure Store
+    
+    auto setSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                          PropNameID::forAscii(jsiRuntime,
+                                                                               "setSecureKey"),
+                                                          3,
+                                                          [](Runtime &runtime,
+                                                             const Value &thisValue,
+                                                             const Value *arguments,
+                                                             size_t count) -> Value {
+       
+      
+        
+        NSString* alias = convertJSIStringToNSString(runtime, arguments[0].getString(
+                                                                                   runtime));
+        NSString* key = convertJSIStringToNSString(runtime, arguments[1].getString(
+                                                                                   runtime));
+        NSString* accValue = convertJSIStringToNSString(runtime, arguments[2].getString(
+                                                                                   runtime));
+        [_secureStorage setSecureKey:alias value:key options:@{@"accessible":accValue}];
+        
+        return Value(true);
+    });
+    
+    
+    
+    jsiRuntime.global().setProperty(jsiRuntime, "setSecureKey", move(setSecureKey));
+    
+    auto getSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                          PropNameID::forAscii(jsiRuntime,
+                                                                               "getSecureKey"),
+                                                          3,
+                                                          [](Runtime &runtime,
+                                                             const Value &thisValue,
+                                                             const Value *arguments,
+                                                             size_t count) -> Value {
+       
+      
+        
+        NSString* alias = convertJSIStringToNSString(runtime, arguments[0].getString(
+                                                                                   runtime));
+        
+      
+        
+        return Value(convertNSStringToJSIString(runtime, [_secureStorage getSecureKey:alias]));
+    });
+    
+    
+    
+    jsiRuntime.global().setProperty(jsiRuntime, "getSecureKey", move(getSecureKey));
+    
+    auto secureKeyExists = Function::createFromHostFunction(jsiRuntime,
+                                                          PropNameID::forAscii(jsiRuntime,
+                                                                               "secureKeyExists"),
+                                                          3,
+                                                          [](Runtime &runtime,
+                                                             const Value &thisValue,
+                                                             const Value *arguments,
+                                                             size_t count) -> Value {
+       
+      
+        
+        NSString* alias = convertJSIStringToNSString(runtime, arguments[0].getString(
+                                                                                   runtime));
+        
+        return Value([_secureStorage secureKeyExists:alias]);
+    });
+    
+    
+    
+    jsiRuntime.global().setProperty(jsiRuntime, "secureKeyExists", move(secureKeyExists));
+    
+    auto removeSecureKey = Function::createFromHostFunction(jsiRuntime,
+                                                          PropNameID::forAscii(jsiRuntime,
+                                                                               "removeSecureKey"),
+                                                          3,
+                                                          [](Runtime &runtime,
+                                                             const Value &thisValue,
+                                                             const Value *arguments,
+                                                             size_t count) -> Value {
+       
+      
+        
+        NSString* alias = convertJSIStringToNSString(runtime, arguments[0].getString(
+                                                                                   runtime));
+        [_secureStorage removeSecureKey:alias];
+        return Value(true);
+    });
+    
+    
+    
+    jsiRuntime.global().setProperty(jsiRuntime, "removeSecureKey", move(removeSecureKey));
+    
+    // Secure Store End
+
 }
 
 

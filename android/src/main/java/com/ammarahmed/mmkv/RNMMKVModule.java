@@ -2,26 +2,32 @@
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
+import com.facebook.react.bridge.JavaScriptContextHolder;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.module.annotations.ReactModule;
 import com.google.gson.Gson;
-import com.tencent.mmkv.MMKV;
-
+import com.ammarahmed.mmkv.MMKV;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@ReactModule(name = RNMMKVModule.NAME)
 public class RNMMKVModule extends ReactContextBaseJavaModule {
+
+    public static final String NAME =  "MMKVStorage";
 
     private final ReactApplicationContext reactContext;
     private SecureKeystore secureKeystore;
@@ -32,6 +38,9 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private native void nativeInstall(long jsi, String rootPath);
 
+    private native void destroy();
+
+    public static boolean libLoaded = false;
 
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -40,24 +49,28 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         
     }
 
+    public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
 
-
-    @Override
-    public void initialize() {
-        super.initialize();
-        if (this.getReactApplicationContext().getJavaScriptContextHolder().get() != 0) {
-            nativeInstall(
-                    this.getReactApplicationContext().getJavaScriptContextHolder().get(),
-                    this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv"
+        if (reactContext.get() != 0) {
+            this.nativeInstall(
+                    reactContext.get(),
+                    rootPath
             );
-            migrate();
-
+            libLoaded = true;
         } else {
             Log.e("RNMMKVModule","JSI Runtime is not available in debug mode");
         }
 
     }
 
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        //this.installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
+
+        migrate();
+    }
 
     public void migrate() {
         MMKV.initialize(reactContext);
@@ -77,8 +90,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
                 if ((boolean) child.get("encrypted")) {
                     String alias = (String) child.get("alias");
-                    if (secureKeystore.secureKeyExists(alias, null)) {
-                        String cKey = secureKeystore.getSecureKey(alias, null);
+                    if (secureKeystore.secureKeyExists(alias)) {
+                        String cKey = secureKeystore.getSecureKey(alias);
                         MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE, cKey);
                         writeToJSON(kvv);
                     }
@@ -137,25 +150,27 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         return "MMKVStorage";
     }
 
-    @ReactMethod
-    public void setSecureKey(String key, String value, @Nullable ReadableMap options, Callback callback) {
-        secureKeystore.setSecureKey(key, value, options, callback);
+    public boolean secureKeyExists(String key) {
+        return secureKeystore.secureKeyExists(key);
     }
 
-    @ReactMethod
-    public void getSecureKey(String key, Callback callback) {
-        secureKeystore.getSecureKey(key, callback);
+    public void removeSecureKey(String key) {
+        secureKeystore.removeSecureKey(key);
     }
 
-    @ReactMethod
-    public void secureKeyExists(String key, Callback callback) {
-        secureKeystore.secureKeyExists(key, callback);
+    public void setSecureKey(String key, String value) {
+        secureKeystore.setSecureKey(key, value);
     }
 
-    @ReactMethod
-    public void removeSecureKey(String key, Callback callback) {
-        secureKeystore.removeSecureKey(key, callback);
+    public String getSecureKey(String key) {
+        return secureKeystore.getSecureKey(key);
     }
 
 
+    @Override
+    public void onCatalystInstanceDestroy() {
+        super.onCatalystInstanceDestroy();
+        libLoaded = false;
+        destroy();
+    }
 }

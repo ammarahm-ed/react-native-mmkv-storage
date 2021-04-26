@@ -13,8 +13,6 @@ add_library(rnmmkv
 
         ../../../../../react-native/ReactCommon/jsi/jsi/jsi.cpp
         ./rnmmkv-adapter.cpp
-        ../../../../MMKV/Android/MMKV/mmkv/src/main/cpp/native-bridge.cpp
-        ../../../../MMKV/Android/MMKV/mmkv/src/main/cpp/flutter-bridge.cpp
 )
 
 set_target_properties(

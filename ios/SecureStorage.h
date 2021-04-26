@@ -12,14 +12,10 @@
 
 
 - (void) setSecureKey: (nonnull NSString *)key value:(nonnull NSString *)value
-              options: (nonnull NSDictionary *)options
-             callback:(nullable RCTResponseSenderBlock)callback;
-- (nullable NSString *) getSecureKey:(nonnull NSString *)key
-                            callback:(nullable RCTResponseSenderBlock)callback;
-- (bool) secureKeyExists:(nonnull NSString *)key
-                callback:(nullable RCTResponseSenderBlock)callback;
-- (void) removeSecureKey:(nonnull NSString *)key
-                callback:(nullable RCTResponseSenderBlock)callback;
+              options: (nonnull NSDictionary *)options;
+- (nullable NSString *) getSecureKey:(nonnull NSString *)key;
+- (bool) secureKeyExists:(nonnull NSString *)key;
+- (void) removeSecureKey:(nonnull NSString *)key;
 
 - (BOOL)searchKeychainCopyMatchingExists:(nonnull NSString *)identifier;
 

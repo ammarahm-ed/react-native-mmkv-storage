@@ -1,6 +1,10 @@
-# Callback API
+# Synchronous API
 
-Synchronous calls is 5 to 8 times faster than Asynchronous calls. However at the very start of your app lifecycle, you cannot use Synchronous API with return values, only callbacks. A callback function can be optionally provided in case you need some value at the very beginning of app load, usually you won't need to.
+Synchronous calls is 8 to 10 times faster than Asynchronous calls. 
+
+However If you are on <=0.5.3 at the very start of your app lifecycle, you cannot use Synchronous API with return values, only callbacks. A callback function can be optionally provided in case you need some value at the very beginning of app load, usually you won't need to.
+
+Starting from `0.5.4` all calls are Synchronous and you should not use the callbacks anymore.
 
 First we create a default MMKV Instance
 

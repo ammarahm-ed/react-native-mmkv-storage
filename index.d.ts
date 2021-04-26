@@ -17,7 +17,7 @@ type MODES = {
   MULTI_PROCESS: number;
 };
 
-type Callback<T> = (error: Error | null, result: T | null) => void;
+type Callback<T> = (error: Error | null, result: T | null | undefined) => void;
 
 declare module MMKVStorage {
   export const MODES: MODES;
@@ -35,13 +35,13 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setItem(key: string, value: string): Promise<boolean>;
+    setItem(key: string, value: string): Promise<boolean | undefined>;
     /**
      * Get a string value for a given key.
      * This method is added for redux-persist support. It is similar to setStringAsync()
      * @param {String} key
      */
-    getItem(key: string): Promise<string>;
+    getItem(key: string): Promise<string | null | undefined>;
 
     /**
      * Set a string value to storag for a given key.
@@ -50,12 +50,12 @@ declare module MMKVStorage {
      * @param {String} value
      *
      */
-    setStringAsync(key: string, value: string): Promise<boolean>;
+    setStringAsync(key: string, value: string): Promise<boolean | undefined>;
     /**
      * Get a string value for a given key.
      * @param {String} key
      */
-    getStringAsync(key: string): Promise<string | null>;
+    getStringAsync(key: string): Promise<string | null | undefined>;
 
     /**
      * Set a number value to storage for a given key.
@@ -64,13 +64,13 @@ declare module MMKVStorage {
      * @param {number} value
      *
      */
-    setIntAsync(key: string, value: number): Promise<boolean>;
+    setIntAsync(key: string, value: number): Promise<boolean | undefined>;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      */
-    getIntAsync(key: string): Promise<number | null>;
+    getIntAsync(key: string): Promise<number | null | undefined>;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -79,13 +79,13 @@ declare module MMKVStorage {
      * @param {boolean} value
      *
      */
-    setBoolAsync(key: string, value: boolean): Promise<boolean>;
+    setBoolAsync(key: string, value: boolean): Promise<boolean | undefined>;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      */
-    getBoolAsync(key: string): Promise<boolean | null>;
+    getBoolAsync(key: string): Promise<boolean | null | undefined>;
 
     /**
      * Set an Object to storage for a given key.
@@ -95,24 +95,24 @@ declare module MMKVStorage {
      *
      */
 
-    setMapAsync(key: string, value: object): Promise<boolean>;
+    setMapAsync(key: string, value: object): Promise<boolean | undefined>;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      */
-    getMapAsync<T extends object>(key: string): Promise<T | null>;
+    getMapAsync<T extends object>(key: string): Promise<T | null | undefined>;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      */
-    setArrayAsync(key: string, value: Array<any>): Promise<boolean>;
+    setArrayAsync(key: string, value: Array<any>): Promise<boolean | undefined>;
     /**
      * get an array from the storage for give key.
      * @param {String} key
      */
 
-    getArrayAsync<T extends any>(key: string): Promise<Array<T> | null>;
+    getArrayAsync<T extends any>(key: string): Promise<Array<T> | null | undefined>;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.
@@ -125,13 +125,13 @@ declare module MMKVStorage {
       keys: Array<string>
     ): Promise<Array<T>>;
 
-    clearStore(): Promise<boolean>;
+    clearStore(): Promise<boolean | undefined>;
     /**
      * Remove an item from storage for a given key.
      *
      * @param {String} key
      */
-    removeItem(key: string): Promise<boolean>;
+    removeItem(key: string): Promise<boolean | undefined>;
 
     // NON ASYNC CALLS
 
@@ -142,13 +142,13 @@ declare module MMKVStorage {
      * @param {String} value
      * @param {Callback<boolean>} callback
      */
-    setString(key: string, value: string, callback?: Callback<boolean>): null;
+    setString(key: string, value: string, callback?: Callback<boolean>): boolean | undefined;
     /**
      * Get a string value for a given key.
      * @param {String} key
      * @param {Callback<string>} callback
      */
-    getString(key: string, callback?: Callback<string>): string | null;
+    getString(key: string, callback?: Callback<string>): string | null | undefined;
 
     /**
      * Set a number value to storage for a given key.
@@ -157,14 +157,14 @@ declare module MMKVStorage {
      * @param {number} value
      * @param {Callback<boolean>} callback
      */
-    setInt(key: string, value: number, callback?: Callback<boolean>): null;
+    setInt(key: string, value: number, callback?: Callback<boolean>): boolean | undefined;
 
     /**
      * Get a number value for a given key
      * @param {String} key
      * @param {Callback<number>} callback
      */
-    getInt(key: string, callback?: Callback<number>): number | null;
+    getInt(key: string, callback?: Callback<number>): number | null | undefined;
 
     /**
      * Set a boolean value to storag for a given key.
@@ -173,14 +173,14 @@ declare module MMKVStorage {
      * @param {boolean} value
      * @param {Callback<boolean>} callback
      */
-    setBool(key: string, value: boolean, callback?: Callback<boolean>): null;
+    setBool(key: string, value: boolean, callback?: Callback<boolean>): boolean | undefined;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      * @param {Callback<boolean>} callback
      */
-    getBool(key: string, callback?: Callback<boolean>): boolean | null;
+    getBool(key: string, callback?: Callback<boolean>): boolean | null | undefined;
 
     /**
      * Set an Object to storage for a given key.
@@ -190,13 +190,13 @@ declare module MMKVStorage {
      * @param {Callback<boolean>} callback
      */
 
-    setMap(key: string, value: object, callback?: Callback<boolean>): null;
+    setMap(key: string, value: object, callback?: Callback<boolean>):boolean | undefined;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      * @param {Callback<object>} callback
      */
-    getMap<T extends object>(key: string, callback?: Callback<T>): T | null;
+    getMap<T extends object>(key: string, callback?: Callback<T>): T | null | undefined;
     /**
      * Set an array to the db.
      * @param {String} key
@@ -207,7 +207,7 @@ declare module MMKVStorage {
       key: string,
       value: Array<any>,
       callback?: Callback<boolean>
-    ): null;
+    ): boolean | undefined;
     /**
      * get an array from the storage for give key.
      * @param {String} key
@@ -216,7 +216,7 @@ declare module MMKVStorage {
     getArray<T extends any>(
       key: string,
       callback?: Callback<Array<T>>
-    ): Array<T> | null;
+    ): Array<T> | null | undefined;
     /**
      * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
      * Arrays will also be returned but wrappen in a object.

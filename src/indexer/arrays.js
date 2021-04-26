@@ -29,28 +29,22 @@ export default class arrayIndex {
   }
 
   async getAll() {
-    return new Promise((resolve, reject) => {
-      handleAction(
-        (error, result) => {
-          if (!result) {
-            resolve([]);
-            return;
-          }
-          let items = [];
-          for (let i = 0; i < result.length; i++) {
-            let item = [];
-            item[0] = result[i];
-            let array = global.getArrayMMKV(result[i], this.instanceID);
-            item[1] = JSON.parse(array);
-
-            items.push(item);
-          }
-          resolve(items);
-        },
+    return new Promise((resolve) => {
+      let keys = handleAction(
         global.getIndexMMKV,
         INDEX_TYPE,
         this.instanceID,
       );
+      let items = [];
+      for (let i = 0; i < keys.length; i++) {
+        let item = [];
+        item[0] = keys[i];
+        let array = global.getArrayMMKV(keys[i], this.instanceID);
+        item[1] = JSON.parse(array);
+        items.push(item);
+      }
+      resolve(items);
+
     });
   }
 }

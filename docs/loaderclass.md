@@ -1,6 +1,6 @@
 # Loader Class
 
-The `Loader Class` helps you create an MMKV Instance. Once the instance is loaded, you can then use it to read and write data in database. It follows a builder pattern. You need to tell the Loader class everything about the MMKV Instance you want to create and the finally call `initialize` to create it and get the instance by calling `getInstance`.
+The `Loader Class` helps you create an MMKV Instance. Once the instance is loaded, you can then use it to read and write data in database. It follows a builder pattern. You need to tell the Loader class everything about the MMKV Instance you want to create and then finally call `initialize` to create and get the instance.
 
 ## Create a Loader
 
