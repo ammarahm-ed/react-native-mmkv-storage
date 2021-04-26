@@ -27,7 +27,7 @@ import java.util.Set;
 @ReactModule(name = RNMMKVModule.NAME)
 public class RNMMKVModule extends ReactContextBaseJavaModule {
 
-    public static final String NAME =  "MMKVStorage";
+    public static final String NAME =  "MMKVNative";
 
     private final ReactApplicationContext reactContext;
     private SecureKeystore secureKeystore;
@@ -48,6 +48,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         secureKeystore = new SecureKeystore(reactContext);
         
     }
+
+   @ReactMethod
+    public void installMMKV() {
+        // DO nothing
+    }
+ 
+
 
     public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
 
@@ -147,7 +154,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     @Override
     public String getName() {
-        return "MMKVStorage";
+        return "MMKVNative";
     }
 
     public boolean secureKeyExists(String key) {
