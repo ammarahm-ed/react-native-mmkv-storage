@@ -3,8 +3,6 @@ import generatePassword from './keygen';
 import {stringToHex} from './utils';
 import {handleActionAsync} from 'react-native-mmkv-storage/src/handlers';
 import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
-import {NativeModules} from 'react-native';
-const MMKV = NativeModules.MMKVStorage;
 
 function encryptStorage(
   options,
@@ -15,16 +13,11 @@ function encryptStorage(
   callback,
 ) {
   if (secureKeyStorage) {
-    MMKV.setSecureKey(alias, key, {accessible: accessibleMode}, (error) => {
-      if (error) {
-        return;
-      } else {
-        global.encryptMMKV(key, options.instanceID);
-        global.setBoolMMKV(options.instanceID, true, options.instanceID);
-        IDStore.add(options.instanceID, true, alias);
-        callback(null, true);
-      }
-    });
+    global.setSecureKey(alias, key, accessibleMode);
+    global.encryptMMKV(key, options.instanceID);
+    global.setBoolMMKV(options.instanceID, true, options.instanceID);
+    IDStore.add(options.instanceID, true, alias);
+    callback(null, true);
   } else {
     global.encryptMMKV(key, options.instanceID);
     global.setBoolMMKV(options.instanceID, true, options.instanceID);

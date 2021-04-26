@@ -17,6 +17,7 @@ using namespace std;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 SecureStorage* _secureStorage;
+BOOL runtimeIsReady = NO;
 
 RCT_EXPORT_MODULE()
 
@@ -26,6 +27,7 @@ RCT_EXPORT_MODULE()
 {
     return YES;
 }
+
 
 MMKV *getInstance(NSString* ID)
 {
@@ -38,6 +40,49 @@ MMKV *getInstance(NSString* ID)
         return NULL;
     }
 }
+
+/**
+ Sometimes when refreshing the app while debugging, the setBridge method is called
+ too soon. The runtime is not ready yet.  We use the method
+ below as a workaround so when our app loads, we will call this method to check if MMKV
+ was installed or not. If not, we will check for runtime again and install MMKV.
+ */
+#pragma mark installMMKV
+RCT_EXPORT_METHOD(installMMKV) {
+    if (runtimeIsReady) return;
+    
+    RCTCxxBridge* bridgeVal = (RCTCxxBridge *) _bridge;
+    if (bridgeVal.runtime) {
+        [self installLibrary];
+    }
+}
+
+- (void)setBridge:(RCTBridge *)bridge
+{
+    _bridge = bridge;
+    _setBridgeOnMainQueue = RCTIsMainQueue();
+    [self installLibrary];
+}
+
+- (void)installLibrary {
+    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+    if (!cxxBridge.runtime) {
+        runtimeIsReady = NO;
+        return;
+    }
+    runtimeIsReady = YES;
+    mmkvInstances = [NSMutableDictionary dictionary];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *libraryPath = (NSString *) [paths firstObject];
+    NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
+    rPath = rootDir;
+    _secureStorage = [[SecureStorage alloc] init];
+    [MMKV initializeMMKV:rootDir];
+    install(*(jsi::Runtime *)cxxBridge.runtime);
+    [self migrate];
+}
+
 
 
 MMKV *createInstance(NSString* ID, MMKVMode mode, NSString* key, NSString* path)
@@ -778,28 +823,8 @@ static void install(jsi::Runtime & jsiRuntime)
 
 
 
-- (void)setBridge:(RCTBridge *)bridge
-{
-    _bridge = bridge;
-    _setBridgeOnMainQueue = RCTIsMainQueue();
-    
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    if (!cxxBridge.runtime) {
-        return;
-    }
- 
-    mmkvInstances = [NSMutableDictionary dictionary];
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    NSString *libraryPath = (NSString *) [paths firstObject];
-    NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-    rPath = rootDir;
-    _secureStorage = [[SecureStorage alloc] init];
-    [MMKV initializeMMKV:rootDir];
-    install(*(jsi::Runtime *)cxxBridge.runtime);
-    [self migrate];
-    
-}
+
+
 
 - (void)migrate {
     MMKV *kv = [MMKV mmkvWithID:@"mmkvIdStore"];
@@ -881,6 +906,11 @@ static void install(jsi::Runtime & jsiRuntime)
         [kv removeValueForKey:@"intIndex"];
     }
   
+}
+
+- (void)dealloc
+{
+    runtimeIsReady = NO;
 }
 
 @end
