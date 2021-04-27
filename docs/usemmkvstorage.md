@@ -1,6 +1,6 @@
 # Reactive Apps with useMMKVStorage Hook
 
-Starting from `v0.5.5` , thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it. Everything will be in place on app load. Let's see how this works:
+Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it. Everything will be in place on app load. Let's see how this works:
 
 Import `MMKVStorage` and `useMMKVStorage` Hook.
 
