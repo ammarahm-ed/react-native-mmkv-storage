@@ -67,7 +67,7 @@ If you are using `react-native-reanimated` library, follow the steps below inste
 2. Open the file in VSCode and make the following changes:
 
 ```java
-package com.ammarahmed.mmkv;
+package com.ammarahmed.mmkv; // <-- CHANGE TO YOUR PACKAGE NAME
 
 import com.facebook.react.bridge.JSIModulePackage;
 import com.facebook.react.bridge.JSIModuleSpec;
