@@ -79,10 +79,11 @@ import java.util.List;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <-- ADD THIS
 import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
 
-public class RNMMKVJSIModulePackage implements ReanimatedJSIModulePackage  { // <--- REPLACE JSIModulePackage with ReanimatedJSIModulePackage
+public class CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage  { // <--- REPLACE JSIModulePackage with ReanimatedJSIModulePackage
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
-
+	super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
+	
         reactApplicationContext.getNativeModule(RNMMKVModule.class).installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
 
         return Collections.emptyList();
