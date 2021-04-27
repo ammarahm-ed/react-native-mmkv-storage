@@ -18,9 +18,6 @@ using namespace std;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 SecureStorage* _secureStorage;
-BOOL runtimeIsReady = NO;
-BOOL setBridgeOver = NO;
-dispatch_block_t block;
 
 RCT_EXPORT_MODULE()
 
@@ -61,14 +58,14 @@ BOOL functionDiedBeforeCompletion = YES;
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.001 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             /**
-             Sometimes when refreshing the app while debugging, the setBridge method is called
-             too soon. The runtime is not ready yet. We need to install library as soon as runtime becomes available.
+             When refreshing the app while debugging, the setBridge method is called
+             too soon. The runtime is not ready yet quite often. We need to install library as soon as runtime becomes available.
              */
             [self installLibrary];
         });
         return;
     }
-    runtimeIsReady = YES;
+  
     mmkvInstances = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -79,7 +76,6 @@ BOOL functionDiedBeforeCompletion = YES;
     [MMKV initializeMMKV:rootDir];
     install(*(jsi::Runtime *)cxxBridge.runtime);
     [self migrate];
-    setBridgeOver = YES;
 }
 
 
@@ -907,13 +903,5 @@ static void install(jsi::Runtime & jsiRuntime)
   
 }
 
-- (void)dealloc
-{
-    if (block != nil) {
-            dispatch_block_cancel(block);
-    }
-    setBridgeOver = NO;
-    runtimeIsReady = NO;
-}
 
 @end
