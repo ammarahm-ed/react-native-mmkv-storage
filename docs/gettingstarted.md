@@ -79,7 +79,7 @@ import java.util.List;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <-- ADD THIS
 import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
 
-public class CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage  { // <--- REPLACE RNMMKVJSIModulePackage implements JSIModulePackage with CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage
+public class RNMMKVJSIModulePackage implements ReanimatedJSIModulePackage  { // <--- REPLACE RNMMKVJSIModulePackage implements JSIModulePackage with CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
 	    super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
