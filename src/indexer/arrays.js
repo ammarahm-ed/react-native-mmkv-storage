@@ -20,7 +20,7 @@ export default class arrayIndex {
   }
 
   async hasKey(key) {
-    let keys = await handleActionAsync(
+    let keys = handleAction(
       global.getIndexMMKV,
       INDEX_TYPE,
       this.instanceID,

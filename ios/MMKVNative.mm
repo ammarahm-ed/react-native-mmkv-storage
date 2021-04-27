@@ -7,6 +7,7 @@
 #import "SecureStorage.h"
 #import <MMKV/MMKV.h>
 
+
 using namespace facebook;
 using namespace jsi;
 using namespace std;
@@ -17,7 +18,6 @@ using namespace std;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 SecureStorage* _secureStorage;
-BOOL runtimeIsReady = NO;
 
 RCT_EXPORT_MODULE()
 
@@ -25,6 +25,7 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
+
     return YES;
 }
 
@@ -41,21 +42,6 @@ MMKV *getInstance(NSString* ID)
     }
 }
 
-/**
- Sometimes when refreshing the app while debugging, the setBridge method is called
- too soon. The runtime is not ready yet.  We use the method
- below as a workaround so when our app loads, we will call this method to check if MMKV
- was installed or not. If not, we will check for runtime again and install MMKV.
- */
-#pragma mark installMMKV
-RCT_EXPORT_METHOD(installMMKV) {
-    if (runtimeIsReady) return;
-    
-    RCTCxxBridge* bridgeVal = (RCTCxxBridge *) _bridge;
-    if (bridgeVal.runtime) {
-        [self installLibrary];
-    }
-}
 
 - (void)setBridge:(RCTBridge *)bridge
 {
@@ -63,14 +49,23 @@ RCT_EXPORT_METHOD(installMMKV) {
     _setBridgeOnMainQueue = RCTIsMainQueue();
     [self installLibrary];
 }
-
+BOOL functionDiedBeforeCompletion = YES;
 - (void)installLibrary {
+    
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+  
     if (!cxxBridge.runtime) {
-        runtimeIsReady = NO;
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.001 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            /**
+             When refreshing the app while debugging, the setBridge method is called
+             too soon. The runtime is not ready yet quite often. We need to install library as soon as runtime becomes available.
+             */
+            [self installLibrary];
+        });
         return;
     }
-    runtimeIsReady = YES;
+  
     mmkvInstances = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -908,9 +903,5 @@ static void install(jsi::Runtime & jsiRuntime)
   
 }
 
-- (void)dealloc
-{
-    runtimeIsReady = NO;
-}
 
 @end

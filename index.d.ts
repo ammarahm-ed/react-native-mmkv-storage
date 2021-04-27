@@ -1,6 +1,9 @@
 declare function MMKVStorage(): any;
 
+export declare function useMMKVStorage(key:string,storage:MMKVStorage.API):[value:string,setValue:(value:any)=>void];
+
 export default MMKVStorage;
+
 
 type ACCESSIBLE = {
   WHEN_UNLOCKED: string;
@@ -24,11 +27,7 @@ declare module MMKVStorage {
 
   export const ACCESSIBLE: ACCESSIBLE;
   
-  /**
-   * If you get error, global.xx not found etc. Call this method
-   * to install MMKV. iOS Only
-   */
-  export const install:Function;
+
 
   const myVar: string;
 

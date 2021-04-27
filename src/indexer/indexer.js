@@ -3,7 +3,7 @@ import numbersIndex from './numbers';
 import boolIndex from './booleans';
 import mapsIndex from './maps';
 import arrayIndex from './arrays';
-import {handleActionAsync} from '../handlers';
+import {handleAction, handleActionAsync} from '../handlers';
 export default class indexer {
   constructor(args) {
     this.MMKV = args.mmkv;
@@ -23,8 +23,8 @@ export default class indexer {
     );
   }
 
-  async hasKey(key) {
-    return await handleActionAsync(
+hasKey(key) {
+    return handleAction(
       global.containsKeyMMKV,
       key,
       this.instanceID,

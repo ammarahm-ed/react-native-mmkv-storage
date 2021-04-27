@@ -1,8 +1,6 @@
-import { NativeModules } from 'react-native';
+import {useMMKVStorage as useMMKV} from "./src/hooks/useMMKV"
 import { ACCESSIBLE, MODES } from 'react-native-mmkv-storage/src/utils';
-if (!global.getStringMMKV) {
-    setTimeout(()=> NativeModules.MMKVNative.installMMKV(),1) 
-}
+export const useMMKVStorage = useMMKV;
 
 const Loader = require('./src/loader').default;
 
@@ -10,7 +8,6 @@ const MMKVStorage = {
   Loader:Loader,
   MODES: MODES,
   ACCESSIBLE : ACCESSIBLE,
-  install:() => setTimeout(()=> NativeModules.MMKVNative.installMMKV(),1) 
 }
 
 export default MMKVStorage;

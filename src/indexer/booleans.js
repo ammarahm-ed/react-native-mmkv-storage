@@ -15,8 +15,8 @@ export default class boolIndex {
     );
   }
 
-  async hasKey(key) {
-    let keys = await handleActionAsync(
+hasKey(key) {
+    let keys = handleAction(
       global.getIndexMMKV,
       INDEX_TYPE,
       this.instanceID,
