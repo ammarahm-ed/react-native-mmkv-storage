@@ -4,6 +4,7 @@ import { promisify } from 'react-native-mmkv-storage/src/utils';
 import { handleAction, handleActionAsync } from './handlers';
 import { currentInstancesStatus } from 'react-native-mmkv-storage/src/initializer';
 import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
+import EventManager from './eventmanager';
 
 export default class API {
   constructor(args) {
@@ -19,6 +20,7 @@ export default class API {
     this.options = args;
     this.encryption = new encryption(this.options);
     this.indexer = new indexer(this.options);
+    this.ev = new EventManager();
   }
 
   setItem(key, value) {
@@ -95,7 +97,11 @@ export default class API {
   }
 
   setString = (key, value) => {
-    return handleAction(global.setStringMMKV, key, value, this.instanceID);
+    let result = handleAction(global.setStringMMKV, key, value, this.instanceID);
+    if (result) 
+    {this.ev.publish(`${key}:onwrite`); }
+
+  return result;
   };
 
   getString = (key, callback) => {
@@ -105,7 +111,11 @@ export default class API {
   };
 
   setInt = (key, value) => {
-    return handleAction(global.setNumberMMKV, key, value, this.instanceID);
+    let result = handleAction(global.setNumberMMKV, key, value, this.instanceID);
+    if (result) 
+    {this.ev.publish(`${key}:onwrite`); }
+
+  return result;
   };
 
   getInt = (key, callback) => {
@@ -115,7 +125,12 @@ export default class API {
   };
 
   setBool = (key, value) => {
-    return handleAction(global.setBoolMMKV, key, value, this.instanceID);
+    let result = handleAction(global.setBoolMMKV, key, value, this.instanceID);
+
+    if (result) 
+    {this.ev.publish(`${key}:onwrite`); }
+
+  return result;
   };
 
   getBool = (key, callback) => {
@@ -126,12 +141,16 @@ export default class API {
 
   setMap = (key, value) => {
     if (typeof value !== 'object') throw new Error('value must be an object');
-    return handleAction(
+    let result =  handleAction(
       global.setMapMMKV,
       key,
       JSON.stringify(value),
       this.instanceID,
     );
+    if (result) 
+    {this.ev.publish(`${key}:onwrite`); }
+
+  return result;
   };
 
   getMap = (key, callback) => {
@@ -152,12 +171,17 @@ export default class API {
 
   setArray = (key, value) => {
     if (!Array.isArray(value)) throw new Error('value must be an Array');
-    return handleAction(
+    
+    let result = handleAction(
       global.setArrayMMKV,
       key,
       JSON.stringify(value),
       this.instanceID,
     );
+     if (result) 
+      {this.ev.publish(`${key}:onwrite`); }
+
+    return result;
   };
 
   getArray = (key, callback) => {
@@ -254,11 +278,15 @@ export default class API {
   }
 
   async removeItem(key) {
-    return await handleActionAsync(
+   let result = await handleActionAsync(
       global.removeValueMMKV,
       key,
       this.instanceID,
     );
+    if (result) 
+    {this.ev.publish(`${key}:onwrite`); }
+
+  return result;
   }
 
   async clearStore() {
