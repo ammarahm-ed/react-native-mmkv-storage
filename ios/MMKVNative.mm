@@ -7,6 +7,7 @@
 #import "SecureStorage.h"
 #import <MMKV/MMKV.h>
 
+
 using namespace facebook;
 using namespace jsi;
 using namespace std;
@@ -18,6 +19,8 @@ NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 SecureStorage* _secureStorage;
 BOOL runtimeIsReady = NO;
+BOOL setBridgeOver = NO;
+dispatch_block_t block;
 
 RCT_EXPORT_MODULE()
 
@@ -25,6 +28,7 @@ RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
+
     return YES;
 }
 
@@ -41,21 +45,6 @@ MMKV *getInstance(NSString* ID)
     }
 }
 
-/**
- Sometimes when refreshing the app while debugging, the setBridge method is called
- too soon. The runtime is not ready yet.  We use the method
- below as a workaround so when our app loads, we will call this method to check if MMKV
- was installed or not. If not, we will check for runtime again and install MMKV.
- */
-#pragma mark installMMKV
-RCT_EXPORT_METHOD(installMMKV) {
-    if (runtimeIsReady) return;
-    
-    RCTCxxBridge* bridgeVal = (RCTCxxBridge *) _bridge;
-    if (bridgeVal.runtime) {
-        [self installLibrary];
-    }
-}
 
 - (void)setBridge:(RCTBridge *)bridge
 {
@@ -63,11 +52,20 @@ RCT_EXPORT_METHOD(installMMKV) {
     _setBridgeOnMainQueue = RCTIsMainQueue();
     [self installLibrary];
 }
-
+BOOL functionDiedBeforeCompletion = YES;
 - (void)installLibrary {
+    
     RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
+  
     if (!cxxBridge.runtime) {
-        runtimeIsReady = NO;
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.001 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            /**
+             Sometimes when refreshing the app while debugging, the setBridge method is called
+             too soon. The runtime is not ready yet. We need to install library as soon as runtime becomes available.
+             */
+            [self installLibrary];
+        });
         return;
     }
     runtimeIsReady = YES;
@@ -81,6 +79,7 @@ RCT_EXPORT_METHOD(installMMKV) {
     [MMKV initializeMMKV:rootDir];
     install(*(jsi::Runtime *)cxxBridge.runtime);
     [self migrate];
+    setBridgeOver = YES;
 }
 
 
@@ -910,6 +909,10 @@ static void install(jsi::Runtime & jsiRuntime)
 
 - (void)dealloc
 {
+    if (block != nil) {
+            dispatch_block_cancel(block);
+    }
+    setBridgeOver = NO;
     runtimeIsReady = NO;
 }
 

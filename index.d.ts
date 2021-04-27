@@ -24,11 +24,7 @@ declare module MMKVStorage {
 
   export const ACCESSIBLE: ACCESSIBLE;
   
-  /**
-   * If you get error, global.xx not found etc. Call this method
-   * to install MMKV. iOS Only
-   */
-  export const install:Function;
+
 
   const myVar: string;
 
