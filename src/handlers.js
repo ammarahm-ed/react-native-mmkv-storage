@@ -21,8 +21,11 @@ export function handleAction(action, ...args) {
     return action(...args);
   }
   let opts = options[id];
-  initialize(opts);
-  currentInstancesStatus[id] = true;
+  let ready = initialize(opts);
+  if (ready) {
+    currentInstancesStatus[id] = true;
+  }
+  if (!ready) return undefined;
   if (!action) return;
   return action(...args);
 
@@ -30,14 +33,25 @@ export function handleAction(action, ...args) {
 
 export async function handleActionAsync(action, ...args) {
   let id = args[args.length - 1];
-  return new Promise(async (resolve) => {
+  return new Promise(async (resolve,reject) => {
     if (currentInstancesStatus[id]) {
+      if (!action) {
+        resolve(undefined);
+        return;
+      }
       let result = action(...args);
       resolve(result);
     } else {
       let opts = options[id];
-      initialize(opts);
+      let ready = initialize(opts);
+      if (ready) {
+        currentInstancesStatus[id] = true;
+      }
       currentInstancesStatus[id] = true;
+      if (!action) {
+        resolve(undefined);
+        return;
+      }
       let result = action(...args);
       resolve(result);
     }
