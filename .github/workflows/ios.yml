@@ -1,0 +1,30 @@
+name: iOS
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    - run: yarn
+      working-directory: example
+      
+    - run: xcode-select -p
+    
+    - run: pod install
+      working-directory: ios
+      name: Install pod dependencies
+    - name: Build iOS (debug)
+      working-directory: ios
+      run: "xcodebuild \
+        -workspace ios/example.xcworkspace \
+        -scheme example \
+        clean archive \
+        -sdk iphoneos \
+        -configuration Debug \
+        -UseModernBuildSystem=NO \
+        -archivePath $PWD/example \
+        CODE_SIGNING_ALLOWED=NO"
