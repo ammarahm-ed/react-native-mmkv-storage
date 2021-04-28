@@ -20,7 +20,7 @@ jobs:
     - name: Build iOS (debug)
       working-directory: example/ios
       run: "xcodebuild \
-        -workspace ios/example.xcworkspace \
+        -workspace example/ios/example.xcworkspace \
         -scheme example \
         clean archive \
         -sdk iphoneos \
