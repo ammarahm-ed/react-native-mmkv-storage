@@ -13,7 +13,7 @@ import java.util.List;
 public class RNMMKVJSIModulePackage implements JSIModulePackage { // Replace implements JSIModulePackage with extends ReanimatedJSIModulePackage 
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
-        super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
+        //super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
         reactApplicationContext.getNativeModule(RNMMKVModule.class).installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
 
         return Collections.emptyList();
