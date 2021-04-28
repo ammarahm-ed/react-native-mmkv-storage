@@ -13,6 +13,7 @@ jobs:
         node-version: 12.x
 
     - run: yarn
+      working-directory: example
     
     - run: ./gradlew assembleDebug -Dorg.gradle.logging.level=info
       working-directory: example/android
