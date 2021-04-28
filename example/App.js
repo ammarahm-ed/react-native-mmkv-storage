@@ -1,65 +1,103 @@
-import React, {useEffect, useState} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  Text,
-  StatusBar,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import MMKVStorage, { useMMKVStorage } from 'react-native-mmkv-storage';
 
-import MMKV from 'react-native-mmkv-storage';
-
-const MMKVStorage = new MMKV.Loader().withEncryption().initialize();
-
+const storage = new MMKVStorage.Loader().withEncryption().initialize();
+const useStorage = key => {
+  const [value, setValue] = useMMKVStorage(key, storage);
+  return [value, setValue];
+};
 const App = () => {
-  const [stringValue, setStringValue] = useState('');
-  const [arrayValue, setArrayValue] = useState([]);
-  const [mapValue, setMapValue] = useState({});
+  const [user, setUser] = useStorage('user');
+  const [age, setAge] = useStorage('age');
 
-  useEffect(() => {
-    (async () => {
-      let map = await MMKVStorage.getMapAsync('map');
-      setMapValue(map);
-      await MMKVStorage.removeItem('map');
-      await MMKVStorage.setMapAsync('map', {
-        name: 'AAA',
-        date: Date.now(),
-      });
-      let randomString = await MMKVStorage.getStringAsync('random-string');
-      setStringValue(randomString);
-      await MMKVStorage.setStringAsync(
-        'random-string',
-        Math.random().toString(36).substring(7),
-      );
-      let array = await MMKVStorage.getArrayAsync('array');
-      setArrayValue(array);
-      await MMKVStorage.setArrayAsync('array', new Array(16).fill());
-      await MMKVStorage.indexer.hasKey('map').then(console.log);
-    })();
-  }, []);
+  const getUser = useCallback(() => {
+    let users = ['andrew', 'robert', 'jack', 'alison'];
+    let _user =
+      users[
+        users.indexOf(user) === users.length - 1 ? 0 : users.indexOf(user) + 1
+      ];
+    return _user;
+  }, [user]);
+
+  const getAge = useCallback(() => {
+    let ages = [24, 27, 32, 36];
+    let _age =
+      ages[ages.indexOf(age) === ages.length - 1 ? 0 : ages.indexOf(age) + 1];
+    return _age;
+  }, [age]);
+  
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Text>Previous value: {stringValue}</Text>
-          <Text>
-            Map value: {mapValue?.name} {mapValue?.date}
+      <View
+        style={{
+          alignItems: 'center',
+          flex: 1,
+          backgroundColor: 'white',
+        }}>
+        <View
+          style={{
+            width: '100%',
+            backgroundColor: '#f7f7f7',
+            marginBottom: 20,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical:50
+          }}>
+          <Text style={{fontSize: 40,textAlign:'center'}}>
+            I am {user || 'andrew'} and I am {age || 24} years old.
           </Text>
-          <Text>Array Length: {arrayValue?.length}</Text>
-        </ScrollView>
-      </SafeAreaView>
+        </View>
+        <TouchableOpacity
+          style={{
+            width: '95%',
+            height: 50,
+            marginBottom: 10,
+            backgroundColor: 'green',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+          }}
+          onPress={async () => {
+            storage.setString('user', getUser());
+          }}>
+          <Text style={{color: 'white'}}>setString</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: '95%',
+            height: 50,
+            backgroundColor: 'orange',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+            marginBottom: 10,
+          }}
+          onPress={async () => {
+            setUser(getUser());
+          }}>
+          <Text style={{color: 'black'}}>setUser</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            width: '95%',
+            height: 50,
+            backgroundColor: 'blue',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 10,
+          }}
+          onPress={async () => {
+            setAge(getAge());
+          }}>
+          <Text style={{color: 'white'}}>setAge</Text>
+        </TouchableOpacity>
+      </View>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  scrollView: {
-    padding: 32,
-  },
-});
 
 export default App;
