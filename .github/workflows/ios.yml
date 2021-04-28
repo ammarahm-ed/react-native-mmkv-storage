@@ -15,10 +15,10 @@ jobs:
     - run: xcode-select -p
     
     - run: pod install
-      working-directory: ios
+      working-directory: example/ios
       name: Install pod dependencies
     - name: Build iOS (debug)
-      working-directory: ios
+      working-directory: example/ios
       run: "xcodebuild \
         -workspace ios/example.xcworkspace \
         -scheme example \
