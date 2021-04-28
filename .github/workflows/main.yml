@@ -14,7 +14,12 @@ jobs:
 
     - run: yarn
       working-directory: example
+      name: Installing node modules
     
     - run: ./gradlew assembleDebug -Dorg.gradle.logging.level=info
       working-directory: example/android
       name: Build Android apk (debug)
+      
+    - run: ./gradlew assembleRelease -Dorg.gradle.logging.level=info
+      working-directory: example/android
+      name: Build Android apk (release)
