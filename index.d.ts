@@ -1,6 +1,6 @@
 declare function MMKVStorage(): any;
 
-export declare function useMMKVStorage(key: string, storage: MMKVStorage.API): [any, (value?: any) => void];
+export declare function useMMKVStorage<T extends any>(key: string, storage: MMKVStorage.API): [T, (value?: T) => void];
 
 export default MMKVStorage;
 
