@@ -20,7 +20,7 @@ jobs:
     - name: Build iOS (debug)
       working-directory: example/ios
       run: "xcodebuild \
-        -workspace example/ios/example.xcworkspace \
+        -workspace example.xcworkspace \
         -scheme example \
         clean archive \
         -sdk iphoneos \
@@ -28,3 +28,4 @@ jobs:
         -UseModernBuildSystem=NO \
         -archivePath $PWD/example \
         CODE_SIGNING_ALLOWED=NO"
+     working-directory: example/ios
