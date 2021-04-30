@@ -36,7 +36,7 @@ setUser("andrew");
 setUser() //removes the value from storage.
 
 
-// or you can do this too:
+// or you can do this too anywhere in your app:
 MMKV.setString("user", "andrew");
 ```
 
