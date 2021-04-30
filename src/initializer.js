@@ -1,4 +1,4 @@
-import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
+import IDStore from './mmkv/IDStore';
 
 export const currentInstancesStatus = {};
 

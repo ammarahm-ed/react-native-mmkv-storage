@@ -1,8 +1,8 @@
 import {initialize, currentInstancesStatus} from './initializer';
 import generatePassword from './keygen';
 import {stringToHex} from './utils';
-import {handleActionAsync} from 'react-native-mmkv-storage/src/handlers';
-import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
+import {handleActionAsync} from './handlers';
+import IDStore from './mmkv/IDStore';
 
 function encryptStorage(
   options,

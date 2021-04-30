@@ -2,7 +2,7 @@ import generatePassword from './keygen';
 import API from './api';
 import {stringToHex, ACCESSIBLE, MODES, options} from './utils';
 import {currentInstancesStatus} from './initializer';
-import { handleAction } from 'react-native-mmkv-storage/src/handlers';
+import { handleAction } from './handlers';
 
 export default class Loader {
   constructor() {

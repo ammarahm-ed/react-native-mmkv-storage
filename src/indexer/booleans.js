@@ -1,4 +1,4 @@
-import { handleActionAsync, handleAction } from "react-native-mmkv-storage/src/handlers";
+import { handleActionAsync, handleAction } from "../handlers";
 const INDEX_TYPE = "boolIndex"
 export default class boolIndex {
   constructor(args) {

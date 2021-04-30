@@ -1,7 +1,7 @@
 import {
   handleActionAsync,
   handleAction,
-} from 'react-native-mmkv-storage/src/handlers';
+} from '../handlers';
 const INDEX_TYPE = "mapIndex"
 export default class mapsIndex {
   constructor(args) {
