@@ -1,10 +1,10 @@
-import encryption from 'react-native-mmkv-storage/src/encryption';
-import indexer from 'react-native-mmkv-storage/src/indexer/indexer';
-import { promisify } from 'react-native-mmkv-storage/src/utils';
-import { handleAction, handleActionAsync } from './handlers';
-import { currentInstancesStatus } from 'react-native-mmkv-storage/src/initializer';
-import IDStore from 'react-native-mmkv-storage/src/mmkv/IDStore';
-import EventManager from './eventmanager';
+import encryption from "./encryption";
+import EventManager from "./eventmanager";
+import { handleAction } from "./handlers";
+import indexer from "./indexer/indexer";
+import { currentInstancesStatus } from "./initializer";
+import IDStore from "./mmkv/IDStore";
+import { promisify } from "./utils";
 
 export default class API {
   constructor(args) {
@@ -33,38 +33,37 @@ export default class API {
 
   setStringAsync(key, value) {
     return new Promise((resolve) => {
-      resolve(this.setString(key, value))
+      resolve(this.setString(key, value));
     });
   }
 
   getStringAsync(key) {
     return new Promise((resolve) => {
-      resolve(this.getString(key))
+      resolve(this.getString(key));
     });
   }
 
   setIntAsync(key, value) {
     return new Promise((resolve) => {
-      resolve(this.setInt(key, value))
-
+      resolve(this.setInt(key, value));
     });
   }
 
   getIntAsync(key) {
     return new Promise((resolve) => {
-      resolve(this.getInt(key))
+      resolve(this.getInt(key));
     });
   }
 
   setBoolAsync(key, value) {
     return new Promise((resolve) => {
-      resolve(this.setBool(key, value))
+      resolve(this.setBool(key, value));
     });
   }
 
   getBoolAsync(key) {
     return new Promise((resolve) => {
-      resolve(this.getBool(key))
+      resolve(this.getBool(key));
     });
   }
 
@@ -76,147 +75,154 @@ export default class API {
 
   getMapAsync(key) {
     return new Promise((resolve) => {
-      resolve(this.getMap(key))
+      resolve(this.getMap(key));
     });
   }
 
-  async getMultipleItemsAsync(keys, type = 'map') {
+  async getMultipleItemsAsync(keys, type = "map") {
     return promisify(this.getMultipleItems)(keys, type);
   }
 
   async setArrayAsync(key, value) {
     return new Promise((resolve) => {
-      resolve(this.setArray(key, value))
+      resolve(this.setArray(key, value));
     });
   }
 
   async getArrayAsync(key) {
     return new Promise((resolve) => {
-      resolve(this.getArray(key))
+      resolve(this.getArray(key));
     });
   }
 
   setString = (key, value) => {
-    let result = handleAction(global.setStringMMKV, key, value, this.instanceID);
-    if (result) 
-    {this.ev.publish(`${key}:onwrite`); }
+    let result = handleAction(
+      global.setStringMMKV,
+      key,
+      value,
+      this.instanceID
+    );
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
-  return result;
+    return result;
   };
 
   getString = (key, callback) => {
     let string = handleAction(global.getStringMMKV, key, this.instanceID);
-    callback && callback(null,string);
+    callback && callback(null, string);
     return string;
   };
 
   setInt = (key, value) => {
-    let result = handleAction(global.setNumberMMKV, key, value, this.instanceID);
-    if (result) 
-    {this.ev.publish(`${key}:onwrite`); }
+    let result = handleAction(
+      global.setNumberMMKV,
+      key,
+      value,
+      this.instanceID
+    );
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
-  return result;
+    return result;
   };
 
   getInt = (key, callback) => {
-    let int = handleAction(global.getNumberMMKV, key, this.instanceID)
-    callback && callback(null,int)
+    let int = handleAction(global.getNumberMMKV, key, this.instanceID);
+    callback && callback(null, int);
     return int;
   };
 
   setBool = (key, value) => {
     let result = handleAction(global.setBoolMMKV, key, value, this.instanceID);
 
-    if (result) 
-    {this.ev.publish(`${key}:onwrite`); }
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
-  return result;
+    return result;
   };
 
   getBool = (key, callback) => {
     let bool = handleAction(global.getBoolMMKV, key, this.instanceID);
-    callback && callback(null,bool);
-    return bool
+    callback && callback(null, bool);
+    return bool;
   };
 
   setMap = (key, value) => {
-    if (typeof value !== 'object') throw new Error('value must be an object');
-    let result =  handleAction(
+    if (typeof value !== "object") throw new Error("value must be an object");
+    let result = handleAction(
       global.setMapMMKV,
       key,
       JSON.stringify(value),
-      this.instanceID,
+      this.instanceID
     );
-    if (result) 
-    {this.ev.publish(`${key}:onwrite`); }
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
-  return result;
+    return result;
   };
 
   getMap = (key, callback) => {
-    let map = handleAction(
-      global.getMapMMKV,
-      key,
-      this.instanceID,
-    );
+    let map = handleAction(global.getMapMMKV, key, this.instanceID);
     try {
       map = JSON.parse(map);
-      callback && callback(null,map)
-      return map
+      callback && callback(null, map);
+      return map;
     } catch (e) {
-      callback && callback(null,null)
+      callback && callback(null, null);
       return null;
     }
   };
 
   setArray = (key, value) => {
-    if (!Array.isArray(value)) throw new Error('value must be an Array');
-    
+    if (!Array.isArray(value)) throw new Error("value must be an Array");
+
     let result = handleAction(
       global.setArrayMMKV,
       key,
       JSON.stringify(value),
-      this.instanceID,
+      this.instanceID
     );
-     if (result) 
-      {this.ev.publish(`${key}:onwrite`); }
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
     return result;
   };
 
   getArray = (key, callback) => {
-    let array = handleAction(
-      global.getMapMMKV,
-      key,
-      this.instanceID,
-    );
+    let array = handleAction(global.getMapMMKV, key, this.instanceID);
     try {
-      array = JSON.parse(array)
-      callback && callback(null,array);
+      array = JSON.parse(array);
+      callback && callback(null, array);
       return array;
     } catch (e) {
-      callback && callback(null,null);
+      callback && callback(null, null);
       return null;
     }
   };
 
-  getMultipleItems = (keys, type = 'map') => {
+  getMultipleItems = (keys, type = "map") => {
     const func = () => {
       let items = [];
       for (let i = 0; i < keys.length; i++) {
         let item = [];
         item[0] = keys[i];
         switch (type) {
-          case 'string':
+          case "string":
             item[1] = global.getStringMMKV(keys[i], this.instanceID);
             break;
-          case 'bool':
+          case "bool":
             item[1] = global.getBoolMMKV(keys[i], this.instanceID);
             break;
-          case 'number':
+          case "number":
             item[1] = global.getNumberMMKV(keys[i], this.instanceID);
             break;
-          case 'map':
+          case "map":
             let map = global.getMapMMKV(keys[i], this.instanceID);
             if (map) {
               try {
@@ -225,7 +231,7 @@ export default class API {
                 if (__DEV__) {
                   console.warn(
                     keys[i] +
-                    'has a value that is not an object, returning null',
+                      "has a value that is not an object, returning null"
                   );
                 }
                 item[1] = null;
@@ -234,7 +240,7 @@ export default class API {
               item[1] = null;
             }
             break;
-          case 'array':
+          case "array":
             let array = global.getArrayMMKV(keys[i], this.instanceID);
             if (array) {
               try {
@@ -242,8 +248,7 @@ export default class API {
               } catch (e) {
                 if (__DEV__) {
                   console.warn(
-                    keys[i] +
-                    'has a value that is not an array, returning null',
+                    keys[i] + "has a value that is not an array, returning null"
                   );
                 }
                 item[1] = null;
@@ -260,36 +265,29 @@ export default class API {
       }
       return items;
     };
-    handleAction(
-      () => null,
-      keys,
-      this.instanceID,
-    );
+    handleAction(() => null, keys, this.instanceID);
     return func();
   };
 
-  async getCurrentMMKVInstanceIDs() {
+getCurrentMMKVInstanceIDs() {
     return currentInstancesStatus;
   }
 
-  async getAllMMKVInstanceIDs() {
+ getAllMMKVInstanceIDs() {
     let instances = IDStore.getAll();
     return Object.keys(instances);
   }
 
-  async removeItem(key) {
-   let result = await handleActionAsync(
-      global.removeValueMMKV,
-      key,
-      this.instanceID,
-    );
-    if (result) 
-    {this.ev.publish(`${key}:onwrite`); }
+  removeItem(key) {
+    let result = handleAction(global.removeValueMMKV, key, this.instanceID);
+    if (result) {
+      this.ev.publish(`${key}:onwrite`);
+    }
 
-  return result;
+    return result;
   }
 
-  async clearStore() {
-    return await handleActionAsync(global.clearMMKV, this.instanceID);
+  clearStore() {
+    return handleAction(global.clearMMKV, this.instanceID);
   }
 }

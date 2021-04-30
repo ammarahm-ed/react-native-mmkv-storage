@@ -21,7 +21,7 @@ Remove an item for a given key.
 | key  | String |
 
 ```js
-await MMKV.removeItem(key);
+MMKV.removeItem(key);
 ```
 
 ## clearStore
@@ -29,15 +29,7 @@ await MMKV.removeItem(key);
 Clear the storage.
 
 ```js
-await MMKV.clearStore();
-```
-
-## clearMemoryCache
-
-Clear the memory cache of an instance.
-
-```js
-await MMKV.clearMemoryCache();
+MMKV.clearStore();
 ```
 
 ## getAllMMKVInstances
@@ -45,7 +37,7 @@ await MMKV.clearMemoryCache();
 Returns a list of all the MMKV Instance IDs created.
 
 ```js
-let allInstances = await MMKV.getAllInstanceIDs();
+let allInstances = MMKV.getAllInstanceIDs();
 ```
 
 ## getCurrentMMKVInstances
@@ -53,5 +45,5 @@ let allInstances = await MMKV.getAllInstanceIDs();
 get the currently initialized instance IDs.
 
 ```js
-let intializedInstances = await MMKV.getCurrentMMKVInstanceIDs();
+let intializedInstances = MMKV.getCurrentMMKVInstanceIDs();
 ```

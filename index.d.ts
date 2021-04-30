@@ -130,13 +130,13 @@ declare module MMKVStorage {
       keys: Array<string>
     ): Promise<Array<T>>;
 
-    clearStore(): Promise<boolean | undefined>;
+    clearStore(): boolean | undefined;
     /**
      * Remove an item from storage for a given key.
      *
      * @param {String} key
      */
-    removeItem(key: string): Promise<boolean | undefined>;
+    removeItem(key: string): boolean | undefined;
 
     // NON ASYNC CALLS
 
