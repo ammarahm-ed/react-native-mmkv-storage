@@ -1,5 +1,5 @@
-import {Platform} from "react-native";
-const STORE_ID = Platform.OS === "ios" ? "mmkvIdStore" : 'mmkvIDStore';
+import { Platform } from "react-native";
+const STORE_ID = Platform.OS === "ios" ? "mmkvIdStore" : "mmkvIDStore";
 
 /**
  *	Store instance properties that we will use later to
@@ -57,7 +57,7 @@ function exists(id) {
   return true;
 }
 
-let blacklist = ['stringIndex'];
+let blacklist = ["stringIndex"];
 /**
  * Get all the available instances that
  * were loaded since the app was installed.

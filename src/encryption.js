@@ -1,8 +1,8 @@
-import {initialize, currentInstancesStatus} from './initializer';
-import generatePassword from './keygen';
-import {stringToHex} from './utils';
-import {handleActionAsync} from './handlers';
-import IDStore from './mmkv/IDStore';
+import { initialize, currentInstancesStatus } from "./initializer";
+import generatePassword from "./keygen";
+import { stringToHex } from "./utils";
+import { handleActionAsync } from "./handlers";
+import IDStore from "./mmkv/IDStore";
 
 function encryptStorage(
   options,
@@ -10,7 +10,7 @@ function encryptStorage(
   secureKeyStorage = true,
   alias,
   accessibleMode,
-  callback,
+  callback
 ) {
   if (secureKeyStorage) {
     global.setSecureKey(alias, key, accessibleMode);
@@ -71,7 +71,7 @@ export default class encryption {
               reject(e);
             }
             resolve(r);
-          },
+          }
         );
       } else {
         initialize(this.options, (e) => {
@@ -90,7 +90,7 @@ export default class encryption {
                 reject(e);
               }
               resolve(r);
-            },
+            }
           );
         });
       }
@@ -108,7 +108,7 @@ export default class encryption {
     key,
     secureKeyStorage = true,
     alias,
-    accessibleMode,
+    accessibleMode
   ) {
     if (accessibleMode) {
       this.accessibleMode = accessibleMode;
@@ -142,7 +142,7 @@ export default class encryption {
               reject(e);
             }
             resolve(r);
-          },
+          }
         );
       } else {
         initialize(this.options, (e) => {
@@ -161,7 +161,7 @@ export default class encryption {
                 reject(e);
               }
               resolve(r);
-            },
+            }
           );
         });
       }

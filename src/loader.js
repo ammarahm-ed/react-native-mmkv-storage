@@ -1,18 +1,18 @@
-import generatePassword from './keygen';
-import API from './api';
-import {stringToHex, ACCESSIBLE, MODES, options} from './utils';
-import {currentInstancesStatus} from './initializer';
-import { handleAction } from './handlers';
+import generatePassword from "./keygen";
+import API from "./api";
+import { stringToHex, ACCESSIBLE, MODES, options } from "./utils";
+import { currentInstancesStatus } from "./initializer";
+import { handleAction } from "./handlers";
 
 export default class Loader {
   constructor() {
     this.options = {
-      instanceID: 'default',
+      instanceID: "default",
       initWithEncryption: false,
       secureKeyStorage: false,
       accessibleMode: ACCESSIBLE.WHEN_UNLOCKED,
       processingMode: MODES.SINGLE_PROCESS,
-      aliasPrefix: 'com.MMKV.',
+      aliasPrefix: "com.MMKV.",
       alias: null,
       key: null,
       initialized: false,
@@ -29,7 +29,7 @@ export default class Loader {
     this.options.initWithEncryption = true;
     this.options.key = generatePassword();
     this.options.alias = stringToHex(
-      this.options.aliasPrefix + this.options.instanceID,
+      this.options.aliasPrefix + this.options.instanceID
     );
     this.options.secureKeyStorage = true;
     return this;
@@ -49,7 +49,7 @@ export default class Loader {
         this.options.alias = stringToHex(this.options.aliasPrefix + alias);
       } else {
         this.options.alias = stringToHex(
-          this.options.aliasPrefix + this.options.instanceID,
+          this.options.aliasPrefix + this.options.instanceID
         );
       }
     }
@@ -67,14 +67,12 @@ export default class Loader {
     currentInstancesStatus[this.options.instanceID] = false;
     let instance = new API(this.options);
     options[this.options.instanceID] = this.options;
-    handleAction(null,this.options.instanceID);
-    return instance
+    handleAction(null, this.options.instanceID);
+    return instance;
   }
 
   generateKey() {
     this.options.key = generatePassword();
     return this;
   }
-
-  
 }

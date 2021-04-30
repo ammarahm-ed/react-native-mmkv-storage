@@ -33,13 +33,11 @@ Now whenever you update value of `"user"` in storage, your `App` component will 
 ```jsx
 setUser("andrew");
 //or you cal call setUser without a value to remove the value
-setUser() //removes the value from storage.
-
+setUser(); //removes the value from storage.
 
 // or you can do this too anywhere in your app:
 MMKV.setString("user", "andrew");
 ```
-
 
 Simple right? now refresh the app or restart it. When it loads, it will always show andrew as the user until you update it.
 The ideal way which I would recommend for better development experience would to wrap `useMMKVStorage` hook in a custom hook as follows:
@@ -48,18 +46,19 @@ The ideal way which I would recommend for better development experience would to
 const MMKV = new MMKVStorage.Loader().initialize();
 
 export const useStorage = (key) => {
-  const [value,setValue] = useMMKVStorage(key,MMKV);
-  return [value,setValue];
-}
+  const [value, setValue] = useMMKVStorage(key, MMKV);
+  return [value, setValue];
+};
 ```
+
 Now you don't have to import `MMKV` everywhere in your app but only once. If you use TypeScript you can do something like below to get nice intellisense in your editor.
 
 ```tsx
-const MMKV:MMKVStorage.API = new MMKVStorage.Loader().initialize();
+const MMKV: MMKVStorage.API = new MMKVStorage.Loader().initialize();
 type LiteralUnion<T extends U, U = string> = T | (U & {});
 
-export const useStorage = (key:LiteralUnion<"user" | "password">) => {
-  const [value,setValue] = useMMKVStorage(key,MMKV);
-  return [value,setValue];
-}
+export const useStorage = (key: LiteralUnion<"user" | "password">) => {
+  const [value, setValue] = useMMKVStorage(key, MMKV);
+  return [value, setValue];
+};
 ```

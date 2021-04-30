@@ -1,4 +1,4 @@
-import IDStore from './mmkv/IDStore';
+import IDStore from "./mmkv/IDStore";
 
 export const currentInstancesStatus = {};
 
@@ -12,7 +12,6 @@ export const currentInstancesStatus = {};
  */
 
 export function initialize(options) {
-
   if (!global.setupMMKVInstance) return false;
   if (IDStore.exists(options.instanceID)) {
     if (!IDStore.encrypted(options.instanceID)) {
@@ -50,7 +49,7 @@ function initWithEncryptionUsingOldKey(options) {
       options.instanceID,
       options.processingMode,
       key,
-      options.alias,
+      options.alias
     );
   }
 }
@@ -65,17 +64,14 @@ function initWithEncryptionUsingOldKey(options) {
 
 function initWithEncryptionUsingNewKey(options) {
   if (options.key == null || options.key.length < 3)
-    throw new Error('Key is null or too short');
+    throw new Error("Key is null or too short");
 
-  global.setSecureKey(
-    options.alias,
-    options.key,
-    options.accessibleMode);
+  global.setSecureKey(options.alias, options.key, options.accessibleMode);
   return setupWithEncryption(
     options.instanceID,
     options.processingMode,
     options.key,
-    options.alias,
+    options.alias
   );
 }
 
@@ -90,13 +86,13 @@ function initWithEncryptionUsingNewKey(options) {
 
 function initWithEncryptionWithoutSecureStorage(options) {
   if (options.key == null || options.key.length < 3)
-    throw new Error('Key is null or too short');
+    throw new Error("Key is null or too short");
 
   return setupWithEncryption(
     options.instanceID,
     options.processingMode,
     options.key,
-    options.alias,
+    options.alias
   );
 }
 
@@ -113,12 +109,11 @@ function initWithoutEncryption(options) {
 }
 
 function setup(id, mode) {
-
-  global.setupMMKVInstance(id, mode, '', '');
+  global.setupMMKVInstance(id, mode, "", "");
   if (!IDStore.exists(id)) {
     global.setBoolMMKV(id, true, id);
     IDStore.add(id, false, null);
-    return true
+    return true;
   } else {
     if (global.containsKeyMMKV(id, id)) {
       return true;
@@ -129,8 +124,7 @@ function setup(id, mode) {
 }
 
 function setupWithEncryption(id, mode, key, alias) {
-
-  global.setupMMKVInstance(id, mode, key, '');
+  global.setupMMKVInstance(id, mode, key, "");
   if (!IDStore.exists(id)) {
     global.setBoolMMKV(id, true, id);
     IDStore.add(id, true, alias);
@@ -151,12 +145,12 @@ function encryptionHandler(id, mode) {
     if (exists) {
       let key = global.getSecureKey(alias);
       if (key) {
-        global.setupMMKVInstance(id, mode, key, '');
+        global.setupMMKVInstance(id, mode, key, "");
         return true;
       }
     }
   } else {
-    global.setupMMKVInstance(id, mode, '', '');
+    global.setupMMKVInstance(id, mode, "", "");
     return true;
   }
 }

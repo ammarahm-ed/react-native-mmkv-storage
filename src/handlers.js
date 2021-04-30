@@ -11,8 +11,8 @@
  * @param  {...any} args Arguments for the native function
  */
 
-import { options } from 'react-native-mmkv-storage/src/utils';
-import { currentInstancesStatus, initialize } from './initializer';
+import { options } from "react-native-mmkv-storage/src/utils";
+import { currentInstancesStatus, initialize } from "./initializer";
 
 export function handleAction(action, ...args) {
   let id = args[args.length - 1];
@@ -28,12 +28,11 @@ export function handleAction(action, ...args) {
   if (!ready) return undefined;
   if (!action) return;
   return action(...args);
-
 }
 
 export async function handleActionAsync(action, ...args) {
   let id = args[args.length - 1];
-  return new Promise(async (resolve,reject) => {
+  return new Promise(async (resolve, reject) => {
     if (currentInstancesStatus[id]) {
       if (!action) {
         resolve(undefined);
