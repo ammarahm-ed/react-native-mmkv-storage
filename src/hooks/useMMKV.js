@@ -67,7 +67,6 @@ export const useMMKVStorage = (key, storage) => {
 		let _value;
 		let _valueType;
 		if (indexer.hasKey(key)) {
-			console.log("haskey")
 			for (type of types) {
 				if (valueType === type || indexer[methods[type].indexer].hasKey(key)) {
 					_valueType = type;
@@ -96,7 +95,6 @@ export const useMMKVStorage = (key, storage) => {
 			}
 			_value = updatedValue
 			storage[methods[_valueType]['set']](key, _value);
-			console.log('setting value',updatedValue,_valueType)
 		}
 	
 		setValue(_value);
