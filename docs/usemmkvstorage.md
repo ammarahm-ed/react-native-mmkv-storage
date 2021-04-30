@@ -32,11 +32,14 @@ Now whenever you update value of `"user"` in storage, your `App` component will 
 
 ```jsx
 setUser("andrew");
+//or you cal call setUser without a value to remove the value
+setUser() //removes the value from storage.
 
 
 // or you can do this too:
 MMKV.setString("user", "andrew");
 ```
+
 
 Simple right? now refresh the app or restart it. When it loads, it will always show andrew as the user until you update it.
 The ideal way which I would recommend for better development experience would to wrap `useMMKVStorage` hook in a custom hook as follows:
