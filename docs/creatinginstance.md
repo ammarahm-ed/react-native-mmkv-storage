@@ -33,9 +33,9 @@ const MMKVwithID = new MMKVStorage.Loader()
 
 // Then make are read/write requests
 
-await MMKV.setStringAsync("string", "string");
+await MMKVwithID.setStringAsync("string", "string");
 
-let string = await MMKV.getStringAsync("string");
+let string = await MMKVwithID.getStringAsync("string");
 ```
 
 ## MMKV Instance with Encryption
