@@ -23,8 +23,7 @@ jobs:
         -workspace example.xcworkspace \
         -scheme example \
         clean archive \
-        -sdk iphoneos \
+        -sdk iphonesimulator \
         -configuration Debug \
-        -UseModernBuildSystem=NO \
-        -archivePath $PWD/example \
+        -UseModernBuildSystem=YES \
         CODE_SIGNING_ALLOWED=NO"
