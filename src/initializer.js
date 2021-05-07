@@ -118,7 +118,7 @@ function setup(id, mode) {
     if (global.containsKeyMMKV(id, id)) {
       return true;
     } else {
-      encryptionHandler(id, mode);
+      return encryptionHandler(id, mode);
     }
   }
 }
@@ -133,7 +133,7 @@ function setupWithEncryption(id, mode, key, alias) {
     if (global.containsKeyMMKV(id, id)) {
       return true;
     } else {
-      encryptionHandler(id, mode);
+      return encryptionHandler(id, mode);
     }
   }
 }

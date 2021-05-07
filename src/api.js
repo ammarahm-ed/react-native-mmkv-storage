@@ -288,6 +288,8 @@ getCurrentMMKVInstanceIDs() {
   }
 
   clearStore() {
-    return handleAction(global.clearMMKV, this.instanceID);
+    let cleared = handleAction(global.clearMMKV, this.instanceID);
+    global.setBoolMMKV(this.instanceID,true,this.instanceID)
+    return cleared;
   }
 }
