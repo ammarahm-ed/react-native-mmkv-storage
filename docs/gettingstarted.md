@@ -26,7 +26,7 @@ Plug MMKV in `MainApplication.java`
 
 ```java
 import com.ammarahmed.mmkv.RNMMKVJSIModulePackage; // <- add here
-
+import com.facebook.react.bridge.JSIModulePackage; // <- add here
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -79,6 +79,7 @@ import java.util.List;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <-- ADD THIS
 import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
 
+
 public class RNMMKVJSIModulePackage implements ReanimatedJSIModulePackage  { // <--- REPLACE RNMMKVJSIModulePackage implements JSIModulePackage with CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
@@ -95,7 +96,7 @@ then import this file instead in `MainApplication.java` as mentioned above and m
 
 ```java
 import com.your.project.name.CustomMMKVJSIModulePackage; // <- add here
-
+import com.facebook.react.bridge.JSIModulePackage; // <-- ADD THIS
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
