@@ -7,6 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage/blob/master/LICENSE)
 [![](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
 [![Android](https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/main.yml/badge.svg)](https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/main.yml)
+[![iOS](https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/ios.yml/badge.svg)](https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/ios.yml)
 
 
 > An efficient, small & encrypted mobile key-value storage framework for React Native written in C++ using JSI
