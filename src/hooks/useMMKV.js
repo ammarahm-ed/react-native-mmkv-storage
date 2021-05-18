@@ -80,7 +80,9 @@ export const useMMKVStorage = (key, storage) => {
   }, []);
 
   const setNewValue = useCallback(
-    async (updatedValue) => {
+    async (nextValue) => {
+      let updatedValue = nextValue;
+      if (typeof nextValue === "function") updatedValue = nextValue(value)
       let _value;
       let _valueType = valueType;
       if (updatedValue === null || updatedValue === undefined) {
@@ -105,7 +107,7 @@ export const useMMKVStorage = (key, storage) => {
       setValueType(_valueType);
       return;
     },
-    [valueType]
+    [valueType,value]
   );
 
   return [value, setNewValue];
