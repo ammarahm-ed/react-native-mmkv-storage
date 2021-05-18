@@ -66,7 +66,8 @@ export const useMMKVStorage = (key, storage) => {
     let _value;
     let _valueType;
     if (indexer.hasKey(key)) {
-      for (type of types) {
+      for (var i=0; i < types.length; i++) {
+        let type = types[i];
         if (valueType === type || indexer[methods[type].indexer].hasKey(key)) {
           _valueType = type;
           _value = updatedValue || storage[methods[type]["get"]](key);
