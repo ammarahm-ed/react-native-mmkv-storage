@@ -46,7 +46,20 @@ const getDataType = (value) => {
 };
 
 export const useMMKVStorage = (key, storage) => {
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(()=>{
+    if(storage?.indexer){
+      return null;
+    }
+    let indexer = storage.indexer;
+    if (indexer.hasKey(key)) {
+      for (let i=0; i < types.length; i++) {
+        let type = types[i];
+        if (indexer[methods[type].indexer].hasKey(key)) {
+          return storage[methods[type]["get"]](key);
+        }
+      }
+    }
+  });
   const [valueType, setValueType] = useState(null);
 
   useEffect(() => {
