@@ -47,10 +47,11 @@ const getDataType = (value) => {
 
 export const useMMKVStorage = (key, storage) => {
   const [value, setValue] = useState(()=>{
-    if(storage?.indexer){
+    if(!storage?.indexer){
       return null;
     }
     let indexer = storage.indexer;
+
     if (indexer.hasKey(key)) {
       for (let i=0; i < types.length; i++) {
         let type = types[i];
@@ -59,6 +60,7 @@ export const useMMKVStorage = (key, storage) => {
         }
       }
     }
+    return null;
   });
   const [valueType, setValueType] = useState(null);
 
