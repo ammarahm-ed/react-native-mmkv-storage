@@ -82,7 +82,18 @@ export const useMMKVStorage = (key, storage) => {
   const setNewValue = useCallback(
     async (nextValue) => {
       let updatedValue = nextValue;
-      if (typeof nextValue === "function") updatedValue = nextValue(value)
+      if (typeof nextValue === "function") {
+        if (nextValue.constructor.name === "AsyncFunction") {
+          __DEV__ &&
+            console.warn(
+              `Attempting to use an async function as state setter is not allowed.`
+            );
+          return;
+        }
+
+        updatedValue = nextValue(value);
+      }
+
       let _value;
       let _valueType = valueType;
       if (updatedValue === null || updatedValue === undefined) {
@@ -107,7 +118,7 @@ export const useMMKVStorage = (key, storage) => {
       setValueType(_valueType);
       return;
     },
-    [valueType,value]
+    [valueType, value]
   );
 
   return [value, setNewValue];
