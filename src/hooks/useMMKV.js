@@ -45,7 +45,7 @@ const getDataType = (value) => {
   }
 };
 
-const initDefault = (storage,kindValue)=>()=>{
+const initDefault = ({storage,kindValue, key})=>()=>{
   if(!storage?.indexer){
     return null;
   }
@@ -67,8 +67,8 @@ const initDefault = (storage,kindValue)=>()=>{
 }
 
 export const useMMKVStorage = (key, storage) => {
-  const [value, setValue] = useState(initDefault(storage,'value'));
-  const [valueType, setValueType] = useState(initDefault(storage,'valueType'));
+  const [value, setValue] = useState(initDefault({storage,key,kindValue:'value'}));
+  const [valueType, setValueType] = useState(initDefault({storage,key,kindValue:'valueType'}));
 
   useEffect(() => {
     if (storage !== null) {
