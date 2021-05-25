@@ -1,3 +1,5 @@
+import {types,methods} from "./constants";
+
 export const getDataType = (value) => {
   if (typeof value === "string") {
     return "string";
