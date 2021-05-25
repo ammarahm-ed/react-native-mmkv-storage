@@ -45,9 +45,30 @@ const getDataType = (value) => {
   }
 };
 
+const initDefault = ({storage,kindValue, key})=>()=>{
+  if(!storage?.indexer){
+    return null;
+  }
+  let indexer = storage.indexer;
+    if (indexer.hasKey(key)) {
+      for (let i=0; i < types.length; i++) {
+        let type = types[i];
+        if (indexer[methods[type].indexer].hasKey(key)) {
+          if(kindValue==='value'){
+            return storage[methods[type]["get"]](key);
+          }
+          if(kindValue==='valueType') {
+            return type;
+          }
+        }
+      }
+    }
+    return null;
+}
+
 export const useMMKVStorage = (key, storage) => {
-  const [value, setValue] = useState(null);
-  const [valueType, setValueType] = useState(null);
+  const [value, setValue] = useState(initDefault({storage,key,kindValue:'value'}));
+  const [valueType, setValueType] = useState(initDefault({storage,key,kindValue:'valueType'}));
 
   useEffect(() => {
     if (storage !== null) {
