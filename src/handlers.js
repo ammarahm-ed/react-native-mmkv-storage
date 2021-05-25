@@ -11,7 +11,7 @@
  * @param  {...any} args Arguments for the native function
  */
 
-import { options } from "react-native-mmkv-storage/src/utils";
+import { options } from "./utils";
 import { currentInstancesStatus, initialize } from "./initializer";
 
 export function handleAction(action, ...args) {
