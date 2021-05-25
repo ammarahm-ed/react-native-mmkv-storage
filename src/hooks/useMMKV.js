@@ -1,78 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-
-let types = ["string", "int", "bool", "map", "array"];
-let methods = {
-  string: {
-    indexer: "strings",
-    get: "getString",
-    set: "setString",
-  },
-  int: {
-    indexer: "numbers",
-    get: "getInt",
-    set: "setInt",
-  },
-  bool: {
-    indexer: "booleans",
-    get: "getBool",
-    set: "setBool",
-  },
-  map: {
-    indexer: "maps",
-    get: "getMap",
-    set: "setMap",
-  },
-  array: {
-    indexer: "arrays",
-    get: "getArray",
-    set: "setArray",
-  },
-};
-
-const getDataType = (value) => {
-  if (typeof value === "string") {
-    return "string";
-  } else if (typeof value === "boolean") {
-    return "bool";
-  } else if (typeof value === "object") {
-    return "map";
-  } else if (Array.isArray(value)) {
-    return "array";
-  } else if (typeof value === "number") {
-    return "int";
-  } else {
-    return "unknown";
-  }
-};
-
-const initDefault = ({storage,kindValue, key})=>()=>{
-  if(!storage?.indexer){
-    return null;
-  }
-  let indexer = storage.indexer;
-    if (indexer.hasKey(key)) {
-      for (let i=0; i < types.length; i++) {
-        let type = types[i];
-        if (indexer[methods[type].indexer].hasKey(key)) {
-          if(kindValue==='value'){
-            return storage[methods[type]["get"]](key);
-          }
-          if(kindValue==='valueType') {
-            return type;
-          }
-        }
-      }
-    }
-    return null;
-}
+import { methods, types } from "./constants";
+import { getDataType, getInitialValue } from "./functions";
 
 export const useMMKVStorage = (key, storage) => {
-  const [value, setValue] = useState(initDefault({storage,key,kindValue:'value'}));
-  const [valueType, setValueType] = useState(initDefault({storage,key,kindValue:'valueType'}));
+  const [value, setValue] = useState(
+    getInitialValue({ key, storage, kindValue: "value" })
+  );
+  const [valueType, setValueType] = useState(
+    getInitialValue({ key, storage,  kindValue: "valueType" })
+  );
 
   useEffect(() => {
     if (storage !== null) {
-      updateValue();
       storage.ev.subscribe(`${key}:onwrite`, updateValue);
     }
     return () => {
@@ -87,7 +26,7 @@ export const useMMKVStorage = (key, storage) => {
     let _value;
     let _valueType;
     if (indexer.hasKey(key)) {
-      for (var i=0; i < types.length; i++) {
+      for (var i = 0; i < types.length; i++) {
         let type = types[i];
         if (valueType === type || indexer[methods[type].indexer].hasKey(key)) {
           _valueType = type;
