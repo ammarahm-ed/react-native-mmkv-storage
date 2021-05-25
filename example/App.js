@@ -1,6 +1,21 @@
-import React, { useCallback } from 'react';
-import { StatusBar, Text, TouchableOpacity, View } from 'react-native';
-import MMKVStorage, { useMMKVStorage } from 'react-native-mmkv-storage';
+import React, {useCallback} from 'react';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import MMKVStorage, {useMMKVStorage} from 'react-native-mmkv-storage';
+
+const Button = ({title, onPress}) => {
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={{color: 'white'}}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const storage = new MMKVStorage.Loader().withEncryption().initialize();
 const useStorage = key => {
@@ -20,84 +35,72 @@ const App = () => {
     return _user;
   }, [user]);
 
-  const getAge = useCallback(() => {
-    let ages = [24, 27, 32, 36];
-    let _age =
-      ages[ages.indexOf(age) === ages.length - 1 ? 0 : ages.indexOf(age) + 1];
-    return _age;
-  }, [age]);
-  
+  const buttons = [
+    {
+      title: 'setString',
+      onPress: () => {
+        storage.setString('user', getUser());
+      },
+    },
+    {
+      title: 'setUser',
+      onPress: () => {
+        setUser(getUser());
+      },
+    },
+    {
+      title: 'setAge',
+      onPress: () => {
+        setAge(age => {
+          console.log(age);
+          return age + 1;
+        });
+      },
+    },
+  ];
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <View
-        style={{
-          alignItems: 'center',
-          flex: 1,
-          backgroundColor: 'white',
-        }}>
-        <View
-          style={{
-            width: '100%',
-            backgroundColor: '#f7f7f7',
-            marginBottom: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingVertical:50
-          }}>
-          <Text style={{fontSize: 40,textAlign:'center'}}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>
             I am {user || 'andrew'} and I am {age || 24} years old.
           </Text>
         </View>
-        <TouchableOpacity
-          style={{
-            width: '95%',
-            height: 50,
-            marginBottom: 10,
-            backgroundColor: 'green',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-          }}
-          onPress={async () => {
-            storage.setString('user', getUser());
-          }}>
-          <Text style={{color: 'white'}}>setString</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            width: '95%',
-            height: 50,
-            backgroundColor: 'orange',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-            marginBottom: 10,
-          }}
-          onPress={async () => {
-            setUser(getUser());
-          }}>
-          <Text style={{color: 'black'}}>setUser</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            width: '95%',
-            height: 50,
-            backgroundColor: 'blue',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-          }}
-          onPress={async () => {
-            setAge(getAge());
-          }}>
-          <Text style={{color: 'white'}}>setAge</Text>
-        </TouchableOpacity>
-      </View>
+        {buttons.map(item => (
+          <Button key={item.title} title={item.title} onPress={item.onPress} />
+        ))}
+      </SafeAreaView>
     </>
   );
 };
 
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    width: '100%',
+    backgroundColor: '#f7f7f7',
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  button: {
+    width: '95%',
+    height: 50,
+    backgroundColor: 'orange',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  headerText: {fontSize: 40, textAlign: 'center'},
+});
