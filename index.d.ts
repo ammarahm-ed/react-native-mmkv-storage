@@ -12,7 +12,7 @@ export declare function useMMKVStorage<T extends any>(
   storage: MMKVStorage.API
 ): [T, (value?: T | ((prevValue: T) => T)) => void];
 
-export declare const create = (storage:MMKVStorage.API) => (key:string) => store;
+export declare const create = (storage:MMKVStorage.API) => (key:string) => store(key,storage);
 
 
 export default MMKVStorage;
