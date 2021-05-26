@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
+export const create = (storage) => (key) => useMMKVStorage(key,storage);
+
 export const useMMKVStorage = (key, storage) => {
   const [value, setValue] = useState(
     getInitialValue({ key, storage, kindValue: "value" })
