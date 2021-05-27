@@ -50,6 +50,13 @@ export const useStorage = (key) => {
   return [value, setValue];
 };
 ```
+You should use the `create` function from `v0.5.9` onwards:
+```jsx
+import MMKVStorage, {create} from "react-native-mmkv-storage";
+const MMKV = new MMKVStorage.Loader().initialize();
+
+export const useStorage = create(MMKV);
+```
 
 Now you don't have to import `MMKV` everywhere in your app but only once. If you use TypeScript you can do something like below to get nice intellisense in your editor.
 
