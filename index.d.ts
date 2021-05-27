@@ -1,19 +1,13 @@
 declare function MMKVStorage(): any;
 
+interface T extends any {}
 
-
-declare function store<T extends any>(
+export declare function useMMKVStorage(
   key: string,
   storage: MMKVStorage.API
 ): [T, (value?: T | ((prevValue: T) => T)) => void];
 
-export declare function useMMKVStorage<T extends any>(
-  key: string,
-  storage: MMKVStorage.API
-): [T, (value?: T | ((prevValue: T) => T)) => void];
-
-export declare const create = (storage:MMKVStorage.API) => (key:string) => store(key,storage);
-
+export declare function create(storage:MMKVStorage.API):(key:string) => [T, (value?: T | ((prevValue: T) => T)) => void];
 
 export default MMKVStorage;
 
