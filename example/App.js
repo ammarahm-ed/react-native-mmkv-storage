@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MMKVStorage, {useMMKVStorage} from 'react-native-mmkv-storage';
+import MMKVStorage, {create} from 'react-native-mmkv-storage';
 
 const Button = ({title, onPress}) => {
   return (
@@ -18,15 +18,14 @@ const Button = ({title, onPress}) => {
 };
 
 const storage = new MMKVStorage.Loader().withEncryption().initialize();
-const useStorage = key => {
-  const [value, setValue] = useMMKVStorage(key, storage);
-  return [value, setValue];
-};
+const useStorage = create(storage);
+
 const App = () => {
   const [user, setUser] = useStorage('user');
   const [age, setAge] = useStorage('age');
 
   const getUser = useCallback(() => {
+   
     let users = ['andrew', 'robert', 'jack', 'alison'];
     let _user =
       users[
