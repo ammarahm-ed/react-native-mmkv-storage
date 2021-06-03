@@ -134,9 +134,12 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
                 if (bundle != null) {
                     WritableMap map = Arguments.fromBundle(bundle);
-                    List<Object> subChild = Arguments.toList(map.getArray(string));
-                    String obj = gson.toJson(subChild);
-                    kvv.putString(string, obj);
+                    if (map.getArray(string) != null) {
+                        List<Object> subChild = Arguments.toList(map.getArray(string));
+                        String obj = gson.toJson(subChild);
+                        kvv.putString(string, obj);
+                    }
+                   
                 }
                
             }
