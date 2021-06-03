@@ -119,9 +119,12 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         if (mapIndex != null) {
             for (String string : mapIndex) {
                 Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
-                WritableMap map = Arguments.fromBundle(bundle);
-                String obj = gson.toJson(map.toHashMap());
-                kvv.putString(string, obj);
+                if (bundle != null) {
+                    WritableMap map = Arguments.fromBundle(bundle);
+                    String obj = gson.toJson(map.toHashMap());
+                    kvv.putString(string, obj);
+                }
+                
             }
         }
         Set<String> arrayIndex = new HashSet<>();
@@ -129,11 +132,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         if (arrayIndex != null) {
             for (String string : arrayIndex) {
                 Bundle bundle = kvv.decodeParcelable(string, Bundle.class);
-                WritableMap map = Arguments.fromBundle(bundle);
-
-                List<Object> subChild = Arguments.toList(map.getArray(string));
-                String obj = gson.toJson(subChild);
-                kvv.putString(string, obj);
+                if (bundle != null) {
+                    WritableMap map = Arguments.fromBundle(bundle);
+                    List<Object> subChild = Arguments.toList(map.getArray(string));
+                    String obj = gson.toJson(subChild);
+                    kvv.putString(string, obj);
+                }
+               
             }
         }
 

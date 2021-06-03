@@ -865,12 +865,14 @@ static void install(jsi::Runtime & jsiRuntime)
     if (mapIndex != nil) {
         for (NSString *key in mapIndex) {
             NSDictionary *data = [kv getObjectOfClass:NSDictionary.class forKey:key];
-            NSError *error;
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
-                                                               options:0
-                                                                 error:&error];
-            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            [kv setString:jsonString forKey:key];
+            if (data != nil) {
+                NSError *error;
+                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                                options:0
+                                                                    error:&error];
+                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                [kv setString:jsonString forKey:key];
+            }
            }
     }
    
@@ -880,13 +882,15 @@ static void install(jsi::Runtime & jsiRuntime)
         for (NSString *key in arrayIndex) {
             NSMutableArray *data =
                    [kv getObjectOfClass:NSMutableArray.class forKey:key];
-            NSError *error;
-          
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
-                                                               options:0
-                                                                 error:&error];
-            NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            [kv setString:jsonString forKey:key];
+            if (data != nil) {
+                NSError *error;
+                NSData *jsonData = [NSJSONSerialization dataWithJSONObject:data
+                                                                options:0
+                                                                    error:&error];
+                NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+                [kv setString:jsonString forKey:key];
+            }       
+            
           }
     }
    
