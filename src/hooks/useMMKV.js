@@ -38,6 +38,9 @@ export const useMMKVStorage = (key, storage) => {
           return;
         }
       }
+    } else {
+      setValue(null);
+      setValueType(null);
     }
   }, []);
 
