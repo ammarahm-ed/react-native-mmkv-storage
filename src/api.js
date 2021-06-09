@@ -7,6 +7,11 @@ import IDStore from "./mmkv/IDStore";
 import { promisify } from "./utils";
 
 export default class API {
+  static getAllMMKVInstanceIDs() {
+    let instances = IDStore.getAll();
+    return Object.keys(instances);
+  }
+
   constructor(args) {
     this.instanceID = args.instanceID;
     this.initWithEncryption = args.initWithEncryption;
@@ -274,8 +279,7 @@ export default class API {
   }
 
   getAllMMKVInstanceIDs() {
-    let instances = IDStore.getAll();
-    return Object.keys(instances);
+    return API.getAllMMKVInstanceIDs();
   }
 
   removeItem(key) {
