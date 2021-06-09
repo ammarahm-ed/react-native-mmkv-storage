@@ -269,11 +269,11 @@ export default class API {
     return func();
   };
 
-getCurrentMMKVInstanceIDs() {
+  getCurrentMMKVInstanceIDs() {
     return currentInstancesStatus;
   }
 
- getAllMMKVInstanceIDs() {
+  getAllMMKVInstanceIDs() {
     let instances = IDStore.getAll();
     return Object.keys(instances);
   }
@@ -289,7 +289,7 @@ getCurrentMMKVInstanceIDs() {
 
   clearStore() {
     let cleared = handleAction(global.clearMMKV, this.instanceID);
-    global.setBoolMMKV(this.instanceID,true,this.instanceID)
+    global.setBoolMMKV(this.instanceID, true, this.instanceID);
     return cleared;
   }
 }
