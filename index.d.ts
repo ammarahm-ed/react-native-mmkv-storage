@@ -246,14 +246,14 @@ declare module MMKVStorage {
      * Get all MMKV Instance IDs.
      *
      */
-    getAllMMKVInstanceIDs(): Promise<Array<string>>;
+    getAllMMKVInstanceIDs(): string[];
 
     /**
      *
      * Get all MMKV Instance IDs.
      *
      */
-    static getAllMMKVInstanceIDs(): Promise<Array<string>>;
+    static getAllMMKVInstanceIDs(): string[];
 
     /**
      *
@@ -261,7 +261,15 @@ declare module MMKVStorage {
      *
      */
 
-    getCurrentMMKVInstanceIDs(): Promise<Array<string>>;
+    getCurrentMMKVInstanceIDs(): Record<string, boolean>;
+
+    /**
+     *
+     * Get all MMKV Instance IDs that are currently loaded
+     *
+     */
+
+    static getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
     encryption: encryption;
 
