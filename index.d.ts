@@ -250,6 +250,13 @@ declare module MMKVStorage {
 
     /**
      *
+     * Get all MMKV Instance IDs.
+     *
+     */
+    static getAllMMKVInstanceIDs(): Promise<Array<string>>;
+
+    /**
+     *
      * Get all MMKV Instance IDs that are currently loaded
      *
      */
