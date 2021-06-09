@@ -12,6 +12,10 @@ export default class API {
     return Object.keys(instances);
   }
 
+  static getCurrentMMKVInstanceIDs() {
+    return currentInstancesStatus;
+  }
+
   constructor(args) {
     this.instanceID = args.instanceID;
     this.initWithEncryption = args.initWithEncryption;
@@ -275,7 +279,7 @@ export default class API {
   };
 
   getCurrentMMKVInstanceIDs() {
-    return currentInstancesStatus;
+    return API.getCurrentMMKVInstanceIDs();
   }
 
   getAllMMKVInstanceIDs() {
