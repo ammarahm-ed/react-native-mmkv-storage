@@ -3,6 +3,14 @@ import IDStore from "./mmkv/IDStore";
 export const currentInstancesStatus = {};
 
 /**
+ * Get current instance ID status for instances
+ * loaded since application started
+ */
+export function getCurrentMMKVInstanceIDs() {
+  return { ...currentInstancesStatus };
+}
+
+/**
  *
  * Initialize function is used to create
  * the storage or load the storage if

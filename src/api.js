@@ -2,20 +2,11 @@ import encryption from "./encryption";
 import EventManager from "./eventmanager";
 import { handleAction } from "./handlers";
 import indexer from "./indexer/indexer";
-import { currentInstancesStatus } from "./initializer";
-import IDStore from "./mmkv/IDStore";
+import { getCurrentMMKVInstanceIDs } from "./initializer";
+import { default as IDStore } from "./mmkv/IDStore";
 import { promisify } from "./utils";
 
 export default class API {
-  static getAllMMKVInstanceIDs() {
-    let instances = IDStore.getAll();
-    return Object.keys(instances);
-  }
-
-  static getCurrentMMKVInstanceIDs() {
-    return currentInstancesStatus;
-  }
-
   constructor(args) {
     this.instanceID = args.instanceID;
     this.initWithEncryption = args.initWithEncryption;
@@ -279,11 +270,11 @@ export default class API {
   };
 
   getCurrentMMKVInstanceIDs() {
-    return API.getCurrentMMKVInstanceIDs();
+    return getCurrentMMKVInstanceIDs();
   }
 
   getAllMMKVInstanceIDs() {
-    return API.getAllMMKVInstanceIDs();
+    return IDStore.getAllMMKVInstanceIDs();
   }
 
   removeItem(key) {

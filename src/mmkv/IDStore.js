@@ -75,10 +75,20 @@ function getAll() {
   return storeUnits;
 }
 
+/**
+ * Get all the instance ids for instances
+ * that were loaded since the app was installed
+ */
+function getAllMMKVInstanceIDs() {
+  return Object.keys(getAll());
+}
+
 export default {
   getAll,
   getAlias,
+  getAllMMKVInstanceIDs,
   add,
   exists,
   encrypted,
+  STORE_ID,
 };

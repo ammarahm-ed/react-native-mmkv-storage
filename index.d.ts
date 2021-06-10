@@ -32,7 +32,10 @@ declare module MMKVStorage {
 
   export const ACCESSIBLE: ACCESSIBLE;
   
+  export declare function getAllMMKVInstanceIDs(): string[];
+  export declare function getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
+  export const IDSTORE_ID: string;
 
   const myVar: string;
 
@@ -250,26 +253,11 @@ declare module MMKVStorage {
 
     /**
      *
-     * Get all MMKV Instance IDs.
-     *
-     */
-    static getAllMMKVInstanceIDs(): string[];
-
-    /**
-     *
      * Get all MMKV Instance IDs that are currently loaded
      *
      */
 
     getCurrentMMKVInstanceIDs(): Record<string, boolean>;
-
-    /**
-     *
-     * Get all MMKV Instance IDs that are currently loaded
-     *
-     */
-
-    static getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
     encryption: encryption;
 
