@@ -2,8 +2,8 @@ import encryption from "./encryption";
 import EventManager from "./eventmanager";
 import { handleAction } from "./handlers";
 import indexer from "./indexer/indexer";
-import { currentInstancesStatus } from "./initializer";
-import IDStore from "./mmkv/IDStore";
+import { getCurrentMMKVInstanceIDs } from "./initializer";
+import { default as IDStore } from "./mmkv/IDStore";
 import { promisify } from "./utils";
 
 export default class API {
@@ -269,13 +269,12 @@ export default class API {
     return func();
   };
 
-getCurrentMMKVInstanceIDs() {
-    return currentInstancesStatus;
+  getCurrentMMKVInstanceIDs() {
+    return getCurrentMMKVInstanceIDs();
   }
 
- getAllMMKVInstanceIDs() {
-    let instances = IDStore.getAll();
-    return Object.keys(instances);
+  getAllMMKVInstanceIDs() {
+    return IDStore.getAllMMKVInstanceIDs();
   }
 
   removeItem(key) {
@@ -289,7 +288,7 @@ getCurrentMMKVInstanceIDs() {
 
   clearStore() {
     let cleared = handleAction(global.clearMMKV, this.instanceID);
-    global.setBoolMMKV(this.instanceID,true,this.instanceID)
+    global.setBoolMMKV(this.instanceID, true, this.instanceID);
     return cleared;
   }
 }
