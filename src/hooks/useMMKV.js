@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
@@ -12,8 +12,16 @@ export const useMMKVStorage = (key, storage) => {
     getInitialValue({ key, storage,  kindValue: "valueType" })
   );
 
+  const prevKey = usePrevious(key);
+  const prevStorage = usePrevious(storage);
+  
   useEffect(() => {
     if (storage !== null) {
+      if (prevKey !== key || prevStorage !== storage) {
+        setValue(getInitialValue({ key, storage, kindValue: "value" }));
+        setValueType(getInitialValue({ key, storage,  kindValue: "valueType" }));
+      }
+      
       storage.ev.subscribe(`${key}:onwrite`, updateValue);
     }
     return () => {
@@ -21,7 +29,7 @@ export const useMMKVStorage = (key, storage) => {
         storage.ev.unsubscribe(`${key}:onwrite`, updateValue);
       }
     };
-  }, [key, storage]);
+  }, [prevKey, key, prevStorage, storage]);
 
   const updateValue = useCallback(async (updatedValue) => {
     let indexer = storage.indexer;
@@ -87,4 +95,14 @@ export const useMMKVStorage = (key, storage) => {
   );
 
   return [value, setNewValue];
+};
+
+function usePrevious(value) {
+	const ref = useRef(value);
+
+	useEffect(() => {
+		ref.current = value;
+	}, [value]);
+
+	return ref.current;
 };
