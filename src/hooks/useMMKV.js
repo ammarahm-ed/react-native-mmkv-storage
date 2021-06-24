@@ -98,11 +98,11 @@ export const useMMKVStorage = (key, storage) => {
 };
 
 function usePrevious(value) {
-	const ref = useRef(value);
+  const ref = useRef(value);
 
-	useEffect(() => {
-		ref.current = value;
-	}, [value]);
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
 
-	return ref.current;
+  return ref.current;
 };
