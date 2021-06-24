@@ -17,6 +17,7 @@ export const useMMKVStorage = (key, storage) => {
   
   useEffect(() => {
     if (storage !== null) {
+      // This check prevents getInitialValue from being called twice when this hook intially loads
       if (prevKey !== key || prevStorage !== storage) {
         setValue(getInitialValue({ key, storage, kindValue: "value" }));
         setValueType(getInitialValue({ key, storage,  kindValue: "valueType" }));
