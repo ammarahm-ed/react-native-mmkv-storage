@@ -1,6 +1,6 @@
 declare function MMKVStorage(): any;
 
-type StoredValueAndSetter<T> = [T | null, (value?: T | ((prevValue: T) => T)) => void];
+type StoredValueAndSetter<T> = [T | null, (value: T | ((prevValue: T) => T)) => void];
 
 export declare function useMMKVStorage<T = any>(
   key: string,
