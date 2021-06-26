@@ -1,10 +1,7 @@
-import { useMMKVStorage as useMMKV } from "./src/hooks/useMMKV";
+import { useMMKVStorage, create } from "./src/hooks/useMMKV";
 import { ACCESSIBLE, MODES } from "./src/utils";
 import { getCurrentMMKVInstanceIDs } from "./src/initializer";
 import { default as IDStore } from "./src/mmkv/IDStore";
-
-export const useMMKVStorage = useMMKV;
-export const create = require("./src/hooks/useMMKV").create;
 
 const Loader = require("./src/loader").default;
 const API = require("./src/api").default;
@@ -20,3 +17,8 @@ const MMKVStorage = {
 };
 
 export default MMKVStorage;
+
+export {
+  useMMKVStorage,
+  create
+};
