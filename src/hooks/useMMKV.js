@@ -1,19 +1,28 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
 export const create = (storage) => (key) => useMMKVStorage(key,storage);
 
 export const useMMKVStorage = (key, storage) => {
-  const [value, setValue] = useState(
-    getInitialValue({ key, storage, kindValue: "value" })
-  );
-  const [valueType, setValueType] = useState(
-    getInitialValue({ key, storage,  kindValue: "valueType" })
-  );
+  
+  const getValue = useCallback(getInitialValue({ key, storage, kindValue: "value" }), [key, storage]);
+  const getValueType = useCallback(getInitialValue({ key, storage,  kindValue: "valueType" }), [key, storage]);
+  
+  const [value, setValue] = useState(getValue);
+  const [valueType, setValueType] = useState(getValueType);
 
+  const prevKey = usePrevious(key);
+  const prevStorage = usePrevious(storage);
+  
   useEffect(() => {
     if (storage !== null) {
+      // This check prevents getInitialValue from being called twice when this hook intially loads
+      if (prevKey !== key || prevStorage !== storage) {
+        setValue(getValue);
+        setValueType(getValueType);
+      }
+      
       storage.ev.subscribe(`${key}:onwrite`, updateValue);
     }
     return () => {
@@ -21,7 +30,7 @@ export const useMMKVStorage = (key, storage) => {
         storage.ev.unsubscribe(`${key}:onwrite`, updateValue);
       }
     };
-  }, [key, storage]);
+  }, [prevKey, key, prevStorage, storage, getValue, getValueType]);
 
   const updateValue = useCallback(async (updatedValue) => {
     let indexer = storage.indexer;
@@ -87,4 +96,14 @@ export const useMMKVStorage = (key, storage) => {
   );
 
   return [value, setNewValue];
+};
+
+function usePrevious(value) {
+  const ref = useRef(value);
+
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+
+  return ref.current;
 };
