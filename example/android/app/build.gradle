@@ -145,6 +145,11 @@ android {
             include "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
         }
     }
+    
+    packagingOptions {
+        pickFirst "**/*.so"
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
