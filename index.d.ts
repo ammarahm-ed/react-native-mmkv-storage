@@ -134,8 +134,16 @@ declare module MMKVStorage {
     getMultipleItemsAsync<T extends object>(
       keys: Array<string>
     ): Promise<Array<T>>;
-
+    
+    /**
+     * Remove all keys and values from storage.
+     */
     clearStore(): boolean | undefined;
+
+    /**
+     * Clear memory cache of the current MMKV instance
+     */
+    clearMemoryCache(): boolean | undefined;
     /**
      * Remove an item from storage for a given key.
      *

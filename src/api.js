@@ -292,4 +292,9 @@ getCurrentMMKVInstanceIDs() {
     global.setBoolMMKV(this.instanceID,true,this.instanceID)
     return cleared;
   }
+
+  clearMemoryCache() {
+    let cleared = handleAction(global.clearMemoryCache, this.instanceID);
+    return cleared;
+  }
 }

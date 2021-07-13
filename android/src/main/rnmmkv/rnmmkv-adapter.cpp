@@ -879,6 +879,30 @@ void install(Runtime &jsiRuntime) {
                                                            });
     jsiRuntime.global().setProperty(jsiRuntime, "clearMMKV", std::move(clearMMKV));
 
+    auto clearMemoryCache = jsi::Function::createFromHostFunction(jsiRuntime,
+                                                           jsi::PropNameID::forAscii(
+                                                                   jsiRuntime,
+                                                                   "clearMemoryCache"),
+                                                           1,
+                                                           [](jsi::Runtime &runtime,
+                                                              const jsi::Value &thisValue,
+                                                              const jsi::Value *arguments,
+
+                                                              size_t count) -> jsi::Value {
+                                                               MMKV *kv = getInstance(
+                                                                       arguments[0].getString(
+                                                                                       runtime)
+                                                                               .utf8(runtime));
+                                                               if (!kv) {
+                                                                   return Value::undefined();
+                                                               }
+
+                                                               kv->clearMemoryCache();
+
+                                                               return Value(true);
+                                                           });
+    jsiRuntime.global().setProperty(jsiRuntime, "clearMemoryCache", std::move(clearMemoryCache));
+
 
     auto encryptMMKV = jsi::Function::createFromHostFunction(jsiRuntime,
                                                              jsi::PropNameID::forAscii(

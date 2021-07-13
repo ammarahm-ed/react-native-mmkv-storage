@@ -32,6 +32,14 @@ Clear the storage.
 MMKV.clearStore();
 ```
 
+## clearMemoryCache
+
+Clear the storage from memory.
+
+```js
+MMKV.clearMemoryCache();
+```
+
 ## getAllMMKVInstances
 
 Returns a list of all the MMKV Instance IDs created.
