@@ -54,6 +54,7 @@ android {
 
   packagingOptions {
     excludes = ["**/libc++_shared.so"]
+    pickFirst '**/*.so'
   }
   
   configurations {
@@ -122,3 +123,4 @@ tasks.whenTaskAdded { task ->
     task.dependsOn(extractJNIFiles)
   }
 }
+
