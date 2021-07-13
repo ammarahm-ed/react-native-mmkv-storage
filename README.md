@@ -3,6 +3,7 @@
 </div>
 
 
+
 [![](https://img.shields.io/npm/v/react-native-mmkv-storage.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage/blob/master/LICENSE)
 [![](https://img.shields.io/npm/dt/react-native-mmkv-storage?style=flat-square)](https://www.npmjs.com/package/react-native-mmkv-storage)
@@ -15,6 +16,8 @@
 ## What it is
 
 This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way. Read about it on this blog post I wrote on [dev.to](https://dev.to/ammarahmed/best-data-storage-option-for-react-native-apps-42k)
+
+> Learn how to build your own module with JSI in this [blog](https://blog.notesnook.com/getting-started-react-native-jsi/)
 
 
 ## Features
@@ -67,3 +70,8 @@ That is awesome news! There is alot happening at a very fast pace in this librar
 This library is licensed under the [MIT license](https://github.com/ammarahm-ed/react-native-mmkv-storage/blob/master/LICENSE).
 
 Copyright © Ammar Ahmed ([@ammarahm-ed](https://github.com/ammarahm-ed))
+
+#
+<a href="https://notesnook.com" target="_blank">
+<img style="align:center;" src="https://i.imgur.com/EMIqXNc.jpg" href="https://notesnook.com" alt="Notesnook Logo" width="50%" />
+</a>

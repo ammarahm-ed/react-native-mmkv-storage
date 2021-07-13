@@ -1,11 +1,13 @@
 declare function MMKVStorage(): any;
 
+type StoredValueAndSetter<T> = [T | null, (value: T | ((prevValue: T) => T)) => void];
+
 export declare function useMMKVStorage<T = any>(
   key: string,
   storage: MMKVStorage.API
-): [T, (value?: T | ((prevValue: T) => T)) => void];
+): StoredValueAndSetter<T>;
 
-export declare function create(storage:MMKVStorage.API):<T = any>(key:string) => [T, (value?: T | ((prevValue: T) => T)) => void];
+export declare function create(storage:MMKVStorage.API):<T = any>(key:string) => StoredValueAndSetter<T>;
 
 export default MMKVStorage;
 
@@ -32,7 +34,10 @@ declare module MMKVStorage {
 
   export const ACCESSIBLE: ACCESSIBLE;
   
+  export declare function getAllMMKVInstanceIDs(): string[];
+  export declare function getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
+  export const IDSTORE_ID: string;
 
   const myVar: string;
 
@@ -254,7 +259,7 @@ declare module MMKVStorage {
      * Get all MMKV Instance IDs.
      *
      */
-    getAllMMKVInstanceIDs(): Promise<Array<string>>;
+    getAllMMKVInstanceIDs(): string[];
 
     /**
      *
@@ -262,7 +267,7 @@ declare module MMKVStorage {
      *
      */
 
-    getCurrentMMKVInstanceIDs(): Promise<Array<string>>;
+    getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
     encryption: encryption;
 
