@@ -83,11 +83,9 @@ import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
 public class RNMMKVJSIModulePackage implements ReanimatedJSIModulePackage  { // <--- REPLACE RNMMKVJSIModulePackage implements JSIModulePackage with CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
-	    super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
-	
         reactApplicationContext.getNativeModule(RNMMKVModule.class).installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
 
-        return Collections.emptyList();
+        return super.getJSIModules(reactApplicationContext, jsContext); // <-- ADD THIS
     }
 }
 
