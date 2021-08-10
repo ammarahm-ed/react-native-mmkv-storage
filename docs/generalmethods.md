@@ -40,12 +40,12 @@ Clear the storage from memory.
 MMKV.clearMemoryCache();
 ```
 
-## getAllMMKVInstances
+## getAllMMKVInstanceIDs
 
 Returns a list of all the MMKV Instance IDs created.
 
 ```js
-let allInstances = MMKV.getAllInstanceIDs();
+let allInstances = MMKV.getAllMMKVInstanceIDs();
 ```
 
 ## getCurrentMMKVInstances
