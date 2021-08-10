@@ -19,7 +19,7 @@ export default class arrayIndex {
     );
   }
 
-  async hasKey(key) {
+  hasKey(key) {
     let keys = handleAction(
       global.getIndexMMKV,
       INDEX_TYPE,
