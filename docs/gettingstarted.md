@@ -22,6 +22,8 @@ pod install
 
 ### Android
 
+First off, if you are using `react-native-reanimated` library, skip this next part.
+
 Plug MMKV in `MainApplication.java`
 
 ```java
