@@ -4,7 +4,7 @@ import { getDataType, getInitialValue } from "./functions";
 
 export const create = (storage) => (key) => {
   if (!key || typeof key !== "string" || !storage) throw new Error("Key and Storage are required parameters.");
-  useMMKVStorage(key,storage)
+  return useMMKVStorage(key,storage)
 };
 
 export const useMMKVStorage = (key, storage) => {
