@@ -4,10 +4,11 @@ type StoredValueAndSetter<T> = [T | null, (value: T | ((prevValue: T) => T)) => 
 
 export declare function useMMKVStorage<T = any>(
   key: string,
-  storage: MMKVStorage.API
+  storage: MMKVStorage.API,
+  defaultValue?:unknown
 ): StoredValueAndSetter<T>;
 
-export declare function create(storage:MMKVStorage.API):<T = any>(key:string) => StoredValueAndSetter<T>;
+export declare function create(storage:MMKVStorage.API):<T = any>(key:string,defaultValue?:unknown) => StoredValueAndSetter<T>;
 
 export default MMKVStorage;
 

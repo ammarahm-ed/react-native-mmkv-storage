@@ -2,12 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
-export const create = (storage) => (key) => {
+export const create = (storage) => (key,defaultValue) => {
   if (!key || typeof key !== "string" || !storage) throw new Error("Key and Storage are required parameters.");
-  return useMMKVStorage(key,storage)
+  return useMMKVStorage(key,storage,defaultValue)
 };
 
-export const useMMKVStorage = (key, storage) => {
+export const useMMKVStorage = (key, storage, defaultValue) => {
   
   const getValue = useCallback(getInitialValue({ key, storage, kindValue: "value" }), [key, storage]);
   const getValueType = useCallback(getInitialValue({ key, storage,  kindValue: "valueType" }), [key, storage]);
@@ -98,7 +98,7 @@ export const useMMKVStorage = (key, storage) => {
     [valueType, value]
   );
 
-  return [value, setNewValue];
+  return [value || defaultValue, setNewValue];
 };
 
 function usePrevious(value) {
