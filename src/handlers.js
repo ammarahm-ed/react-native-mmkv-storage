@@ -11,7 +11,6 @@
  * @param  {...any} args Arguments for the native function
  */
 
-import { options } from "./utils";
 import { currentInstancesStatus, initialize } from "./initializer";
 
 export function handleAction(action, ...args) {
@@ -20,8 +19,7 @@ export function handleAction(action, ...args) {
     if (!action) return;
     return action(...args);
   }
-  let opts = options[id];
-  let ready = initialize(opts);
+  let ready = initialize(id);
   if (ready) {
     currentInstancesStatus[id] = true;
   }
@@ -41,8 +39,7 @@ export async function handleActionAsync(action, ...args) {
       let result = action(...args);
       resolve(result);
     } else {
-      let opts = options[id];
-      let ready = initialize(opts);
+      let ready = initialize(id);
       if (ready) {
         currentInstancesStatus[id] = true;
       }

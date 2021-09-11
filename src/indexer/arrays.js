@@ -1,40 +1,27 @@
-import {
-  handleActionAsync,
-  handleAction,
-} from '../handlers';
+import { handleActionAsync, handleAction } from "../handlers";
 
-const INDEX_TYPE = 'arrayIndex';
+const INDEX_TYPE = "arrayIndex";
 export default class arrayIndex {
-  constructor(args) {
-    this.MMKV = args.mmkv;
-    this.instanceID = args.instanceID;
-    this.options = args;
+  constructor(id) {
+    this.instanceID = id;
   }
 
   async getKeys() {
     return await handleActionAsync(
       global.getIndexMMKV,
       INDEX_TYPE,
-      this.instanceID,
+      this.instanceID
     );
   }
 
   async hasKey(key) {
-    let keys = handleAction(
-      global.getIndexMMKV,
-      INDEX_TYPE,
-      this.instanceID,
-    );
+    let keys = handleAction(global.getIndexMMKV, INDEX_TYPE, this.instanceID);
     return keys.indexOf(key) > -1;
   }
 
   async getAll() {
     return new Promise((resolve) => {
-      let keys = handleAction(
-        global.getIndexMMKV,
-        INDEX_TYPE,
-        this.instanceID,
-      );
+      let keys = handleAction(global.getIndexMMKV, INDEX_TYPE, this.instanceID);
       let items = [];
       for (let i = 0; i < keys.length; i++) {
         let item = [];
@@ -44,7 +31,6 @@ export default class arrayIndex {
         items.push(item);
       }
       resolve(items);
-
     });
   }
 }

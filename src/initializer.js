@@ -1,3 +1,4 @@
+import { options } from "./utils";
 import IDStore from "./mmkv/IDStore";
 
 export const currentInstancesStatus = {};
@@ -16,29 +17,31 @@ export function getCurrentMMKVInstanceIDs() {
  * the storage or load the storage if
  * it already exists with the given options.
  *
- * @param {*} options
+ * @param {string} id
  */
 
-export function initialize(options) {
+export function initialize(id) {
+  let opts = options[id];
+
   if (!global.setupMMKVInstance) return false;
-  if (IDStore.exists(options.instanceID)) {
-    if (!IDStore.encrypted(options.instanceID)) {
-      return initWithoutEncryption(options);
+  if (IDStore.exists(id)) {
+    if (!IDStore.encrypted(id)) {
+      return initWithoutEncryption(opts);
     }
-    options.alias = IDStore.getAlias(options.instanceID);
-    return initWithEncryptionUsingOldKey(options);
+    opts.alias = IDStore.getAlias(id);
+    return initWithEncryptionUsingOldKey(opts);
   }
 
-  if (!options.initWithEncryption) {
-    return initWithoutEncryption(options);
+  if (!opts.initWithEncryption) {
+    return initWithoutEncryption(opts);
   }
-  if (!options.secureKeyStorage) {
-    return initWithEncryptionWithoutSecureStorage(options);
+  if (!opts.secureKeyStorage) {
+    return initWithEncryptionWithoutSecureStorage(opts);
   }
-  if (!global.secureKeyExists(options.alias)) {
-    return initWithEncryptionUsingNewKey(options);
+  if (!global.secureKeyExists(opts.alias)) {
+    return initWithEncryptionUsingNewKey(opts);
   }
-  return initWithEncryptionUsingOldKey(options);
+  return initWithEncryptionUsingOldKey(opts);
 }
 
 /**
@@ -71,7 +74,7 @@ function initWithEncryptionUsingOldKey(options) {
  */
 
 function initWithEncryptionUsingNewKey(options) {
-  if (options.key == null || options.key.length < 3)
+  if (!options.key || options.key.length < 3)
     throw new Error("Key is null or too short");
 
   global.setSecureKey(options.alias, options.key, options.accessibleMode);
@@ -93,7 +96,7 @@ function initWithEncryptionUsingNewKey(options) {
  */
 
 function initWithEncryptionWithoutSecureStorage(options) {
-  if (options.key == null || options.key.length < 3)
+  if (!options.key || options.key.length < 3)
     throw new Error("Key is null or too short");
 
   return setupWithEncryption(
@@ -139,6 +142,7 @@ function setupWithEncryption(id, mode, key, alias) {
     return true;
   } else {
     if (global.containsKeyMMKV(id, id)) {
+      options[id].key = key;
       return true;
     } else {
       return encryptionHandler(id, mode);
@@ -154,6 +158,7 @@ function encryptionHandler(id, mode) {
       let key = global.getSecureKey(alias);
       if (key) {
         global.setupMMKVInstance(id, mode, key, "");
+        options[id].key = key;
         return true;
       }
     }

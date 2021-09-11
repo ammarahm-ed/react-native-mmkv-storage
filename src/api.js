@@ -4,22 +4,13 @@ import { handleAction } from "./handlers";
 import indexer from "./indexer/indexer";
 import { getCurrentMMKVInstanceIDs } from "./initializer";
 import { default as IDStore } from "./mmkv/IDStore";
-import { promisify } from "./utils";
+import { options, promisify } from "./utils";
 
 export default class API {
-  constructor(args) {
-    this.instanceID = args.instanceID;
-    this.initWithEncryption = args.initWithEncryption;
-    this.accessibleMode = args.accessibleMode;
-    this.processingMode = args.processingMode;
-    this.secureKeyStorage = args.secureKeyStorage;
-    this.alias = args.alias;
-    this.aliasPrefix = args.aliasPrefix;
-    this.key = args.key;
-    this.initialized = false;
-    this.options = args;
-    this.encryption = new encryption(this.options);
-    this.indexer = new indexer(this.options);
+  constructor(id) {
+    this.instanceID = id;
+    this.encryption = new encryption(id);
+    this.indexer = new indexer(id);
     this.ev = new EventManager();
   }
 
@@ -290,6 +281,11 @@ export default class API {
     let cleared = handleAction(global.clearMMKV, this.instanceID);
     global.setBoolMMKV(this.instanceID, true, this.instanceID);
     return cleared;
+  }
+
+  getKey() {
+    let { alias, key } = options[this.instanceID];
+    return { alias, key };
   }
 
   clearMemoryCache() {
