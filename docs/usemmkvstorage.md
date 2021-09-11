@@ -18,7 +18,7 @@ Next, in our component we are going to register our hook.
 
 ```jsx
 const App = () => {
-  const [user, setUser] = useMMKVStorage("user", MMKV);
+  const [user, setUser] = useMMKVStorage("user", MMKV, "robert"); // robert is the default value
 
   return (
     <View>
@@ -45,14 +45,16 @@ The ideal way which I would recommend for better development experience would to
 ```jsx
 const MMKV = new MMKVStorage.Loader().initialize();
 
-export const useStorage = (key) => {
-  const [value, setValue] = useMMKVStorage(key, MMKV);
+export const useStorage = (key, defaultValue) => {
+  const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
   return [value, setValue];
 };
 ```
+
 You should use the `create` function from `v0.5.9` onwards:
+
 ```jsx
-import MMKVStorage, {create} from "react-native-mmkv-storage";
+import MMKVStorage, { create } from "react-native-mmkv-storage";
 const MMKV = new MMKVStorage.Loader().initialize();
 
 export const useStorage = create(MMKV);
@@ -64,8 +66,11 @@ Now you don't have to import `MMKV` everywhere in your app but only once. If you
 const MMKV: MMKVStorage.API = new MMKVStorage.Loader().initialize();
 type LiteralUnion<T extends U, U = string> = T | (U & {});
 
-export const useStorage = (key: LiteralUnion<"user" | "password">) => {
-  const [value, setValue] = useMMKVStorage(key, MMKV);
+export const useStorage = (
+  key: LiteralUnion<"user" | "password">,
+  defaultValue?: string
+) => {
+  const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
   return [value, setValue];
 };
 ```
