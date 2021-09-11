@@ -67,8 +67,8 @@ export default class encryption {
 
   decrypt() {
     handleAction(global.decryptMMKV, this.instanceID);
-    global.setBoolMMKV(this.instanceID, false, this.instanceID);
-    IDStore.add(this.instanceID, true, null);
+    global.setBoolMMKV(this.instanceID, true, this.instanceID);
+    IDStore.add(this.instanceID, false, null);
     return true;
   }
 
