@@ -269,6 +269,11 @@ declare module MMKVStorage {
 
     getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
+    /**
+     * Get the key and alias for the encrypted storage
+     */
+    getKey(): {alias:string,key:string};
+
     encryption: encryption;
 
     indexer: indexer;
