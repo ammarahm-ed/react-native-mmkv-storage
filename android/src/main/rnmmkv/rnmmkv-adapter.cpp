@@ -950,7 +950,7 @@ void install(Runtime &jsiRuntime) {
                                                                      return Value::undefined();
                                                                  }
 
-                                                                 kv->reKey(nullptr);
+                                                                 kv->reKey("");
 
                                                                  return Value(true);
                                                              });
