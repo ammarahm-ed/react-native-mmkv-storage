@@ -55,3 +55,11 @@ get the currently initialized instance IDs.
 ```js
 let intializedInstances = MMKV.getCurrentMMKVInstanceIDs();
 ```
+
+## getKey
+
+get the encryption key for the current MMKV instance
+
+```js
+let key = MMKV.getKey();
+```
