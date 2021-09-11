@@ -21,8 +21,8 @@ const storage = new MMKVStorage.Loader().withEncryption().initialize();
 const useStorage = create(storage);
 
 const App = () => {
-  const [user, setUser] = useStorage('user');
-  const [age, setAge] = useStorage('age');
+  const [user, setUser] = useStorage('user',"robert");
+  const [age, setAge] = useStorage('age',24);
 
   const getUser = useCallback(() => {
    
@@ -64,7 +64,7 @@ const App = () => {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerText}>
-            I am {user || 'andrew'} and I am {age || 24} years old.
+            I am {user} and I am {age} years old.
           </Text>
         </View>
 
