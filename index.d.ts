@@ -286,7 +286,7 @@ declare module MMKVStorage {
      *
      * @param {String} key
      */
-    hasKey(key: string): Promise<boolean>;
+    hasKey(key: string): boolean;
 
     strings: {
       /**
@@ -300,7 +300,7 @@ declare module MMKVStorage {
        *
        * @param {String} key
        */
-      hasKey(key: string): Promise<boolean>;
+      hasKey(key: string): boolean;
 
       /**
        * Get all strings in the strings index
@@ -321,7 +321,7 @@ declare module MMKVStorage {
        *
        * @param {String} key
        */
-      hasKey(key: string): Promise<boolean>;
+      hasKey(key: string): boolean;
 
       /**
        * Get all numbers in the numbers index;
@@ -342,7 +342,7 @@ declare module MMKVStorage {
        *
        * @param {String} key
        */
-      hasKey(key: string): Promise<boolean>;
+      hasKey(key: string): boolean;
 
       /**
        * Get all booleans in the booleans index
@@ -363,7 +363,7 @@ declare module MMKVStorage {
        *
        * @param {String} key
        */
-      hasKey(key: string): Promise<boolean>;
+      hasKey(key: string): boolean;
 
       /**
        * Get all items in the maps index
@@ -384,7 +384,7 @@ declare module MMKVStorage {
        *
        * @param {String} key
        */
-      hasKey(key: string): Promise<boolean>;
+      hasKey(key: string): boolean;
 
       /**
        * Get all arrays in the array index

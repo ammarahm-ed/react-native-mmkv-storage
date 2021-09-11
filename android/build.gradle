@@ -2,21 +2,18 @@ import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
-  // The Android Gradle plugin is only required when opening the android folder stand-alone.
-  // This avoids unnecessary downloads and potential conflicts when the library is included as a
-  // module dependency in an application project.
-  //if (project == rootProject) {
+
   repositories {
     google()
-    jcenter()
+    mavenCentral()
+
     maven {
       url "https://plugins.gradle.org/m2/"
     }
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.1.3'
+    classpath 'com.android.tools.build:gradle:4.2.1'
   }
-  //}
 }
 
 apply plugin: 'com.android.library'
@@ -48,7 +45,6 @@ android {
   externalNativeBuild {
      cmake {
           path "./src/main/rnmmkv/CMakeLists.txt"
-          version "3.8.0+"
       }
   }
 
@@ -63,12 +59,14 @@ android {
 }
 
 repositories {
-  google()
+  mavenCentral()
+  mavenLocal()
+  
   maven {
     // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
     url "$rootDir/../node_modules/react-native/android"
   }
-  jcenter()
+  google()  
 }
 
 dependencies {
@@ -85,9 +83,6 @@ dependencies {
   def (major, minor, patch) = reactNativeVersion.tokenize('.')
   extractJNI(files(rnAAR))
 }
-
-// fbjni
-// https://github.com/facebookincubator/fbjni/blob/master/docs/android_setup.md
 
 task extractAARHeaders {
   doLast {

@@ -2,7 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
-export const create = (storage) => (key) => useMMKVStorage(key,storage);
+export const create = (storage) => (key) => {
+  if (!key || typeof key !== "string" || !storage) throw new Error("Key and Storage are required parameters.");
+  return useMMKVStorage(key,storage)
+};
 
 export const useMMKVStorage = (key, storage) => {
   
