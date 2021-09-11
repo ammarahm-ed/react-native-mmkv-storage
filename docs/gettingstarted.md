@@ -22,7 +22,7 @@ pod install
 
 ### Android
 
-Plug MMKV in `MainApplication.java`
+Plug MMKV in `MainApplication.java`, skip to next part if you are using `react-native-reanimated@v2` library, follow the steps below instead.
 
 ```java
 import com.ammarahmed.mmkv.RNMMKVJSIModulePackage; // <- add here
@@ -58,7 +58,8 @@ public class MainApplication extends Application implements ReactApplication {
 		//  
       };
 ```
-If you are using `react-native-reanimated` library, follow the steps below instead.
+
+If you are using `react-native-reanimated@v2` library, follow the steps below instead.
 
 1. Go to `node_modules/react-native-mmkv-storage/android/src/java/com/ammarahmed/mmkv` and copy file named `RNMMKVJSIModulePackage.java` to `Your Project/android/app/src/main/java/com/your/project/name/` and paste the file there.
 
@@ -126,10 +127,6 @@ public class MainApplication extends Application implements ReactApplication {
 		//  
       };
 ```
-
-
-
-
 
 if your build fails, check your NDK version & CMake version selected in Android Studio SDK Manager. Preferred selected version of NDK is 20.xx and CMake 3.10.2. Also make sure you do not have multiple CMake & NDK versions selected in SDK Manager.[Refer to this comment](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/67#issuecomment-801467636)
 
