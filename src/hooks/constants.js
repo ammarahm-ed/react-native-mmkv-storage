@@ -5,19 +5,25 @@ export const methods = {
     indexer: "strings",
     get: "getString",
     set: "setString",
-    copy:value => value
+    copy:value => {
+      return value;
+    }
   },
   number: {
     indexer: "numbers",
     get: "getInt",
     set: "setInt",
-    copy:value => value
+    copy:value => {
+      return value;
+    }
   },
   boolean: {
     indexer: "booleans",
     get: "getBool",
     set: "setBool",
-    copy:value => value
+    copy:value => {
+      return value;
+    }
   },
   object: {
     indexer: "maps",

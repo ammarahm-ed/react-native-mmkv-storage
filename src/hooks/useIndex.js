@@ -6,7 +6,7 @@ export const useIndex = (keys, type, storage) => {
       storage.getMultipleItems(keys || [], type),
     );
   
-    const onChange = useCallback(key => {
+    const onChange = useCallback(({key}) => {
         setValues(values => {
           let index = values.findIndex(v => v[0] === key);
           let value = storage[methods[type]["get"]](key);
@@ -14,7 +14,7 @@ export const useIndex = (keys, type, storage) => {
               if (index !== -1) {
               values[index][1] = value;
               } else {
-                setValues(storage.getMultipleItems(keys || [], type),)
+                setValues(storage.getMultipleItems(keys || [], type))
               }
           } else {
               values.splice(index)
@@ -39,6 +39,7 @@ export const useIndex = (keys, type, storage) => {
     }, [keys,type]);
 
     const update = (key,value) => {
+      if (!value) return remove(key);
         storage[methods[type]["set"]](key,value);
     }
     
@@ -46,5 +47,5 @@ export const useIndex = (keys, type, storage) => {
         storage.removeItem(key);
     }
   
-    return [values.map(v => v[1]),update,remove]
+    return [values.map(v => v[1]).filter(v => v !== null),update,remove]
   };
