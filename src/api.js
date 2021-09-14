@@ -103,7 +103,7 @@ export default class API {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
       let onwrite = this.transactions.onwrite["string"];
       if (onwrite) {
         onwrite(key, _value);
@@ -140,7 +140,7 @@ export default class API {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
       let onwrite = this.transactions.onwrite["number"];
       if (onwrite) {
         onwrite(key, _value);
@@ -167,7 +167,7 @@ export default class API {
     let result = handleAction(global.setBoolMMKV, key, _value, this.instanceID);
 
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
       let onwrite = this.transactions.onwrite["boolean"];
       if (onwrite) {
         onwrite(key, _value);
@@ -199,7 +199,7 @@ export default class API {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
       let onwrite = this.transactions.onwrite["map"];
       if (onwrite) {
         onwrite(key, _value);
@@ -238,7 +238,7 @@ export default class API {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
       
       let onwrite = this.transactions.onwrite["array"];
       if (onwrite) {
@@ -336,7 +336,7 @@ export default class API {
   removeItem(key) {
     let result = handleAction(global.removeValueMMKV, key, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, key);
+      this.ev.publish(`${key}:onwrite`, {key});
     }
 
     if (this.transactions.ondelete) {
