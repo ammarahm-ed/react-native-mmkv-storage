@@ -4,6 +4,7 @@ import { handleAction } from "./handlers";
 import indexer from "./indexer/indexer";
 import { getCurrentMMKVInstanceIDs } from "./initializer";
 import { default as IDStore } from "./mmkv/IDStore";
+import transactions from "./transactions";
 import { options, promisify } from "./utils";
 
 export default class API {
@@ -12,6 +13,7 @@ export default class API {
     this.encryption = new encryption(id);
     this.indexer = new indexer(id);
     this.ev = new EventManager();
+    this.transactions = new transactions();
   }
 
   setItem(key, value) {
@@ -87,14 +89,25 @@ export default class API {
   }
 
   setString = (key, value) => {
+
+    let _value = value;
+    let before = this.transactions.beforewrite["string"];
+    if (before) {
+      _value = before(key, value);
+    }
+
     let result = handleAction(
       global.setStringMMKV,
       key,
-      value,
+      _value,
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
+      let onwrite = this.transactions.onwrite["string"];
+      if (onwrite) {
+        onwrite(key, _value);
+      }
     }
 
     return result;
@@ -102,19 +115,36 @@ export default class API {
 
   getString = (key, callback) => {
     let string = handleAction(global.getStringMMKV, key, this.instanceID);
+
+    let onread = this.transactions.onread["string"];
+    if (onread) {
+      string = onread(key, string);
+    }
+
     callback && callback(null, string);
     return string;
   };
 
   setInt = (key, value) => {
+
+    let _value = value;
+    let before = this.transactions.beforewrite["number"];
+    if (before) {
+      _value = before(key, value);
+    }
+
     let result = handleAction(
       global.setNumberMMKV,
       key,
-      value,
+      _value,
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
+      let onwrite = this.transactions.onwrite["number"];
+      if (onwrite) {
+        onwrite(key, _value);
+      }
     }
 
     return result;
@@ -127,10 +157,21 @@ export default class API {
   };
 
   setBool = (key, value) => {
-    let result = handleAction(global.setBoolMMKV, key, value, this.instanceID);
+
+    let _value = value;
+    let before = this.transactions.beforewrite["boolean"];
+    if (before) {
+      _value = before(key, value);
+    }
+
+    let result = handleAction(global.setBoolMMKV, key, _value, this.instanceID);
 
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
+      let onwrite = this.transactions.onwrite["boolean"];
+      if (onwrite) {
+        onwrite(key, _value);
+      }
     }
 
     return result;
@@ -144,20 +185,32 @@ export default class API {
 
   setMap = (key, value) => {
     if (typeof value !== "object") throw new Error("value must be an object");
+
+    let _value = value;
+    let before = this.transactions.beforewrite["map"];
+    if (before) {
+      _value = before(key, value);
+    }
+
     let result = handleAction(
       global.setMapMMKV,
       key,
-      JSON.stringify(value),
+      JSON.stringify(_value),
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
+      let onwrite = this.transactions.onwrite["map"];
+      if (onwrite) {
+        onwrite(key, _value);
+      }
     }
 
     return result;
   };
 
   getMap = (key, callback) => {
+    
     let map = handleAction(global.getMapMMKV, key, this.instanceID);
     try {
       map = JSON.parse(map);
@@ -172,6 +225,12 @@ export default class API {
   setArray = (key, value) => {
     if (!Array.isArray(value)) throw new Error("value must be an Array");
 
+    let _value = value;
+    let before = this.transactions.beforewrite["array"];
+    if (before) {
+      _value = before(key, value);
+    }
+
     let result = handleAction(
       global.setArrayMMKV,
       key,
@@ -179,7 +238,12 @@ export default class API {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:_value});
+      
+      let onwrite = this.transactions.onwrite["array"];
+      if (onwrite) {
+        onwrite(key, _value);
+      }
     }
 
     return result;
@@ -207,7 +271,7 @@ export default class API {
           case "string":
             item[1] = global.getStringMMKV(keys[i], this.instanceID);
             break;
-          case "bool":
+          case "boolean":
             item[1] = global.getBoolMMKV(keys[i], this.instanceID);
             break;
           case "number":
@@ -256,6 +320,7 @@ export default class API {
       }
       return items;
     };
+
     handleAction(() => null, keys, this.instanceID);
     return func();
   };
@@ -271,9 +336,13 @@ export default class API {
   removeItem(key) {
     let result = handleAction(global.removeValueMMKV, key, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`);
+      this.ev.publish(`${key}:onwrite`, {key,value:null});
+      if (this.transactions.ondelete) {
+        this.transactions.ondelete(key);
+      }
     }
 
+    
     return result;
   }
 
