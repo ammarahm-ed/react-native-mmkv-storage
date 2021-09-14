@@ -10,7 +10,7 @@ export declare function useMMKVStorage<T = any>(
 
 export declare function create(storage: MMKVStorage.API): <T = any>(key: string, defaultValue?: unknown) => StoredValueAndSetter<T>;
 
-export declare const useIndex: (keys: Array<string>, type: "string" | "number" | "map" | "boolean" | "array", storage: MMKVStorage.API) => [unknown[], (key: string, value: unknown) => void, (key: string) => void]
+export declare const useIndex: (keys: Array<string>, type: "string" | "number" | "object" | "boolean" | "array", storage: MMKVStorage.API) => [unknown[], (key: string, value: unknown) => void, (key: string) => void]
 
 export default MMKVStorage;
 
@@ -143,7 +143,7 @@ declare module MMKVStorage {
      */
     getMultipleItemsAsync<T extends unknown>(
       keys: Array<string>,
-      type:"string" |"number" | "map" | "boolean" | "array",
+      type:"string" |"number" | "map" | "boolean" | "array" | "object",
     ): Promise<Array<T>>;
 
     /**
@@ -257,7 +257,7 @@ declare module MMKVStorage {
      */
     getMultipleItems<T extends any>(
       keys: Array<string>,
-      type:"string" |"number" | "map" | "boolean" | "array",
+      type:"string" |"number" | "map" | "boolean" | "array" | "object",
       callback?: Callback<Array<T>>
     ): Array<T>;
 
@@ -516,8 +516,8 @@ class encryption {
 }
 
 class transcations {
-  register(type: "string" | "number" | "map" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete", mutator: (key: string, value: unknown) => void):() => {} 
-  unregister(type: "string" | "number" | "map" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"):void
+  register(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete", mutator: (key: string, value: unknown) => void):() => {} 
+  unregister(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"):void
   clear():void
 }
 
