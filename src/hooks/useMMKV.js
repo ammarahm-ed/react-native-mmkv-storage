@@ -2,22 +2,30 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { methods, types } from "./constants";
 import { getDataType, getInitialValue } from "./functions";
 
-export const create = (storage) => (key,defaultValue) => {
-  if (!key || typeof key !== "string" || !storage) throw new Error("Key and Storage are required parameters.");
-  return useMMKVStorage(key,storage,defaultValue)
+export const create = (storage) => (key, defaultValue) => {
+  if (!key || typeof key !== "string" || !storage)
+    throw new Error("Key and Storage are required parameters.");
+  return useMMKVStorage(key, storage, defaultValue);
 };
 
 export const useMMKVStorage = (key, storage, defaultValue) => {
-  
-  const getValue = useCallback(getInitialValue({ key, storage, kindValue: "value" }), [key, storage]);
-  const getValueType = useCallback(getInitialValue({ key, storage,  kindValue: "valueType" }), [key, storage]);
-  
+  const getValue = useCallback(
+    getInitialValue({ key, storage, kindValue: "value" }),
+    [key, storage]
+  );
+  const getValueType = useCallback(
+    getInitialValue({ key, storage, kindValue: "valueType" }),
+    [key, storage]
+  );
+
   const [value, setValue] = useState(getValue);
   const [valueType, setValueType] = useState(getValueType);
 
   const prevKey = usePrevious(key);
   const prevStorage = usePrevious(storage);
-  
+
+  const prevValue = usePrevious(value);
+
   useEffect(() => {
     if (storage !== null) {
       // This check prevents getInitialValue from being called twice when this hook intially loads
@@ -25,7 +33,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
         setValue(getValue);
         setValueType(getValueType);
       }
-      
+
       storage.ev.subscribe(`${key}:onwrite`, updateValue);
     }
     return () => {
@@ -35,25 +43,11 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
     };
   }, [prevKey, key, prevStorage, storage, getValue, getValueType]);
 
-  const updateValue = useCallback(async (updatedValue) => {
-    let indexer = storage.indexer;
-    let _value;
-    let _valueType;
-    if (indexer.hasKey(key)) {
-      for (var i = 0; i < types.length; i++) {
-        let type = types[i];
-        if (valueType === type || indexer[methods[type].indexer].hasKey(key)) {
-          _valueType = type;
-          _value = updatedValue || storage[methods[type]["get"]](key);
-          setValue(_value);
-          setValueType(_valueType);
-          return;
-        }
-      }
-    } else {
-      setValue(null);
-      setValueType(null);
-    }
+  const updateValue = useCallback((event) => {
+    let _value = event.value ? methods[type]["copy"](event.value) : null;
+    setValue(_value);
+    setValueType(getDataType(_value));
+    return;
   }, []);
 
   const setNewValue = useCallback(
@@ -67,8 +61,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
             );
           return;
         }
-
-        updatedValue = nextValue(value);
+        updatedValue = nextValue(prevValue);
       }
 
       let _value;
@@ -95,7 +88,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
       setValueType(_valueType);
       return;
     },
-    [valueType, value]
+    [valueType]
   );
 
   return [value || defaultValue, setNewValue];
@@ -109,4 +102,4 @@ function usePrevious(value) {
   }, [value]);
 
   return ref.current;
-};
+}
