@@ -1,19 +1,9 @@
 import {types,methods} from "./constants";
 
 export const getDataType = (value) => {
-  if (typeof value === "string") {
-    return "string";
-  } else if (typeof value === "boolean") {
-    return "bool";
-  } else if (typeof value === "object") {
-    return "map";
-  } else if (Array.isArray(value)) {
-    return "array";
-  } else if (typeof value === "number") {
-    return "int";
-  } else {
-    return "unknown";
-  }
+  if (!value) return null;
+  let type = Array.isArray(value) ? "array" : typeof value;
+  return type;
 };
 
 export const getInitialValue =
