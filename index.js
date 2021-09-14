@@ -2,6 +2,7 @@ import { useMMKVStorage, create } from "./src/hooks/useMMKV";
 import { ACCESSIBLE, MODES } from "./src/utils";
 import { getCurrentMMKVInstanceIDs } from "./src/initializer";
 import { default as IDStore } from "./src/mmkv/IDStore";
+import {useIndex} from "./src/hooks/useIndex";
 
 const Loader = require("./src/loader").default;
 const API = require("./src/api").default;
@@ -20,5 +21,6 @@ export default MMKVStorage;
 
 export {
   useMMKVStorage,
-  create
+  create,
+  useIndex
 };
