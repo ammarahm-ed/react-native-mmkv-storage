@@ -347,8 +347,11 @@ export default class API {
   }
 
   clearStore() {
+    let keys = handleAction(global.getAllKeysMMKV, this.instanceID);
     let cleared = handleAction(global.clearMMKV, this.instanceID);
     global.setBoolMMKV(this.instanceID, true, this.instanceID);
+    keys?.forEach(key => this.ev.publish(`${key}:onwrite`, {key}));
+
     return cleared;
   }
 
