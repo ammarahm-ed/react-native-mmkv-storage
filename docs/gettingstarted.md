@@ -128,7 +128,7 @@ public class MainApplication extends Application implements ReactApplication {
       };
 ```
 
-if your build fails, check your NDK version & CMake version selected in Android Studio SDK Manager. Preferred selected version of NDK is 20.xx and CMake 3.10.2. Also make sure you do not have multiple CMake & NDK versions selected in SDK Manager.[Refer to this comment](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/67#issuecomment-801467636)
+if your build fails, check your NDK version & CMake version installed in Android Studio SDK Manager. Also make sure you do not have multiple CMake & NDK versions selected in SDK Manager.[Refer to this comment](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/67#issuecomment-801467636)
 
 ### iOS
 
