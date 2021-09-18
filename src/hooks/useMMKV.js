@@ -24,7 +24,11 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
   const prevKey = usePrevious(key);
   const prevStorage = usePrevious(storage);
 
-  const prevValue = usePrevious(value);
+  const prevValue = useRef(value);
+
+  useEffect(() => {
+    prevValue.current = value;
+  },[value])
 
   useEffect(() => {
     if (storage !== null) {
@@ -46,14 +50,12 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
   const updateValue = useCallback((event) => {
     let type = getDataType(event.value);
     let _value = event.value ? methods[type]["copy"](event.value) : null;
-    console.log(_value,type)
     setValue(_value);
     setValueType(type);
   }, []);
 
   const setNewValue = useCallback(
     async (nextValue) => {
-      console.log(nextValue);
       let updatedValue = nextValue;
       if (typeof nextValue === "function") {
         if (nextValue.constructor.name === "AsyncFunction") {
@@ -63,7 +65,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
             );
           return;
         }
-        updatedValue = nextValue(prevValue);
+        updatedValue = nextValue(prevValue.current);
       }
 
       let _value;
@@ -105,5 +107,5 @@ function usePrevious(value) {
     ref.current = value;
   }, [value]);
 
-  return ref.current;
+  return ref.current
 }
