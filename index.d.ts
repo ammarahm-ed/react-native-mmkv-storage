@@ -10,6 +10,18 @@ export declare function useMMKVStorage<T = any>(
 
 export declare function create(storage: MMKVStorage.API): <T = any>(key: string, defaultValue?: unknown) => StoredValueAndSetter<T>;
 
+/**
+ * Provided an array of keys, this hook will return an array of values, 
+ * an update function and a remove function. This is supposed to be used with 
+ * `transactions` which let you mutate data when moving in and out of storage and
+ * easily build indexes based on that data.
+ * 
+ * @param {Array<string>} keys An array of keys for which data is/will be present in storage
+ * @param {"string" | "number" | "object" | "boolean" | "array"} type type of data
+ * @param {MMKVStorage.API} storage An instance of storage
+ * 
+ * @returns `[values,update,remove]`
+ */
 export declare const useIndex: (keys: Array<string>, type: "string" | "number" | "object" | "boolean" | "array", storage: MMKVStorage.API) => [unknown[], (key: string, value: unknown) => void, (key: string) => void]
 
 export default MMKVStorage;
@@ -133,13 +145,11 @@ declare module MMKVStorage {
      */
 
     getArrayAsync<T extends any>(key: string): Promise<Array<T> | null | undefined>;
-    /**
-     * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
-     * Arrays will also be returned but wrappen in a object.
-     *
-     * **Will not work if a key as a String value.**
+      /**
+     * Retrieve multiple Objects for a given array of keys.
      *
      * @param {Array} keys
+     * @param {"string" |"number" | "map" | "boolean" | "array" | "object"} type
      */
     getMultipleItemsAsync<T extends unknown>(
       keys: Array<string>,
@@ -247,12 +257,10 @@ declare module MMKVStorage {
       callback?: Callback<Array<T>>
     ): Array<T> | null | undefined;
     /**
-     * Retrieve multiple Objects for a given array of keys. Currently will work only if data for all keys is an Object.
-     * Arrays will also be returned but wrappen in a object.
-     *
-     * **Will not work if a key as a String value.**
+     * Retrieve multiple Objects for a given array of keys.
      *
      * @param {Array} keys
+     * @param {"string" |"number" | "map" | "boolean" | "array" | "object"} type
      * @param {Array<unknown>} callback
      */
     getMultipleItems<T extends any>(
@@ -515,6 +523,11 @@ class encryption {
   ): Promise<boolean>;
 }
 
+
+/**
+ * A class that allows you to register lifecycle events for various data types in storage
+ * to mutate data and build indexes. 
+ */
 class transcations {
   register(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete", mutator: (key: string, value: unknown) => void):() => {} 
   unregister(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"):void
