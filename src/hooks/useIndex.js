@@ -38,14 +38,14 @@ export const useIndex = (keys, type, storage) => {
       
     }, [keys,type]);
 
-    const update = (key,value) => {
+    const update = useCallback((key,value) => {
       if (!value) return remove(key);
         storage[methods[type]["set"]](key,value);
-    }
+    },[])
     
-    const remove = (key) => {
+    const remove = useCallback((key) => {
         storage.removeItem(key);
-    }
+    },[])
   
     return [values.map(v => v[1]).filter(v => v !== null),update,remove]
   };
