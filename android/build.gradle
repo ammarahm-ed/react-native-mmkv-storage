@@ -102,15 +102,10 @@ task extractJNIFiles {
   }
 }
 
-def hasExtractedJNIFiles = false;
-
 tasks.whenTaskAdded { task ->
-  println("executing: ${task.name}");
-  if (task.name.contains('generateJsonModel') || task.name.contains('bundleLibResRelease') || task.name.contains('externalNativeBuild')) {
-    if (!hasExtractedJNIFiles) {
-      hasExtractedJNIFiles = true;
-      task.dependsOn(extractJNIFiles)
-    }
+  if (task.name.contains('generateJsonModel') || task.name.contains('externalNativeBuild')) {
+    println("attaching to task: ${task.name}");
+    task.dependsOn(extractJNIFiles)
   }
 }
 
