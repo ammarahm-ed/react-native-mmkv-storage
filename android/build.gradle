@@ -105,7 +105,7 @@ task extractJNIFiles {
 def hasExtractedJNIFiles = false;
 
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('generateJsonModel') || task.name.contains('externalNativeBuild')) {
+  if (task.name.contains('generateJsonModelDebug') || task.name.contains('generateJsonModelRelease') || task.name.contains('externalNativeBuild')) {
     if (!hasExtractedJNIFiles) {
       hasExtractedJNIFiles = true;
       task.dependsOn(extractJNIFiles)
