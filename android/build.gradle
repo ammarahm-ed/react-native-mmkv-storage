@@ -28,6 +28,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrDefault('minSdkVersion', 16)
     targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
+    //ndkVersion "21.1.6352462"
 
     externalNativeBuild {
       cmake {
@@ -38,8 +39,14 @@ android {
     }
   }
 
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
   lintOptions{
     abortOnError false
+    disable 'GradleCompatible'
   }
 
   externalNativeBuild {
@@ -54,7 +61,6 @@ android {
   }
   
   configurations {
-    extractHeaders
     extractJNI
   }
 }
@@ -78,27 +84,12 @@ dependencies {
 
   def rnAAR = fileTree("${rootDir}/../node_modules/react-native/android").matching({ it.include "**/**/*.aar" }).singleFile
   
-  def inputFile = new File(rootDir, '../node_modules/react-native/package.json')
-  def json = new JsonSlurper().parseText(inputFile.text)
-  def reactNativeVersion = json.version as String
-  def (major, minor, patch) = reactNativeVersion.tokenize('.')
   extractJNI(files(rnAAR))
 }
 
-task extractAARHeaders {
-  doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      copy {
-        from zipTree(file)
-        into "$buildDir/$file.name"
-        include "**/*.h"
-      }
-    }
-  }
-}
-
 task extractJNIFiles {
+  logger.info("reactNativeMMKVRootDir:$rootDir")
+  logger.info("reactNativeMMKVBuildDir:$buildDir")
   doLast {
     configurations.extractJNI.files.each {
       def file = it.absoluteFile
@@ -114,7 +105,6 @@ task extractJNIFiles {
 
 tasks.whenTaskAdded { task ->
   if (task.name.contains('externalNativeBuild')) {
-    task.dependsOn(extractAARHeaders)
     task.dependsOn(extractJNIFiles)
   }
 }
