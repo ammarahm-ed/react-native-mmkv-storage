@@ -28,6 +28,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrDefault('minSdkVersion', 16)
     targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
+    ndkVersion "21.1.6352462"
 
     externalNativeBuild {
       cmake {
@@ -38,22 +39,28 @@ android {
     }
   }
 
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
   lintOptions{
     abortOnError false
+    disable 'GradleCompatible'
   }
 
   externalNativeBuild {
      cmake {
           path "./src/main/rnmmkv/CMakeLists.txt"
+          version "3.10.2"
       }
   }
 
   packagingOptions {
-    excludes = ["**/libc++_shared.so","**/libreactnativeutilsjni.so"]
+    excludes = ["**/libc++_shared.so"]
   }
   
   configurations {
-    extractHeaders
     extractJNI
   }
 }
@@ -77,27 +84,11 @@ dependencies {
 
   def rnAAR = fileTree("${rootDir}/../node_modules/react-native/android").matching({ it.include "**/**/*.aar" }).singleFile
   
-  def inputFile = new File(rootDir, '../node_modules/react-native/package.json')
-  def json = new JsonSlurper().parseText(inputFile.text)
-  def reactNativeVersion = json.version as String
-  def (major, minor, patch) = reactNativeVersion.tokenize('.')
   extractJNI(files(rnAAR))
 }
 
-task extractAARHeaders {
-  doLast {
-    configurations.extractHeaders.files.each {
-      def file = it.absoluteFile
-      copy {
-        from zipTree(file)
-        into "$buildDir/$file.name"
-        include "**/*.h"
-      }
-    }
-  }
-}
-
 task extractJNIFiles {
+  
   doLast {
     configurations.extractJNI.files.each {
       def file = it.absoluteFile
@@ -111,10 +102,14 @@ task extractJNIFiles {
   }
 }
 
+def hasExtractedJNIFiles = false;
+
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('externalNativeBuild')) {
-    task.dependsOn(extractAARHeaders)
-    task.dependsOn(extractJNIFiles)
+  if (task.name.contains('generateJsonModel') || task.name.contains('externalNativeBuild')) {
+    if (!hasExtractedJNIFiles) {
+      hasExtractedJNIFiles = true;
+      task.dependsOn(extractJNIFiles)
+    }
   }
 }
 
