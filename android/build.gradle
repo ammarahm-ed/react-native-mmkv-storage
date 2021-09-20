@@ -88,8 +88,7 @@ dependencies {
 }
 
 task extractJNIFiles {
-  logger.info("reactNativeMMKVRootDir:$rootDir")
-  logger.info("reactNativeMMKVBuildDir:$buildDir")
+  
   doLast {
     configurations.extractJNI.files.each {
       def file = it.absoluteFile
@@ -104,8 +103,9 @@ task extractJNIFiles {
 }
 
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('externalNativeBuild')) {
+  if (task.name.contains('generateJsonModelDebug')) {
     task.dependsOn(extractJNIFiles)
   }
 }
+
 
