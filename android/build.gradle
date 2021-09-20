@@ -28,7 +28,7 @@ android {
   defaultConfig {
     minSdkVersion getExtOrDefault('minSdkVersion', 16)
     targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
-    ndkVersion "21.1.6352462"
+    //ndkVersion "21.1.6352462"
 
     externalNativeBuild {
       cmake {
@@ -102,14 +102,28 @@ task extractJNIFiles {
   }
 }
 
-def hasExtractedJNIFiles = false;
+task extractJNIFilesForRelease {
+  
+  doLast {
+    configurations.extractJNI.files.each {
+      def file = it.absoluteFile
+
+      copy {
+        from zipTree(file)
+        into "$buildDir/$file.name"
+        include "jni/**/*"
+      }
+    }
+  }
+}
 
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('generateJsonModel') || task.name.contains('externalNativeBuild')) {
-    if (!hasExtractedJNIFiles) {
-      hasExtractedJNIFiles = true;
-      task.dependsOn(extractJNIFiles)
-    }
+  if (task.name.contains('generateJsonModelDebug') || task.name.contains('externalNativeBuild')) {
+    task.dependsOn(extractJNIFiles);
+  }
+
+  if (task.name.contains('generateJsonModelRelease')) {
+    task.dependsOn(extractJNIFilesForRelease)
   }
 }
 
