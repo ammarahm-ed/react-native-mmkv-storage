@@ -103,7 +103,7 @@ task extractJNIFiles {
 }
 
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('generateJsonModel') || task.name.contains('externalNativeBuild')) {
+  if (task.name.contains('generateJsonModelRelease')) {
     println("attaching to task: ${task.name}");
     task.dependsOn(extractJNIFiles)
   }
