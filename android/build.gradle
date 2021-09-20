@@ -45,11 +45,12 @@ android {
   externalNativeBuild {
      cmake {
           path "./src/main/rnmmkv/CMakeLists.txt"
+          version "3.10.2"
       }
   }
 
   packagingOptions {
-    excludes = ["**/libc++_shared.so","**/libreactnativeutilsjni.so"]
+    excludes = ["**/libc++_shared.so"]
   }
   
   configurations {
