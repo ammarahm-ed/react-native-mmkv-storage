@@ -1,7 +1,7 @@
 import {types,methods} from "./constants";
 
 export const getDataType = (value) => {
-  if (!value) return null;
+  if (value === null || value === undefined) return null;
   let type = Array.isArray(value) ? "array" : typeof value;
   return type;
 };
