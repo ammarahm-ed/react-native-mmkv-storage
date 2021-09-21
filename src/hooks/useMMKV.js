@@ -76,7 +76,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
 
       } else {
         let _dataType = getDataType(updatedValue);
-
+        
         if (_valueType && _dataType !== valueType) {
           __DEV__ &&
             console.warn(
@@ -97,7 +97,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
     [valueType]
   );
 
-  return [value || defaultValue, setNewValue];
+  return [valueType === "boolean" ? value : value || defaultValue, setNewValue];
 };
 
 function usePrevious(value) {
