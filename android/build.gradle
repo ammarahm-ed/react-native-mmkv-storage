@@ -22,6 +22,38 @@ def getExtOrDefault(name, defaultValue) {
   return rootProject.ext.has(name) ? rootProject.ext.get(name) : defaultValue
 }
 
+def found = false
+def reactNativeDir = null
+def androidSourcesName = 'React Native sources'
+def parentDir = rootProject.projectDir
+
+if (rootProject.ext.has('reactNativeAndroidRoot')) {
+  reactNativeDir = rootProject.ext.get('reactNativeAndroidRoot')
+} else {
+  reactNativeDir = new File(
+          projectDir,
+          '/../../../node_modules/react-native/android'
+  )
+}
+if (reactNativeDir.exists()) {
+  found = true
+} else {
+  1.upto(5, {
+    if (found) return true
+    parentDir = reactNativeDir.parentFile
+
+    reactNativeDir = new File(
+            parentDir,
+            'node_modules/react-native/android'
+    )
+
+    if (reactNativeDir.exists()) {
+      found = true
+    }
+  })
+}
+
+
 android {
   compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
 
@@ -34,7 +66,7 @@ android {
       cmake {
         cppFlags "-fexceptions", "-frtti", "-std=c++1y", "-DONANDROID"
         abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-        arguments '-DANDROID_STL=c++_shared', "-DNODE_MODULES_DIR=${rootDir}/../node_modules"
+        arguments '-DANDROID_STL=c++_shared', "-DNODE_MODULES_DIR=${reactNativeDir.parentFile.parentFile.toString()}"
       }
     }
   }
@@ -67,12 +99,23 @@ android {
 repositories {
   mavenCentral()
   mavenLocal()
-  
-  maven {
-    // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-    url "$rootDir/../node_modules/react-native/android"
-  }
   google()  
+
+  if (reactNativeDir.exists()) {
+    maven {
+      url reactNativeDir.toString()
+      name androidSourcesName
+    }
+    logger.info(":${project.name}:reactNativeAndroidRoot ${reactNativeDir.canonicalPath}")
+  }
+
+  if (!found) {
+    throw new GradleException(
+            "${project.name}: unable to locate React Native android sources. " +
+                    "Ensure you have you installed React Native as a dependency in your project and try again."
+    )
+  }
+ 
 }
 
 dependencies {
@@ -81,8 +124,7 @@ dependencies {
   implementation "com.scottyab:secure-preferences-lib:0.1.4"
   implementation 'com.google.code.gson:gson:2.8.6'
 
-  def rnAAR = fileTree("${rootDir}/../node_modules/react-native/android").matching({ it.include "**/**/*.aar" }).singleFile
-  
+  def rnAAR = fileTree(reactNativeDir.toString()).matching({ it.include "**/**/*.aar" }).singleFile
   extractJNI(files(rnAAR))
 }
 
