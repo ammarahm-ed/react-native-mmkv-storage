@@ -24,6 +24,11 @@ export function initialize(id) {
   let opts = options[id];
 
   if (!global.setupMMKVInstance) return false;
+  
+  if(opts.serviceName){
+    global.setMMKVServiceName(opts.alias, opts.serviceName);
+  }
+
   if (IDStore.exists(id)) {
     if (!IDStore.encrypted(id)) {
       return initWithoutEncryption(opts);

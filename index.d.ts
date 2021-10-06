@@ -307,6 +307,13 @@ declare module MMKVStorage {
     withInstanceID(id: string): this;
 
     /**
+     * (iOS only) Sets the kSecAttrService attribute in the key chain (https://developer.apple.com/documentation/security/ksecattrservice).
+     * Addresses https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/156#issuecomment-934046177 issue.
+     * @param {String} serviceName
+     */
+     withServiceName(serviceName: string): this;
+
+    /**
      * Encrypt MMKV Instance and store the creditials in secured storage for later use.
      * The key for encryption is automatically generated and the default alias for key storage is 'com.MMKV.ammarahmed' which is converted to HEX for usage.
      *

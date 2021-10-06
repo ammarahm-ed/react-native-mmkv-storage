@@ -10,7 +10,7 @@
 @implementation SecureStorage : NSObject
 
 
-NSString *serviceName;
+NSString *serviceName = nil;
 
 
 - (void) setSecureKey: (NSString *)key value:(NSString *)value
@@ -96,7 +96,9 @@ NSString *serviceName;
 
 - (NSMutableDictionary *)newSearchDictionary:(NSString *)identifier {
     NSMutableDictionary *searchDictionary = [[NSMutableDictionary alloc] init];
-    serviceName = [[NSBundle mainBundle] bundleIdentifier];
+    if(serviceName == nil){
+        serviceName = [[NSBundle mainBundle] bundleIdentifier];
+    }
     
     [searchDictionary setObject:(id)kSecClassGenericPassword forKey:(id)kSecClass];
     
@@ -211,6 +213,11 @@ NSString *serviceName;
      //[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"IsAppInstalled"];
      [[NSUserDefaults standardUserDefaults] synchronize];
    // }
+}
+
+- (void) setServiceName:(NSString *)_serviceName
+{
+    serviceName = _serviceName;
 }
 
 NSError * secureKeyStoreError(NSString *errMsg)

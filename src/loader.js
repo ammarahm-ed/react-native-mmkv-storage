@@ -15,6 +15,7 @@ export default class Loader {
       aliasPrefix: "com.MMKV.",
       alias: null,
       key: null,
+      serviceName: null,
       initialized: false,
     };
   }
@@ -32,6 +33,11 @@ export default class Loader {
       this.options.aliasPrefix + this.options.instanceID
     );
     this.options.secureKeyStorage = true;
+    return this;
+  }
+
+  withServiceName(serviceName) {
+    this.options.serviceName = serviceName;
     return this;
   }
 
