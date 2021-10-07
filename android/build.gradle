@@ -58,7 +58,7 @@ android {
     minSdkVersion getExtOrDefault('minSdkVersion', 16)
     targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
     //ndkVersion "21.1.6352462"
-
+    
     externalNativeBuild {
       cmake {
         cppFlags "-fexceptions", "-frtti", "-std=c++1y", "-DONANDROID"
@@ -85,7 +85,7 @@ android {
   }
 
   packagingOptions {
-    excludes = ["**/libc++_shared.so"]
+    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so"]
   }
   
   configurations {
