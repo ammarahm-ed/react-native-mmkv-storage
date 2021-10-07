@@ -25,6 +25,7 @@ emoji=true
 
 esproposal.optional_chaining=enable
 esproposal.nullish_coalescing=enable
+format.bracket_spacing=false
 
 exact_by_default=true
 
@@ -63,4 +64,4 @@ untyped-import
 untyped-type-import
 
 [version]
-^0.149.0
+^0.158.0
