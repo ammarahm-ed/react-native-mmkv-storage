@@ -138,6 +138,26 @@ type ACCESSIBLE = {
 
 **Returns:** `this`;
 
+## withServiceName (iOS only)
+
+Sets the [kSecAttrService](https://developer.apple.com/documentation/security/ksecattrservice) option for secure key storage (IOS ONLY);
+
+**Arguments**
+
+| Name        | Required | Type   | Description      |
+| ----------- | -------- | -------| -----------------|
+| serviceName | yes      | String | The service name |
+
+```js
+import MMKVStorage from "react-native-mmkv-storage";
+
+const MMKV = new MMKVStorage.Loader();
+
+MMKV = MMKV.withServiceName('com.MMKV.example');
+```
+
+**Returns:** `this`;
+
 ## Putting it together
 
 Now you know about the loader class, lets create a MMKV Instance with an ID.

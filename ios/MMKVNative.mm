@@ -16,6 +16,7 @@ using namespace std;
 @synthesize methodQueue = _methodQueue;
 NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
+NSMutableDictionary *serviceNames;
 SecureStorage *_secureStorage;
 
 RCT_EXPORT_MODULE()
@@ -33,6 +34,19 @@ MMKV *getInstance(NSString *ID) {
     } else {
         return NULL;
     }
+}
+
+NSString *getServiceName(NSString *alias) {
+    if ([[serviceNames allKeys] containsObject:alias]) {
+        NSString *serviceName = [serviceNames objectForKey:alias];
+        return serviceName;
+    } else {
+        return nil;
+    }
+}
+
+void setServiceName(NSString *alias, NSString *serviceName) {
+    [serviceNames setObject:serviceName forKey: alias];
 }
 
 - (void)setBridge:(RCTBridge *)bridge {
@@ -61,6 +75,7 @@ BOOL functionDiedBeforeCompletion = YES;
     }
     
     mmkvInstances = [NSMutableDictionary dictionary];
+    serviceNames = [NSMutableDictionary dictionary];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
                                                          NSUserDomainMask, YES);
@@ -199,6 +214,22 @@ static void install(jsi::Runtime &jsiRuntime) {
     
     jsiRuntime.global().setProperty(jsiRuntime, "setupMMKVInstance",
                                     move(setupMMKVInstance));
+
+    auto setMMKVServiceName = Function::createFromHostFunction(jsiRuntime, PropNameID::forAscii(jsiRuntime, "setMMKVServiceName"), 2,
+                                                                [](Runtime &runtime, const Value &thisValue, const Value *arguments,
+                                                                    size_t count) -> Value {
+        NSString *alias = convertJSIStringToNSString(
+                                                runtime, arguments[0].getString(runtime));
+        NSString *serviceName = convertJSIStringToNSString(
+                                                runtime, arguments[1].getString(runtime));
+        setServiceName(alias, serviceName);
+        // [_secureStorage setServiceName:serviceName];
+        return Value::undefined();
+    });
+    
+    jsiRuntime.global().setProperty(jsiRuntime, "setMMKVServiceName",
+                                    move(setMMKVServiceName));
+
     
     auto setStringMMKV = Function::createFromHostFunction(
                                                           jsiRuntime, PropNameID::forAscii(jsiRuntime, "setStringMMKV"), 3,
@@ -617,6 +648,7 @@ static void install(jsi::Runtime &jsiRuntime) {
                                                    runtime, arguments[1].getString(runtime));
         NSString *accValue = convertJSIStringToNSString(
                                                         runtime, arguments[2].getString(runtime));
+                                                                [_secureStorage setServiceName: getServiceName(alias)];
         [_secureStorage setSecureKey:alias
                                value:key
                              options:@{@"accessible" : accValue}];
@@ -634,6 +666,7 @@ static void install(jsi::Runtime &jsiRuntime) {
         NSString *alias = convertJSIStringToNSString(
                                                      runtime, arguments[0].getString(runtime));
         
+                                                                [_secureStorage setServiceName: getServiceName(alias)];
         return Value(convertNSStringToJSIString(
                                                 runtime, [_secureStorage getSecureKey:alias]));
     });
@@ -648,6 +681,7 @@ static void install(jsi::Runtime &jsiRuntime) {
         NSString *alias = convertJSIStringToNSString(
                                                      runtime, arguments[0].getString(runtime));
         
+                                                                   [_secureStorage setServiceName: getServiceName(alias)];
         return Value([_secureStorage secureKeyExists:alias]);
     });
     
@@ -660,6 +694,7 @@ static void install(jsi::Runtime &jsiRuntime) {
                                                                size_t count) -> Value {
         NSString *alias = convertJSIStringToNSString(
                                                      runtime, arguments[0].getString(runtime));
+                                                                   [_secureStorage setServiceName: getServiceName(alias)];
         [_secureStorage removeSecureKey:alias];
         return Value(true);
     });
@@ -692,6 +727,7 @@ static void install(jsi::Runtime &jsiRuntime) {
             
             if ([[entry valueForKey:@"encrypted"] boolValue]) {
                 NSString *alias = [entry valueForKey:@"alias"];
+                [_secureStorage setServiceName: getServiceName(alias)];
                 if ([_secureStorage searchKeychainCopyMatchingExists:alias]) {
                     NSString *key = [_secureStorage searchKeychainCopyMatching:alias];
                     if (key != nil) {

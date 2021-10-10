@@ -33,7 +33,7 @@
 
 - (void)handleAppUninstallation;
 
-
+- (void) setServiceName: (nonnull NSString *)serviceName;
 
 @end
 

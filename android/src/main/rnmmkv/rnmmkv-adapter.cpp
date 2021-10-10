@@ -198,6 +198,17 @@ void install(Runtime &jsiRuntime) {
 
     jsiRuntime.global().setProperty(jsiRuntime, "initializeMMKV", move(initializeMMKV));
 
+    auto setMMKVServiceName = Function::createFromHostFunction(jsiRuntime,PropNameID::forAscii(jsiRuntime,"setMMKVServiceName"), 1, [](Runtime &runtime,
+                                                              const Value &thisValue,
+                                                              const Value *arguments,
+                                                              size_t count) -> Value {
+        string alias = arguments[0].getString(runtime).utf8(runtime);
+        string serviceName = arguments[1].getString(runtime).utf8(runtime);
+        return Value::undefined();
+    });
+
+    jsiRuntime.global().setProperty(jsiRuntime, "setMMKVServiceName", move(setMMKVServiceName));
+
     auto setupMMKVInstance = Function::createFromHostFunction(jsiRuntime,
                                                               PropNameID::forAscii(jsiRuntime,
                                                                                    "setupMMKVInstance"),
