@@ -1,25 +1,44 @@
 name: Android
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: "0.61.x"
+            folder: "rn61"
+          - version: "0.62.x"
+            folder: "rn62"
+          - version: "0.63.x"
+            folder: "rn63"
+          - version: "0.64.x"
+            folder: "rn64"
+          - version: "0.65.x"
+            folder: "rn65"
+          - version: "0.66.x"
+            folder: "rn66"
+
     steps:
     - uses: actions/checkout@v2
-    - name: Use Node.js v12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12.x
-
-    - run: yarn
-      working-directory: example
-      name: Installing node modules
-    
-    - run: ./gradlew assembleDebug -Dorg.gradle.logging.level=info
-      working-directory: example/android
-      name: Build Android apk (debug)
-      
-    - run: ./gradlew assembleRelease -Dorg.gradle.logging.level=info
-      working-directory: example/android
-      name: Build Android apk (release)
+    - run: printenv
+    - name: Build Android apk (release & debug)
+      env:
+        RN_VERSION: ${{ matrix.version }}
+        RN_FOLDER: ${{ matrix.folder }}
+        ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/21.4.7075529
+        # GITHUB_REPOSITORY=retyui/react-native-mmkv-storage
+        # GITHUB_HEAD_REF=fix-android-build
+      run: |
+        echo $RN_VERSION $RN_FOLDER $ANDROID_NDK_HOME
+        npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
+        cd "$RN_FOLDER"
+        yarn add "$GITHUB_REPOSITORY#$GITHUB_HEAD_REF"
+        cd ..
+        node ./autoLinks.js "$RN_FOLDER"
+        cd "$RN_FOLDER/android"
+        ./gradlew assembleRelease
+        ./gradlew assembleDebug

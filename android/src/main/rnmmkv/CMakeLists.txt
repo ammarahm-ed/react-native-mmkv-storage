@@ -5,12 +5,6 @@ set (BUILD_DIR ../../../build)
 
 add_subdirectory(../../../../MMKV/Core core)
 
-add_library(
-        ${PACKAGE_NAME}
-        SHARED
-        ./rnmmkv-adapter.cpp
-)
-
 include_directories(
         ${PACKAGE_NAME}
         "${NODE_MODULES_DIR}/react-native/React"
@@ -21,17 +15,33 @@ include_directories(
 
 file (GLOB LIBRN_DIR "${BUILD_DIR}/react-native-0*/jni/${ANDROID_ABI}")
 
+if (JSI_LIB)
+  # React Native 0.66.x and above
+  add_library(
+          ${PACKAGE_NAME}
+          SHARED
+          ./rnmmkv-adapter.cpp
+  )
 
-find_library(
-        LOG_LIB
-        log
-)
-
-find_library(
+  find_library(
         JSI_LIB
         jsi
         PATHS ${LIBRN_DIR}
         NO_CMAKE_FIND_ROOT_PATH
+  )
+else()
+  # React Native 0.65.x and below
+  add_library(
+          ${PACKAGE_NAME}
+          SHARED
+          ../../../../../react-native/ReactCommon/jsi/jsi/jsi.cpp
+          ./rnmmkv-adapter.cpp
+  )
+endif()
+
+find_library(
+        LOG_LIB
+        log
 )
 
 find_library(
