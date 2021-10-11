@@ -1,6 +1,15 @@
 name: Android
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - ".github/workflows/main.yml"
+      - "src/**"
+      - "android/**"
+      - "MMKV/**"
 
 jobs:
   build:
@@ -21,24 +30,38 @@ jobs:
             folder: "rn65"
           - version: "0.66.x"
             folder: "rn66"
+          - version: "reanimated-2"
+            folder: "reanimated2"
 
     steps:
     - uses: actions/checkout@v2
+
     - run: printenv
+
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - uses: actions/cache@v2
+      id: yarn-cache
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ matrix.version }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
     - name: Build Android apk (release & debug)
       env:
         RN_VERSION: ${{ matrix.version }}
         RN_FOLDER: ${{ matrix.folder }}
         ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/21.4.7075529
-        # GITHUB_REPOSITORY=retyui/react-native-mmkv-storage
-        # GITHUB_HEAD_REF=fix-android-build
       run: |
         echo $RN_VERSION $RN_FOLDER $ANDROID_NDK_HOME
-        npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
+        [[ "$RN_VERSION" == "reanimated-2" ]] && git clone --depth=1 https://github.com/software-mansion-labs/reanimated-2-playground.git "$RN_FOLDER" || npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
         cd "$RN_FOLDER"
-        yarn add "$GITHUB_REPOSITORY#$GITHUB_HEAD_REF"
-        cd ..
-        node ./autoLinks.js "$RN_FOLDER"
-        cd "$RN_FOLDER/android"
+        yarn add file:..
+        npx mmkv-link
+        cd ./android
+        echo "cmake.dir=/usr/local/lib/android/sdk/cmake/3.10.2.4988404" >> local.properties
         ./gradlew assembleRelease
         ./gradlew assembleDebug
