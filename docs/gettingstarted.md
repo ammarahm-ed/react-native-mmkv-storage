@@ -77,7 +77,7 @@ public class MainApplication extends Application implements ReactApplication {
 
 If you are using `react-native-reanimated@v2` library, follow the steps below instead.
 
-1. Go to `node_modules/react-native-mmkv-storage/android/src/java/com/ammarahmed/mmkv` and copy file named `RNMMKVJSIModulePackage.java` to `Your Project/android/app/src/main/java/com/your/project/name/` and paste the file there.
+1. Go to `node_modules/react-native-mmkv-storage/android/src/java/com/ammarahmed/mmkv` and copy file named [`RNMMKVJSIModulePackage.java`](https://github.com/ammarahm-ed/react-native-mmkv-storage/blob/master/android/src/main/java/com/ammarahmed/mmkv/RNMMKVJSIModulePackage.java) to `Your Project/android/app/src/main/java/com/your/project/name/` and paste the file there.
 
 2. Rename the file to `CustomMMKVJSIModulePackage.java`
 
@@ -96,8 +96,8 @@ import java.util.List;
 +import com.swmansion.reanimated.ReanimatedJSIModulePackage; // <-- ADD THIS
 +import com.ammarahmed.mmkv.RNMMKVModule; // <-- ADD THIS
 
-
-+public class RNMMKVJSIModulePackage implements ReanimatedJSIModulePackage  { // <--- REPLACE RNMMKVJSIModulePackage implements JSIModulePackage with CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage
+-public class RNMMKVJSIModulePackage implements JSIModulePackage {
++public class CustomMMKVJSIModulePackage extends ReanimatedJSIModulePackage {
     @Override
     public List<JSIModuleSpec> getJSIModules(ReactApplicationContext reactApplicationContext, JavaScriptContextHolder jsContext) {
         reactApplicationContext.getNativeModule(RNMMKVModule.class).installLib(jsContext, reactApplicationContext.getFilesDir().getAbsolutePath() + "/mmkv");
@@ -136,12 +136,12 @@ public class MainApplication extends Application implements ReactApplication {
           return "index";
         }
 
-		// add this method to load our CustomMMKVJSIModulePackage.
++		// add this method to load our CustomMMKVJSIModulePackage.
 +          @Override
 +          protected JSIModulePackage getJSIModulePackage() {
 +              return new CustomMMKVJSIModulePackage();
 +          }
-		//
++		//
       };
 ```
 
@@ -156,8 +156,8 @@ buildscript {
 +        ndkVersion = "21.4.7075529"
     }
     dependencies {
-+        classpath 'com.android.tools.build:gradle:3.2.0'
--        classpath 'com.android.tools.build:gradle:4.2.2'
+-        classpath 'com.android.tools.build:gradle:3.2.0'
++        classpath 'com.android.tools.build:gradle:4.2.2'
 
 // When SDK 29
 buildscript {
@@ -167,8 +167,8 @@ buildscript {
 +        ndkVersion = "21.1.6352462"
     }
     dependencies {
-+        classpath 'com.android.tools.build:gradle:3.2.0'
--        classpath 'com.android.tools.build:gradle:4.1.0'
+-        classpath 'com.android.tools.build:gradle:3.2.0'
++        classpath 'com.android.tools.build:gradle:4.1.0'
 ```
 
 Update Gradle version
