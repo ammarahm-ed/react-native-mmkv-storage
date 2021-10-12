@@ -94,7 +94,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
       setValueType(_valueType);
       return;
     },
-    [valueType]
+    [key, storage, valueType]
   );
 
   return [valueType === "boolean" ? value : value || defaultValue, setNewValue];
