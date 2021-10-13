@@ -1,5 +1,14 @@
 name: iOS
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - ".github/workflows/ios.yml"
+      - "src/**"
+      - "ios/**"
+      - "MMKV/**"
 jobs:
   build:
     runs-on: macos-latest
@@ -11,9 +20,9 @@ jobs:
         node-version: 14.x
     - run: yarn
       working-directory: example
-      
+
     - run: xcode-select -p
-    
+
     - run: pod install
       working-directory: example/ios
       name: Install pod dependencies
