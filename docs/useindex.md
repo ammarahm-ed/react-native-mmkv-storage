@@ -3,6 +3,7 @@
 A hook that will take an array of keys and returns an array of values for those keys. This is supposed to work in combination with [Transactions](transactionmanager.md). When you have build your custom index, you will need an easy and quick way to load values for your index. useIndex hook actively listens to all read/write changes and updates the values accordingly.
 
 **Arguments**
+
 | Name | Required | Type | Description |
 |-------------------|----------|------------------------------------------------------|----------------------------------------------------------------------------|
 | index | yes | Array | The type of data you want to register the function for. |
