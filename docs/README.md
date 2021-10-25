@@ -21,8 +21,10 @@ See the [Quick start](gettingstarted.md) guide for more details.
 - **Fast and Efficient (0.0002s Read/Write Speed)**<br/>
   MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
   You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
-- **Reactive using useMMKVStorage Hook**<br/>
-  Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.  
+- **Reactive using `useMMKVStorage` & `useIndex` Hooks**<br/>
+  Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.
+- **Lifecycle Control**  
+  Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as `onwrite`, `beforewrite`, `onread`, `ondelete`. This allows for a better and more managed control over the storage and also let's you build custom indexes with a few lines of code.
 - **Multi-Process Support**<br/>
   MMKV supports concurrent read-read and read-write access between processes.
 - **Create unlimited Database instances**<br/>
@@ -32,7 +34,7 @@ See the [Quick start](gettingstarted.md) guide for more details.
 - **Simple indexer and data querying**<br/>
   For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
 - **Supports redux-persist**<br/>
-  Support for redux persist is also added starting from v0.3.2.
+  Support for redux persist is also added starting from v0.3.2..
 
 ## Contact & Support
 

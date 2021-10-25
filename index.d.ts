@@ -532,7 +532,7 @@ class encryption {
 
 
 /**
- * A class that allows you to register lifecycle events for various data types in storage
+ * A class that allows you to register lifecycle functions for various data types in storage
  * to mutate data and build indexes. 
  */
 class transcations {

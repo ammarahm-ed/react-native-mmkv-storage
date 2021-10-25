@@ -10,7 +10,7 @@ A `useState` like hook that allows you to easily manage values in storage.
 | Name              | Required | Type    | Description                                                                |
 |-------------------|----------|---------|----------------------------------------------------------------------------|
 | key               | yes      | String  | The key against which to get the value                                     |
-| `MMKVStorage.API` | yes      | boolean | MMKV storage instance created from `new MMKVStorage.Loader().initialize()` |
+| `MMKVStorage.API` | yes      | `MMKVStorage.API` | MMKV storage instance created from `new MMKVStorage.Loader().initialize()` |
 | defaultValue      | no       | String  | Pass a default value for the hook if any                                   |
 
 **returns:** A pair of `value` & `setValue`. 
