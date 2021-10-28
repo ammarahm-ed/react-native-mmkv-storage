@@ -111,3 +111,6 @@ flex-direction: column;
 </div>
 
 </div>
+
+
+The Map data type is **not** supported.
