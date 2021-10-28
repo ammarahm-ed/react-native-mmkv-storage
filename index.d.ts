@@ -122,6 +122,7 @@ declare module MMKVStorage {
     /**
      * Set an Object to storage for a given key.
      *
+     * Note that this function does **not** work with the Map data type.
      * @param {String} key
      * @param {Object} value
      *
@@ -223,6 +224,8 @@ declare module MMKVStorage {
 
     /**
      * Set an Object to storage for a given key.
+     *
+     * Note that this function does **not** work with the Map data type
      *
      * @param {String} key
      * @param {Object} value
