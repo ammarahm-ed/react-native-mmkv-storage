@@ -47,7 +47,7 @@ let keys = await MMKV.indexer.getKeys();
 ```
 
 **Returns**
-`Promise<boolean>`
+`Promise<string[]>`
 
 # Strings Indexer
 
