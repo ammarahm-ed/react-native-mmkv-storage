@@ -1,4 +1,5 @@
 
+
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
@@ -15,10 +16,13 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
 import com.google.gson.Gson;
 import com.ammarahmed.mmkv.MMKV;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,14 +50,14 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         super(reactContext);
         this.reactContext = reactContext;
         secureKeystore = new SecureKeystore(reactContext);
-        
+
     }
 
-   @ReactMethod
+    @ReactMethod
     public void installMMKV() {
         // DO nothing
     }
- 
+
 
 
     public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
@@ -124,7 +128,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                     String obj = gson.toJson(map.toHashMap());
                     kvv.putString(string, obj);
                 }
-                
+
             }
         }
         Set<String> arrayIndex = new HashSet<>();
@@ -135,13 +139,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 if (bundle != null) {
                     WritableMap map = Arguments.fromBundle(bundle);
                     if (map.getArray(string) != null) {
-                        List<Object> subChild = Arguments.toList(map.getArray(string));
-                        String obj = gson.toJson(subChild);
+                        ArrayList<Object> list = map.getArray(string).toArrayList();
+                        String obj = gson.toJson(list);
                         kvv.putString(string, obj);
                     }
-                   
+
                 }
-               
+
             }
         }
 
