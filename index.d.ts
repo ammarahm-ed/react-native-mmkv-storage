@@ -57,8 +57,8 @@ declare module MMKVStorage {
 
   export const ACCESSIBLE: ACCESSIBLE;
 
-  export declare function getAllMMKVInstanceIDs(): string[];
-  export declare function getCurrentMMKVInstanceIDs(): Record<string, boolean>;
+  export function getAllMMKVInstanceIDs(): string[];
+  export function getCurrentMMKVInstanceIDs(): Record<string, boolean>;
 
   export const IDSTORE_ID: string;
 
@@ -399,7 +399,7 @@ declare module MMKVStorage {
   }
 }
 
-class indexer {
+declare class indexer {
   /**
    * Get all keys from storage.
    *
@@ -519,7 +519,7 @@ class indexer {
   };
 }
 
-class encryption {
+declare class encryption {
   /**
    * You can encrypt an MMKV instance anytime, even after it is created.
    *
@@ -566,7 +566,7 @@ class encryption {
  * A class that allows you to register lifecycle functions for various data types in storage
  * to mutate data and build indexes.
  */
-class transcations {
+declare class transcations {
   register(
     type: "string" | "number" | "object" | "array" | "boolean",
     transaction: "beforewrite" | "onwrite" | "onread" | "ondelete",
