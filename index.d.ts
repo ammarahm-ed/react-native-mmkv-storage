@@ -1,6 +1,9 @@
 declare function MMKVStorage(): any;
 
-type StoredValueAndSetter<T> = [T | null, (value: T | ((prevValue: T) => T)) => void];
+type StoredValueAndSetter<T> = [
+  T | null,
+  (value: T | ((prevValue: T) => T)) => void
+];
 
 export declare function useMMKVStorage<T = any>(
   key: string,
@@ -8,24 +11,29 @@ export declare function useMMKVStorage<T = any>(
   defaultValue?: unknown
 ): StoredValueAndSetter<T>;
 
-export declare function create(storage: MMKVStorage.API): <T = any>(key: string, defaultValue?: unknown) => StoredValueAndSetter<T>;
+export declare function create(
+  storage: MMKVStorage.API
+): <T = any>(key: string, defaultValue?: unknown) => StoredValueAndSetter<T>;
 
 /**
- * Provided an array of keys, this hook will return an array of values, 
- * an update function and a remove function. This is supposed to be used with 
+ * Provided an array of keys, this hook will return an array of values,
+ * an update function and a remove function. This is supposed to be used with
  * `transactions` which let you mutate data when moving in and out of storage and
  * easily build indexes based on that data.
- * 
+ *
  * @param {Array<string>} keys An array of keys for which data is/will be present in storage
  * @param {"string" | "number" | "object" | "boolean" | "array"} type type of data
  * @param {MMKVStorage.API} storage An instance of storage
- * 
+ *
  * @returns `[values,update,remove]`
  */
-export declare const useIndex: (keys: Array<string>, type: "string" | "number" | "object" | "boolean" | "array", storage: MMKVStorage.API) => [unknown[], (key: string, value: unknown) => void, (key: string) => void]
+export declare const useIndex: (
+  keys: Array<string>,
+  type: "string" | "number" | "object" | "boolean" | "array",
+  storage: MMKVStorage.API
+) => [unknown[], (key: string, value: unknown) => void, (key: string) => void];
 
 export default MMKVStorage;
-
 
 type ACCESSIBLE = {
   WHEN_UNLOCKED: string;
@@ -43,8 +51,6 @@ type MODES = {
 };
 
 type Callback<T> = (error: Error | null, result: T | null | undefined) => void;
-
-
 
 declare module MMKVStorage {
   export const MODES: MODES;
@@ -145,8 +151,10 @@ declare module MMKVStorage {
      * @param {String} key
      */
 
-    getArrayAsync<T extends any>(key: string): Promise<Array<T> | null | undefined>;
-      /**
+    getArrayAsync<T extends any>(
+      key: string
+    ): Promise<Array<T> | null | undefined>;
+    /**
      * Retrieve multiple Objects for a given array of keys.
      *
      * @param {Array} keys
@@ -154,7 +162,7 @@ declare module MMKVStorage {
      */
     getMultipleItemsAsync<T extends unknown>(
       keys: Array<string>,
-      type:"string" |"number" | "map" | "boolean" | "array" | "object",
+      type: "string" | "number" | "map" | "boolean" | "array" | "object"
     ): Promise<Array<T>>;
 
     /**
@@ -173,7 +181,7 @@ declare module MMKVStorage {
      */
     removeItem(key: string): boolean | undefined;
 
-    // NON ASYNC CALLS 
+    // NON ASYNC CALLS
 
     /**
      * Set a string value to storag for a given key.
@@ -182,13 +190,20 @@ declare module MMKVStorage {
      * @param {String} value
      * @param {Callback<boolean>} callback
      */
-    setString(key: string, value: string, callback?: Callback<boolean>): boolean | undefined;
+    setString(
+      key: string,
+      value: string,
+      callback?: Callback<boolean>
+    ): boolean | undefined;
     /**
      * Get a string value for a given key.
      * @param {String} key
      * @param {Callback<string>} callback
      */
-    getString(key: string, callback?: Callback<string>): string | null | undefined;
+    getString(
+      key: string,
+      callback?: Callback<string>
+    ): string | null | undefined;
 
     /**
      * Set a number value to storage for a given key.
@@ -197,7 +212,11 @@ declare module MMKVStorage {
      * @param {number} value
      * @param {Callback<boolean>} callback
      */
-    setInt(key: string, value: number, callback?: Callback<boolean>): boolean | undefined;
+    setInt(
+      key: string,
+      value: number,
+      callback?: Callback<boolean>
+    ): boolean | undefined;
 
     /**
      * Get a number value for a given key
@@ -213,14 +232,21 @@ declare module MMKVStorage {
      * @param {boolean} value
      * @param {Callback<boolean>} callback
      */
-    setBool(key: string, value: boolean, callback?: Callback<boolean>): boolean | undefined;
+    setBool(
+      key: string,
+      value: boolean,
+      callback?: Callback<boolean>
+    ): boolean | undefined;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      * @param {Callback<boolean>} callback
      */
-    getBool(key: string, callback?: Callback<boolean>): boolean | null | undefined;
+    getBool(
+      key: string,
+      callback?: Callback<boolean>
+    ): boolean | null | undefined;
 
     /**
      * Set an Object to storage for a given key.
@@ -231,13 +257,20 @@ declare module MMKVStorage {
      * @param {Callback<boolean>} callback
      */
 
-    setMap(key: string, value: object, callback?: Callback<boolean>): boolean | undefined;
+    setMap(
+      key: string,
+      value: object,
+      callback?: Callback<boolean>
+    ): boolean | undefined;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      * @param {Callback<object>} callback
      */
-    getMap<T extends object>(key: string, callback?: Callback<T>): T | null | undefined;
+    getMap<T extends object>(
+      key: string,
+      callback?: Callback<T>
+    ): T | null | undefined;
     /**
      * Set an array to the db.
      * @param {String} key
@@ -267,7 +300,7 @@ declare module MMKVStorage {
      */
     getMultipleItems<T extends any>(
       keys: Array<string>,
-      type:"string" |"number" | "map" | "boolean" | "array" | "object",
+      type: "string" | "number" | "map" | "boolean" | "array" | "object",
       callback?: Callback<Array<T>>
     ): Array<T>;
 
@@ -289,17 +322,14 @@ declare module MMKVStorage {
     /**
      * Get the key and alias for the encrypted storage
      */
-    getKey(): { alias: string, key: string };
+    getKey(): { alias: string; key: string };
 
     encryption: encryption;
 
     indexer: indexer;
 
-    transactions:transcations;
+    transactions: transcations;
   }
-
-  
-
 
   export class Loader {
     /**
@@ -313,7 +343,7 @@ declare module MMKVStorage {
      * Addresses https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/156#issuecomment-934046177 issue.
      * @param {String} serviceName
      */
-     withServiceName(serviceName: string): this;
+    withServiceName(serviceName: string): this;
 
     /**
      * Encrypt MMKV Instance and store the creditials in secured storage for later use.
@@ -532,14 +562,19 @@ class encryption {
   ): Promise<boolean>;
 }
 
-
 /**
  * A class that allows you to register lifecycle functions for various data types in storage
- * to mutate data and build indexes. 
+ * to mutate data and build indexes.
  */
 class transcations {
-  register(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete", mutator: (key: string, value: unknown) => void):() => {} 
-  unregister(type: "string" | "number" | "object" | "array" | "boolean", transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"):void
-  clear():void
+  register(
+    type: "string" | "number" | "object" | "array" | "boolean",
+    transaction: "beforewrite" | "onwrite" | "onread" | "ondelete",
+    mutator: (key: string, value: unknown) => void
+  ): () => {};
+  unregister(
+    type: "string" | "number" | "object" | "array" | "boolean",
+    transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"
+  ): void;
+  clear(): void;
 }
-
