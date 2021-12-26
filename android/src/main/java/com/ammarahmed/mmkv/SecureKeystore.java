@@ -1,20 +1,16 @@
 package com.ammarahmed.mmkv;
 
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.security.KeyPairGeneratorSpec;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.IllegalViewOperationException;
-import com.securepreferences.SecurePreferences;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,19 +37,24 @@ import javax.security.auth.x500.X500Principal;
 public class SecureKeystore {
 
     private SharedPreferences prefs;
-    private SecureKeystore rnKeyStore;
-
-    private boolean useKeystore() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    }
-
     private ReactApplicationContext reactContext;
+    private String SharedPrefFileName = "rnmmkv.shareprefs";
 
     public SecureKeystore(ReactApplicationContext reactApplicationContext) {
 
         reactContext = reactApplicationContext;
         if (!useKeystore()) {
-            prefs = new SecurePreferences(reactApplicationContext, (String) null, "e4b001df9a082298dd090bb7455c45d92fbd5ddd.xml");
+            try {
+                prefs = EncryptedSharedPreferences.create("e4b001df9a082298dd090bb7455c45d92fbd5dda.xml",
+                        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                        reactContext,
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+            } catch (GeneralSecurityException | IOException e) {
+                Log.e("RNMMKV:SecureKeystore", "Failed to create encrypted shared preferences! Failing back to standard SharedPreferences",e);
+                prefs = reactContext.getSharedPreferences(SharedPrefFileName, Context.MODE_PRIVATE);
+            }
+
         }
     }
 
@@ -64,6 +65,9 @@ public class SecureKeystore {
                 directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
+    private boolean useKeystore() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
 
     public void setSecureKey(String key, String value) {
 
@@ -79,14 +83,16 @@ public class SecureKeystore {
                 } else {
                     setCipherText(reactContext, key, value);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
         } else {
             try {
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString(key, value);
                 editor.apply();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -97,19 +103,16 @@ public class SecureKeystore {
                 String value = getPlainText(reactContext, key);
 
 
-
                 return value;
 
 
             } catch (FileNotFoundException fnfe) {
 
 
-
                 return null;
 
 
             } catch (Exception e) {
-
 
 
                 return null;

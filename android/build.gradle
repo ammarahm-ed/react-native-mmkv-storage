@@ -55,7 +55,7 @@ android {
   compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
 
   defaultConfig {
-    minSdkVersion getExtOrDefault('minSdkVersion', 16)
+    minSdkVersion getExtOrDefault('minSdkVersion', 21)
     targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
     //ndkVersion "21.1.6352462"
     
@@ -85,7 +85,7 @@ android {
   }
 
   packagingOptions {
-    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so", "META-INF/MANIFEST.MF"]
+    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so"]
   }
   
   configurations {
@@ -118,7 +118,7 @@ repositories {
 dependencies {
   //noinspection GradleDynamicVersion
   implementation 'com.facebook.react:react-native:+'
-  implementation "com.scottyab:secure-preferences-lib:0.1.4"
+  implementation "androidx.security:security-crypto:1.0.0"
   implementation 'com.google.code.gson:gson:2.8.6'
 
   def rnAAR = fileTree(reactNativeDir.toString()).matching({ it.include "**/**/*.aar" }).singleFile
