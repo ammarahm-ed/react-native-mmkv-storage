@@ -85,7 +85,7 @@ android {
   }
 
   packagingOptions {
-    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so"]
+    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so", "META-INF/MANIFEST.MF"]
   }
   
   configurations {
