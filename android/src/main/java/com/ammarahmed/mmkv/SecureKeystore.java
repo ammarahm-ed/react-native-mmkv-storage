@@ -7,7 +7,7 @@ import android.security.KeyPairGeneratorSpec;
 import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKeys;
+import androidx.security.crypto.MasterKey;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.IllegalViewOperationException;
@@ -38,19 +38,28 @@ public class SecureKeystore {
 
     private SharedPreferences prefs;
     private ReactApplicationContext reactContext;
-    private String SharedPrefFileName = "rnmmkv.shareprefs";
+    private final String SharedPrefFileName = "rnmmkv.shareprefs";
+
+    private boolean useKeystore() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+    }
 
     public SecureKeystore(ReactApplicationContext reactApplicationContext) {
 
         reactContext = reactApplicationContext;
         if (!useKeystore()) {
             try {
-                prefs = EncryptedSharedPreferences.create("e4b001df9a082298dd090bb7455c45d92fbd5dda.xml",
-                        MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                MasterKey key = new MasterKey.Builder(reactContext)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build();
+
+                prefs = EncryptedSharedPreferences.create(
                         reactContext,
+                        "e4b001df9a082298dd090bb7455c45d92fbd5dda.xml",
+                        key,
                         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
-            } catch (GeneralSecurityException | IOException e) {
+            } catch (GeneralSecurityException | IOException | RuntimeException e) {
                 Log.e("RNMMKV:SecureKeystore", "Failed to create encrypted shared preferences! Failing back to standard SharedPreferences",e);
                 prefs = reactContext.getSharedPreferences(SharedPrefFileName, Context.MODE_PRIVATE);
             }
@@ -65,9 +74,6 @@ public class SecureKeystore {
                 directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
-    private boolean useKeystore() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-    }
 
     public void setSecureKey(String key, String value) {
 
