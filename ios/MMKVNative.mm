@@ -84,8 +84,8 @@ BOOL functionDiedBeforeCompletion = YES;
     rPath = rootDir;
     _secureStorage = [[SecureStorage alloc] init];
     [MMKV initializeMMKV:rootDir];
-    install(*(jsi::Runtime *)cxxBridge.runtime);
     [self migrate];
+    install(*(jsi::Runtime *)cxxBridge.runtime);
 }
 
 MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,

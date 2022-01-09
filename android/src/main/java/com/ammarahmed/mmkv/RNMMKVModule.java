@@ -63,6 +63,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
 
         if (reactContext.get() != 0) {
+            migrate();
             this.nativeInstall(
                     reactContext.get(),
                     rootPath
@@ -77,10 +78,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @Override
     public void initialize() {
         super.initialize();
-
-        //this.installLib(this.getReactApplicationContext().getJavaScriptContextHolder(),this.getReactApplicationContext().getFilesDir().getAbsolutePath() + "/mmkv");
-
-        migrate();
     }
 
     public void migrate() {
@@ -93,18 +90,27 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             IdStore = (HashMap<String, Object>) mmkvIdStore.getSerializable("mmkvIdStore");
             Set<String> keys = IdStore.keySet();
             for (String key : keys) {
-                Object entry = IdStore.get(key);
-                Gson gson = new Gson();
-                String json = gson.toJson(entry);
-                kv.putString(key, json);
                 HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(key);
-
+                if (!child.containsKey("alias")) {
+                    Set<String> storeKeys =  child.keySet();
+                    String alias = (String) child.get("alias");
+                    for (String storeKey: storeKeys) {
+                        if (!storeKey.equals("ID") && !storeKey.equals("encrypted")) {
+                            alias = (String) child.get(storeKey);
+                        }
+                    }
+                    child.put("alias",alias);
+                }
+                Gson gson = new Gson();
+                String json = gson.toJson(child);
+                kv.putString(key, json);
+                
                 if ((boolean) child.get("encrypted")) {
                     String alias = (String) child.get("alias");
                     if (secureKeystore.secureKeyExists(alias)) {
                         String cKey = secureKeystore.getSecureKey(alias);
                         MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE, cKey);
-                        writeToJSON(kvv);
+                         writeToJSON(kvv);
                     }
                 } else {
                     MMKV kvv = MMKV.mmkvWithID(key, MMKV.SINGLE_PROCESS_MODE);
