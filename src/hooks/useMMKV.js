@@ -65,7 +65,7 @@ export const useMMKVStorage = (key, storage, defaultValue) => {
             );
           return;
         }
-        updatedValue = nextValue(prevValue.current);
+        updatedValue = nextValue(prevValue.current || defaultValue);
       }
 
       let _value;
