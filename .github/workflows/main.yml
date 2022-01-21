@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - fix-ci
   pull_request:
     paths:
       - ".github/workflows/main.yml"
