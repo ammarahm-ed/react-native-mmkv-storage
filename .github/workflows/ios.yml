@@ -24,7 +24,7 @@ jobs:
 
     - run: xcode-select -p
 
-    - run: pod repo update  && pod update && pod install
+    - run: pod install
       working-directory: example/ios
       name: Install pod dependencies
     - name: Build iOS (debug)

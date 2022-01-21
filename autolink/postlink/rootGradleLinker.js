@@ -22,6 +22,7 @@ class RootGradleLinker {
 
     try {
       content = this._setNdkVersion(content);
+      content = this._setMinSdkVersion(content);
       this.setNdkVersion = true;
     } catch (e) {
       errorn("   " + e);
@@ -53,6 +54,15 @@ class RootGradleLinker {
     }
 
     return NaN;
+  }
+
+  _setMinSdkVersion(content) {
+    let minSdkRegex = /minSdkVersion = ([0-9])\w+/;
+    let minSdk = content.match(minSdkRegex)[0];
+    if (parseInt(minSdk.match(/([0-9])\w+/)) < 21) {
+      return content.replace(minSdk, "minSdkVersion = 21");
+    }
+    return content;
   }
 
   _setNdkVersion(content) {
