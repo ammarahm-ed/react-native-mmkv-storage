@@ -13,6 +13,21 @@
 
 </div>
 
+
+<div align="center">
+  <h3>Install the library</h3>
+  <pre>npm install react-native-mmkv-storage && npx mmkv-link</pre>
+</div>
+
+<div align="center">
+    
+   <a href="https://rnmmkv.vercel.app/#/gettingstarted"><h3>Get Started with Documentation</h3></a>
+  
+</div>
+
+
+
+
 ## What it is
 
 This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way. Read about it on this blog post I wrote on [dev.to](https://dev.to/ammarahmed/best-data-storage-option-for-react-native-apps-42k)
