@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/DC7bEyg.png" />
+  <img src="https://i.imgur.com/P13HcId.png" />
 </div>
 
 # 
@@ -16,7 +16,7 @@
 
 <div align="center">
   <h3>Install the library</h3>
-  <pre>npm install react-native-mmkv-storage && npx mmkv-link</pre>
+  <pre>npm install react-native-mmkv-storage</pre>
 </div>
 
 <div align="center">
