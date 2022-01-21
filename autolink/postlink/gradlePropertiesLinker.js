@@ -7,6 +7,16 @@ class GradlePropertiesLinker {
     this.gradleProperties = path.gradleProperties;
     this.setGradleVersion = false;
     this.buildToolsVersion = buildToolsVersion;
+    this.distUrlRegex = /distributionUrl=.*\n/;
+    this.versionRegex = /\d+(\.\d+)+/;
+    this.distUrl = `distributionUrl=https://services.gradle.org/distributions/gradle-`;
+  }
+
+  needLinking(content) {
+    let distUrl = content.match(this.distUrlRegex)[0];
+    let version = distUrl.match(this.versionRegex)[0];
+    infon(`Detected gradle version: ${version}`);
+    return parseInt(version[0]) < 7;
   }
 
   link() {
@@ -22,6 +32,11 @@ class GradlePropertiesLinker {
     let content = fs.readFileSync(this.gradleProperties, "utf8");
 
     try {
+      if (!this.needLinking(content)) {
+        infon("gradle.properties linked already.\n");
+        return;
+      }
+
       content = this._setGradleVersion(content);
       this.setGradleVersion = true;
     } catch (e) {
@@ -58,10 +73,10 @@ class GradlePropertiesLinker {
   }
 
   _setGradleDistributionUrl(version, content) {
-    return content.replace(/distributionUrl=.*\n/, () => {
+    return content.replace(this.distUrlRegex, () => {
       debugn(`   Updating Gradle distributionUrl ${version}`);
 
-      return `distributionUrl=https\\://services.gradle.org/distributions/gradle-${version}-all.zip\n`;
+      return `distributionUrl=https://services.gradle.org/distributions/gradle-${version}-all.zip\n`;
     });
   }
 }
