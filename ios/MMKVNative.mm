@@ -49,30 +49,22 @@ void setServiceName(NSString *alias, NSString *serviceName) {
     [serviceNames setObject:serviceName forKey: alias];
 }
 
-- (void)setBridge:(RCTBridge *)bridge {
-    _bridge = bridge;
-    _setBridgeOnMainQueue = RCTIsMainQueue();
-    [self installLibrary];
-}
-BOOL functionDiedBeforeCompletion = YES;
-- (void)installLibrary {
+// Installing JSI Bindings as done by
+// https://github.com/mrousavy/react-native-mmkv
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
+{
     
-    RCTCxxBridge *cxxBridge = (RCTCxxBridge *)self.bridge;
-    
-    if (!cxxBridge.runtime) {
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.001 * NSEC_PER_SEC),
-                       dispatch_get_main_queue(), ^{
-            /**
-             When refreshing the app while debugging, the setBridge
-             method is called too soon. The runtime is not ready yet
-             quite often. We need to install library as soon as runtime
-             becomes available.
-             */
-            [self installLibrary];
-        });
-        return;
+    RCTBridge* bridge = [RCTBridge currentBridge];
+    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
+    if (cxxBridge == nil) {
+        return @false;
     }
+
+    auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
+    if (jsiRuntime == nil) {
+        return @false;
+    }
+    auto& runtime = *jsiRuntime;
     
     mmkvInstances = [NSMutableDictionary dictionary];
     serviceNames = [NSMutableDictionary dictionary];
@@ -85,7 +77,8 @@ BOOL functionDiedBeforeCompletion = YES;
     _secureStorage = [[SecureStorage alloc] init];
     [MMKV initializeMMKV:rootDir];
     [self migrate];
-    install(*(jsi::Runtime *)cxxBridge.runtime);
+    install(*(jsi::Runtime *)jsiRuntime);
+    return @true;
 }
 
 MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,

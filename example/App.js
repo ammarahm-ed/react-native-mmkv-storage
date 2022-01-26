@@ -21,11 +21,10 @@ const storage = new MMKVStorage.Loader().withEncryption().initialize();
 const useStorage = create(storage);
 
 const App = () => {
-  const [user, setUser] = useStorage('user',"robert");
-  const [age, setAge] = useStorage('age',24);
+  const [user, setUser] = useStorage('user', 'robert');
+  const [age, setAge] = useStorage('age', 24);
 
   const getUser = useCallback(() => {
-   
     let users = ['andrew', 'robert', 'jack', 'alison'];
     let _user =
       users[
@@ -101,5 +100,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 10,
   },
-  headerText: {fontSize: 40, textAlign: 'center'},
+  headerText: {fontSize: 40, textAlign: 'center', color: 'black'},
 });

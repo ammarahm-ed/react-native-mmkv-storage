@@ -1,5 +1,3 @@
-
-
 package com.ammarahmed.mmkv;
 
 import android.os.Bundle;
@@ -44,33 +42,30 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
     private native void destroy();
 
-    public static boolean libLoaded = false;
-
     public RNMMKVModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         secureKeystore = new SecureKeystore(reactContext);
-
     }
 
-    @ReactMethod
-    public void installMMKV() {
-        // DO nothing
-    }
+    // Installing JSI Bindings as done by
+    // https://github.com/mrousavy/react-native-mmkv
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public boolean install() {
 
+        String rootPath = reactContext.getFilesDir().getAbsolutePath() + "/mmkv";
+        JavaScriptContextHolder jsContext = getReactApplicationContext().getJavaScriptContextHolder();
 
-
-    public void installLib(JavaScriptContextHolder reactContext, String rootPath) {
-
-        if (reactContext.get() != 0) {
+        if (jsContext.get() != 0) {
             migrate();
             this.nativeInstall(
-                    reactContext.get(),
+                    jsContext.get(),
                     rootPath
             );
-            libLoaded = true;
+            return true;
         } else {
             Log.e("RNMMKVModule","JSI Runtime is not available in debug mode");
+            return false;
         }
 
     }
@@ -201,7 +196,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
     @Override
     public void onCatalystInstanceDestroy() {
         super.onCatalystInstanceDestroy();
-        libLoaded = false;
         destroy();
     }
 }

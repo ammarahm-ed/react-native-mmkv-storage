@@ -16,6 +16,17 @@ export declare function create(
 ): <T = any>(key: string, defaultValue?: unknown) => StoredValueAndSetter<T>;
 
 /**
+ * Checks if MMKV Native Bindings are installed
+ */
+export declare function isLoaded();
+
+/**
+ * Install JSI Bindings if they are not installed already.
+ *
+ * Note: You don't need to call this normally.
+ */
+export declare function init();
+/**
  * Provided an array of keys, this hook will return an array of values,
  * an update function and a remove function. This is supposed to be used with
  * `transactions` which let you mutate data when moving in and out of storage and
