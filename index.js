@@ -8,7 +8,7 @@ import { useIndex } from "./src/hooks/useIndex";
 // Installing JSI Bindings as done by
 // https://github.com/mrousavy/react-native-mmkv
 export function isLoaded() {
-  return typeof global.getStringMMKV !== "function";
+  return typeof global.getStringMMKV === "function";
 }
 
 export function init() {
