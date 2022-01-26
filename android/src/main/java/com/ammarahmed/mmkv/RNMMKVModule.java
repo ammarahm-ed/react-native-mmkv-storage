@@ -91,10 +91,16 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             Set<String> keys = IdStore.keySet();
             for (String key : keys) {
                 HashMap<String, Object> child = (HashMap<String, Object>) IdStore.get(key);
-                if (!child.containsKey("alias")) {
+
+                boolean isEncrypted = false;
+                if (child.containsKey("encrypted")) {
+                  isEncrypted  = (boolean) child.get("encrypted");
+                }
+                if (isEncrypted && !child.containsKey("alias")) {
                     Set<String> storeKeys =  child.keySet();
                     String alias = (String) child.get("alias");
                     for (String storeKey: storeKeys) {
+                        if (storeKey == null) continue;
                         if (!storeKey.equals("ID") && !storeKey.equals("encrypted")) {
                             alias = (String) child.get(storeKey);
                         }
@@ -105,7 +111,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 String json = gson.toJson(child);
                 kv.putString(key, json);
                 
-                if ((boolean) child.get("encrypted")) {
+                if (isEncrypted) {
                     String alias = (String) child.get("alias");
                     if (secureKeystore.secureKeyExists(alias)) {
                         String cKey = secureKeystore.getSecureKey(alias);
