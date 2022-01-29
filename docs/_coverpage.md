@@ -1,4 +1,4 @@
-# react-native-mmkv-storage <small>0.5.7</small>
+# react-native-mmkv-storage <small>0.6.11</small>
 
 
 > An ultra fast(0.0002s read/write), small & encrypted mobile key-value storage framework for React Native written in C++ using JSI

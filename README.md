@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/P13HcId.png" />
 </div>
 
-# 
+#
 
 <div align="center">
     <p><a href="https://www.npmjs.com/package/react-native-mmkv-storage"><img src="https://img.shields.io/npm/v/react-native-mmkv-storage.svg?style=flat-square" alt=""></a>
@@ -12,7 +12,6 @@
 <a href="https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/ios.yml"><img src="https://github.com/ammarahm-ed/react-native-mmkv-storage/actions/workflows/ios.yml/badge.svg" alt="iOS"></a></p>
 
 </div>
-
 
 <div align="center">
   <h3>Install the library</h3>
@@ -25,9 +24,6 @@
   
 </div>
 
-
-
-
 ## What it is
 
 This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way. Read about it on this blog post I wrote on [dev.to](https://dev.to/ammarahmed/best-data-storage-option-for-react-native-apps-42k)
@@ -36,45 +32,133 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 ## Features
 
-- **Written in C++ using JSI**<br/>
-  Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI making it the fastest storage option for React Native.
-- **Simple and lightweight**<br/>
-  (~ 50K Android/30K iOS) and even smaller when packaged.
-- **Fast and Efficient (0.0002s Read/Write Speed)**<br/>
-  MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
-  You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
-- **Reactive using `useMMKVStorage` & `useIndex` Hook**<br/>
-  Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.
-- **Lifecycle Control**  
-  Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as `onwrite`, `beforewrite`, `onread`, `ondelete`. This allows for a better and more managed control over the storage and also let's you build custom indexes with a few lines of code.
-- **Multi-Process Support**<br/>
-  MMKV supports concurrent read-read and read-write access between processes.
-- **Create unlimited Database instances**<br/>
-  You can create many database instances. This helps greatly if you have seperate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
-- **Full encryption support**<br/>
-  The library supports full encryption on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). On android for lower api levels (API 22 and below), it uses [secure prefrences](https://github.com/scottyab/secure-preferences/) which provides not perfect but incremental security on older Android APIs.
-- **Simple indexer and data querying**<br/>
-  For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
-- **Supports redux-persist**<br/>
-  Support for redux persist is also added starting from v0.3.2.
+### **Written in C++ using JSI**
 
-## Links
+Starting from `v0.5.0` the library has been rewritten in C++ on Android and iOS both. It employs React Native JSI making it the fastest storage option for React Native.
 
-- [Documentation](https://rnmmkv.now.sh/#/)
+### **Simple and lightweight**
 
-## Quickstart
+(~ 50K Android/30K iOS) and even smaller when packaged.
 
-- [Quickstart guide](https://rnmmkv.now.sh/#/gettingstarted)
+### **Fast and Efficient (0.0002s Read/Write Speed)**
+
+MMKV uses mmap to keep memory synced with file, and protobuf to encode/decode values to achieve best performance.
+You can see the benchmarks here: [Android](https://github.com/Tencent/MMKV/wiki/android_benchmark) & [iOS](https://github.com/Tencent/MMKV/wiki/iOS_benchmark)
+
+### **Reactive using `useMMKVStorage` & `useIndex` Hooks**
+
+Hooks let's the storage update your app when a change takes place in storage.
+
+#### `useMMKVStorage` hook
+
+Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.
+
+```js
+import MMKVStorage, { useMMKVStorage } from "react-native-mmkv-storage";
+
+const storage = new MMKVStorage.Loader().initialize();
+const App = () => {
+  const [user, setUser] = useMMKVStorage("user", storage, "robert");
+  const [age, setAge] = useMMKVStorage("age", storage, 24);
+
+  return (
+    <View style={styles.header}>
+      <Text style={styles.headerText}>
+        I am {user} and I am {age} years old.
+      </Text>
+    </View>
+  );
+};
+```
+
+Learn more about `useMMKVStorage` hook it in the [docs](https://rnmmkv.vercel.app/#/usemmkvstorage).
+
+#### `useIndex` hook
+
+A hook that will take an array of keys and returns an array of values for those keys. This is supposed to work in combination with Transactions. When you have build your custom index, you will need an easy and quick way to load values for your index. useIndex hook actively listens to all read/write changes and updates the values accordingly.
+
+```js
+const App = () => {
+    // Get list of all post ids
+    const postsIndex = useMMKVStorage("postsIndex",storage,[]); // ['post123','post234'];
+    // Get the posts based on those ids.
+    const [posts,update,remove] = useIndex(postsIndex,"object" storage);
+
+    return <View>
+    <FlatList
+    data={posts}
+    renderItem={...}
+    >
+</View>
+
+}
+```
+
+Learn more about `useIndex` hook it in the [docs](https://rnmmkv.vercel.app/#/useindex).
+
+### **Lifecycle Control with Transaction Manager**
+
+Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as Read, Write and Delete. This allows for a better and more managed control over the storage and also let's you **build custom indexes** with a few lines of code.
+
+```js
+MMKV.transcations.register("object", "beforewrite", ({ key, value }) => {
+  if (key.startsWith("post.")) {
+    // Call this only when the key has the post prefix.
+    let indexForTag = MMKV.getArray(`${value.tag}-index`) || [];
+    MMKV.setArray(indexForTag.push(key));
+  }
+});
+```
+
+Learn more about how to use Transactions in [docs](https://rnmmkv.vercel.app/#/transactionmanager)
+
+### **Multi-Process Support**
+
+MMKV supports concurrent read-read and read-write access between processes. This means that you can use MMKV for various extenstions and widgets and your app.
+
+### **Create unlimited Database instances**
+
+You can create many database instances. This helps greatly if you have seperate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
+
+```js
+const userStorage = new MMKVStorage.Loader()
+  .withEncryption()
+  .withInstanceID("userdata")
+  .initialize();
+
+const settingsStorage = new MMKVStorage.Loader()
+  .withInstanceID("settings")
+  .initialize();
+```
+
+### **Full encryption support**
+
+The library supports full encryption (AES CFB-128) on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). Encrypting an instance is simple:
+
+```js
+const storage = new MMKVStorage.Loader()
+  .withEncryption() // Generates a random key and stores it securely in Keychain
+  .initialize();
+```
+
+And that's it.
+
+### **Simple indexer and data querying**
+
+For each database instance, there is one global key index and then there are indexes of each type of data. So querying is easy and fast.
+
+### **Supports redux-persist**
+
+Support for redux persist is also added starting from v0.3.2.
+
+## Consider supporting with a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/)
+
+If you are using the library in one of your projects, consider supporting with a star. It takes a lot of time and effort to keep this maintained and address issues and bugs. Thank you.
 
 ## Contact & Support
 
 - Create a GitHub issue for bug reports, feature requests, or questions
-- Follow [@ammarahm-ed](https://github.com/ammarahm-ed) for announcements
-- Add a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/) or ❤️ tweet to support the project!
-
-## RoadMap
-
-You can track the upcoming features, changes and the future of this library in this [issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/13)
+- Follow [@ammarahm-ed](https://github.com/ammarahm-ed)
 
 ## I want to contribute
 
