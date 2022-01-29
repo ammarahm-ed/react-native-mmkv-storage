@@ -17,13 +17,13 @@ It's recommended that you upgrade your project to latest version of react native
 npx mmkv-link
 ```
 
-Run the following inside ios folder in your project.
+### iOS Steps
 
 ```bash
 pod install
 ```
 
-#### Manual Installation (For React Native 0.65.x & older)
+### Manual Installation (For React Native 0.65.x & older)
 If `npx mmkv-link` fails for some reason. You can follow the steps below and make the changes manually.
 
 Update the Android Gradle plugin to `4.1+` (`android/build.gradle`) and `ndkVersion` define property:
