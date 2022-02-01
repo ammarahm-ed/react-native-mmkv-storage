@@ -48,6 +48,8 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         secureKeystore = new SecureKeystore(reactContext);
     }
 
+    public void installLib(JavaScriptContextHolder reactContext, String rootPath) {}
+
     // Installing JSI Bindings as done by
     // https://github.com/mrousavy/react-native-mmkv
     @ReactMethod(isBlockingSynchronousMethod = true)
