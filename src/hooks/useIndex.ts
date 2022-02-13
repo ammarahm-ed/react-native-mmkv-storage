@@ -38,7 +38,15 @@ type GenericValueType<T> = [key: string, value: T | null | undefined];
  *
  * @returns `[values, update, remove]`
  */
-export const useIndex = <T>(keys: string[], type: DataType, storage: API) => {
+export const useIndex = <T>(
+  keys: string[],
+  type: DataType,
+  storage: API
+): [
+  values: (T | null | undefined)[],
+  update: (key: string, value: T) => void,
+  remove: (key: string) => void
+] => {
   const [values, setValues] = useState<GenericValueType<T>[]>(
     storage.getMultipleItems(keys || [], type)
   );

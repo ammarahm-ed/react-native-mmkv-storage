@@ -58,11 +58,13 @@ import { getDataType, getInitialValue } from './functions';
  * @param storage The storage instance
  * @returns `useMMKVStorage` hook
  */
-export var create = function (storage) { return function (key, defaultValue) {
-    if (!key || typeof key !== 'string' || !storage)
-        throw new Error('Key and Storage are required parameters.');
-    return useMMKVStorage(key, storage, defaultValue);
-}; };
+export var create = function (storage) {
+    return function (key, defaultValue) {
+        if (!key || typeof key !== 'string' || !storage)
+            throw new Error('Key and Storage are required parameters.');
+        return useMMKVStorage(key, storage, defaultValue);
+    };
+};
 /**
  *
  * useMMKVStorage Hook is like a persisted state that will always write every change in storage and update your app UI instantly.

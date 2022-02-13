@@ -33,5 +33,5 @@ import { DataType } from '../types';
  *
  * @returns `[values, update, remove]`
  */
-export declare const useIndex: <T>(keys: string[], type: DataType, storage: API) => ((T | null | undefined)[] | ((key: any, value: any) => void))[];
+export declare const useIndex: <T>(keys: string[], type: DataType, storage: API) => [values: (T | null | undefined)[], update: (key: string, value: T) => void, remove: (key: string) => void];
 //# sourceMappingURL=useIndex.d.ts.map

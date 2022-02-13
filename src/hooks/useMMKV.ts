@@ -24,11 +24,13 @@ import { getDataType, getInitialValue } from './functions';
  * @param storage The storage instance
  * @returns `useMMKVStorage` hook
  */
-export const create = (storage: API) => (key: string, defaultValue: any) => {
-  if (!key || typeof key !== 'string' || !storage)
-    throw new Error('Key and Storage are required parameters.');
-  return useMMKVStorage(key, storage, defaultValue);
-};
+export const create =
+  <T>(storage: API) =>
+  (key: string, defaultValue: any) => {
+    if (!key || typeof key !== 'string' || !storage)
+      throw new Error('Key and Storage are required parameters.');
+    return useMMKVStorage<T>(key, storage, defaultValue);
+  };
 
 /**
  *
@@ -55,7 +57,11 @@ export const create = (storage: API) => (key: string, defaultValue: any) => {
  *
  * @returns `[value,setValue]`
  */
-export const useMMKVStorage = <T>(key: string, storage: API, defaultValue: any) => {
+export const useMMKVStorage = <T>(
+  key: string,
+  storage: API,
+  defaultValue: any
+): [value: T | null | undefined, setValue: (value: T) => void] => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
 
