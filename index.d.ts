@@ -1,9 +1,6 @@
 declare function MMKVStorage(): any;
 
-type StoredValueAndSetter<T> = [
-  T | null,
-  (value: T | ((prevValue: T) => T)) => void
-];
+type StoredValueAndSetter<T> = [T | null, (value: T | ((prevValue: T) => T)) => void];
 
 export declare function useMMKVStorage<T = any>(
   key: string,
@@ -40,7 +37,7 @@ export declare function init();
  */
 export declare const useIndex: (
   keys: Array<string>,
-  type: "string" | "number" | "object" | "boolean" | "array",
+  type: 'string' | 'number' | 'object' | 'boolean' | 'array',
   storage: MMKVStorage.API
 ) => [unknown[], (key: string, value: unknown) => void, (key: string) => void];
 
@@ -93,7 +90,7 @@ declare module MMKVStorage {
     getItem(key: string): Promise<string | null | undefined>;
 
     /**
-     * Set a string value to storag for a given key.
+     * Set a string value to storage for a given key.
      *
      * @param {String} key
      * @param {String} value
@@ -162,9 +159,7 @@ declare module MMKVStorage {
      * @param {String} key
      */
 
-    getArrayAsync<T extends any>(
-      key: string
-    ): Promise<Array<T> | null | undefined>;
+    getArrayAsync<T extends any>(key: string): Promise<Array<T> | null | undefined>;
     /**
      * Retrieve multiple Objects for a given array of keys.
      *
@@ -173,7 +168,7 @@ declare module MMKVStorage {
      */
     getMultipleItemsAsync<T extends unknown>(
       keys: Array<string>,
-      type: "string" | "number" | "map" | "boolean" | "array" | "object"
+      type: 'string' | 'number' | 'map' | 'boolean' | 'array' | 'object'
     ): Promise<Array<T>>;
 
     /**
@@ -201,20 +196,13 @@ declare module MMKVStorage {
      * @param {String} value
      * @param {Callback<boolean>} callback
      */
-    setString(
-      key: string,
-      value: string,
-      callback?: Callback<boolean>
-    ): boolean | undefined;
+    setString(key: string, value: string, callback?: Callback<boolean>): boolean | undefined;
     /**
      * Get a string value for a given key.
      * @param {String} key
      * @param {Callback<string>} callback
      */
-    getString(
-      key: string,
-      callback?: Callback<string>
-    ): string | null | undefined;
+    getString(key: string, callback?: Callback<string>): string | null | undefined;
 
     /**
      * Set a number value to storage for a given key.
@@ -223,11 +211,7 @@ declare module MMKVStorage {
      * @param {number} value
      * @param {Callback<boolean>} callback
      */
-    setInt(
-      key: string,
-      value: number,
-      callback?: Callback<boolean>
-    ): boolean | undefined;
+    setInt(key: string, value: number, callback?: Callback<boolean>): boolean | undefined;
 
     /**
      * Get a number value for a given key
@@ -243,21 +227,14 @@ declare module MMKVStorage {
      * @param {boolean} value
      * @param {Callback<boolean>} callback
      */
-    setBool(
-      key: string,
-      value: boolean,
-      callback?: Callback<boolean>
-    ): boolean | undefined;
+    setBool(key: string, value: boolean, callback?: Callback<boolean>): boolean | undefined;
 
     /**
      * Get a boolean value for a given key.
      * @param {String} key
      * @param {Callback<boolean>} callback
      */
-    getBool(
-      key: string,
-      callback?: Callback<boolean>
-    ): boolean | null | undefined;
+    getBool(key: string, callback?: Callback<boolean>): boolean | null | undefined;
 
     /**
      * Set an Object to storage for a given key.
@@ -268,31 +245,20 @@ declare module MMKVStorage {
      * @param {Callback<boolean>} callback
      */
 
-    setMap(
-      key: string,
-      value: object,
-      callback?: Callback<boolean>
-    ): boolean | undefined;
+    setMap(key: string, value: object, callback?: Callback<boolean>): boolean | undefined;
     /**
      * Get an Object from storage for a given key.
      * @param {String} key
      * @param {Callback<object>} callback
      */
-    getMap<T extends object>(
-      key: string,
-      callback?: Callback<T>
-    ): T | null | undefined;
+    getMap<T extends object>(key: string, callback?: Callback<T>): T | null | undefined;
     /**
      * Set an array to the db.
      * @param {String} key
      * @param {Array} array
      * @param {Callback<boolean>} callback
      */
-    setArray(
-      key: string,
-      value: Array<any>,
-      callback?: Callback<boolean>
-    ): boolean | undefined;
+    setArray(key: string, value: Array<any>, callback?: Callback<boolean>): boolean | undefined;
     /**
      * get an array from the storage for give key.
      * @param {String} key
@@ -311,7 +277,7 @@ declare module MMKVStorage {
      */
     getMultipleItems<T extends any>(
       keys: Array<string>,
-      type: "string" | "number" | "map" | "boolean" | "array" | "object",
+      type: 'string' | 'number' | 'map' | 'boolean' | 'array' | 'object',
       callback?: Callback<Array<T>>
     ): Array<T>;
 
@@ -383,11 +349,7 @@ declare module MMKVStorage {
      * @param {string} alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
      */
 
-    encryptWithCustomKey(
-      key: string,
-      secureKeyStorage: boolean,
-      alias: string
-    ): this;
+    encryptWithCustomKey(key: string, secureKeyStorage: boolean, alias: string): this;
 
     /**
      * Set the processing mode for storage.
@@ -579,13 +541,13 @@ declare class encryption {
  */
 declare class transcations {
   register(
-    type: "string" | "number" | "object" | "array" | "boolean",
-    transaction: "beforewrite" | "onwrite" | "onread" | "ondelete",
+    type: 'string' | 'number' | 'object' | 'array' | 'boolean',
+    transaction: 'beforewrite' | 'onwrite' | 'onread' | 'ondelete',
     mutator: (key: string, value: unknown) => void
   ): () => {};
   unregister(
-    type: "string" | "number" | "object" | "array" | "boolean",
-    transaction: "beforewrite" | "onwrite" | "onread" | "ondelete"
+    type: 'string' | 'number' | 'object' | 'array' | 'boolean',
+    transaction: 'beforewrite' | 'onwrite' | 'onread' | 'ondelete'
   ): void;
   clear(): void;
 }

@@ -1,11 +1,15 @@
-const lowercase = "abcdefghijklmnopqrstuvwxyz";
-const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const numbers = "0123456789";
+const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const numbers = '0123456789';
 
 const all = lowercase + uppercase + numbers;
 
-export default function generatePassword() {
-  let password = "";
+/**
+ * A utility function that generates a strong password
+ * @returns
+ */
+export default function generatePassword(): string {
+  let password = '';
 
   password += pick(password, lowercase, 1, 5);
   password += pick(password, uppercase, 1, 5);
@@ -14,9 +18,9 @@ export default function generatePassword() {
   return shuffle(password);
 }
 
-function pick(exclusions, string, min, max) {
-  var n,
-    chars = "";
+function pick(exclusions: string, string: string, min: number, max?: number): string {
+  var n: number,
+    chars = '';
 
   if (max === undefined) {
     n = min;
@@ -36,10 +40,10 @@ function pick(exclusions, string, min, max) {
   return chars;
 }
 
-function shuffle(string) {
-  var array = string.split("");
-  var tmp,
-    current,
+function shuffle(string: string): string {
+  var array = string.split('');
+  var tmp: string,
+    current: number,
     top = array.length;
 
   if (top)
@@ -50,5 +54,5 @@ function shuffle(string) {
       array[top] = tmp;
     }
 
-  return array.join("");
+  return array.join('');
 }
