@@ -19,15 +19,25 @@ export function handleAction<T extends (...args: any[]) => any | undefined | nul
   let id = args[args.length - 1];
   if (currentInstancesStatus[id]) {
     if (!action) return;
-    return action(...args);
+    let result = action(...args);
+    if (result === undefined) {
+      initialize(id);
+      result = action(...args);
+    }
+    return result;
   }
   let ready = initialize(id);
   if (ready) {
     currentInstancesStatus[id] = true;
   }
-  if (!ready || !action) return undefined;
+  if (!action) return undefined;
 
-  return action(...args);
+  let result = action(...args);
+  if (result === undefined) {
+    initialize(id);
+    result = action(...args);
+  }
+  return;
 }
 
 /**
@@ -54,6 +64,10 @@ export async function handleActionAsync<T extends (...args: any[]) => any | unde
         return;
       }
       let result = action(...args);
+      if (result === undefined) {
+        initialize(id);
+        result = action(...args);
+      }
       resolve(result);
     } else {
       let ready = initialize(id);
@@ -66,6 +80,10 @@ export async function handleActionAsync<T extends (...args: any[]) => any | unde
         return;
       }
       let result = action(...args);
+      if (result === undefined) {
+        initialize(id);
+        result = action(...args);
+      }
       resolve(result);
     }
   });
