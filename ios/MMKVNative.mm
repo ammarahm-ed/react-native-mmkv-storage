@@ -26,6 +26,23 @@ RCT_EXPORT_MODULE()
     return YES;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    RCTExecuteOnMainQueue(^{
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                             NSUserDomainMask, YES);
+        NSString *libraryPath = (NSString *)[paths firstObject];
+        NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
+        rPath = rootDir;
+        _secureStorage = [[SecureStorage alloc] init];
+        [MMKV initializeMMKV:rootDir];
+    });
+    
+    
+    return self;
+}
+
 MMKV *getInstance(NSString *ID) {
     if ([[mmkvInstances allKeys] containsObject:ID]) {
         MMKV *kv = [mmkvInstances objectForKey:ID];
@@ -64,18 +81,10 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     if (jsiRuntime == nil) {
         return @false;
     }
-    auto& runtime = *jsiRuntime;
     
     mmkvInstances = [NSMutableDictionary dictionary];
     serviceNames = [NSMutableDictionary dictionary];
     
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
-                                                         NSUserDomainMask, YES);
-    NSString *libraryPath = (NSString *)[paths firstObject];
-    NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-    rPath = rootDir;
-    _secureStorage = [[SecureStorage alloc] init];
-    [MMKV initializeMMKV:rootDir];
     [self migrate];
     install(*(jsi::Runtime *)jsiRuntime);
     return @true;

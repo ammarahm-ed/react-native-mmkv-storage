@@ -56,15 +56,25 @@ export function handleAction(action) {
     if (currentInstancesStatus[id]) {
         if (!action)
             return;
-        return action.apply(void 0, args);
+        var result_1 = action.apply(void 0, args);
+        if (result_1 === undefined) {
+            initialize(id);
+            result_1 = action.apply(void 0, args);
+        }
+        return result_1;
     }
     var ready = initialize(id);
     if (ready) {
         currentInstancesStatus[id] = true;
     }
-    if (!ready || !action)
+    if (!action)
         return undefined;
-    return action.apply(void 0, args);
+    var result = action.apply(void 0, args);
+    if (result === undefined) {
+        initialize(id);
+        result = action.apply(void 0, args);
+    }
+    return;
 }
 /**
  *
@@ -97,6 +107,10 @@ export function handleActionAsync(action) {
                                 return [2 /*return*/];
                             }
                             result = action.apply(void 0, args);
+                            if (result === undefined) {
+                                initialize(id);
+                                result = action.apply(void 0, args);
+                            }
                             resolve(result);
                         }
                         else {
@@ -110,6 +124,10 @@ export function handleActionAsync(action) {
                                 return [2 /*return*/];
                             }
                             result = action.apply(void 0, args);
+                            if (result === undefined) {
+                                initialize(id);
+                                result = action.apply(void 0, args);
+                            }
                             resolve(result);
                         }
                         return [2 /*return*/];
