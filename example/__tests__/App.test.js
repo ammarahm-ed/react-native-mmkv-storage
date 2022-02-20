@@ -1,9 +1,9 @@
 import 'react-native';
 import MMKVStorage, {isLoaded} from 'react-native-mmkv-storage';
 
-describe('MMKV Storage mock tests', () => {
+describe('MMKV Storage mock functionality', () => {
   beforeEach(function () {
-    let mmkvMock = require('../../jest/dist/jest/memoryStore');
+    let mmkvMock = require('react-native-mmkv-storage/jest/dist/jest/memoryStore.js');
     mmkvMock.unmock();
     mmkvMock.mock();
   });

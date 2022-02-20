@@ -1,4 +1,7 @@
 module.exports = {
   preset: 'react-native',
-  setupFiles: ['./jest.setup.js'],
+  setupFiles: [
+    './node_modules/react-native-mmkv-storage/jest/mmkvJestSetup.js',
+  ],
+  transformIgnorePatterns: ['/!node_modules\\/react-native-mmkv-storage/'],
 };
