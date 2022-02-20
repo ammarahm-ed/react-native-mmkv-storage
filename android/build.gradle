@@ -139,29 +139,10 @@ task extractJNIFiles {
     }
   }
 }
-
-task extractJNIFilesForRelease {
-  
-  doLast {
-    configurations.extractJNI.files.each {
-      def file = it.absoluteFile
-
-      copy {
-        from zipTree(file)
-        into "$buildDir/$file.name"
-        include "jni/**/*"
-      }
-    }
-  }
-}
-
+// Extract JNI files as soon as first task is added
+def extracted = false;
 tasks.whenTaskAdded { task ->
-  if (task.name.contains('generateJsonModelDebug') || task.name.contains('externalNativeBuild')) {
-    task.dependsOn(extractJNIFiles);
-  }
-
-  if (task.name.contains('generateJsonModelRelease')) {
-    task.dependsOn(extractJNIFilesForRelease)
-  }
+  if (extracted) return
+  task.dependsOn(extractJNIFiles);
+  extracted = true;
 }
-
