@@ -7,6 +7,7 @@
   - [Value Lifecycle Control](transcationmanager.md)
   - [Supported Data Types](datatypes.md)
   - [Redux persist support](redux-persist.md)
+  - [Testing with Jest](mockjest.md)
 
 - API Reference
 

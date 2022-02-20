@@ -1,6 +1,7 @@
 src/
 index.ts
 
+jest/memoryStore.ts
 
 # OSX
 #
