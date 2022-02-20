@@ -125,8 +125,9 @@ dependencies {
   extractJNI(files(rnAAR))
 }
 
+def extracted = false;
 task extractJNIFiles {
-  
+  if (extracted) return
   doLast {
     configurations.extractJNI.files.each {
       def file = it.absoluteFile
@@ -136,13 +137,12 @@ task extractJNIFiles {
         into "$buildDir/$file.name"
         include "jni/**/*"
       }
+      extracted = true;
     }
   }
 }
+
 // Extract JNI files as soon as first task is added
-def extracted = false;
 tasks.whenTaskAdded { task ->
-  if (extracted) return
   task.dependsOn(extractJNIFiles);
-  extracted = true;
 }
