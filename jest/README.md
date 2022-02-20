@@ -3,7 +3,7 @@ The library supports mocking the storage in memory to support read/write during 
 
 Add `mmkvJestSetup.js` and `transformIgnorePatterns` in `jest.config.js`.
 
-```
+```js
 module.exports = {
   preset: 'react-native',
   setupFiles: [
