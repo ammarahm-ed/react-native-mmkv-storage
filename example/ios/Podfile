@@ -12,6 +12,8 @@ target 'example' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-mmkv-storage', :path => '../../react-native-mmkv-storage.podspec'
+
   target 'exampleTests' do
     inherit! :complete
     # Pods for testing

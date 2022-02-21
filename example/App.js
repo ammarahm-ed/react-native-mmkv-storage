@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import MMKVStorage, {create} from 'react-native-mmkv-storage';
-
 const Button = ({title, onPress}) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>

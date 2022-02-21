@@ -1,5 +1,5 @@
 import 'react-native';
-import MMKVStorage, {isLoaded} from 'react-native-mmkv-storage';
+import MMKVStorage, {isLoaded} from '../../';
 
 const mmkvMock = require('../../jest/dist/jest/memoryStore.js');
 
