@@ -93,11 +93,12 @@ export const mock = (): boolean => {
   };
 
   mmkvJsiModule.removeValueMMKV = (key, id) => {
+    if (!MEMORY_STORE[id]) return undefined;
     delete MEMORY_STORE[id].storage[key];
 
-    Object.keys(MEMORY_STORE[id].indexes).forEach(key => {
+    Object.keys(MEMORY_STORE[id].indexes).forEach(indexKey => {
       //@ts-ignore
-      let index: string[] = MEMORY_STORE[id].indexes[key];
+      let index: string[] = MEMORY_STORE[id].indexes[indexKey];
       if (index.includes(key)) {
         index.splice(index.indexOf(key), 1);
       }
@@ -172,7 +173,7 @@ export const mock = (): boolean => {
   mmkvJsiModule.setArrayMMKV = (key, value, id) => {
     if (!MEMORY_STORE[id]) return undefined;
     MEMORY_STORE[id].storage[key] = value;
-    updateIndex(key, 'mapIndex', id);
+    updateIndex(key, 'arrayIndex', id);
     return true;
   };
 

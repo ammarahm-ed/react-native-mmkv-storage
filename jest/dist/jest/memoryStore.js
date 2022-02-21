@@ -67,10 +67,12 @@ export var mock = function () {
         return MEMORY_STORE[id].indexes[type];
     };
     mmkvJsiModule.removeValueMMKV = function (key, id) {
+        if (!MEMORY_STORE[id])
+            return undefined;
         delete MEMORY_STORE[id].storage[key];
-        Object.keys(MEMORY_STORE[id].indexes).forEach(function (key) {
+        Object.keys(MEMORY_STORE[id].indexes).forEach(function (indexKey) {
             //@ts-ignore
-            var index = MEMORY_STORE[id].indexes[key];
+            var index = MEMORY_STORE[id].indexes[indexKey];
             if (index.includes(key)) {
                 index.splice(index.indexOf(key), 1);
             }
@@ -147,7 +149,7 @@ export var mock = function () {
         if (!MEMORY_STORE[id])
             return undefined;
         MEMORY_STORE[id].storage[key] = value;
-        updateIndex(key, 'mapIndex', id);
+        updateIndex(key, 'arrayIndex', id);
         return true;
     };
     mmkvJsiModule.getArrayMMKV = function (key, id) {
