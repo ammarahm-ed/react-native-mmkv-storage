@@ -52,29 +52,18 @@ export function handleAction(action) {
     for (var _i = 1; _i < arguments.length; _i++) {
         args[_i - 1] = arguments[_i];
     }
+    // The last argument is always the instance id.
     var id = args[args.length - 1];
-    if (currentInstancesStatus[id]) {
-        if (!action)
-            return;
-        var result_1 = action.apply(void 0, args);
-        if (result_1 === undefined) {
-            initialize(id);
-            result_1 = action.apply(void 0, args);
-        }
-        return result_1;
-    }
-    var ready = initialize(id);
-    if (ready) {
-        currentInstancesStatus[id] = true;
+    if (!currentInstancesStatus[id]) {
+        currentInstancesStatus[id] = initialize(id);
     }
     if (!action)
         return undefined;
     var result = action.apply(void 0, args);
-    if (result === undefined) {
-        initialize(id);
-        result = action.apply(void 0, args);
-    }
-    return;
+    if (result === undefined)
+        currentInstancesStatus[id] = initialize(id);
+    result = action.apply(void 0, args);
+    return result;
 }
 /**
  *
@@ -95,44 +84,20 @@ export function handleActionAsync(action) {
     }
     return __awaiter(this, void 0, void 0, function () {
         var id;
-        var _this = this;
         return __generator(this, function (_a) {
             id = args[args.length - 1];
-            return [2 /*return*/, new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
-                    var result, ready, result;
-                    return __generator(this, function (_a) {
-                        if (currentInstancesStatus[id]) {
-                            if (!action) {
-                                resolve(undefined);
-                                return [2 /*return*/];
-                            }
-                            result = action.apply(void 0, args);
-                            if (result === undefined) {
-                                initialize(id);
-                                result = action.apply(void 0, args);
-                            }
-                            resolve(result);
-                        }
-                        else {
-                            ready = initialize(id);
-                            if (ready) {
-                                currentInstancesStatus[id] = true;
-                            }
-                            currentInstancesStatus[id] = true;
-                            if (!action) {
-                                resolve(undefined);
-                                return [2 /*return*/];
-                            }
-                            result = action.apply(void 0, args);
-                            if (result === undefined) {
-                                initialize(id);
-                                result = action.apply(void 0, args);
-                            }
-                            resolve(result);
-                        }
-                        return [2 /*return*/];
-                    });
-                }); })];
+            return [2 /*return*/, new Promise(function (resolve) {
+                    if (!currentInstancesStatus[id]) {
+                        currentInstancesStatus[id] = initialize(id);
+                    }
+                    if (!action)
+                        return resolve(undefined);
+                    var result = action.apply(void 0, args);
+                    if (result === undefined)
+                        currentInstancesStatus[id] = initialize(id);
+                    result = action.apply(void 0, args);
+                    resolve(result);
+                })];
         });
     });
 }

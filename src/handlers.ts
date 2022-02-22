@@ -16,28 +16,16 @@ export function handleAction<T extends (...args: any[]) => any | undefined | nul
   action: T,
   ...args: any[]
 ): ReturnType<T> | undefined | null {
-  let id = args[args.length - 1];
-  if (currentInstancesStatus[id]) {
-    if (!action) return;
-    let result = action(...args);
-    if (result === undefined) {
-      initialize(id);
-      result = action(...args);
-    }
-    return result;
-  }
-  let ready = initialize(id);
-  if (ready) {
-    currentInstancesStatus[id] = true;
+  // The last argument is always the instance id.
+  let id: string = args[args.length - 1];
+  if (!currentInstancesStatus[id]) {
+    currentInstancesStatus[id] = initialize(id);
   }
   if (!action) return undefined;
-
   let result = action(...args);
-  if (result === undefined) {
-    initialize(id);
-    result = action(...args);
-  }
-  return;
+  if (result === undefined) currentInstancesStatus[id] = initialize(id);
+  result = action(...args);
+  return result;
 }
 
 /**
@@ -57,34 +45,14 @@ export async function handleActionAsync<T extends (...args: any[]) => any | unde
   ...args: any[]
 ): Promise<ReturnType<T> | undefined | null> {
   let id = args[args.length - 1];
-  return new Promise(async resolve => {
-    if (currentInstancesStatus[id]) {
-      if (!action) {
-        resolve(undefined);
-        return;
-      }
-      let result = action(...args);
-      if (result === undefined) {
-        initialize(id);
-        result = action(...args);
-      }
-      resolve(result);
-    } else {
-      let ready = initialize(id);
-      if (ready) {
-        currentInstancesStatus[id] = true;
-      }
-      currentInstancesStatus[id] = true;
-      if (!action) {
-        resolve(undefined);
-        return;
-      }
-      let result = action(...args);
-      if (result === undefined) {
-        initialize(id);
-        result = action(...args);
-      }
-      resolve(result);
+  return new Promise(resolve => {
+    if (!currentInstancesStatus[id]) {
+      currentInstancesStatus[id] = initialize(id);
     }
+    if (!action) return resolve(undefined);
+    let result = action(...args);
+    if (result === undefined) currentInstancesStatus[id] = initialize(id);
+    result = action(...args);
+    resolve(result);
   });
 }
