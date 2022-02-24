@@ -45,6 +45,8 @@ export declare type StorageOptions = {
      * Persist default values in hooks
      */
     persistDefaults: boolean;
+    callback?: (logs: string) => void;
+    logs: string[];
 };
 export declare type DataType = 'string' | 'number' | 'object' | 'array' | 'boolean';
 export declare type GenericReturnType<T> = [key: string, value: T | null | undefined];

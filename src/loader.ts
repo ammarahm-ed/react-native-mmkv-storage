@@ -1,10 +1,9 @@
 import API from './api';
-import { handleAction } from './handlers';
-import { currentInstancesStatus } from './initializer';
+import { currentInstancesStatus, initialize } from './initializer';
 import generatePassword from './keygen';
 import { init } from './mmkv/init';
-import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
 import { StorageOptions } from './types';
+import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
 
 export default class Loader {
   options: StorageOptions;
@@ -20,7 +19,8 @@ export default class Loader {
       key: null,
       serviceName: null,
       initialized: false,
-      persistDefaults: false
+      persistDefaults: false,
+      logs: []
     };
   }
 
@@ -116,13 +116,16 @@ export default class Loader {
   /**
    * Create the instance with the given options.
    */
-  initialize() {
+  initialize(callback?: (logs: string) => void) {
     if (!init()) throw new Error('MMKVNative bindings not installed');
     currentInstancesStatus[this.options.instanceID] = false;
+    this.options.callback = callback;
     options[this.options.instanceID] = this.options;
+
     let instance = new API(this.options.instanceID);
     //@ts-ignore
-    handleAction(null, this.options.instanceID);
+    currentInstancesStatus[this.options.instanceID] = initialize(this.options.instanceID);
+    callback && callback(`storage instance ${this.options.instanceID} is loaded successfully`);
     return instance;
   }
 

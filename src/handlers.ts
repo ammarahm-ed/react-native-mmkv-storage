@@ -1,4 +1,5 @@
 import { currentInstancesStatus, initialize } from './initializer';
+import { options } from './utils';
 
 /**
  *
@@ -21,10 +22,19 @@ export function handleAction<T extends (...args: any[]) => any | undefined | nul
   if (!currentInstancesStatus[id]) {
     currentInstancesStatus[id] = initialize(id);
   }
+  const opts = options[id];
+  opts.logs = [`status: fetch value for ${args[0]}`];
   if (!action) return undefined;
   let result = action(...args);
+
   if (result === undefined) currentInstancesStatus[id] = initialize(id);
   result = action(...args);
+  opts.logs.push(
+    `result for ${args[0]} is: undefined?${result === undefined} null?${
+      result === null
+    }: current instance status: ${currentInstancesStatus[id]}`
+  );
+  opts.callback && opts.callback(opts.logs.join('\n'));
   return result;
 }
 

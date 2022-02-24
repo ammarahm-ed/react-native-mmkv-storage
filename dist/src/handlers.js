@@ -35,6 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { currentInstancesStatus, initialize } from './initializer';
+import { options } from './utils';
 /**
  *
  * A handler function used to handle all the
@@ -57,12 +58,16 @@ export function handleAction(action) {
     if (!currentInstancesStatus[id]) {
         currentInstancesStatus[id] = initialize(id);
     }
+    var opts = options[id];
+    opts.logs = ["status: fetch value for ".concat(args[0])];
     if (!action)
         return undefined;
     var result = action.apply(void 0, args);
     if (result === undefined)
         currentInstancesStatus[id] = initialize(id);
     result = action.apply(void 0, args);
+    opts.logs.push("result for ".concat(args[0], " is: undefined?").concat(result === undefined, " null?").concat(result === null, ": current instance status: ").concat(currentInstancesStatus[id]));
+    opts.callback && opts.callback(opts.logs.join('\n'));
     return result;
 }
 /**

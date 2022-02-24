@@ -15,14 +15,14 @@ describe('MMKVStorage mock functionality', () => {
   });
 
   it('should init the default instance', () => {
-    let instance = new MMKVStorage.Loader().initialize();
+    let instance = new MMKVStorage.Loader().initialize(console.log);
     expect(instance.instanceID).toBe('default');
   });
 
   it('should init instance with custom id', () => {
     let instance = new MMKVStorage.Loader()
       .withInstanceID('test_id')
-      .initialize();
+      .initialize(console.log);
     expect(instance.instanceID).toBe('test_id');
   });
 
@@ -31,7 +31,7 @@ describe('MMKVStorage mock functionality', () => {
     let instance = new MMKVStorage.Loader()
       .withInstanceID(id)
       .withEncryption()
-      .initialize();
+      .initialize(console.log);
     expect(instance.instanceID).toBe(id);
     expect(instance.getKey()).toBeTruthy();
   });
@@ -43,7 +43,7 @@ describe('MMKVStorage mock functionality', () => {
       .withInstanceID(id)
       .withEncryption()
       .encryptWithCustomKey(key, false, false)
-      .initialize();
+      .initialize(console.log);
     expect(instance.instanceID).toBe(id);
     expect(instance.getKey().key).toBe(key);
   });
@@ -55,7 +55,7 @@ describe('MMKVStorage mock functionality', () => {
       .withInstanceID(id)
       .withEncryption()
       .encryptWithCustomKey(key, true)
-      .initialize();
+      .initialize(console.log);
     expect(instance.instanceID).toBe(id);
     expect(instance.getKey().key).toBe(key);
     expect(MMKVStorage._jsiModule.getSecureKey(instance.getKey().alias)).toBe(
@@ -64,7 +64,7 @@ describe('MMKVStorage mock functionality', () => {
   });
 
   it('should get/set a string from storage', () => {
-    let instance = new MMKVStorage.Loader().initialize();
+    let instance = new MMKVStorage.Loader().initialize(console.log);
     const testValue = 'testValue';
     const testKey = 'test';
     let result = instance.setString(testKey, testValue);

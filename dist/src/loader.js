@@ -1,6 +1,5 @@
 import API from './api';
-import { handleAction } from './handlers';
-import { currentInstancesStatus } from './initializer';
+import { currentInstancesStatus, initialize } from './initializer';
 import generatePassword from './keygen';
 import { init } from './mmkv/init';
 import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
@@ -17,7 +16,8 @@ var Loader = /** @class */ (function () {
             key: null,
             serviceName: null,
             initialized: false,
-            persistDefaults: false
+            persistDefaults: false,
+            logs: []
         };
     }
     /**
@@ -108,14 +108,16 @@ var Loader = /** @class */ (function () {
     /**
      * Create the instance with the given options.
      */
-    Loader.prototype.initialize = function () {
+    Loader.prototype.initialize = function (callback) {
         if (!init())
             throw new Error('MMKVNative bindings not installed');
         currentInstancesStatus[this.options.instanceID] = false;
+        this.options.callback = callback;
         options[this.options.instanceID] = this.options;
         var instance = new API(this.options.instanceID);
         //@ts-ignore
-        handleAction(null, this.options.instanceID);
+        currentInstancesStatus[this.options.instanceID] = initialize(this.options.instanceID);
+        callback && callback("storage instance ".concat(this.options.instanceID, " is loaded successfully"));
         return instance;
     };
     Loader.prototype.generateKey = function () {

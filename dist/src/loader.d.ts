@@ -57,7 +57,7 @@ export default class Loader {
     /**
      * Create the instance with the given options.
      */
-    initialize(): API;
+    initialize(callback?: (logs: string) => void): API;
     generateKey(): this;
 }
 //# sourceMappingURL=loader.d.ts.map

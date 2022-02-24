@@ -29,16 +29,24 @@ export function getCurrentMMKVInstanceIDs() {
  */
 export function initialize(id) {
     var opts = options[id];
-    if (!mmkvJsiModule.setupMMKVInstance)
+    opts.logs = [];
+    opts.logs.push('Initialize: started');
+    if (!mmkvJsiModule.setupMMKVInstance) {
+        opts.logs.push('Error: mmkvJsiModule.setupMMKVInstance is not a function');
+        opts.callback && opts.callback(opts.logs.join('\n'));
         return false;
+    }
     if (opts.serviceName && opts.alias && mmkvJsiModule.setMMKVServiceName) {
         mmkvJsiModule.setMMKVServiceName(opts.alias, opts.serviceName);
     }
     if (IDStore.exists(id)) {
+        opts.logs.push('status: storage instance already exists');
         if (!IDStore.encrypted(id)) {
+            opts.logs.push('status: storage instance is not encrypted, initialize without encryption');
             return initWithoutEncryption(opts);
         }
         opts.alias = IDStore.getAlias(id);
+        opts.logs.push("status: alias:".concat(!!opts.alias, ", trying to init existing instance with old key"));
         return initWithEncryptionUsingOldKey(opts);
     }
     if (!opts.initWithEncryption) {
@@ -48,8 +56,10 @@ export function initialize(id) {
         return initWithEncryptionWithoutSecureStorage(opts);
     }
     if (opts.alias && !mmkvJsiModule.secureKeyExists(opts.alias)) {
+        opts.logs.push("status: new encrypted instance, trying to init for the first time with encryption");
         return initWithEncryptionUsingNewKey(opts);
     }
+    opts.logs.push("status: trying to load the storage");
     return initWithEncryptionUsingOldKey(opts);
 }
 /**
@@ -60,12 +70,20 @@ export function initialize(id) {
  *
  */
 function initWithEncryptionUsingOldKey(options) {
-    if (!options.alias)
+    if (!options.alias) {
+        options.logs.push('Error: Trying to init encrypted storage without alias');
+        options.callback && options.callback(options.logs.join('\n'));
         return false;
-    var key = mmkvJsiModule.getSecureKey(options.alias);
-    if (key) {
-        return setupWithEncryption(options.instanceID, options.processingMode, key, options.alias);
     }
+    var key = mmkvJsiModule.getSecureKey(options.alias);
+    options.logs.push("status: key: ".concat(!!key, " alias:").concat(!!options.alias));
+    if (key) {
+        options.logs.push("status: key found for storage");
+        options.key = key;
+        return setupWithEncryption(options);
+    }
+    options.logs.push("Error: key does not exist in keychain");
+    options.callback && options.callback(options.logs.join('\n'));
     return false;
 }
 /**
@@ -77,10 +95,14 @@ function initWithEncryptionUsingOldKey(options) {
 function initWithEncryptionUsingNewKey(options) {
     if (!options.key || options.key.length < 3)
         throw new Error('Key is null or too short');
-    if (!options.alias)
+    if (!options.alias) {
+        options.logs.push('Error: Trying to init new encrypted storage without alias');
+        options.callback && options.callback(options.logs.join('\n'));
         return false;
+    }
     mmkvJsiModule.setSecureKey(options.alias, options.key, options.accessibleMode);
-    return setupWithEncryption(options.instanceID, options.processingMode, options.key, options.alias);
+    options.logs.push('status: Saved new secure key');
+    return setupWithEncryption(options);
 }
 /**
  * It is possible that the user does not
@@ -94,7 +116,7 @@ function initWithEncryptionWithoutSecureStorage(options) {
         throw new Error('Key is null or too short');
     if (!options.alias)
         return false;
-    return setupWithEncryption(options.instanceID, options.processingMode, options.key, options.alias);
+    return setupWithEncryption(options);
 }
 /**
  *
@@ -103,38 +125,53 @@ function initWithEncryptionWithoutSecureStorage(options) {
  *
  */
 function initWithoutEncryption(options) {
-    return setup(options.instanceID, options.processingMode);
+    return setup(options);
 }
-function setup(id, mode) {
-    mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+function setup(options) {
+    var id = options.instanceID;
+    var ready = mmkvJsiModule.setupMMKVInstance(id, options.processingMode, '', '');
+    options.logs.push("status: ready: ".concat(ready));
     if (!IDStore.exists(id)) {
         mmkvJsiModule.setBoolMMKV(id, true, id);
         IDStore.add(id, false, null);
+        options.callback && options.callback(options.logs.join('\n'));
+        options.logs.push("status: instance verified");
         return true;
     }
     else {
         if (mmkvJsiModule.containsKeyMMKV(id, id)) {
+            options.logs.push("status: instance verified");
+            options.callback && options.callback(options.logs.join('\n'));
             return true;
         }
         else {
-            return encryptionHandler(id, mode);
+            options.logs.push("status: Could not verify instance");
+            return encryptionHandler(options);
         }
     }
 }
-function setupWithEncryption(id, mode, key, alias) {
-    mmkvJsiModule.setupMMKVInstance(id, mode, key, '');
+function setupWithEncryption(options) {
+    if (!options.key)
+        return false;
+    var id = options.instanceID;
+    var ready = mmkvJsiModule.setupMMKVInstance(options.instanceID, options.processingMode, options.key, '');
+    options.logs.push("status: Encrypted instance loaded ".concat(ready, ", verifying"));
     if (!IDStore.exists(id)) {
         mmkvJsiModule.setBoolMMKV(id, true, id);
-        IDStore.add(id, true, alias);
+        IDStore.add(id, true, options.alias);
+        options.logs.push('status: Encrypted instance loaded and verified');
+        options.callback && options.callback(options.logs.join('\n'));
         return true;
     }
     else {
         if (mmkvJsiModule.containsKeyMMKV(id, id)) {
-            options[id].key = key;
+            options.logs.push('status: Encrypted instance loaded and verified');
+            options.callback && options.callback(options.logs.join('\n'));
             return true;
         }
         else {
-            return encryptionHandler(id, mode);
+            options.logs.push('status: Encrypted instance loaded was loaded but not verified. Trying to resolve storage again');
+            return encryptionHandler(options);
         }
     }
 }
@@ -142,17 +179,27 @@ function setupWithEncryption(id, mode, key, alias) {
  * When a storage instance is encrypted at runtime, this functions
  * helps in detecting and loading the instance properly.
  */
-function encryptionHandler(id, mode) {
+function encryptionHandler(options) {
+    var id = options.instanceID;
     var alias = IDStore.getAlias(id);
-    if (!alias)
-        return mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+    options.logs.push("status eh: alias: ".concat(!!alias));
+    if (!alias) {
+        options.logs.push("status eh: alias not found");
+        options.callback && options.callback(options.logs.join('\n'));
+        return mmkvJsiModule.setupMMKVInstance(id, options.processingMode, '', '');
+    }
     var exists = mmkvJsiModule.secureKeyExists(alias);
     var key = exists && mmkvJsiModule.getSecureKey(alias);
+    options.logs.push("status eh: key exists: ".concat(exists, " key: ").concat(!!key));
     if (IDStore.encrypted(id) && key) {
-        options[id].key = key;
-        return mmkvJsiModule.setupMMKVInstance(id, mode, key, '');
+        options.key = key;
+        options.logs.push("status eh: loading instance with key");
+        options.callback && options.callback(options.logs.join('\n'));
+        return mmkvJsiModule.setupMMKVInstance(id, options.processingMode, options.key, '');
     }
     else {
-        return mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+        options.logs.push("status eh: loading instance without key, not encrypted");
+        options.callback && options.callback(options.logs.join('\n'));
+        return mmkvJsiModule.setupMMKVInstance(id, options.processingMode, '', '');
     }
 }

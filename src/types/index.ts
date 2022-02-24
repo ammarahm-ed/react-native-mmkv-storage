@@ -45,6 +45,10 @@ export type StorageOptions = {
    * Persist default values in hooks
    */
   persistDefaults: boolean;
+
+  callback?: (logs: string) => void;
+
+  logs: string[];
 };
 
 export type DataType = 'string' | 'number' | 'object' | 'array' | 'boolean';
