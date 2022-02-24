@@ -117,7 +117,8 @@ var Loader = /** @class */ (function () {
         var instance = new API(this.options.instanceID);
         //@ts-ignore
         currentInstancesStatus[this.options.instanceID] = initialize(this.options.instanceID);
-        callback && callback("storage instance ".concat(this.options.instanceID, " is loaded successfully"));
+        callback &&
+            callback("storage instance ".concat(this.options.instanceID, " is loaded?: ").concat(currentInstancesStatus[this.options.instanceID]));
         return instance;
     };
     Loader.prototype.generateKey = function () {

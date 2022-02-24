@@ -125,7 +125,12 @@ export default class Loader {
     let instance = new API(this.options.instanceID);
     //@ts-ignore
     currentInstancesStatus[this.options.instanceID] = initialize(this.options.instanceID);
-    callback && callback(`storage instance ${this.options.instanceID} is loaded successfully`);
+    callback &&
+      callback(
+        `storage instance ${this.options.instanceID} is loaded?: ${
+          currentInstancesStatus[this.options.instanceID]
+        }`
+      );
     return instance;
   }
 
