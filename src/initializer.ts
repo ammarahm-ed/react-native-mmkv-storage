@@ -46,6 +46,8 @@ export function initialize(id: string) {
     return initWithEncryptionUsingOldKey(opts);
   }
 
+  opts.logs.push('status: storage instance does not exist');
+
   if (!opts.initWithEncryption) {
     return initWithoutEncryption(opts);
   }
@@ -58,7 +60,11 @@ export function initialize(id: string) {
     );
     return initWithEncryptionUsingNewKey(opts);
   }
-  opts.logs.push(`status: trying to load the storage`);
+  opts.logs.push(
+    `status: trying to load the storage: secureKeyExists: ${
+      opts.alias ? mmkvJsiModule.secureKeyExists(opts.alias) : 'no alias'
+    }`
+  );
   return initWithEncryptionUsingOldKey(opts);
 }
 

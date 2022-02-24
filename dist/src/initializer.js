@@ -49,6 +49,7 @@ export function initialize(id) {
         opts.logs.push("status: alias:".concat(!!opts.alias, ", trying to init existing instance with old key"));
         return initWithEncryptionUsingOldKey(opts);
     }
+    opts.logs.push('status: storage instance does not exist');
     if (!opts.initWithEncryption) {
         return initWithoutEncryption(opts);
     }
@@ -59,7 +60,7 @@ export function initialize(id) {
         opts.logs.push("status: new encrypted instance, trying to init for the first time with encryption");
         return initWithEncryptionUsingNewKey(opts);
     }
-    opts.logs.push("status: trying to load the storage");
+    opts.logs.push("status: trying to load the storage: secureKeyExists: ".concat(opts.alias ? mmkvJsiModule.secureKeyExists(opts.alias) : 'no alias'));
     return initWithEncryptionUsingOldKey(opts);
 }
 /**
