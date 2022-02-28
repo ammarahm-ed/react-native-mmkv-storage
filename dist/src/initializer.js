@@ -76,14 +76,17 @@ function initWithEncryptionUsingOldKey(options) {
         options.callback && options.callback(options.logs.join('\n'));
         return false;
     }
+    var keyExists = mmkvJsiModule.secureKeyExists(options.alias);
     var key = mmkvJsiModule.getSecureKey(options.alias);
-    options.logs.push("status: key: ".concat(!!key, " alias:").concat(!!options.alias));
+    options.logs.push("status: keyExists:".concat(keyExists, ": key: ").concat(!!key, " alias:").concat(!!options.alias));
     if (key) {
         options.logs.push("status: key found for storage");
         options.key = key;
         return setupWithEncryption(options);
     }
-    options.logs.push("Error: key does not exist in keychain");
+    keyExists = mmkvJsiModule.secureKeyExists(options.alias);
+    key = mmkvJsiModule.getSecureKey(options.alias);
+    options.logs.push("Error: key does not exist in keychain: keyExists:".concat(keyExists, ": key: ").concat(!!key, " alias:").concat(!!options.alias));
     options.callback && options.callback(options.logs.join('\n'));
     return false;
 }

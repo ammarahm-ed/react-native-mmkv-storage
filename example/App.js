@@ -16,7 +16,9 @@ const Button = ({title, onPress}) => {
   );
 };
 
-const storage = new MMKVStorage.Loader().withEncryption().initialize();
+const storage = new MMKVStorage.Loader()
+  .withEncryption()
+  .initialize(logs => console.log(logs));
 const useStorage = create(storage);
 
 const App = () => {
@@ -42,7 +44,7 @@ const App = () => {
     {
       title: 'setUser',
       onPress: () => {
-        setUser(getUser());
+        //setUser(getUser());
       },
     },
     {

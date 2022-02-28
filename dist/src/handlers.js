@@ -55,13 +55,20 @@ export function handleAction(action) {
     }
     // The last argument is always the instance id.
     var id = args[args.length - 1];
-    if (!currentInstancesStatus[id]) {
-        currentInstancesStatus[id] = initialize(id);
-    }
     var opts = options[id];
+    if (!currentInstancesStatus[id]) {
+        opts.logs = ["status: try to reinit storage ".concat(args[0])];
+        opts.callback && opts.callback(opts.logs.join('\n'));
+        currentInstancesStatus[id] = initialize(id);
+        opts.logs = ["status: reinit result: ".concat(currentInstancesStatus[id])];
+        opts.callback && opts.callback(opts.logs.join('\n'));
+    }
     opts.logs = ["status: fetch value for ".concat(args[0])];
-    if (!action)
+    if (!action) {
+        opts.logs = ["status: handleAction called with no action ".concat(args[0])];
+        opts.callback && opts.callback(opts.logs.join('\n'));
         return undefined;
+    }
     var result = action.apply(void 0, args);
     if (result === undefined)
         currentInstancesStatus[id] = initialize(id);

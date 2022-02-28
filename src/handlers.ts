@@ -19,12 +19,21 @@ export function handleAction<T extends (...args: any[]) => any | undefined | nul
 ): ReturnType<T> | undefined | null {
   // The last argument is always the instance id.
   let id: string = args[args.length - 1];
-  if (!currentInstancesStatus[id]) {
-    currentInstancesStatus[id] = initialize(id);
-  }
   const opts = options[id];
+  if (!currentInstancesStatus[id]) {
+    opts.logs = [`status: try to reinit storage ${args[0]}`];
+    opts.callback && opts.callback(opts.logs.join('\n'));
+    currentInstancesStatus[id] = initialize(id);
+    opts.logs = [`status: reinit result: ${currentInstancesStatus[id]}`];
+    opts.callback && opts.callback(opts.logs.join('\n'));
+  }
+
   opts.logs = [`status: fetch value for ${args[0]}`];
-  if (!action) return undefined;
+  if (!action) {
+    opts.logs = [`status: handleAction called with no action ${args[0]}`];
+    opts.callback && opts.callback(opts.logs.join('\n'));
+    return undefined;
+  }
   let result = action(...args);
 
   if (result === undefined) currentInstancesStatus[id] = initialize(id);
