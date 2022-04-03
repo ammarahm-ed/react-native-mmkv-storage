@@ -19,6 +19,11 @@
 </div>
 
 <div align="center">
+  <h3>For expo bare workflow</h3>
+  <pre>expo prebuild</pre>
+</div>
+
+<div align="center">
     
    <a href="https://rnmmkv.vercel.app/#/gettingstarted"><h3>Get Started with Documentation</h3></a>
   
@@ -150,6 +155,9 @@ For each database instance, there is one global key index and then there are ind
 ### **Supports redux-persist**
 
 Support for redux persist is also added starting from v0.3.2.
+
+### **Supports expo**
+You can use this library with expo [bare workflow](https://docs.expo.dev/workflow/customizing/).
 
 ## Consider supporting with a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/)
 
