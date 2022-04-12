@@ -144,5 +144,6 @@ task extractJNIFiles {
 
 // Extract JNI files as soon as first task is added
 tasks.whenTaskAdded { task ->
+  if (task.name.contains("Clean") || task.name.contains("clean")) return;
   task.dependsOn(extractJNIFiles);
 }
