@@ -5,6 +5,7 @@
 #endif
 
 #import "SecureStorage.h"
+#import <UIKit/UIKit.h>
 
 
 @implementation SecureStorage : NSObject
@@ -44,6 +45,14 @@ NSString *serviceName = nil;
     @try {
         [self handleAppUninstallation];
         NSString *value = [self searchKeychainCopyMatching:key];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            int readAttempts = 0;
+            // See: https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/195
+            while (![[UIApplication sharedApplication] isProtectedDataAvailable] && readAttempts++ < 100) {
+                // sleep 25ms before another attempt
+                usleep(25000);
+            }
+        });
         if (value == nil) {
             NSString* errorMessage = @"key does not present";
           
