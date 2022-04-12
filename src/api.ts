@@ -44,7 +44,7 @@ export default class API {
   /**
    * Set a string value to storage for the given key.
    */
-  setStringAsync(key: string, value: string) {
+  setStringAsync(key: string, value: string): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.setString(key, value));
     });
@@ -52,7 +52,7 @@ export default class API {
   /**
    * Get the string value for the given key.
    */
-  getStringAsync(key: string) {
+  getStringAsync(key: string): Promise<string | null | undefined> {
     return new Promise(resolve => {
       resolve(this.getString(key));
     });
@@ -60,7 +60,7 @@ export default class API {
   /**
    * Set a number value to storage for the given key.
    */
-  setIntAsync(key: string, value: number) {
+  setIntAsync(key: string, value: number): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.setInt(key, value));
     });
@@ -68,7 +68,7 @@ export default class API {
   /**
    * Get the number value for the given key.
    */
-  getIntAsync(key: string) {
+  getIntAsync(key: string): Promise<number | null | undefined> {
     return new Promise(resolve => {
       resolve(this.getInt(key));
     });
@@ -77,7 +77,7 @@ export default class API {
    * Set a boolean value to storage for the given key.
    *
    */
-  setBoolAsync(key: string, value: boolean) {
+  setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.setBool(key, value));
     });
@@ -85,7 +85,7 @@ export default class API {
   /**
    * Get the boolean value for the given key.
    */
-  getBoolAsync(key: string) {
+  getBoolAsync(key: string): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.getBool(key));
     });
@@ -96,7 +96,7 @@ export default class API {
    * Note that this function does **not** work with the Map data type.
    *
    */
-  setMapAsync(key: string, value: object) {
+  setMapAsync(key: string, value: object): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.setMap(key, value));
     });
@@ -104,7 +104,7 @@ export default class API {
   /**
    * Get then Object from storage for the given key.
    */
-  getMapAsync<T>(key: string) {
+  getMapAsync<T>(key: string): Promise<T | null | undefined> {
     return new Promise(resolve => {
       resolve(this.getMap<T>(key));
     });
@@ -113,7 +113,10 @@ export default class API {
   /**
    * Retrieve multiple items for the given array of keys.
    */
-  async getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map') {
+  async getMultipleItemsAsync<T>(
+    keys: string[],
+    type: DataType | 'map'
+  ): Promise<GenericReturnType<T>[]> {
     return new Promise(resolve => {
       resolve(this.getMultipleItems<T>(keys, type));
     });
@@ -121,7 +124,7 @@ export default class API {
   /**
    * Set an array to storage for the given key.
    */
-  async setArrayAsync(key: string, value: any[]) {
+  async setArrayAsync(key: string, value: any[]): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
       resolve(this.setArray(key, value));
     });
@@ -129,7 +132,7 @@ export default class API {
   /**
    * Get the array from the storage for the given key.
    */
-  async getArrayAsync<T>(key: string) {
+  async getArrayAsync<T>(key: string): Promise<T[] | null | undefined> {
     return new Promise(resolve => {
       resolve(this.getArray<T>(key));
     });
