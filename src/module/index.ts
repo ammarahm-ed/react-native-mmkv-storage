@@ -18,7 +18,6 @@ export const mmkvBridgeModule: {
  * `null`: Value does not exist or some error occured while getting the value
  *
  */
-
 //@ts-ignore
 const mmkvJsiModule: MMKVJsiModule = global;
 

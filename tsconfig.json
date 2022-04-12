@@ -5,7 +5,7 @@
     "jsx": "react-native",
     "module": "esnext",
     "moduleResolution": "node",
-    "lib": ["es2017"],
+    "lib": ["es2017", "dom"],
     "declaration": true,
     "declarationMap": true,
     "outDir": "dist",

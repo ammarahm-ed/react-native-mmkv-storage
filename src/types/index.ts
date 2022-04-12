@@ -53,6 +53,8 @@ export type GenericReturnType<T> = [key: string, value: T | null | undefined];
 
 export type IndexType = 'stringIndex' | 'boolIndex' | 'numberIndex' | 'mapIndex' | 'arrayIndex';
 
+export type Callback<T> = (result: T) => void;
+
 export type MMKVJsiModule = {
   setupMMKVInstance: (id: string, mode?: number, cryptKey?: string, path?: string) => boolean;
 
@@ -62,8 +64,17 @@ export type MMKVJsiModule = {
   secureKeyExists: (alias: string) => boolean;
   removeSecureKey: (alias: string) => boolean;
 
-  setStringMMKV: (key: string, value: string, id: string) => boolean | undefined;
-  getStringMMKV: (key: string, id: string) => string | null | undefined;
+  setStringMMKV: (
+    key: string,
+    value: string,
+    id: string,
+    callback?: Callback<boolean | undefined>
+  ) => boolean | undefined;
+  getStringMMKV: (
+    key: string,
+    id: string,
+    callback?: Callback<string | null | undefined>
+  ) => string | null | undefined;
 
   setMapMMKV: (key: string, value: string, id: string) => boolean | undefined;
   getMapMMKV: (key: string, id: string) => string | null | undefined;
@@ -88,4 +99,12 @@ export type MMKVJsiModule = {
 
   encryptMMKV: (cryptKey: string, id: string) => boolean | undefined;
   decryptMMKV: (id: string) => boolean | undefined;
+
+  /**
+   * Web only methods.
+   */
+  getSecureKeyAsync?: (alias: string) => Promise<string | null>;
+  setSecureKeyAsync?: (alias: string, key: string) => Promise<boolean>;
+  secureKeyExistsAsync?: (alias: string) => Promise<boolean>;
+  removeSecureKeyAsync?: (alias: string) => Promise<boolean>;
 };

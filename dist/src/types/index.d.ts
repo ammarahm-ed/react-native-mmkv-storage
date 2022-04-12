@@ -74,5 +74,12 @@ export declare type MMKVJsiModule = {
     clearMemoryCache: (id: string) => boolean | undefined;
     encryptMMKV: (cryptKey: string, id: string) => boolean | undefined;
     decryptMMKV: (id: string) => boolean | undefined;
+    /**
+     * Web only methods.
+     */
+    getSecureKeyAsync?: (alias: string) => Promise<string | null>;
+    setSecureKeyAsync?: (alias: string, key: string) => Promise<boolean>;
+    secureKeyExistsAsync?: (alias: string) => Promise<boolean>;
+    removeSecureKeyAsync?: (alias: string) => Promise<boolean>;
 };
 //# sourceMappingURL=index.d.ts.map

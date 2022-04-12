@@ -10,6 +10,5 @@ export var mmkvBridgeModule = NativeModules.MMKVNative;
  * `null`: Value does not exist or some error occured while getting the value
  *
  */
-//@ts-ignore
 var mmkvJsiModule = global;
 export default mmkvJsiModule;

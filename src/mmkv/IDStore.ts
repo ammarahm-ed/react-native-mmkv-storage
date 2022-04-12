@@ -7,6 +7,19 @@ export type StorageInstanceInfo = {
   id: string;
   alias: string;
 };
+
+/** Get all keys of instances from local storage. **web only** */
+const getAllKeys = () => {
+  let keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    let key = localStorage.key(i);
+    if (key?.startsWith('idstore.')) {
+      keys.push(key);
+    }
+  }
+  return keys;
+};
+
 /**
  *	Store instance properties that we will use later to
  *  load the storage again.
@@ -17,14 +30,23 @@ function add(id: string, encrypted?: boolean, alias?: string | null) {
     encrypted,
     alias
   };
-  mmkvJsiModule.setStringMMKV(id, JSON.stringify(storeUnit), STORE_ID);
+
+  if (Platform.OS === 'web') {
+    localStorage.setItem(`idstore.${id}`, JSON.stringify(storeUnit));
+  } else {
+    mmkvJsiModule.setStringMMKV(id, JSON.stringify(storeUnit), STORE_ID);
+  }
 }
 
 /**
  * Check if the storage instance with the given ID is encrypted or not.
  */
 function encrypted(id: string) {
-  let json = mmkvJsiModule.getStringMMKV(id, STORE_ID);
+  let json =
+    Platform.OS === 'web'
+      ? localStorage.getItem(`idstore.${id}`)
+      : mmkvJsiModule.getStringMMKV(id, STORE_ID);
+
   if (!json) {
     return false;
   }
@@ -38,7 +60,10 @@ function encrypted(id: string) {
  * @param {string} id instance id
  */
 function getAlias(id: string) {
-  let json = mmkvJsiModule.getStringMMKV(id, STORE_ID);
+  let json =
+    Platform.OS === 'web'
+      ? localStorage.getItem(`idstore.${id}`)
+      : mmkvJsiModule.getStringMMKV(id, STORE_ID);
   if (!json) {
     return null;
   }
@@ -51,7 +76,10 @@ function getAlias(id: string) {
  * @param {string} id instance id
  */
 function exists(id: string) {
-  let json = mmkvJsiModule.getStringMMKV(id, STORE_ID);
+  let json =
+    Platform.OS === 'web'
+      ? localStorage.getItem(`idstore.${id}`)
+      : mmkvJsiModule.getStringMMKV(id, STORE_ID);
   if (!json) {
     return false;
   }
@@ -64,8 +92,8 @@ let blacklist = ['stringIndex'];
  * were loaded since the app was installed.
  */
 function getAll() {
-  let keys = mmkvJsiModule.getAllKeysMMKV(STORE_ID);
-  if (!keys) return [];
+  let keys = Platform.OS === 'web' ? getAllKeys() : mmkvJsiModule.getAllKeysMMKV(STORE_ID);
+  if (!keys) return {};
   let storeUnits: { [name: string]: StorageInstanceInfo } = {};
   keys.forEach(key => {
     if (!blacklist.includes(key)) {
@@ -84,7 +112,12 @@ function getAll() {
  * that were loaded since the app was installed
  */
 function getAllMMKVInstanceIDs() {
-  return Object.keys(getAll());
+  let stores = getAll();
+  let keys: string[] = Object.keys(stores);
+  if (Platform.OS === 'web') {
+    keys = keys.map(k => stores[k].id);
+  }
+  return keys;
 }
 
 export default {
