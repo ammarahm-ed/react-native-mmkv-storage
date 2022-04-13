@@ -16,60 +16,60 @@ export default class API {
      * This method is added for redux-persist/zustand support.
      *
      */
-    setItem(key: string, value: string): Promise<unknown>;
+    setItem(key: string, value: string): Promise<boolean | null | undefined>;
     /**
      * Get the string value for the given key.
      * This method is added for redux-persist/zustand support.
      */
-    getItem(key: string): Promise<unknown>;
+    getItem(key: string): Promise<string | null | undefined>;
     /**
      * Set a string value to storage for the given key.
      */
-    setStringAsync(key: string, value: string): Promise<unknown>;
+    setStringAsync(key: string, value: string): Promise<boolean | null | undefined>;
     /**
      * Get the string value for the given key.
      */
-    getStringAsync(key: string): Promise<unknown>;
+    getStringAsync(key: string): Promise<string | null | undefined>;
     /**
      * Set a number value to storage for the given key.
      */
-    setIntAsync(key: string, value: number): Promise<unknown>;
+    setIntAsync(key: string, value: number): Promise<boolean | null | undefined>;
     /**
      * Get the number value for the given key.
      */
-    getIntAsync(key: string): Promise<unknown>;
+    getIntAsync(key: string): Promise<number | null | undefined>;
     /**
      * Set a boolean value to storage for the given key.
      *
      */
-    setBoolAsync(key: string, value: boolean): Promise<unknown>;
+    setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined>;
     /**
      * Get the boolean value for the given key.
      */
-    getBoolAsync(key: string): Promise<unknown>;
+    getBoolAsync(key: string): Promise<boolean | null | undefined>;
     /**
      * Set an Object to storage for the given key.
      *
      * Note that this function does **not** work with the Map data type.
      *
      */
-    setMapAsync(key: string, value: object): Promise<unknown>;
+    setMapAsync(key: string, value: object): Promise<boolean | null | undefined>;
     /**
      * Get then Object from storage for the given key.
      */
-    getMapAsync<T>(key: string): Promise<unknown>;
+    getMapAsync<T>(key: string): Promise<T | null | undefined>;
     /**
      * Retrieve multiple items for the given array of keys.
      */
-    getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map'): Promise<unknown>;
+    getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map'): Promise<GenericReturnType<T>[]>;
     /**
      * Set an array to storage for the given key.
      */
-    setArrayAsync(key: string, value: any[]): Promise<unknown>;
+    setArrayAsync(key: string, value: any[]): Promise<boolean | null | undefined>;
     /**
      * Get the array from the storage for the given key.
      */
-    getArrayAsync<T>(key: string): Promise<unknown>;
+    getArrayAsync<T>(key: string): Promise<T[] | null | undefined>;
     /**
      * Set a string value to storage for the given key.
      */

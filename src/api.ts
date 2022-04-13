@@ -46,7 +46,28 @@ export default class API {
    */
   setStringAsync(key: string, value: string): Promise<boolean | null | undefined> {
     return new Promise(resolve => {
-      resolve(this.setString(key, value));
+      let _value = value;
+      let before = this.transactions.beforewrite['string'];
+      if (before) {
+        _value = before(key, value);
+      }
+
+      handleAction(
+        mmkvJsiModule.setStringMMKVAsync,
+        key,
+        _value,
+        (result: boolean | undefined) => {
+          if (result) {
+            this.ev.publish(`${key}:onwrite`, { key, value: _value });
+            let onwrite = this.transactions.onwrite['string'];
+            if (onwrite) {
+              onwrite(key, _value);
+            }
+          }
+          resolve(result);
+        },
+        this.instanceID
+      );
     });
   }
   /**
@@ -54,7 +75,19 @@ export default class API {
    */
   getStringAsync(key: string): Promise<string | null | undefined> {
     return new Promise(resolve => {
-      resolve(this.getString(key));
+      let string = handleAction(
+        mmkvJsiModule.getStringMMKVAsync,
+        key,
+        (result: string | null | undefined) => {
+          console.log('result got', result);
+          resolve(result);
+          let onread = this.transactions.onread['string'];
+          if (onread) {
+            string = onread(key, string);
+          }
+        },
+        this.instanceID
+      );
     });
   }
   /**

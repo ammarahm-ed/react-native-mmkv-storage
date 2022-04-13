@@ -305,7 +305,21 @@ var API = /** @class */ (function () {
     API.prototype.setStringAsync = function (key, value) {
         var _this = this;
         return new Promise(function (resolve) {
-            resolve(_this.setString(key, value));
+            var _value = value;
+            var before = _this.transactions.beforewrite['string'];
+            if (before) {
+                _value = before(key, value);
+            }
+            handleAction(mmkvJsiModule.setStringMMKVAsync, key, _value, function (result) {
+                if (result) {
+                    _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
+                    var onwrite = _this.transactions.onwrite['string'];
+                    if (onwrite) {
+                        onwrite(key, _value);
+                    }
+                }
+                resolve(result);
+            }, _this.instanceID);
         });
     };
     /**
@@ -314,7 +328,14 @@ var API = /** @class */ (function () {
     API.prototype.getStringAsync = function (key) {
         var _this = this;
         return new Promise(function (resolve) {
-            resolve(_this.getString(key));
+            var string = handleAction(mmkvJsiModule.getStringMMKVAsync, key, function (result) {
+                console.log('result got', result);
+                resolve(result);
+                var onread = _this.transactions.onread['string'];
+                if (onread) {
+                    string = onread(key, string);
+                }
+            }, _this.instanceID);
         });
     };
     /**

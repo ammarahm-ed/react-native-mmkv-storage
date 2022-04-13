@@ -65,6 +65,18 @@ export type MMKVJsiModule = {
   setStringMMKV: (key: string, value: string, id: string) => boolean | undefined;
   getStringMMKV: (key: string, id: string) => string | null | undefined;
 
+  setStringMMKVAsync: (
+    key: string,
+    value: string,
+    id: string,
+    callback: (result: boolean | undefined) => void
+  ) => void;
+  getStringMMKVAsync: (
+    key: string,
+    id: string,
+    callback: (result: string | null | undefined) => void
+  ) => void;
+
   setMapMMKV: (key: string, value: string, id: string) => boolean | undefined;
   getMapMMKV: (key: string, id: string) => string | null | undefined;
 

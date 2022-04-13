@@ -4,6 +4,7 @@
 #include "MMKV.h"
 #include "MMKVPredef.h"
 #include "MMBuffer.h"
+#include<thread>
 
 using namespace facebook;
 using namespace jsi;
@@ -269,7 +270,7 @@ void install(Runtime &jsiRuntime) {
     });
 
     CREATE_FUNC("setStringMMKV", 3, [](Runtime &runtime, const Value &thisValue,
-                                       const Value *arguments, size_t count) -> Value {
+                                              const Value *arguments, size_t count) -> Value {
         MMKV *kv = getInstance(arguments[2].getString(runtime).utf8(runtime));
         if (!kv) {
             return Value::undefined();
@@ -279,6 +280,26 @@ void install(Runtime &jsiRuntime) {
         setIndex(kv, "stringIndex", key);
         kv->set(arguments[1].getString(runtime).utf8(runtime), key);
         return Value(true);
+    });
+
+    CREATE_FUNC("setStringMMKVAsync", 1, [](Runtime &runtime, const Value &thisValue,
+                                       const Value *arguments, size_t count) -> Value {
+
+        auto userCallbackRef = std::make_shared<Object>(arguments[0].getObject(runtime));
+        auto f = [&runtime](shared_ptr<Object> userCallbackRef) {
+            // MMKV *kv = getInstance(arguments[3].getString(runtime).utf8(runtime));
+            // if (!kv) {
+            //     userCallbackRef->asFunction(runtime).call(runtime, Value::undefined());
+            // }
+            // string key = arguments[0].getString(runtime).utf8(runtime);
+            // setIndex(kv, "stringIndex", key);
+            // kv->set(arguments[1].getString(runtime).utf8(runtime), key);
+            userCallbackRef->asFunction(runtime).call(runtime, true);
+        };
+
+        std::thread thread_object(f, userCallbackRef);
+
+        return Value::null();
     });
 
     CREATE_FUNC("getStringMMKV", 2, [](Runtime &runtime, const Value &thisValue,
@@ -294,6 +315,32 @@ void install(Runtime &jsiRuntime) {
             return Value::null();
         }
         return Value(runtime, String::createFromUtf8(runtime, result));
+    });
+
+    CREATE_FUNC("getStringMMKVAsync", 3, [](Runtime &runtime, const Value &thisValue,
+                                       const Value *arguments, size_t count) -> Value {
+
+        auto userCallbackRef = std::make_shared<Object>(arguments[1].getObject(runtime));
+        auto f = [&runtime](shared_ptr<Object> userCallbackRef, const Value *arguments) {
+        MMKV *kv = getInstance(arguments[2].getString(runtime).utf8(runtime));
+        if (!kv) {
+            userCallbackRef->asFunction(runtime).call(runtime, Value::undefined());
+        }
+
+        string result;
+        bool exists = kv->getString(arguments[0].getString(runtime).utf8(runtime), result);
+        if (!exists) {
+            userCallbackRef->asFunction(runtime).call(runtime, Value::null());
+        }
+        userCallbackRef->asFunction(runtime).call(runtime, String::createFromUtf8(runtime, result));
+    };
+
+        std::thread thread_object(f,userCallbackRef,std::ref(arguments));
+        thread_object.detach();
+
+        return Value::undefined();
+
+
     });
 
     CREATE_FUNC("setMapMMKV", 3, [](Runtime &runtime, const Value &thisValue,

@@ -35,8 +35,11 @@ const App = () => {
   const buttons = [
     {
       title: 'setString',
-      onPress: () => {
-        storage.setString('user', getUser());
+      onPress: async () => {
+        MMKVStorage._jsiModule.setStringMMKVAsync(res => {
+          console.log(res);
+        });
+        // console.log(await storage.getStringAsync('abc'));
       },
     },
     {
