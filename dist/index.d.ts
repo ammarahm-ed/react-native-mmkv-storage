@@ -6,6 +6,9 @@ import Loader from './src/loader';
 import API from './src/api';
 declare const MMKVStorage: {
     Loader: typeof Loader;
+    /**
+     * Deprecated: Use `import {API} from "react-native-mmkv-storage`"
+     */
     API: typeof API;
     MODES: {
         SINGLE_PROCESS: number;
@@ -29,5 +32,5 @@ declare const MMKVStorage: {
     };
 };
 export default MMKVStorage;
-export { useMMKVStorage, create, useIndex, isLoaded, init };
+export { useMMKVStorage, create, useIndex, isLoaded, init, API };
 //# sourceMappingURL=index.d.ts.map

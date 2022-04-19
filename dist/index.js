@@ -9,6 +9,9 @@ import API from './src/api';
 import mmkvJsiModule, { mmkvBridgeModule } from './src/module';
 var MMKVStorage = {
     Loader: Loader,
+    /**
+     * Deprecated: Use `import {API} from "react-native-mmkv-storage`"
+     */
     API: API,
     MODES: MODES,
     ACCESSIBLE: ACCESSIBLE,
@@ -19,4 +22,4 @@ var MMKVStorage = {
     _bridgeModule: mmkvBridgeModule
 };
 export default MMKVStorage;
-export { useMMKVStorage, create, useIndex, isLoaded, init };
+export { useMMKVStorage, create, useIndex, isLoaded, init, API };
