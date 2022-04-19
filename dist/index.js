@@ -1,7 +1,7 @@
 import { useMMKVStorage, create } from './src/hooks/useMMKV';
 import { ACCESSIBLE, MODES } from './src/utils';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
-import { default as IDStore } from './src/mmkv/IDStore';
+import IDStore from './src/mmkv/IDStore';
 import { useIndex } from './src/hooks/useIndex';
 import { isLoaded, init } from './src/mmkv/init';
 import Loader from './src/loader';
@@ -9,10 +9,6 @@ import API from './src/api';
 import mmkvJsiModule, { mmkvBridgeModule } from './src/module';
 var MMKVStorage = {
     Loader: Loader,
-    /**
-     * Deprecated: Use `import {API} from "react-native-mmkv-storage`"
-     */
-    API: API,
     MODES: MODES,
     ACCESSIBLE: ACCESSIBLE,
     getAllMMKVInstanceIDs: IDStore.getAllMMKVInstanceIDs,

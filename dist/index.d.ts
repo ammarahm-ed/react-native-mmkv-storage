@@ -1,36 +1,25 @@
 import { useMMKVStorage, create } from './src/hooks/useMMKV';
+import { ACCESSIBLE, MODES } from './src/utils';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
+import IDStore from './src/mmkv/IDStore';
 import { useIndex } from './src/hooks/useIndex';
 import { isLoaded, init } from './src/mmkv/init';
 import Loader from './src/loader';
 import API from './src/api';
-declare const MMKVStorage: {
+import { mmkvBridgeModule } from './src/module';
+import { MMKVJsiModule } from './src/types';
+interface MMKVStorageInterface {
     Loader: typeof Loader;
-    /**
-     * Deprecated: Use `import {API} from "react-native-mmkv-storage`"
-     */
-    API: typeof API;
-    MODES: {
-        SINGLE_PROCESS: number;
-        MULTI_PROCESS: number;
-    };
-    ACCESSIBLE: {
-        WHEN_UNLOCKED: string;
-        AFTER_FIRST_UNLOCK: string;
-        ALWAYS: string;
-        WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
-        WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
-        AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
-        ALWAYS_THIS_DEVICE_ONLY: string;
-    };
-    getAllMMKVInstanceIDs: () => string[];
+    API?: API;
+    MODES: typeof MODES;
+    ACCESSIBLE: typeof ACCESSIBLE;
+    getAllMMKVInstanceIDs: typeof IDStore.getAllMMKVInstanceIDs;
     getCurrentMMKVInstanceIDs: typeof getCurrentMMKVInstanceIDs;
     IDSTORE_ID: string;
-    _jsiModule: import("./src/types").MMKVJsiModule;
-    _bridgeModule: {
-        install: () => boolean;
-    };
-};
+    _jsiModule: MMKVJsiModule;
+    _bridgeModule: typeof mmkvBridgeModule;
+}
+declare const MMKVStorage: MMKVStorageInterface;
 export default MMKVStorage;
-export { useMMKVStorage, create, useIndex, isLoaded, init, API };
+export { useMMKVStorage, create, useIndex, isLoaded, init, API, MMKVStorageInterface };
 //# sourceMappingURL=index.d.ts.map
