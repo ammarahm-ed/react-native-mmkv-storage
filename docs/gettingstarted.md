@@ -98,7 +98,6 @@ platform :ios, '11.0'
 
 You cannot attach chrome debugger if you are using >=0.5.0 version of this library since debugging is not available when JSI modules are used. You can use Flipper to debug if necessary.
 
-
 ##
 
 **Read Next:** [Creating an MMKV Instance](creatinginstance.md)
