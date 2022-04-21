@@ -82,6 +82,8 @@ echo "cmake.dir=$ANDROID_HOME/cmake/3.10.2.4988404" >> android/local.properties
 ls $ANDROID_HOME/cmake/ # 3.10.2.4988404  3.6.4111459
 ```
 
+**Note: AppCenter builds will need to include the above in appcenter-pre-build.sh**
+
 ### iOS
 
 1. Update your project deployment target to `11.0`
@@ -95,6 +97,7 @@ platform :ios, '11.0'
 ## No Debug Mode
 
 You cannot attach chrome debugger if you are using >=0.5.0 version of this library since debugging is not available when JSI modules are used. You can use Flipper to debug if necessary.
+
 
 ##
 
