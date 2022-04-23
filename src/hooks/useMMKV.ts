@@ -99,7 +99,6 @@ export const useMMKVStorage = <T>(
 
   const updateValue = useCallback(event => {
     let type = getDataType(event.value);
-    if (!type) return;
     //@ts-ignore
     let _value = event.value ? methods[type]['copy'](event.value) : null;
     setValue(_value);
