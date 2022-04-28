@@ -122,7 +122,7 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
     var updateValue = useCallback(function (event) {
         var type = getDataType(event.value);
         //@ts-ignore
-        var _value = event.value ? methods[type]['copy'](event.value) : null;
+        var _value = event.value ? methods[type]['copy'](event.value) : event.value;
         setValue(_value);
         setValueType(type);
     }, []);
