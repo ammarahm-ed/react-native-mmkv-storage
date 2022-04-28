@@ -33,6 +33,7 @@ project.xcworkspace
 
 # Android/IntelliJ
 #
+*.aar
 build/
 .cxx
 .idea
