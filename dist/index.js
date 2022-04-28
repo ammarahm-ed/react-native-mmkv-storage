@@ -1,12 +1,11 @@
-import { useMMKVStorage, create } from './src/hooks/useMMKV';
-import { ACCESSIBLE, MODES } from './src/utils';
-import { getCurrentMMKVInstanceIDs } from './src/initializer';
-import IDStore from './src/mmkv/IDStore';
 import { useIndex } from './src/hooks/useIndex';
-import { isLoaded, init } from './src/mmkv/init';
+import { create, useMMKVStorage } from './src/hooks/useMMKV';
+import { getCurrentMMKVInstanceIDs } from './src/initializer';
 import Loader from './src/loader';
-import API from './src/api';
+import IDStore from './src/mmkv/IDStore';
+import { init, isLoaded } from './src/mmkv/init';
 import mmkvJsiModule, { mmkvBridgeModule } from './src/module';
+import { ACCESSIBLE, MODES } from './src/utils';
 var MMKVStorage = {
     Loader: Loader,
     MODES: MODES,
@@ -18,4 +17,4 @@ var MMKVStorage = {
     _bridgeModule: mmkvBridgeModule
 };
 export default MMKVStorage;
-export { useMMKVStorage, create, useIndex, isLoaded, init, API };
+export { useMMKVStorage, create, useIndex, isLoaded, init };
