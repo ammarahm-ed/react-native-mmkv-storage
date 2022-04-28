@@ -4,8 +4,8 @@ import { currentInstancesStatus } from './initializer';
 import generatePassword from './keygen';
 import { init } from './mmkv/init';
 import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
-var Loader = /** @class */ (function () {
-    function Loader() {
+var MMKVLoader = /** @class */ (function () {
+    function MMKVLoader() {
         this.options = {
             instanceID: 'default',
             initWithEncryption: false,
@@ -23,7 +23,7 @@ var Loader = /** @class */ (function () {
     /**
      * Load MMKV with the specified ID. If instance does not exist, a new instance will be created.
      */
-    Loader.prototype.withInstanceID = function (id) {
+    MMKVLoader.prototype.withInstanceID = function (id) {
         this.options.instanceID = id;
         return this;
     };
@@ -34,7 +34,7 @@ var Loader = /** @class */ (function () {
      * Setting this to true, the defaultValue will be returned instead.
      *
      */
-    Loader.prototype.withPersistedDefaultValues = function () {
+    MMKVLoader.prototype.withPersistedDefaultValues = function () {
         this.options.persistDefaults = true;
         return this;
     };
@@ -45,7 +45,7 @@ var Loader = /** @class */ (function () {
      * Requires an ID to be specified.
      *
      */
-    Loader.prototype.withEncryption = function () {
+    MMKVLoader.prototype.withEncryption = function () {
         this.options.initWithEncryption = true;
         this.options.key = generatePassword();
         this.options.alias = stringToHex(this.options.aliasPrefix + this.options.instanceID);
@@ -56,7 +56,7 @@ var Loader = /** @class */ (function () {
      * (iOS only) Sets the kSecAttrService attribute in the key chain (https://developer.apple.com/documentation/security/ksecattrservice).
      * Addresses https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/156#issuecomment-934046177 issue.
      */
-    Loader.prototype.withServiceName = function (serviceName) {
+    MMKVLoader.prototype.withServiceName = function (serviceName) {
         this.options.serviceName = serviceName;
         return this;
     };
@@ -65,7 +65,7 @@ var Loader = /** @class */ (function () {
      *
      * @param accessible `MMKVStorage.ACCESSIBLE`
      */
-    Loader.prototype.setAccessibleIOS = function (accessible) {
+    MMKVLoader.prototype.setAccessibleIOS = function (accessible) {
         this.options.accessibleMode = accessible;
         return this;
     };
@@ -78,7 +78,7 @@ var Loader = /** @class */ (function () {
      * @param secureKeyStorage Should the key be stored securely.
      * @param alias Provide an alias for key storage. Default alias is aliasPrefix + instanceID
      */
-    Loader.prototype.encryptWithCustomKey = function (key, secureKeyStorage, alias) {
+    MMKVLoader.prototype.encryptWithCustomKey = function (key, secureKeyStorage, alias) {
         this.options.key = key;
         this.options.secureKeyStorage = false;
         if (secureKeyStorage) {
@@ -101,14 +101,14 @@ var Loader = /** @class */ (function () {
      *
      * @param {number} mode Set processing mode for storage
      */
-    Loader.prototype.setProcessingMode = function (mode) {
+    MMKVLoader.prototype.setProcessingMode = function (mode) {
         this.options.processingMode = mode;
         return this;
     };
     /**
      * Create the instance with the given options.
      */
-    Loader.prototype.initialize = function () {
+    MMKVLoader.prototype.initialize = function () {
         if (!init())
             throw new Error('MMKVNative bindings not installed');
         currentInstancesStatus[this.options.instanceID] = false;
@@ -118,10 +118,10 @@ var Loader = /** @class */ (function () {
         handleAction(null, this.options.instanceID);
         return instance;
     };
-    Loader.prototype.generateKey = function () {
+    MMKVLoader.prototype.generateKey = function () {
         this.options.key = generatePassword();
         return this;
     };
-    return Loader;
+    return MMKVLoader;
 }());
-export default Loader;
+export default MMKVLoader;

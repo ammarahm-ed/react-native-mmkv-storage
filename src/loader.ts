@@ -6,7 +6,7 @@ import { init } from './mmkv/init';
 import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
 import { StorageOptions } from './types';
 
-export default class Loader {
+export default class MMKVLoader {
   options: StorageOptions;
   constructor() {
     this.options = {

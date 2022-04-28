@@ -1,6 +1,6 @@
 import API from './api';
 import { StorageOptions } from './types';
-export default class Loader {
+export default class MMKVLoader {
     options: StorageOptions;
     constructor();
     /**

@@ -2,27 +2,27 @@ import API from './src/api';
 import { useIndex } from './src/hooks/useIndex';
 import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
-import Loader from './src/loader';
+import MMKVLoader from './src/loader';
 import { init, isLoaded } from './src/mmkv/init';
 import { ACCESSIBLE, MODES } from './src/utils';
 declare const MMKVStorage: {
     /**
-     * Deprecated: Use `import {Loader} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {MMKVLoader} from "react-native-mmkv-storage`"
      */
-    Loader: typeof Loader;
+    Loader: typeof MMKVLoader;
     /**
-     * Deprecated: Use `import {API} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {API} from "react-native-mmkv-storage`"
      */
     API: typeof API;
     /**
-     * Deprecated: Use `import {MODES} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {MODES} from "react-native-mmkv-storage`"
      */
     MODES: {
         SINGLE_PROCESS: number;
         MULTI_PROCESS: number;
     };
     /**
-     * Deprecated: Use `import {ACCESSIBLE} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {ACCESSIBLE} from "react-native-mmkv-storage`"
      */
     ACCESSIBLE: {
         WHEN_UNLOCKED: string;
@@ -34,15 +34,15 @@ declare const MMKVStorage: {
         ALWAYS_THIS_DEVICE_ONLY: string;
     };
     /**
-     * Deprecated: Use `import {getAllMMKVInstanceIDs} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {getAllMMKVInstanceIDs} from "react-native-mmkv-storage`"
      */
     getAllMMKVInstanceIDs: () => string[];
     /**
-     * Deprecated: Use `import {getCurrentMMKVInstanceIDs} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {getCurrentMMKVInstanceIDs} from "react-native-mmkv-storage`"
      */
     getCurrentMMKVInstanceIDs: typeof getCurrentMMKVInstanceIDs;
     /**
-     * Deprecated: Use `import {IDSTORE_ID} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {IDSTORE_ID} from "react-native-mmkv-storage`"
      */
     IDSTORE_ID: string;
     _jsiModule: import("./src/types").MMKVJsiModule;
@@ -52,5 +52,5 @@ declare const MMKVStorage: {
 };
 export default MMKVStorage;
 declare const getAllMMKVInstanceIDs: () => string[], IDSTORE_ID: string;
-export { useMMKVStorage, create, useIndex, isLoaded, init, API, Loader, MODES, ACCESSIBLE, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };
+export { useMMKVStorage, create, useIndex, isLoaded, init, API, MMKVLoader, MODES, ACCESSIBLE, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };
 //# sourceMappingURL=index.d.ts.map
