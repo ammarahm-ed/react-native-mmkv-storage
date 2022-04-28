@@ -87,10 +87,6 @@ android {
   packagingOptions {
     excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so", "META-INF/MANIFEST.MF"]
   }
-  
-  configurations {
-    extractJNI
-  }
 }
 
 repositories {
@@ -122,28 +118,15 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.8.6'
 
   def rnAAR = fileTree(reactNativeDir.toString()).matching({ it.include "**/**/*.aar" }).singleFile
-  extractJNI(files(rnAAR))
-}
 
-def extracted = false;
-task extractJNIFiles {
-  if (extracted) return
-  doLast {
-    configurations.extractJNI.files.each {
+  files(rnAAR).each {
       def file = it.absoluteFile
-
+      def aarFolder = new File("$buildDir/../$file.name");
+      if (aarFolder.exists()) return;
       copy {
         from zipTree(file)
-        into "$buildDir/$file.name"
+        into "$buildDir/../$file.name"
         include "jni/**/*"
       }
-      extracted = true;
     }
-  }
-}
-
-// Extract JNI files as soon as first task is added
-tasks.whenTaskAdded { task ->
-  if (task.name.contains("Clean") || task.name.contains("clean")) return;
-  task.dependsOn(extractJNIFiles);
 }
