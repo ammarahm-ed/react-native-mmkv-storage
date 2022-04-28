@@ -10,7 +10,7 @@ export function promisify(fn: Function) {
 /**
  * Accessible modes for iOS Keychain
  */
-export const ACCESSIBLE = {
+export const IOSAccessibleStates = {
   WHEN_UNLOCKED: 'AccessibleWhenUnlocked',
   AFTER_FIRST_UNLOCK: 'AccessibleAfterFirstUnlock',
   ALWAYS: 'AccessibleAlways',
@@ -23,7 +23,7 @@ export const ACCESSIBLE = {
 /**
  * Processing modes for storage.
  */
-export const MODES = {
+export const ProcessingModes = {
   SINGLE_PROCESS: 1,
   MULTI_PROCESS: 2
 };

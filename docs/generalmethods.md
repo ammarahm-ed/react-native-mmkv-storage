@@ -5,9 +5,9 @@ Some useful general methods for each instance with a single variant.
 First we create a default MMKV Instance
 
 ```js
-import MMKVStorage from "react-native-mmkv-storage";
+import { MMKVLoader } from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().initialize();
+MMKV = new MMKVLoader().initialize();
 ```
 
 ## removeItem
@@ -17,7 +17,7 @@ Remove an item for a given key.
 **Arguments**
 
 | Name | Type   |
-| ---- | ------ |
+|------|--------|
 | key  | String |
 
 ```js

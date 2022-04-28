@@ -15,9 +15,10 @@ Encrypt an already created instance of MMKV.
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
 
 ```js
-// A simple MMKV Instance();
+import { MMKVLoader } from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().initialize();
+// A simple MMKV Instance();
+MMKV = new MMKVLoader().initialize();
 
 await MMKV.encryption.encrypt();
 
@@ -37,7 +38,7 @@ Removes encryption from an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = new MMKVStorage.Loader().withEncryption().initialize();
+MMKV = new MMKVLoader().withEncryption().initialize();
 
 // Remove encryption from an encrypted instance of MMKV.
 
@@ -61,7 +62,7 @@ Change the encryption key of an encrypted instance of MMKV.
 ```js
 // Create an instance that is encrypted
 
-MMKV = new MMKVStorage.Loader().withEncryption().initialize();
+MMKV = new MMKVLoader().withEncryption().initialize();
 
 await MMKV.encryption.changeEncryptionKey();
 

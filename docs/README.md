@@ -59,9 +59,9 @@ Hooks let's the storage update your app when a change takes place in storage.
 Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.
 
 ```js
-import MMKVStorage, { useMMKVStorage } from "react-native-mmkv-storage";
+import {MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
 
-const storage = new MMKVStorage.Loader().initialize();
+const storage = new MMKVLoader().initialize();
 const App = () => {
   const [user, setUser] = useMMKVStorage("user", storage, "robert");
   const [age, setAge] = useMMKVStorage("age", storage, 24);
@@ -126,12 +126,12 @@ MMKV supports concurrent read-read and read-write access between processes. This
 You can create many database instances. This helps greatly if you have seperate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
 
 ```js
-const userStorage = new MMKVStorage.Loader()
+const userStorage = new MMKVLoader()
   .withEncryption()
   .withInstanceID("userdata")
   .initialize();
 
-const settingsStorage = new MMKVStorage.Loader()
+const settingsStorage = new MMKVLoader()
   .withInstanceID("settings")
   .initialize();
 ```
@@ -141,7 +141,7 @@ const settingsStorage = new MMKVStorage.Loader()
 The library supports full encryption (AES CFB-128) on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). Encrypting an instance is simple:
 
 ```js
-const storage = new MMKVStorage.Loader()
+const storage = new MMKVLoader()
   .withEncryption() // Generates a random key and stores it securely in Keychain
   .initialize();
 ```

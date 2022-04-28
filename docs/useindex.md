@@ -4,11 +4,11 @@ A hook that will take an array of keys and returns an array of values for those 
 
 **Arguments**
 
-| Name | Required | Type | Description |
-|-------------------|----------|------------------------------------------------------|----------------------------------------------------------------------------|
-| index | yes | Array | The type of data you want to register the function for. |
-| type | yes | "string" / "number" / "object" / "array" / "boolean" | Type of values in index |
-| [`MMKVStorage.API`](callbackapi.md) | no | `MMKVStorage.API` | MMKV storage instance created from `new MMKVStorage.Loader().initialize()` |
+| Name                                | Required | Type                                                 | Description                                                        |
+|-------------------------------------|----------|------------------------------------------------------|--------------------------------------------------------------------|
+| index                               | yes      | Array                                                | The type of data you want to register the function for.            |
+| type                                | yes      | "string" / "number" / "object" / "array" / "boolean" | Type of values in index                                            |
+| [`MMKVStorage.API`](callbackapi.md) | no       | `MMKVStorage.API`                                    | MMKV storage instance created from `new MMKVLoader().initialize()` |
 
 **returns:** `[values,update,remove]`
 

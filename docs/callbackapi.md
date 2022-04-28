@@ -9,9 +9,9 @@ Starting from `0.5.4` all calls are Synchronous and you should not use the callb
 First we create a default MMKV Instance
 
 ```js
-import MMKVStorage from "react-native-mmkv-storage";
+import { MMKVLoader } from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().initialize();
+MMKV = new MMKVLoader().initialize();
 ```
 
 ## setString
@@ -21,7 +21,7 @@ Sets a string value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | value    | String   |
 | callback | Function |
@@ -48,7 +48,7 @@ Gets a string value for a given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | callback | Function |
 
@@ -77,7 +77,7 @@ Sets a number value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | value    | Number   |
 | callback | Function |
@@ -103,7 +103,7 @@ Gets a number value for a given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | callback | Function |
 
@@ -131,7 +131,7 @@ Sets a boolean value in storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | value    | boolean  |
 | callback | Function |
@@ -158,7 +158,7 @@ Gets a boolean value for a given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | callback | Function |
 
@@ -187,7 +187,7 @@ Sets an object to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | value    | Object   |
 | callback | Function |
@@ -219,7 +219,7 @@ Gets an object from storage.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | callback | Function |
 
@@ -250,7 +250,7 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | value    | Array    |
 | callback | Function |
@@ -279,7 +279,7 @@ Sets an array to storage for the given key.
 **Arguments**
 
 | Name     | Type     |
-| -------- | -------- |
+|----------|----------|
 | key      | String   |
 | callback | Function |
 
@@ -310,7 +310,7 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 **Arguments**
 
 | Name     | Type                                   |
-| -------- | -------------------------------------- |
+|----------|----------------------------------------|
 | keys     | Array of Keys                          |
 | type     | "string","bool","number","map","array" |
 | callback | Function                               |

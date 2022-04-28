@@ -5,9 +5,9 @@ The library provides support for redux-persist so you can replace it directly wi
 First we create an MMKV instance, it could be with or without encryption. 
 
 ```js
-import MMKVStorage from "react-native-mmkv-storage";
+import { MMKVLoader } from "react-native-mmkv-storage";
 
-const storage = new MMKVStorage.Loader().initialize();
+const storage = new MMKVLoader().initialize();
 ```
 
 Then we pass the storage to persistConfig.

@@ -5,9 +5,9 @@ MMKV provides a simple querying system. You can check if a key exists in the dat
 First we create a default MMKV Instance
 
 ```js
-import MMKVStorage from "react-native-mmkv-storage";
+import { MMKVLoader } from "react-native-mmkv-storage";
 
-MMKV = new MMKVStorage.Loader().initialize();
+MMKV = new MMKVLoader().initialize();
 ```
 
 # Instance Indexer

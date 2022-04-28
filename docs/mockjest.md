@@ -19,7 +19,7 @@ You will need to mock the storage with an `in-memory adapter` when your tests ru
 
 ```js
 import 'react-native';
-import MMKVStorage, {isLoaded} from 'react-native-mmkv-storage'; // Import the library as normal.
+import {MMKVLoader,isLoaded} from 'react-native-mmkv-storage'; // Import the library as normal.
 
 describe('MMKV Storage mock functionality', () => {
 
@@ -37,7 +37,7 @@ describe('MMKV Storage mock functionality', () => {
 
   // Create a new instance.
   it('Init an instance', () => {
-    let instance = new MMKVStorage.Loader().initialize();
+    let instance = new MMKVLoader().initialize();
     expect(instance.instanceID).toBe('default');
     expect(instance.getString('unknown')).toBe(null);
   });

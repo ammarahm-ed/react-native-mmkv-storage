@@ -7,11 +7,11 @@ A `useState` like hook that allows you to easily manage values in storage.
 
 **Arguments**
 
-| Name              | Required | Type    | Description                                                                |
-|-------------------|----------|---------|----------------------------------------------------------------------------|
-| key               | yes      | String  | The key against which to get the value                                     |
-| `MMKVStorage.API` | yes      | `MMKVStorage.API` | MMKV storage instance created from `new MMKVStorage.Loader().initialize()` |
-| defaultValue      | no       | String  | Pass a default value for the hook if any                                   |
+| Name              | Required | Type              | Description                                                        |
+|-------------------|----------|-------------------|--------------------------------------------------------------------|
+| key               | yes      | String            | The key against which to get the value                             |
+| `MMKVStorage.API` | yes      | `MMKVStorage.API` | MMKV storage instance created from `new MMKVLoader().initialize()` |
+| defaultValue      | no       | String            | Pass a default value for the hook if any                           |
 
 **returns:** A pair of `value` & `setValue`. 
 
@@ -19,9 +19,9 @@ A `useState` like hook that allows you to easily manage values in storage.
 A helper function that returns `useMMKVStorage` which can then be used inside a functional component.
 **Arguments**
 
-| Name              | Required | Type    | Description                                                                |
-|-------------------|----------|---------|----------------------------------------------------------------------------|
-| `MMKVStorage.API` | yes      | boolean | MMKV storage instance created from `new MMKVStorage.Loader().initialize()` |
+| Name              | Required | Type    | Description                                                        |
+|-------------------|----------|---------|--------------------------------------------------------------------|
+| `MMKVStorage.API` | yes      | boolean | MMKV storage instance created from `new MMKVLoader().initialize()` |
 
 **returns:** `useMMKVStorage(key:string,defaultValue:any)`
 
@@ -30,13 +30,13 @@ A helper function that returns `useMMKVStorage` which can then be used inside a 
 Import `MMKVStorage` and `useMMKVStorage` Hook.
 
 ```js
-import MMKVStorage, { useMMKVStorage } from "react-native-mmkv-storage";
+import { MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
 ```
 
 Initialize the `MMKVStorage` instance.
 
 ```js
-const MMKV = new MMKVStorage.Loader().initialize();
+const MMKV = new MMKVLoader().initialize();
 ```
 
 Next, in our component we are going to register our hook.
@@ -68,7 +68,7 @@ Simple right? now refresh the app or restart it. When it loads, it will always s
 The ideal way which I would recommend for better development experience would to wrap `useMMKVStorage` hook in a custom hook as follows:
 
 ```jsx
-const MMKV = new MMKVStorage.Loader().initialize();
+const MMKV = new MMKVLoader().initialize();
 
 export const useStorage = (key, defaultValue) => {
   const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
@@ -79,8 +79,8 @@ export const useStorage = (key, defaultValue) => {
 You should use the `create` function from `v0.5.9` onwards:
 
 ```jsx
-import MMKVStorage, { create } from "react-native-mmkv-storage";
-const MMKV = new MMKVStorage.Loader().initialize();
+import {MMKVLoader, create } from "react-native-mmkv-storage";
+const MMKV = new MMKVLoader().initialize();
 
 export const useStorage = create(MMKV);
 ```
@@ -88,7 +88,7 @@ export const useStorage = create(MMKV);
 Now you don't have to import `MMKV` everywhere in your app but only once. If you use TypeScript you can do something like below to get nice intellisense in your editor.
 
 ```tsx
-const MMKV: MMKVStorage.API = new MMKVStorage.Loader().initialize();
+const MMKV: MMKVStorage.API = new MMKVLoader().initialize();
 type LiteralUnion<T extends U, U = string> = T | (U & {});
 
 export const useStorage = (

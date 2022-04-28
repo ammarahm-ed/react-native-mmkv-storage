@@ -34,13 +34,13 @@ Clear all registered functions.
 Import `MMKVStorage` and `useMMKVStorage` Hook.
 
 ```js
-import MMKVStorage, { useMMKVStorage } from "react-native-mmkv-storage";
+import { MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
 ```
 
 Initialize the `MMKVStorage` instance.
 
 ```js
-const MMKV = new MMKVStorage.Loader().initialize();
+const MMKV = new MMKVLoader().initialize();
 ```
 
 ### 1. Simple Developer Tooling
