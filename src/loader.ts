@@ -3,7 +3,7 @@ import { handleAction } from './handlers';
 import { currentInstancesStatus } from './initializer';
 import generatePassword from './keygen';
 import { init } from './mmkv/init';
-import { ACCESSIBLE, MODES, options, stringToHex } from './utils';
+import { IOSAccessibleStates, ProcessingModes, options, stringToHex } from './utils';
 import { StorageOptions } from './types';
 
 export default class MMKVLoader {
@@ -13,8 +13,8 @@ export default class MMKVLoader {
       instanceID: 'default',
       initWithEncryption: false,
       secureKeyStorage: false,
-      accessibleMode: ACCESSIBLE.WHEN_UNLOCKED,
-      processingMode: MODES.SINGLE_PROCESS,
+      accessibleMode: IOSAccessibleStates.WHEN_UNLOCKED,
+      processingMode: ProcessingModes.SINGLE_PROCESS,
       aliasPrefix: 'com.MMKV.',
       alias: null,
       key: null,

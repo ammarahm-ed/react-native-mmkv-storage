@@ -4,7 +4,7 @@ import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
 import MMKVLoader from './src/loader';
 import { init, isLoaded } from './src/mmkv/init';
-import { ACCESSIBLE, MODES } from './src/utils';
+import { IOSAccessibleStates, ProcessingModes } from './src/utils';
 declare const MMKVStorage: {
     /**
      * @deprecated Use `import {MMKVLoader} from "react-native-mmkv-storage`"
@@ -15,14 +15,14 @@ declare const MMKVStorage: {
      */
     API: typeof API;
     /**
-     * @deprecated Use `import {MODES} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {ProcessingModes} from "react-native-mmkv-storage`"
      */
     MODES: {
         SINGLE_PROCESS: number;
         MULTI_PROCESS: number;
     };
     /**
-     * @deprecated Use `import {ACCESSIBLE} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {IOSAccessibleStates} from "react-native-mmkv-storage`"
      */
     ACCESSIBLE: {
         WHEN_UNLOCKED: string;
@@ -52,5 +52,5 @@ declare const MMKVStorage: {
 };
 export default MMKVStorage;
 declare const getAllMMKVInstanceIDs: () => string[], IDSTORE_ID: string;
-export { useMMKVStorage, create, useIndex, isLoaded, init, API, MMKVLoader, MODES, ACCESSIBLE, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };
+export { useMMKVStorage, create, useIndex, isLoaded, init, API, MMKVLoader, ProcessingModes, IOSAccessibleStates, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };
 //# sourceMappingURL=index.d.ts.map

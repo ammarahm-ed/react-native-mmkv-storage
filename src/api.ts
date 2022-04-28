@@ -141,6 +141,8 @@ export default class API {
    * Set a string value to storage for the given key.
    */
   setString = (key: string, value: string) => {
+    if (typeof value !== 'string') throw new Error(`Trying to set ${typeof value} as a string`);
+
     let _value = value;
     let before = this.transactions.beforewrite['string'];
     if (before) {
@@ -177,6 +179,8 @@ export default class API {
    * Set a number value to storage for the given key.
    */
   setInt = (key: string, value: number) => {
+    if (typeof value !== 'number') throw new Error(`Trying to set ${typeof value} as a number`);
+
     let _value = value;
     let before = this.transactions.beforewrite['number'];
     if (before) {
@@ -206,6 +210,8 @@ export default class API {
    * Set a boolean value to storage for the given key
    */
   setBool = (key: string, value: boolean) => {
+    if (typeof value !== 'boolean') throw new Error(`Trying to set ${typeof value} as a boolean`);
+
     let _value = value;
     let before = this.transactions.beforewrite['boolean'];
     if (before) {
@@ -238,7 +244,7 @@ export default class API {
    * Note that this function does **not** work with the Map data type
    */
   setMap = (key: string, value: object) => {
-    if (typeof value !== 'object') throw new Error('value must be an object');
+    if (typeof value !== 'object') throw new Error(`Trying to set ${typeof value} as a object`);
 
     let _value = value;
     let before = this.transactions.beforewrite['map'];
@@ -282,7 +288,7 @@ export default class API {
    * Set an array to storage for the given key.
    */
   setArray = (key: string, value: any[]) => {
-    if (!Array.isArray(value)) throw new Error('value must be an Array');
+    if (!Array.isArray(value)) throw new Error(`Trying to set ${typeof value} as a Array`);
 
     let _value = value;
     let before = this.transactions.beforewrite['array'];

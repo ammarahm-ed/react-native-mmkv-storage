@@ -3,7 +3,7 @@ export declare function promisify(fn: Function): (...args: any) => Promise<unkno
 /**
  * Accessible modes for iOS Keychain
  */
-export declare const ACCESSIBLE: {
+export declare const IOSAccessibleStates: {
     WHEN_UNLOCKED: string;
     AFTER_FIRST_UNLOCK: string;
     ALWAYS: string;
@@ -15,7 +15,7 @@ export declare const ACCESSIBLE: {
 /**
  * Processing modes for storage.
  */
-export declare const MODES: {
+export declare const ProcessingModes: {
     SINGLE_PROCESS: number;
     MULTI_PROCESS: number;
 };

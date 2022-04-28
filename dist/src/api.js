@@ -50,6 +50,8 @@ var API = /** @class */ (function () {
          * Set a string value to storage for the given key.
          */
         this.setString = function (key, value) {
+            if (typeof value !== 'string')
+                throw new Error("Trying to set ".concat(typeof value, " as a string"));
             var _value = value;
             var before = _this.transactions.beforewrite['string'];
             if (before) {
@@ -81,6 +83,8 @@ var API = /** @class */ (function () {
          * Set a number value to storage for the given key.
          */
         this.setInt = function (key, value) {
+            if (typeof value !== 'number')
+                throw new Error("Trying to set ".concat(typeof value, " as a number"));
             var _value = value;
             var before = _this.transactions.beforewrite['number'];
             if (before) {
@@ -108,6 +112,8 @@ var API = /** @class */ (function () {
          * Set a boolean value to storage for the given key
          */
         this.setBool = function (key, value) {
+            if (typeof value !== 'boolean')
+                throw new Error("Trying to set ".concat(typeof value, " as a boolean"));
             var _value = value;
             var before = _this.transactions.beforewrite['boolean'];
             if (before) {
@@ -138,7 +144,7 @@ var API = /** @class */ (function () {
          */
         this.setMap = function (key, value) {
             if (typeof value !== 'object')
-                throw new Error('value must be an object');
+                throw new Error("Trying to set ".concat(typeof value, " as a object"));
             var _value = value;
             var before = _this.transactions.beforewrite['map'];
             if (before) {
@@ -175,7 +181,7 @@ var API = /** @class */ (function () {
          */
         this.setArray = function (key, value) {
             if (!Array.isArray(value))
-                throw new Error('value must be an Array');
+                throw new Error("Trying to set ".concat(typeof value, " as a Array"));
             var _value = value;
             var before = _this.transactions.beforewrite['array'];
             if (before) {
