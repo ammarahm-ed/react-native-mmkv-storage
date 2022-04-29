@@ -1,5 +1,14 @@
-import { NativeModules } from 'react-native';
-export var mmkvBridgeModule = NativeModules.MMKVNative;
+//@ts-ignore
+var isDebugMode = global.location && global.location.pathname.includes('/debugger-ui');
+export var mmkvBridgeModule = !isDebugMode
+    ? require('react-native').NativeModules.MMKVNative
+    : {
+        install: function () {
+            console.warn("Remote debugging is not supported by JSI modules. MMKV is running with a memory adapter currently and is fully functional for testing only. Hence any values will not persist on App refresh/reload. ");
+            require('../../../jest/dist/jest/memoryStore.js').mock();
+            return true;
+        }
+    };
 /**
  * All jsi functions bound to global object.
  *
