@@ -9,7 +9,7 @@ import transactions from './transactions';
 import { DataType, GenericReturnType, StorageOptions } from './types';
 import { options } from './utils';
 
-export default class API {
+export default class MMKVInstance {
   transactions: transactions;
   instanceID: string;
   encryption: encryption;

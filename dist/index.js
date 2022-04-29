@@ -1,4 +1,4 @@
-import API from './src/api';
+import MMKVInstance from './src/api';
 import { useIndex } from './src/hooks/useIndex';
 import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
@@ -13,9 +13,9 @@ var MMKVStorage = {
      */
     Loader: MMKVLoader,
     /**
-     * @deprecated Use `import {API} from "react-native-mmkv-storage`"
+     * @deprecated Use `import {MMKVInstance} from "react-native-mmkv-storage`"
      */
-    API: API,
+    API: MMKVInstance,
     /**
      * @deprecated Use `import {ProcessingModes} from "react-native-mmkv-storage`"
      */
@@ -41,4 +41,4 @@ var MMKVStorage = {
 };
 export default MMKVStorage;
 var getAllMMKVInstanceIDs = IDStore.getAllMMKVInstanceIDs, IDSTORE_ID = IDStore.STORE_ID;
-export { useMMKVStorage, create, useIndex, isLoaded, init, API, MMKVLoader, ProcessingModes, IOSAccessibleStates, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };
+export { useMMKVStorage, create, useIndex, isLoaded, init, MMKVInstance, MMKVLoader, ProcessingModes, IOSAccessibleStates, getCurrentMMKVInstanceIDs, getAllMMKVInstanceIDs, IDSTORE_ID };

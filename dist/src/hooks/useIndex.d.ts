@@ -1,4 +1,4 @@
-import API from '../api';
+import MMKVInstance from '../api';
 import { DataType } from '../types';
 /**
  * A hook that will take an array of keys and returns an array of values for those keys.
@@ -33,5 +33,5 @@ import { DataType } from '../types';
  *
  * @returns `[values, update, remove]`
  */
-export declare const useIndex: <T>(keys: string[], type: DataType, storage: API) => [values: (T | null | undefined)[], update: (key: string, value: T) => void, remove: (key: string) => void];
+export declare const useIndex: <T>(keys: string[], type: DataType, storage: MMKVInstance) => [values: (T | null | undefined)[], update: (key: string, value: T) => void, remove: (key: string) => void];
 //# sourceMappingURL=useIndex.d.ts.map

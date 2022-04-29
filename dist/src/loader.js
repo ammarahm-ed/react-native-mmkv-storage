@@ -1,4 +1,4 @@
-import API from './api';
+import MMKVInstance from './api';
 import { handleAction } from './handlers';
 import { currentInstancesStatus } from './initializer';
 import generatePassword from './keygen';
@@ -113,7 +113,7 @@ var MMKVLoader = /** @class */ (function () {
             throw new Error('MMKVNative bindings not installed');
         currentInstancesStatus[this.options.instanceID] = false;
         options[this.options.instanceID] = this.options;
-        var instance = new API(this.options.instanceID);
+        var instance = new MMKVInstance(this.options.instanceID);
         //@ts-ignore
         handleAction(null, this.options.instanceID);
         return instance;

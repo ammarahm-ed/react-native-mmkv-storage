@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import API from '../api';
+import MMKVInstance from '../api';
 import { methods } from './constants';
 import { getDataType, getInitialValue } from './functions';
 
@@ -25,7 +25,7 @@ import { getDataType, getInitialValue } from './functions';
  * @returns `useMMKVStorage` hook
  */
 export const create =
-  <T>(storage: API) =>
+  <T>(storage: MMKVInstance) =>
   (key: string, defaultValue: any) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
@@ -59,7 +59,7 @@ export const create =
  */
 export const useMMKVStorage = <T>(
   key: string,
-  storage: API,
+  storage: MMKVInstance,
   defaultValue: any
 ): [value: T | null | undefined, setValue: (value: T) => void] => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);

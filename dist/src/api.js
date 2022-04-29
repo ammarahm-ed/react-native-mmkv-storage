@@ -43,8 +43,8 @@ import { default as IDStore } from './mmkv/IDStore';
 import mmkvJsiModule from './module';
 import transactions from './transactions';
 import { options } from './utils';
-var API = /** @class */ (function () {
-    function API(id) {
+var MMKVInstance = /** @class */ (function () {
+    function MMKVInstance(id) {
         var _this = this;
         /**
          * Set a string value to storage for the given key.
@@ -295,20 +295,20 @@ var API = /** @class */ (function () {
      * This method is added for redux-persist/zustand support.
      *
      */
-    API.prototype.setItem = function (key, value) {
+    MMKVInstance.prototype.setItem = function (key, value) {
         return this.setStringAsync(key, value);
     };
     /**
      * Get the string value for the given key.
      * This method is added for redux-persist/zustand support.
      */
-    API.prototype.getItem = function (key) {
+    MMKVInstance.prototype.getItem = function (key) {
         return this.getStringAsync(key);
     };
     /**
      * Set a string value to storage for the given key.
      */
-    API.prototype.setStringAsync = function (key, value) {
+    MMKVInstance.prototype.setStringAsync = function (key, value) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.setString(key, value));
@@ -317,7 +317,7 @@ var API = /** @class */ (function () {
     /**
      * Get the string value for the given key.
      */
-    API.prototype.getStringAsync = function (key) {
+    MMKVInstance.prototype.getStringAsync = function (key) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.getString(key));
@@ -326,7 +326,7 @@ var API = /** @class */ (function () {
     /**
      * Set a number value to storage for the given key.
      */
-    API.prototype.setIntAsync = function (key, value) {
+    MMKVInstance.prototype.setIntAsync = function (key, value) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.setInt(key, value));
@@ -335,7 +335,7 @@ var API = /** @class */ (function () {
     /**
      * Get the number value for the given key.
      */
-    API.prototype.getIntAsync = function (key) {
+    MMKVInstance.prototype.getIntAsync = function (key) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.getInt(key));
@@ -345,7 +345,7 @@ var API = /** @class */ (function () {
      * Set a boolean value to storage for the given key.
      *
      */
-    API.prototype.setBoolAsync = function (key, value) {
+    MMKVInstance.prototype.setBoolAsync = function (key, value) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.setBool(key, value));
@@ -354,7 +354,7 @@ var API = /** @class */ (function () {
     /**
      * Get the boolean value for the given key.
      */
-    API.prototype.getBoolAsync = function (key) {
+    MMKVInstance.prototype.getBoolAsync = function (key) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.getBool(key));
@@ -366,7 +366,7 @@ var API = /** @class */ (function () {
      * Note that this function does **not** work with the Map data type.
      *
      */
-    API.prototype.setMapAsync = function (key, value) {
+    MMKVInstance.prototype.setMapAsync = function (key, value) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.setMap(key, value));
@@ -375,7 +375,7 @@ var API = /** @class */ (function () {
     /**
      * Get then Object from storage for the given key.
      */
-    API.prototype.getMapAsync = function (key) {
+    MMKVInstance.prototype.getMapAsync = function (key) {
         var _this = this;
         return new Promise(function (resolve) {
             resolve(_this.getMap(key));
@@ -384,7 +384,7 @@ var API = /** @class */ (function () {
     /**
      * Retrieve multiple items for the given array of keys.
      */
-    API.prototype.getMultipleItemsAsync = function (keys, type) {
+    MMKVInstance.prototype.getMultipleItemsAsync = function (keys, type) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -397,7 +397,7 @@ var API = /** @class */ (function () {
     /**
      * Set an array to storage for the given key.
      */
-    API.prototype.setArrayAsync = function (key, value) {
+    MMKVInstance.prototype.setArrayAsync = function (key, value) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -410,7 +410,7 @@ var API = /** @class */ (function () {
     /**
      * Get the array from the storage for the given key.
      */
-    API.prototype.getArrayAsync = function (key) {
+    MMKVInstance.prototype.getArrayAsync = function (key) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -425,7 +425,7 @@ var API = /** @class */ (function () {
      * Get all Storage Instance IDs that are currently loaded.
      *
      */
-    API.prototype.getCurrentMMKVInstanceIDs = function () {
+    MMKVInstance.prototype.getCurrentMMKVInstanceIDs = function () {
         return getCurrentMMKVInstanceIDs();
     };
     /**
@@ -433,14 +433,14 @@ var API = /** @class */ (function () {
      * Get all Storage Instance IDs.
      *
      */
-    API.prototype.getAllMMKVInstanceIDs = function () {
+    MMKVInstance.prototype.getAllMMKVInstanceIDs = function () {
         return IDStore.getAllMMKVInstanceIDs();
     };
     /**
      * Remove an item from storage for a given key.
      *
      */
-    API.prototype.removeItem = function (key) {
+    MMKVInstance.prototype.removeItem = function (key) {
         var result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
         if (result) {
             this.ev.publish("".concat(key, ":onwrite"), { key: key });
@@ -453,7 +453,7 @@ var API = /** @class */ (function () {
     /**
      * Remove all keys and values from storage.
      */
-    API.prototype.clearStore = function () {
+    MMKVInstance.prototype.clearStore = function () {
         var _this = this;
         var keys = handleAction(mmkvJsiModule.getAllKeysMMKV, this.instanceID);
         var cleared = handleAction(mmkvJsiModule.clearMMKV, this.instanceID);
@@ -464,17 +464,17 @@ var API = /** @class */ (function () {
     /**
      * Get the key and alias for the encrypted storage
      */
-    API.prototype.getKey = function () {
+    MMKVInstance.prototype.getKey = function () {
         var _a = options[this.instanceID], alias = _a.alias, key = _a.key;
         return { alias: alias, key: key };
     };
     /**
      * Clear memory cache of the current MMKV instance
      */
-    API.prototype.clearMemoryCache = function () {
+    MMKVInstance.prototype.clearMemoryCache = function () {
         var cleared = handleAction(mmkvJsiModule.clearMemoryCache, this.instanceID);
         return cleared;
     };
-    return API;
+    return MMKVInstance;
 }());
-export default API;
+export default MMKVInstance;

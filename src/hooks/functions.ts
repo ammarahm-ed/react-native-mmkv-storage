@@ -1,4 +1,4 @@
-import API from '../api';
+import MMKVInstance from '../api';
 import { methods, types } from './constants';
 export const getDataType = (value: any) => {
   if (value === null || value === undefined) return null;
@@ -7,7 +7,7 @@ export const getDataType = (value: any) => {
 };
 
 export const getInitialValue =
-  (key: string, storage: API, initialValueType: 'type' | 'value') => () => {
+  (key: string, storage: MMKVInstance, initialValueType: 'type' | 'value') => () => {
     if (!storage?.indexer) {
       return null;
     }

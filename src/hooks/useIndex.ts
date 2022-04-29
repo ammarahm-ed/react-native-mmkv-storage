@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import API from '../api';
+import MMKVInstance from '../api';
 import { DataType } from '../types';
 import { methods } from './constants';
 
@@ -41,7 +41,7 @@ type GenericValueType<T> = [key: string, value: T | null | undefined];
 export const useIndex = <T>(
   keys: string[],
   type: DataType,
-  storage: API
+  storage: MMKVInstance
 ): [
   values: (T | null | undefined)[],
   update: (key: string, value: T) => void,

@@ -1,4 +1,4 @@
-import API from '../api';
+import MMKVInstance from '../api';
 /**
  * A helper function which returns `useMMKVStorage` hook with a storage instance set.
  *
@@ -20,7 +20,7 @@ import API from '../api';
  * @param storage The storage instance
  * @returns `useMMKVStorage` hook
  */
-export declare const create: <T>(storage: API) => (key: string, defaultValue: any) => [value: T | null | undefined, setValue: (value: T) => void];
+export declare const create: <T>(storage: MMKVInstance) => (key: string, defaultValue: any) => [value: T | null | undefined, setValue: (value: T) => void];
 /**
  *
  * useMMKVStorage Hook is like a persisted state that will always write every change in storage and update your app UI instantly.
@@ -46,5 +46,5 @@ export declare const create: <T>(storage: API) => (key: string, defaultValue: an
  *
  * @returns `[value,setValue]`
  */
-export declare const useMMKVStorage: <T>(key: string, storage: API, defaultValue: any) => [value: T | null | undefined, setValue: (value: T) => void];
+export declare const useMMKVStorage: <T>(key: string, storage: MMKVInstance, defaultValue: any) => [value: T | null | undefined, setValue: (value: T) => void];
 //# sourceMappingURL=useMMKV.d.ts.map

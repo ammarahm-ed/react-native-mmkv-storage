@@ -3,7 +3,7 @@ import EventManager from './eventmanager';
 import indexer from './indexer/indexer';
 import transactions from './transactions';
 import { DataType, GenericReturnType, StorageOptions } from './types';
-export default class API {
+export default class MMKVInstance {
     transactions: transactions;
     instanceID: string;
     encryption: encryption;

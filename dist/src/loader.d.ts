@@ -1,4 +1,4 @@
-import API from './api';
+import MMKVInstance from './api';
 import { StorageOptions } from './types';
 export default class MMKVLoader {
     options: StorageOptions;
@@ -57,7 +57,7 @@ export default class MMKVLoader {
     /**
      * Create the instance with the given options.
      */
-    initialize(): API;
+    initialize(): MMKVInstance;
     generateKey(): this;
 }
 //# sourceMappingURL=loader.d.ts.map
