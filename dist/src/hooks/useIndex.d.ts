@@ -1,4 +1,4 @@
-import MMKVInstance from '../api';
+import MMKVInstance from '../mmkvinstance';
 import { DataType } from '../types';
 /**
  * A hook that will take an array of keys and returns an array of values for those keys.

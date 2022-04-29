@@ -1,8 +1,8 @@
-import MMKVInstance from './src/api';
+import MMKVInstance from './src/mmkvinstance';
 import { useIndex } from './src/hooks/useIndex';
 import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { getCurrentMMKVInstanceIDs } from './src/initializer';
-import MMKVLoader from './src/loader';
+import MMKVLoader from './src/mmkvloader';
 import IDStore from './src/mmkv/IDStore';
 import { init, isLoaded } from './src/mmkv/init';
 import mmkvJsiModule, { mmkvBridgeModule } from './src/module';

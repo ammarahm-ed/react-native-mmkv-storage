@@ -1,4 +1,4 @@
-import MMKVInstance from '../api';
+import MMKVInstance from '../mmkvinstance';
 import { methods, types } from './constants';
 export const getDataType = (value: any) => {
   if (value === null || value === undefined) return null;

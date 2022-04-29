@@ -1,4 +1,4 @@
-import MMKVInstance from './api';
+import MMKVInstance from './mmkvinstance';
 import { handleAction } from './handlers';
 import { currentInstancesStatus } from './initializer';
 import generatePassword from './keygen';

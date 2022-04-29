@@ -1,4 +1,4 @@
-import MMKVInstance from '../api';
+import MMKVInstance from '../mmkvinstance';
 /**
  * A helper function which returns `useMMKVStorage` hook with a storage instance set.
  *

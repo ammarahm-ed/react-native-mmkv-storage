@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import MMKVInstance from '../api';
+import MMKVInstance from '../mmkvinstance';
 import { methods } from './constants';
 import { getDataType, getInitialValue } from './functions';
 
