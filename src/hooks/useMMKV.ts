@@ -61,7 +61,7 @@ export const useMMKVStorage = <T>(
   key: string,
   storage: MMKVInstance,
   defaultValue: any
-): [value: T | null | undefined, setValue: (value: T) => void] => {
+): [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void] => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
 
