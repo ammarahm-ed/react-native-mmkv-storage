@@ -1,7 +1,7 @@
 import { MMKVJsiModule } from '../types';
 
 //@ts-ignore
-const isDebugMode = global.location && global.location.pathname.includes('/debugger-ui');
+const isDebugMode = global.location && global.location.pathname && global.location.pathname.includes('/debugger-ui');
 
 export const mmkvBridgeModule: {
   /**
