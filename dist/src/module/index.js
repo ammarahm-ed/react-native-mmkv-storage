@@ -1,5 +1,5 @@
 //@ts-ignore
-var isDebugMode = global.location && global.location.pathname.includes('/debugger-ui');
+var isDebugMode = global.location && global.location.pathname && global.location.pathname.includes('/debugger-ui');
 export var mmkvBridgeModule = !isDebugMode
     ? require('react-native').NativeModules.MMKVNative
     : {
