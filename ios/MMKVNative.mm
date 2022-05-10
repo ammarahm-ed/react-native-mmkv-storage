@@ -70,9 +70,7 @@ void setServiceName(NSString *alias, NSString *serviceName) {
 // https://github.com/mrousavy/react-native-mmkv
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
 {
-    
-    RCTBridge* bridge = [RCTBridge currentBridge];
-    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)bridge;
+    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)_bridge;
     if (cxxBridge == nil) {
         return @false;
     }
