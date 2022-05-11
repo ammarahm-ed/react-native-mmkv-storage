@@ -100,7 +100,10 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
     var prevValue = useRef(value);
     useEffect(function () {
         prevValue.current = value;
-        if (!value && storage.options.persistDefaults) {
+        if (storage.options.persistDefaults &&
+            defaultValue !== undefined &&
+            defaultValue !== null &&
+            (value === null || value === undefined)) {
             setNewValue(defaultValue);
         }
     }, [value]);
