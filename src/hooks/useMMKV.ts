@@ -60,8 +60,11 @@ export const create =
 export const useMMKVStorage = <T>(
   key: string,
   storage: MMKVInstance,
-  defaultValue: any
-): [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void] => {
+  defaultValue: T | null | undefined
+): [
+  value: T | null | undefined,
+  setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void
+] => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
 
@@ -72,7 +75,6 @@ export const useMMKVStorage = <T>(
   const prevStorage = usePrevious(storage);
 
   const prevValue = useRef(value);
-
   useEffect(() => {
     prevValue.current = value;
     if (!value && storage.options.persistDefaults) {
@@ -147,6 +149,7 @@ export const useMMKVStorage = <T>(
     [key, storage, valueType]
   );
 
+  defaultValue = defaultValue === undefined ? null : defaultValue;
   return [valueType === 'boolean' ? value : value || defaultValue, setNewValue];
 };
 

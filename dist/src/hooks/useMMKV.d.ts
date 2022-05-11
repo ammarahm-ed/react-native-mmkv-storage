@@ -46,5 +46,5 @@ export declare const create: <T>(storage: MMKVInstance) => (key: string, default
  *
  * @returns `[value,setValue]`
  */
-export declare const useMMKVStorage: <T>(key: string, storage: MMKVInstance, defaultValue: any) => [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void];
+export declare const useMMKVStorage: <T>(key: string, storage: MMKVInstance, defaultValue: T | null | undefined) => [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void];
 //# sourceMappingURL=useMMKV.d.ts.map

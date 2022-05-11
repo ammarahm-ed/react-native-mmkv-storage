@@ -443,7 +443,7 @@ var MMKVInstance = /** @class */ (function () {
     MMKVInstance.prototype.removeItem = function (key) {
         var result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
         if (result) {
-            this.ev.publish("".concat(key, ":onwrite"), { key: key });
+            this.ev.publish("".concat(key, ":onwrite"), { key: key, value: null });
         }
         if (this.transactions.ondelete) {
             this.transactions.ondelete(key);
