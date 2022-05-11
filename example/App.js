@@ -1,29 +1,104 @@
-import {MMKVLoader, useMMKVStorage} from 'react-native-mmkv-storage';
-const storage = new MMKVLoader().withInstanceID('settings').initialize();
+import React, {useCallback} from 'react';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import MMKVStorage, {create} from 'react-native-mmkv-storage';
 
-storage.setString('key_1', 'value_1');
-storage.setInt('key_2', 2);
-storage.removeItem('key_2'); // let's say we no longer need this key
+const Button = ({title, onPress}) => {
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={{color: 'white'}}>{title}</Text>
+    </TouchableOpacity>
+  );
+};
 
-export default function App() {
-  const [reactive_key_1] = useMMKVStorage('key_1', storage);
-  const [reactive_key_2] = useMMKVStorage('key_2', storage);
-  const [reactive_key_3] = useMMKVStorage('key_3', storage); // this key doesn't exist
+const storage = new MMKVStorage.Loader().withEncryption().initialize();
+const useStorage = create(storage);
 
-  const key_1 = storage.getString('key_1');
-  const key_2 = storage.getInt('key_2');
-  const key_3 = storage.getString('key_3'); // this key doesn't exist
+const App = () => {
+  const [user, setUser] = useStorage('user', 'robert');
+  const [age, setAge] = useStorage('age', 24);
 
-  // issue #1 - why reactive_key_1 is becoming undefined?
-  console.log(`key_1: ${key_1} - reactive_key_1: ${reactive_key_1}`); // key_1: value_1 - reactive_key_1: undefined
+  const getUser = useCallback(() => {
+    let users = ['andrew', 'robert', 'jack', 'alison'];
+    let _user =
+      users[
+        users.indexOf(user) === users.length - 1 ? 0 : users.indexOf(user) + 1
+      ];
+    return _user;
+  }, [user]);
 
-  // issue #2 - why we have two different default values for same key?
-  console.log(`key_2: ${key_2} - reactive_key_2: ${reactive_key_2}`); // key_2: null - reactive_key_2: undefined
+  const buttons = [
+    {
+      title: 'setString',
+      onPress: () => {
+        storage.setString('user', getUser());
+      },
+    },
+    {
+      title: 'setUser',
+      onPress: () => {
+        setUser(getUser());
+      },
+    },
+    {
+      title: 'setAge',
+      onPress: () => {
+        setAge(age => {
+          console.log(age);
+          return age + 1;
+        });
+      },
+    },
+  ];
 
-  // issue #2 - why we have two different default values for same key?
-  console.log(`key_3: ${key_3} - reactive_key_3: ${reactive_key_3}`); // key_3: null - reactive_key_3: undefined
+  return (
+    <>
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>
+            I am {user} and I am {age} years old.
+          </Text>
+        </View>
 
-  storage.indexer.strings.getKeys().then(r => console.log('keys: ', r));
+        {buttons.map(item => (
+          <Button key={item.title} title={item.title} onPress={item.onPress} />
+        ))}
+      </SafeAreaView>
+    </>
+  );
+};
 
-  return null;
-}
+export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    width: '100%',
+    backgroundColor: '#f7f7f7',
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 50,
+  },
+  button: {
+    width: '95%',
+    height: 50,
+    backgroundColor: 'orange',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  headerText: {fontSize: 40, textAlign: 'center', color: 'black'},
+});
