@@ -423,7 +423,7 @@ export default class MMKVInstance {
   removeItem(key: string) {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key });
+      this.ev.publish(`${key}:onwrite`, { key, value: null });
     }
 
     if (this.transactions.ondelete) {
