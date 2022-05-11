@@ -138,7 +138,7 @@ static bool updateIndex(MMKV *const kv, const string &idx, const string &key)
     auto it = find(indexes.begin(), indexes.end(), key);
     if (it != indexes.end()) {
         indexes.erase(it);
-        kv->set(indexes, "stringIndex");
+        kv->set(indexes, idx);
         return true;
     }
     return false;
