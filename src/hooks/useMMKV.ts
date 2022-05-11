@@ -26,7 +26,7 @@ import { getDataType, getInitialValue } from './functions';
  */
 export const create =
   <T>(storage: MMKVInstance) =>
-  (key: string, defaultValue: any) => {
+  (key: string, defaultValue?: any) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
     return useMMKVStorage<T>(key, storage, defaultValue);
@@ -60,7 +60,7 @@ export const create =
 export const useMMKVStorage = <T>(
   key: string,
   storage: MMKVInstance,
-  defaultValue: T | null | undefined
+  defaultValue?: T | null | undefined
 ): [
   value: T | null | undefined,
   setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void
