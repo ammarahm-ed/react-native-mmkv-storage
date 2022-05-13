@@ -62,7 +62,12 @@ export var create = function (storage) {
     return function (key, defaultValue) {
         if (!key || typeof key !== 'string' || !storage)
             throw new Error('Key and Storage are required parameters.');
-        return useMMKVStorage(key, storage, defaultValue);
+        if (defaultValue === undefined) {
+            return useMMKVStorage(key, storage);
+        }
+        else {
+            return useMMKVStorage(key, storage, defaultValue);
+        }
     };
 };
 /**
@@ -166,8 +171,10 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
             return [2 /*return*/];
         });
     }); }, [key, storage, valueType]);
-    defaultValue = defaultValue === undefined ? null : defaultValue;
-    return [valueType === 'boolean' ? value : value || defaultValue, setNewValue];
+    return [
+        valueType === 'boolean' ? value : value || (defaultValue === undefined ? null : defaultValue),
+        setNewValue
+    ];
 };
 function usePrevious(value) {
     var ref = useRef(value);
