@@ -43,8 +43,10 @@ export const create: CreateType =
  */
 type CreateType = (storage: MMKVInstance) => {
   <T = undefined>(key: string): [
-    value: T | undefined,
-    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+    value: T | null | undefined,
+    setValue: (
+      value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)
+    ) => void
   ];
   <T>(key: string, defaultValue: T): [
     value: T,
@@ -171,10 +173,7 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
     [key, storage, valueType]
   );
 
-  return [
-    valueType === 'boolean' ? value : value || (defaultValue === undefined ? null : defaultValue),
-    setNewValue
-  ];
+  return [value ?? (defaultValue === undefined ? null : defaultValue), setNewValue];
 };
 
 function usePrevious(value: any) {
@@ -193,8 +192,10 @@ function usePrevious(value: any) {
  */
 type UseMMKVStorageType = {
   <T = undefined>(key: string, storage: MMKVInstance): [
-    value: T | undefined,
-    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+    value: T | null | undefined,
+    setValue: (
+      value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)
+    ) => void
   ];
   <T>(key: string, storage: MMKVInstance, defaultValue: T): [
     value: T,
