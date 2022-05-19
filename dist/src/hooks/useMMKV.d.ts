@@ -28,8 +28,8 @@ export declare const create: CreateType;
  */
 declare type CreateType = (storage: MMKVInstance) => {
     <T = undefined>(key: string): [
-        value: T | null | undefined,
-        setValue: (value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)) => void
+        value: T | undefined,
+        setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
     ];
     <T>(key: string, defaultValue: T): [
         value: T,
@@ -68,10 +68,10 @@ export declare const useMMKVStorage: UseMMKVStorageType;
  */
 declare type UseMMKVStorageType = {
     <T = undefined>(key: string, storage: MMKVInstance): [
-        value: T | null | undefined,
-        setValue: (value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)) => void
+        value: T | undefined,
+        setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
     ];
-    <T>(key: string, storage: MMKVInstance, defaultValue: T): [
+    <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
         value: T,
         setValue: (value: T | ((prevValue: T) => T)) => void
     ];

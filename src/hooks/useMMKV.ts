@@ -29,11 +29,8 @@ export const create: CreateType =
   <T = undefined>(key: string, defaultValue?: T) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
-    if (defaultValue === undefined) {
-      return useMMKVStorage<T>(key, storage);
-    } else {
-      return useMMKVStorage<T>(key, storage, defaultValue);
-    }
+
+    return useMMKVStorage<T>(key, storage, defaultValue);
   };
 
 /**
@@ -43,10 +40,8 @@ export const create: CreateType =
  */
 type CreateType = (storage: MMKVInstance) => {
   <T = undefined>(key: string): [
-    value: T | null | undefined,
-    setValue: (
-      value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)
-    ) => void
+    value: T | undefined,
+    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
   ];
   <T>(key: string, defaultValue: T): [
     value: T,
@@ -173,7 +168,10 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
     [key, storage, valueType]
   );
 
-  return [value ?? (defaultValue === undefined ? null : defaultValue), setNewValue];
+  return [
+    valueType === 'boolean' || valueType === 'number' ? value : value || defaultValue,
+    setNewValue
+  ];
 };
 
 function usePrevious(value: any) {
@@ -192,12 +190,10 @@ function usePrevious(value: any) {
  */
 type UseMMKVStorageType = {
   <T = undefined>(key: string, storage: MMKVInstance): [
-    value: T | null | undefined,
-    setValue: (
-      value: (T | null | undefined) | ((prevValue: T | null | undefined) => T | null | undefined)
-    ) => void
+    value: T | undefined,
+    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
   ];
-  <T>(key: string, storage: MMKVInstance, defaultValue: T): [
+  <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
     value: T,
     setValue: (value: T | ((prevValue: T) => T)) => void
   ];
