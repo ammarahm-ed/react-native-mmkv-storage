@@ -20,7 +20,22 @@ import MMKVInstance from '../mmkvinstance';
  * @param storage The storage instance
  * @returns `useMMKVStorage` hook
  */
-export declare const create: <T>(storage: MMKVInstance) => (key: string, defaultValue?: any) => [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void];
+export declare const create: CreateType;
+/**
+ * Types curried function to return differently based on the
+ * absence of the `defaultValue` parameter.
+ * @see {@link UseMMKVStorageType}
+ */
+declare type CreateType = (storage: MMKVInstance) => {
+    <T = undefined>(key: string): [
+        value: T | undefined,
+        setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+    ];
+    <T>(key: string, defaultValue: T): [
+        value: T,
+        setValue: (value: T | ((prevValue: T) => T)) => void
+    ];
+};
 /**
  *
  * useMMKVStorage Hook is like a persisted state that will always write every change in storage and update your app UI instantly.
@@ -46,5 +61,20 @@ export declare const create: <T>(storage: MMKVInstance) => (key: string, default
  *
  * @returns `[value,setValue]`
  */
-export declare const useMMKVStorage: <T>(key: string, storage: MMKVInstance, defaultValue?: T | null | undefined) => [value: T | null | undefined, setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void];
+export declare const useMMKVStorage: UseMMKVStorageType;
+/**
+ * Uses typescript's {@link https://www.typescriptlang.org/docs/handbook/interfaces.html#function-types anonymous function overloading}
+ * to mimic React's `useState` typing.
+ */
+declare type UseMMKVStorageType = {
+    <T = undefined>(key: string, storage: MMKVInstance): [
+        value: T | undefined,
+        setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+    ];
+    <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
+        value: T,
+        setValue: (value: T | ((prevValue: T) => T)) => void
+    ];
+};
+export {};
 //# sourceMappingURL=useMMKV.d.ts.map

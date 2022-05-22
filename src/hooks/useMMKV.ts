@@ -24,13 +24,30 @@ import { getDataType, getInitialValue } from './functions';
  * @param storage The storage instance
  * @returns `useMMKVStorage` hook
  */
-export const create =
-  <T>(storage: MMKVInstance) =>
-  (key: string, defaultValue?: any) => {
+export const create: CreateType =
+  (storage: MMKVInstance) =>
+  <T = undefined>(key: string, defaultValue?: T) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
+
     return useMMKVStorage<T>(key, storage, defaultValue);
   };
+
+/**
+ * Types curried function to return differently based on the
+ * absence of the `defaultValue` parameter.
+ * @see {@link UseMMKVStorageType}
+ */
+type CreateType = (storage: MMKVInstance) => {
+  <T = undefined>(key: string): [
+    value: T | undefined,
+    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+  ];
+  <T>(key: string, defaultValue: T): [
+    value: T,
+    setValue: (value: T | ((prevValue: T) => T)) => void
+  ];
+};
 
 /**
  *
@@ -57,18 +74,15 @@ export const create =
  *
  * @returns `[value,setValue]`
  */
-export const useMMKVStorage = <T>(
+export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   key: string,
   storage: MMKVInstance,
-  defaultValue?: T | null | undefined
-): [
-  value: T | null | undefined,
-  setValue: (value: T | ((prevValue: T | null | undefined) => T)) => void
-] => {
+  defaultValue?: T
+) => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
 
-  const [value, setValue] = useState<T | null | undefined>(getValue);
+  const [value, setValue] = useState<typeof defaultValue>(getValue);
   const [valueType, setValueType] = useState(getValueType);
 
   const prevKey = usePrevious(key);
@@ -154,8 +168,10 @@ export const useMMKVStorage = <T>(
     [key, storage, valueType]
   );
 
-  defaultValue = defaultValue === undefined ? null : defaultValue;
-  return [valueType === 'boolean' ? value : value || defaultValue, setNewValue];
+  return [
+    valueType === 'boolean' || valueType === 'number' ? value : value || defaultValue,
+    setNewValue
+  ];
 };
 
 function usePrevious(value: any) {
@@ -167,3 +183,18 @@ function usePrevious(value: any) {
 
   return ref.current;
 }
+
+/**
+ * Uses typescript's {@link https://www.typescriptlang.org/docs/handbook/interfaces.html#function-types anonymous function overloading}
+ * to mimic React's `useState` typing.
+ */
+type UseMMKVStorageType = {
+  <T = undefined>(key: string, storage: MMKVInstance): [
+    value: T | undefined,
+    setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
+  ];
+  <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
+    value: T,
+    setValue: (value: T | ((prevValue: T) => T)) => void
+  ];
+};

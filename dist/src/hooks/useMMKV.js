@@ -166,8 +166,10 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
             return [2 /*return*/];
         });
     }); }, [key, storage, valueType]);
-    defaultValue = defaultValue === undefined ? null : defaultValue;
-    return [valueType === 'boolean' ? value : value || defaultValue, setNewValue];
+    return [
+        valueType === 'boolean' || valueType === 'number' ? value : value || defaultValue,
+        setNewValue
+    ];
 };
 function usePrevious(value) {
     var ref = useRef(value);
