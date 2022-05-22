@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 buildscript {
 
   repositories {
@@ -50,6 +52,12 @@ if (reactNativeDir.exists()) {
   })
 }
 
+def reactNative = reactNativeDir.absolutePath;
+def reactNativeManifest = file("$reactNative/../package.json")
+def reactNativeManifestAsJson = new JsonSlurper().parseText(reactNativeManifest.text)
+def reactNativeVersion = reactNativeManifestAsJson.version as String
+def (major, minor, patch) = reactNativeVersion.tokenize('.')
+def rnMinorVersion = Integer.parseInt(minor)
 
 android {
   compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
@@ -116,9 +124,18 @@ dependencies {
   implementation 'com.facebook.react:react-native:+'
   implementation "androidx.security:security-crypto:1.1.0-alpha03"
   implementation 'com.google.code.gson:gson:2.8.6'
+  def buildType = "debug"
+    tasks.all({ task ->
+        if (task.name == "buildCMakeRelease") {
+            buildType = "release"
+        }
+    })
+    def rnAarMatcher = "**/react-native/**/*${buildType}.aar"
+    if (rnMinorVersion < 69) {
+        rnAarMatcher = "**/**/*.aar"
+    }
 
-  def rnAAR = fileTree(reactNativeDir.toString()).matching({ it.include "**/**/*.aar" }).singleFile
-
+  def rnAAR = fileTree("$reactNative").matching({ it.include rnAarMatcher }).singleFile
   files(rnAAR).each {
       def file = it.absoluteFile
       def aarFolder = new File("$buildDir/../$file.name");

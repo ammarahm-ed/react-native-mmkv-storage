@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9.0)
 
+
 set (PACKAGE_NAME "rnmmkv")
+project(PACKAGE_NAME)
 set (BUILD_DIR ../../../)
 
 add_subdirectory(../../../../MMKV/Core core)
