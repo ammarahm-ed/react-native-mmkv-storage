@@ -6,10 +6,12 @@ export declare function promisify(fn: Function): (...args: any) => Promise<unkno
 export declare const IOSAccessibleStates: {
     WHEN_UNLOCKED: string;
     AFTER_FIRST_UNLOCK: string;
+    /** @deprected in iOS 16+ */
     ALWAYS: string;
     WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
     AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
+    /** @deprected in iOS 16+ */
     ALWAYS_THIS_DEVICE_ONLY: string;
 };
 /**
