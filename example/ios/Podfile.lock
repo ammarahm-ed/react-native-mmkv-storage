@@ -73,9 +73,9 @@ PODS:
   - fmt (6.2.1)
   - glog (0.3.5)
   - libevent (2.1.12)
-  - MMKV (1.2.10):
-    - MMKVCore (~> 1.2.10)
-  - MMKVCore (1.2.12)
+  - MMKV (1.2.13):
+    - MMKVCore (~> 1.2.13)
+  - MMKVCore (1.2.13)
   - OpenSSL-Universal (1.1.180)
   - RCT-Folly (2021.06.28.00-v2):
     - boost
@@ -275,8 +275,8 @@ PODS:
   - React-jsinspector (0.66.0)
   - React-logger (0.66.0):
     - glog
-  - react-native-mmkv-storage (0.7.2):
-    - MMKV (= 1.2.10)
+  - react-native-mmkv-storage (0.7.6):
+    - MMKV (= 1.2.13)
     - React-Core
   - React-perflogger (0.66.0)
   - React-RCTActionSheet (0.66.0):
@@ -504,8 +504,8 @@ SPEC CHECKSUMS:
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: 5337263514dd6f09803962437687240c5dc39aa4
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  MMKV: 76033b9ace2006623308910a3afcc0e25eba3140
-  MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
+  MMKV: aac95d817a100479445633f2b3ed8961b4ac5043
+  MMKVCore: 3388952ded307e41b3ed8a05892736a236ed1b8e
   OpenSSL-Universal: 1aa4f6a6ee7256b83db99ec1ccdaa80d10f9af9b
   RCT-Folly: a21c126816d8025b547704b777a2ba552f3d9fa9
   RCTRequired: e4a18a90004e0ed97bba9081099104fd0f658dc9
@@ -519,7 +519,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 6a05173dc0142abc582bd4edd2d23146b8cc218a
   React-jsinspector: be95ad424ba9f7b817aff22732eb9b1b810a000a
   React-logger: 9a9cd87d4ea681ae929b32ef580638ff1b50fb24
-  react-native-mmkv-storage: d11202264b015287f3e7f29e74e218a61c3da635
+  react-native-mmkv-storage: 26e0d20f58aff7e31200acecd4c9692082fb61cf
   React-perflogger: 1f554c2b684e2f484f9edcdfdaeedab039fbaca8
   React-RCTActionSheet: 610d5a5d71ab4808734782c8bca6a12ec3563672
   React-RCTAnimation: ec6ed97370ace32724c253f29f0586cafcab8126
@@ -537,4 +537,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 14d4f0fd4ab215ea8dc848a9552d1facb076e3d6
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.10.1
