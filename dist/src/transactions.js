@@ -68,6 +68,14 @@ var transactions = /** @class */ (function () {
         this.onwrite = {};
         this.ondelete = null;
     };
+    transactions.prototype.transact = function (type, transaction, key, value) {
+        var mutator = transaction === 'ondelete' ? this.ondelete : this[transaction][type];
+        if (!mutator)
+            return value;
+        var _value = mutator(key, value);
+        // In case a mutator function does not return a value or returns undefined, we will return the original value.
+        return _value === undefined || _value === null ? value : _value;
+    };
     return transactions;
 }());
 export default transactions;

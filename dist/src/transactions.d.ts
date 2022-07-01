@@ -1,4 +1,8 @@
 import { DataType } from './types';
+/**
+ * A mutator function can return a value where needed. For example,
+ * you can modify the value in `beforewrite` or `onread` transactions.
+ */
 export declare type MutatorFunction = (key: string, value?: unknown) => any;
 export declare type Transaction = {
     [name: string]: MutatorFunction | null;
@@ -49,5 +53,6 @@ export default class transactions {
      * Clear all registered functions.
      */
     clear(): void;
+    transact<T>(type: DataType, transaction: TransactionType, key: string, value?: T): T | undefined;
 }
 //# sourceMappingURL=transactions.d.ts.map

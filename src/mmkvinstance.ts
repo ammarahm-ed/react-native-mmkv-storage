@@ -9,6 +9,14 @@ import transactions from './transactions';
 import { DataType, GenericReturnType, StorageOptions } from './types';
 import { options } from './utils';
 
+function assert(type: DataType, value: any) {
+  if (type === 'array') {
+    if (!Array.isArray(value)) throw new Error(`Trying to set ${typeof value} as a ${type}.`);
+  } else {
+    if (typeof value !== type) throw new Error(`Trying to set ${typeof value} as a ${type}.`);
+  }
+}
+
 export default class MMKVInstance {
   transactions: transactions;
   instanceID: string;
@@ -141,21 +149,14 @@ export default class MMKVInstance {
    * Set a string value to storage for the given key.
    */
   setString = (key: string, value: string) => {
-    if (typeof value !== 'string') throw new Error(`Trying to set ${typeof value} as a string`);
-
-    let _value = value;
-    let before = this.transactions.beforewrite['string'];
-    if (before) {
-      _value = before(key, value);
-    }
+    assert('string', value);
+    let _value = this.transactions.transact('string', 'beforewrite', key, value);
+    assert('string', _value);
 
     let result = handleAction(mmkvJsiModule.setStringMMKV, key, _value, this.instanceID);
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      let onwrite = this.transactions.onwrite['string'];
-      if (onwrite) {
-        onwrite(key, _value);
-      }
+      this.transactions.transact('string', 'onwrite', key, _value);
     }
 
     return result;
@@ -166,12 +167,7 @@ export default class MMKVInstance {
    */
   getString = (key: string, callback?: (error: any, value: string | undefined | null) => void) => {
     let string = handleAction(mmkvJsiModule.getStringMMKV, key, this.instanceID);
-
-    let onread = this.transactions.onread['string'];
-    if (onread) {
-      string = onread(key, string);
-    }
-
+    string = this.transactions.transact('string', 'onread', key, string);
     callback && callback(null, string);
     return string;
   };
@@ -179,21 +175,13 @@ export default class MMKVInstance {
    * Set a number value to storage for the given key.
    */
   setInt = (key: string, value: number) => {
-    if (typeof value !== 'number') throw new Error(`Trying to set ${typeof value} as a number`);
-
-    let _value = value;
-    let before = this.transactions.beforewrite['number'];
-    if (before) {
-      _value = before(key, value);
-    }
-
+    assert('number', value);
+    let _value = this.transactions.transact('number', 'beforewrite', key, value);
+    assert('number', _value);
     let result = handleAction(mmkvJsiModule.setNumberMMKV, key, _value, this.instanceID);
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      let onwrite = this.transactions.onwrite['number'];
-      if (onwrite) {
-        onwrite(key, _value);
-      }
+      this.transactions.transact('number', 'onwrite', key, _value);
     }
 
     return result;
@@ -203,29 +191,22 @@ export default class MMKVInstance {
    */
   getInt = (key: string, callback?: (error: any, value: number | undefined | null) => void) => {
     let int = handleAction(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
+    int = this.transactions.transact('number', 'onread', key, int);
     callback && callback(null, int);
+
     return int;
   };
   /**
    * Set a boolean value to storage for the given key
    */
   setBool = (key: string, value: boolean) => {
-    if (typeof value !== 'boolean') throw new Error(`Trying to set ${typeof value} as a boolean`);
-
-    let _value = value;
-    let before = this.transactions.beforewrite['boolean'];
-    if (before) {
-      _value = before(key, value);
-    }
-
+    assert('boolean', value);
+    let _value = this.transactions.transact('boolean', 'beforewrite', key, value);
+    assert('boolean', _value);
     let result = handleAction(mmkvJsiModule.setBoolMMKV, key, _value, this.instanceID);
-
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      let onwrite = this.transactions.onwrite['boolean'];
-      if (onwrite) {
-        onwrite(key, _value);
-      }
+      this.ev.publish(`${key}:onwrite`, { key, value: value });
+      this.transactions.transact('boolean', 'onwrite', key, _value);
     }
 
     return result;
@@ -235,6 +216,7 @@ export default class MMKVInstance {
    */
   getBool = (key: string, callback?: (error: any, value: boolean | undefined | null) => void) => {
     let bool = handleAction(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
+    bool = this.transactions.transact('boolean', 'onread', key, bool);
     callback && callback(null, bool);
     return bool;
   };
@@ -244,14 +226,9 @@ export default class MMKVInstance {
    * Note that this function does **not** work with the Map data type
    */
   setMap = (key: string, value: object) => {
-    if (typeof value !== 'object') throw new Error(`Trying to set ${typeof value} as a object`);
-
-    let _value = value;
-    let before = this.transactions.beforewrite['map'];
-    if (before) {
-      _value = before(key, value);
-    }
-
+    assert('object', value);
+    let _value = this.transactions.transact('object', 'beforewrite', key, value);
+    assert('object', _value);
     let result = handleAction(
       mmkvJsiModule.setMapMMKV,
       key,
@@ -260,10 +237,7 @@ export default class MMKVInstance {
     );
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      let onwrite = this.transactions.onwrite['map'];
-      if (onwrite) {
-        onwrite(key, _value);
-      }
+      this.transactions.transact('object', 'onwrite', key, _value);
     }
 
     return result;
@@ -276,10 +250,12 @@ export default class MMKVInstance {
     try {
       if (json) {
         let map: T = JSON.parse(json);
+        map = this.transactions.transact('object', 'onread', key, map) as T;
         callback && callback(null, map);
         return map;
       }
     } catch (e) {}
+    this.transactions.transact('object', 'onread', key);
     callback && callback(null, null);
     return null;
   };
@@ -288,13 +264,9 @@ export default class MMKVInstance {
    * Set an array to storage for the given key.
    */
   setArray = (key: string, value: any[]) => {
-    if (!Array.isArray(value)) throw new Error(`Trying to set ${typeof value} as a Array`);
-
-    let _value = value;
-    let before = this.transactions.beforewrite['array'];
-    if (before) {
-      _value = before(key, value);
-    }
+    assert('array', value);
+    let _value = this.transactions.transact('array', 'beforewrite', key, value);
+    assert('array', _value);
 
     let result = handleAction(
       mmkvJsiModule.setArrayMMKV,
@@ -304,11 +276,7 @@ export default class MMKVInstance {
     );
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: _value });
-
-      let onwrite = this.transactions.onwrite['array'];
-      if (onwrite) {
-        onwrite(key, _value);
-      }
+      this.transactions.transact('array', 'onwrite', key, _value);
     }
 
     return result;
@@ -322,10 +290,12 @@ export default class MMKVInstance {
     try {
       if (json) {
         let array: T[] = JSON.parse(json);
+        array = this.transactions.transact('array', 'onread', key, array) as T[];
         callback && callback(null, array);
         return array;
       }
     } catch (e) {}
+    this.transactions.transact('array', 'onread', key);
     callback && callback(null, null);
 
     return null;
@@ -425,10 +395,7 @@ export default class MMKVInstance {
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: null });
     }
-
-    if (this.transactions.ondelete) {
-      this.transactions.ondelete(key);
-    }
+    this.transactions.transact('string', 'ondelete', key);
 
     return result;
   }

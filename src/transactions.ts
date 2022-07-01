@@ -1,5 +1,9 @@
 import { DataType } from './types';
 
+/**
+ * A mutator function can return a value where needed. For example,
+ * you can modify the value in `beforewrite` or `onread` transactions.
+ */
 export type MutatorFunction = (key: string, value?: unknown) => any;
 
 export type Transaction = { [name: string]: MutatorFunction | null };
@@ -79,5 +83,13 @@ export default class transactions {
     this.onread = {};
     this.onwrite = {};
     this.ondelete = null;
+  }
+
+  transact<T>(type: DataType, transaction: TransactionType, key: string, value?: T): T | undefined {
+    const mutator = transaction === 'ondelete' ? this.ondelete : this[transaction][type];
+    if (!mutator) return value;
+    let _value = mutator(key, value);
+    // In case a mutator function does not return a value or returns undefined, we will return the original value.
+    return _value === undefined || _value === null ? value : _value;
   }
 }

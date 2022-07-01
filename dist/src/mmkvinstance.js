@@ -43,6 +43,16 @@ import { default as IDStore } from './mmkv/IDStore';
 import mmkvJsiModule from './module';
 import transactions from './transactions';
 import { options } from './utils';
+function assert(type, value) {
+    if (type === 'array') {
+        if (!Array.isArray(value))
+            throw new Error("Trying to set ".concat(typeof value, " as a ").concat(type, "."));
+    }
+    else {
+        if (typeof value !== type)
+            throw new Error("Trying to set ".concat(typeof value, " as a ").concat(type, "."));
+    }
+}
 var MMKVInstance = /** @class */ (function () {
     function MMKVInstance(id) {
         var _this = this;
@@ -50,20 +60,13 @@ var MMKVInstance = /** @class */ (function () {
          * Set a string value to storage for the given key.
          */
         this.setString = function (key, value) {
-            if (typeof value !== 'string')
-                throw new Error("Trying to set ".concat(typeof value, " as a string"));
-            var _value = value;
-            var before = _this.transactions.beforewrite['string'];
-            if (before) {
-                _value = before(key, value);
-            }
+            assert('string', value);
+            var _value = _this.transactions.transact('string', 'beforewrite', key, value);
+            assert('string', _value);
             var result = handleAction(mmkvJsiModule.setStringMMKV, key, _value, _this.instanceID);
             if (result) {
                 _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
-                var onwrite = _this.transactions.onwrite['string'];
-                if (onwrite) {
-                    onwrite(key, _value);
-                }
+                _this.transactions.transact('string', 'onwrite', key, _value);
             }
             return result;
         };
@@ -72,10 +75,7 @@ var MMKVInstance = /** @class */ (function () {
          */
         this.getString = function (key, callback) {
             var string = handleAction(mmkvJsiModule.getStringMMKV, key, _this.instanceID);
-            var onread = _this.transactions.onread['string'];
-            if (onread) {
-                string = onread(key, string);
-            }
+            string = _this.transactions.transact('string', 'onread', key, string);
             callback && callback(null, string);
             return string;
         };
@@ -83,20 +83,13 @@ var MMKVInstance = /** @class */ (function () {
          * Set a number value to storage for the given key.
          */
         this.setInt = function (key, value) {
-            if (typeof value !== 'number')
-                throw new Error("Trying to set ".concat(typeof value, " as a number"));
-            var _value = value;
-            var before = _this.transactions.beforewrite['number'];
-            if (before) {
-                _value = before(key, value);
-            }
+            assert('number', value);
+            var _value = _this.transactions.transact('number', 'beforewrite', key, value);
+            assert('number', _value);
             var result = handleAction(mmkvJsiModule.setNumberMMKV, key, _value, _this.instanceID);
             if (result) {
                 _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
-                var onwrite = _this.transactions.onwrite['number'];
-                if (onwrite) {
-                    onwrite(key, _value);
-                }
+                _this.transactions.transact('number', 'onwrite', key, _value);
             }
             return result;
         };
@@ -105,6 +98,7 @@ var MMKVInstance = /** @class */ (function () {
          */
         this.getInt = function (key, callback) {
             var int = handleAction(mmkvJsiModule.getNumberMMKV, key, _this.instanceID);
+            int = _this.transactions.transact('number', 'onread', key, int);
             callback && callback(null, int);
             return int;
         };
@@ -112,20 +106,13 @@ var MMKVInstance = /** @class */ (function () {
          * Set a boolean value to storage for the given key
          */
         this.setBool = function (key, value) {
-            if (typeof value !== 'boolean')
-                throw new Error("Trying to set ".concat(typeof value, " as a boolean"));
-            var _value = value;
-            var before = _this.transactions.beforewrite['boolean'];
-            if (before) {
-                _value = before(key, value);
-            }
+            assert('boolean', value);
+            var _value = _this.transactions.transact('boolean', 'beforewrite', key, value);
+            assert('boolean', _value);
             var result = handleAction(mmkvJsiModule.setBoolMMKV, key, _value, _this.instanceID);
             if (result) {
-                _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
-                var onwrite = _this.transactions.onwrite['boolean'];
-                if (onwrite) {
-                    onwrite(key, _value);
-                }
+                _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: value });
+                _this.transactions.transact('boolean', 'onwrite', key, _value);
             }
             return result;
         };
@@ -134,6 +121,7 @@ var MMKVInstance = /** @class */ (function () {
          */
         this.getBool = function (key, callback) {
             var bool = handleAction(mmkvJsiModule.getBoolMMKV, key, _this.instanceID);
+            bool = _this.transactions.transact('boolean', 'onread', key, bool);
             callback && callback(null, bool);
             return bool;
         };
@@ -143,20 +131,13 @@ var MMKVInstance = /** @class */ (function () {
          * Note that this function does **not** work with the Map data type
          */
         this.setMap = function (key, value) {
-            if (typeof value !== 'object')
-                throw new Error("Trying to set ".concat(typeof value, " as a object"));
-            var _value = value;
-            var before = _this.transactions.beforewrite['map'];
-            if (before) {
-                _value = before(key, value);
-            }
+            assert('object', value);
+            var _value = _this.transactions.transact('object', 'beforewrite', key, value);
+            assert('object', _value);
             var result = handleAction(mmkvJsiModule.setMapMMKV, key, JSON.stringify(_value), _this.instanceID);
             if (result) {
                 _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
-                var onwrite = _this.transactions.onwrite['map'];
-                if (onwrite) {
-                    onwrite(key, _value);
-                }
+                _this.transactions.transact('object', 'onwrite', key, _value);
             }
             return result;
         };
@@ -168,11 +149,13 @@ var MMKVInstance = /** @class */ (function () {
             try {
                 if (json) {
                     var map = JSON.parse(json);
+                    map = _this.transactions.transact('object', 'onread', key, map);
                     callback && callback(null, map);
                     return map;
                 }
             }
             catch (e) { }
+            _this.transactions.transact('object', 'onread', key);
             callback && callback(null, null);
             return null;
         };
@@ -180,20 +163,13 @@ var MMKVInstance = /** @class */ (function () {
          * Set an array to storage for the given key.
          */
         this.setArray = function (key, value) {
-            if (!Array.isArray(value))
-                throw new Error("Trying to set ".concat(typeof value, " as a Array"));
-            var _value = value;
-            var before = _this.transactions.beforewrite['array'];
-            if (before) {
-                _value = before(key, value);
-            }
+            assert('array', value);
+            var _value = _this.transactions.transact('array', 'beforewrite', key, value);
+            assert('array', _value);
             var result = handleAction(mmkvJsiModule.setArrayMMKV, key, JSON.stringify(value), _this.instanceID);
             if (result) {
                 _this.ev.publish("".concat(key, ":onwrite"), { key: key, value: _value });
-                var onwrite = _this.transactions.onwrite['array'];
-                if (onwrite) {
-                    onwrite(key, _value);
-                }
+                _this.transactions.transact('array', 'onwrite', key, _value);
             }
             return result;
         };
@@ -205,11 +181,13 @@ var MMKVInstance = /** @class */ (function () {
             try {
                 if (json) {
                     var array = JSON.parse(json);
+                    array = _this.transactions.transact('array', 'onread', key, array);
                     callback && callback(null, array);
                     return array;
                 }
             }
             catch (e) { }
+            _this.transactions.transact('array', 'onread', key);
             callback && callback(null, null);
             return null;
         };
@@ -445,9 +423,7 @@ var MMKVInstance = /** @class */ (function () {
         if (result) {
             this.ev.publish("".concat(key, ":onwrite"), { key: key, value: null });
         }
-        if (this.transactions.ondelete) {
-            this.transactions.ondelete(key);
-        }
+        this.transactions.transact('string', 'ondelete', key);
         return result;
     };
     /**
