@@ -128,10 +128,12 @@ MMKV = MMKV.setAccessibleMode(IOSAccessibleStates.WHEN_UNLOCKED);
 type IOSAccessibleStates = {
   WHEN_UNLOCKED: string;
   AFTER_FIRST_UNLOCK: string;
+  /** @deprected in iOS 16+ */
   ALWAYS: string;
   WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
   WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
   AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
+  /** @deprected in iOS 16+ */
   ALWAYS_THIS_DEVICE_ONLY: string;
 };
 ```

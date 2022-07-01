@@ -13,7 +13,7 @@ export default class MMKVLoader {
       instanceID: 'default',
       initWithEncryption: false,
       secureKeyStorage: false,
-      accessibleMode: IOSAccessibleStates.WHEN_UNLOCKED,
+      accessibleMode: IOSAccessibleStates.AFTER_FIRST_UNLOCK,
       processingMode: ProcessingModes.SINGLE_PROCESS,
       aliasPrefix: 'com.MMKV.',
       alias: null,
