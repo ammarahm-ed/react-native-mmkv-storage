@@ -109,7 +109,7 @@ Learn more about `useIndex` hook it in the [docs](https://rnmmkv.vercel.app/#/us
 Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as Read, Write and Delete. This allows for a better and more managed control over the storage and also let's you **build custom indexes** with a few lines of code.
 
 ```js
-MMKV.transcations.register("object", "beforewrite", ({ key, value }) => {
+MMKV.transactions.register("object", "beforewrite", ({ key, value }) => {
   if (key.startsWith("post.")) {
     // Call this only when the key has the post prefix.
     let indexForTag = MMKV.getArray(`${value.tag}-index`) || [];
@@ -122,11 +122,11 @@ Learn more about how to use Transactions in [docs](https://rnmmkv.vercel.app/#/t
 
 ### **Multi-Process Support**
 
-MMKV supports concurrent read-read and read-write access between processes. This means that you can use MMKV for various extenstions and widgets and your app.
+MMKV supports concurrent read-read and read-write access between processes. This means that you can use MMKV for various extensions and widgets and your app.
 
 ### **Create unlimited Database instances**
 
-You can create many database instances. This helps greatly if you have seperate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
+You can create many database instances. This helps greatly if you have separate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
 
 ```js
 const userStorage = new MMKVStorage.Loader()
@@ -173,7 +173,7 @@ If you are using the library in one of your projects, consider supporting with a
 
 ## I want to contribute
 
-That is awesome news! There is alot happening at a very fast pace in this library right now. Every little help is precious. You can contribute in many ways:
+That is awesome news! There is a lot happening at a very fast pace in this library right now. Every little help is precious. You can contribute in many ways:
 
 - Suggest code improvements on native iOS and Android
 - If you have suggestion or idea you want to discuss, open an issue.
