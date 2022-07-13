@@ -109,7 +109,7 @@ Learn more about `useIndex` hook it in the [docs](https://rnmmkv.vercel.app/#/us
 Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as Read, Write and Delete. This allows for a better and more managed control over the storage and also let's you **build custom indexes** with a few lines of code.
 
 ```js
-MMKV.transcations.register("object", "beforewrite", ({ key, value }) => {
+MMKV.transactions.register("object", "beforewrite", ({ key, value }) => {
   if (key.startsWith("post.")) {
     // Call this only when the key has the post prefix.
     let indexForTag = MMKV.getArray(`${value.tag}-index`) || [];
