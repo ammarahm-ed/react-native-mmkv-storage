@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.9.0)
 
-
 set (PACKAGE_NAME "rnmmkv")
 project(PACKAGE_NAME)
 set (BUILD_DIR ../../../)
@@ -17,7 +16,16 @@ include_directories(
 
 file (GLOB LIBRN_DIR "${BUILD_DIR}/react-native-0*/jni/${ANDROID_ABI}")
 
-if (JSI_LIB)
+if (${RN_VERSION} LESS 65)
+ # React Native 0.65.x and below
+  add_library(
+          ${PACKAGE_NAME}
+          SHARED
+          ../../../../../react-native/ReactCommon/jsi/jsi/jsi.cpp
+          ./rnmmkv-adapter.cpp
+  )
+ 
+else()
   # React Native 0.66.x and above
   add_library(
           ${PACKAGE_NAME}
@@ -30,14 +38,6 @@ if (JSI_LIB)
         jsi
         PATHS ${LIBRN_DIR}
         NO_CMAKE_FIND_ROOT_PATH
-  )
-else()
-  # React Native 0.65.x and below
-  add_library(
-          ${PACKAGE_NAME}
-          SHARED
-          ../../../../../react-native/ReactCommon/jsi/jsi/jsi.cpp
-          ./rnmmkv-adapter.cpp
   )
 endif()
 
