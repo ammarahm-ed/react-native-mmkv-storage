@@ -194,10 +194,4 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         return secureKeystore.getSecureKey(key);
     }
 
-
-    @Override
-    public void onCatalystInstanceDestroy() {
-        super.onCatalystInstanceDestroy();
-        destroy();
-    }
 }
