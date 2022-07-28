@@ -18,13 +18,10 @@
   <pre>npm install react-native-mmkv-storage</pre>
 </div>
 
-
 <div align="center">
   <h3>For expo bare workflow</h3>
   <pre>expo prebuild</pre>
 </div>
-
-
 
 <div align="center">
     
@@ -62,12 +59,12 @@ Hooks let's the storage update your app when a change takes place in storage.
 Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it.
 
 ```js
-import MMKVStorage, { useMMKVStorage } from "react-native-mmkv-storage";
+import MMKVStorage, { useMMKVStorage } from 'react-native-mmkv-storage';
 
 const storage = new MMKVStorage.Loader().initialize();
 const App = () => {
-  const [user, setUser] = useMMKVStorage("user", storage, "robert");
-  const [age, setAge] = useMMKVStorage("age", storage, 24);
+  const [user, setUser] = useMMKVStorage('user', storage, 'robert');
+  const [age, setAge] = useMMKVStorage('age', storage, 24);
 
   return (
     <View style={styles.header}>
@@ -109,8 +106,8 @@ Learn more about `useIndex` hook it in the [docs](https://rnmmkv.vercel.app/#/us
 Listen to a value's lifecycle and mutate it on the go. Transactions lets you register lifecycle functions with your storage instance such as Read, Write and Delete. This allows for a better and more managed control over the storage and also let's you **build custom indexes** with a few lines of code.
 
 ```js
-MMKV.transactions.register("object", "beforewrite", ({ key, value }) => {
-  if (key.startsWith("post.")) {
+MMKV.transactions.register('object', 'beforewrite', ({ key, value }) => {
+  if (key.startsWith('post.')) {
     // Call this only when the key has the post prefix.
     let indexForTag = MMKV.getArray(`${value.tag}-index`) || [];
     MMKV.setArray(indexForTag.push(key));
@@ -131,12 +128,10 @@ You can create many database instances. This helps greatly if you have separate 
 ```js
 const userStorage = new MMKVStorage.Loader()
   .withEncryption()
-  .withInstanceID("userdata")
+  .withInstanceID('userdata')
   .initialize();
 
-const settingsStorage = new MMKVStorage.Loader()
-  .withInstanceID("settings")
-  .initialize();
+const settingsStorage = new MMKVStorage.Loader().withInstanceID('settings').initialize();
 ```
 
 ### **Full encryption support**
@@ -160,7 +155,12 @@ For each database instance, there is one global key index and then there are ind
 Support for redux persist is also added starting from v0.3.2.
 
 ### **Supports expo**
+
 You can use this library with expo [bare workflow](https://docs.expo.dev/workflow/customizing/).
+
+### **Flipper plugino**
+
+Thanks to [pnthach95](https://github.com/pnthach95/flipper-plugin-react-native-mmkv-storage/commits?author=pnthach95) Flipper plugin is finally here. https://github.com/pnthach95/flipper-plugin-react-native-mmkv-storage. It supports logging and manipulating storage values on the fly.
 
 ## Consider supporting with a ⭐️ [star on GitHub](https://github.com/ammarahm-ed/react-native-mmkv-storage/)
 
