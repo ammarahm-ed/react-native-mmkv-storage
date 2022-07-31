@@ -158,7 +158,7 @@ Support for redux persist is also added starting from v0.3.2.
 
 You can use this library with expo [bare workflow](https://docs.expo.dev/workflow/customizing/).
 
-### **Flipper plugino**
+### **Flipper plugin**
 
 Thanks to [pnthach95](https://github.com/pnthach95/flipper-plugin-react-native-mmkv-storage/commits?author=pnthach95) Flipper plugin is finally here. https://github.com/pnthach95/flipper-plugin-react-native-mmkv-storage. It supports logging and manipulating storage values on the fly.
 
