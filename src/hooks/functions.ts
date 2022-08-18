@@ -1,3 +1,4 @@
+import type { JsonReviver } from 'src/types';
 import MMKVInstance from '../mmkvinstance';
 import { methods, types } from './constants';
 export const getDataType = (value: any) => {
@@ -7,7 +8,8 @@ export const getDataType = (value: any) => {
 };
 
 export const getInitialValue =
-  (key: string, storage: MMKVInstance, initialValueType: 'type' | 'value') => () => {
+  (key: string, storage: MMKVInstance, initialValueType: 'type' | 'value', reviver?: JsonReviver) =>
+  () => {
     if (!storage?.indexer) {
       return null;
     }
@@ -18,8 +20,16 @@ export const getInitialValue =
         //@ts-ignore
         if (indexer[methods[type].indexer].hasKey(key)) {
           if (initialValueType === 'value') {
+            const previousReviver = storage.reviver;
+            if (reviver) {
+              storage.reviver = reviver;
+            }
             //@ts-ignore
-            return storage[methods[type]['get']](key);
+            const value = storage[methods[type]['get']](key);
+            // Falls back to default reviver avoiding it being overriden on
+            // multiple `getInitialValue` calls
+            storage.reviver = previousReviver;
+            return value;
           }
           if (initialValueType === 'type') {
             return type;

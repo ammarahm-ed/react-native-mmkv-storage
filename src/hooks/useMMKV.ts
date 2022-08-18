@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { JsonReviver } from 'src/types';
 import MMKVInstance from '../mmkvinstance';
 import { methods } from './constants';
 import { getDataType, getInitialValue } from './functions';
@@ -26,11 +27,17 @@ import { getDataType, getInitialValue } from './functions';
  */
 export const create: CreateType =
   (storage: MMKVInstance) =>
-  <T = undefined>(key: string, defaultValue?: T) => {
+  <T = undefined>(
+    key: string,
+    defaultValue?: T,
+    options?: {
+      reviver?: JsonReviver;
+    }
+  ) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
 
-    return useMMKVStorage<T>(key, storage, defaultValue);
+    return useMMKVStorage<T>(key, storage, defaultValue, options);
   };
 
 /**
@@ -43,10 +50,13 @@ type CreateType = (storage: MMKVInstance) => {
     value: T | undefined,
     setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
   ];
-  <T>(key: string, defaultValue: T): [
-    value: T,
-    setValue: (value: T | ((prevValue: T) => T)) => void
-  ];
+  <T>(
+    key: string,
+    defaultValue: T,
+    options?: {
+      reviver?: JsonReviver;
+    }
+  ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 
 /**
@@ -71,15 +81,22 @@ type CreateType = (storage: MMKVInstance) => {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param options General options, currently only supporting a reviver function for object/array storage
  *
  * @returns `[value,setValue]`
  */
 export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   key: string,
   storage: MMKVInstance,
-  defaultValue?: T
+  defaultValue?: T,
+  options?: {
+    reviver?: JsonReviver;
+  }
 ) => {
-  const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
+  const getValue = useCallback(getInitialValue(key, storage, 'value', options?.reviver), [
+    key,
+    storage
+  ]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
 
   const [value, setValue] = useState<typeof defaultValue>(getValue);
@@ -193,8 +210,10 @@ type UseMMKVStorageType = {
     value: T | undefined,
     setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
   ];
-  <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
-    value: T,
-    setValue: (value: T | ((prevValue: T) => T)) => void
-  ];
+  <T>(
+    key: string,
+    storage: MMKVInstance,
+    defaultValue: T | undefined,
+    options?: { reviver?: JsonReviver }
+  ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
