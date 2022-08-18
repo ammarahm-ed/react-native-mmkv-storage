@@ -245,11 +245,15 @@ export default class MMKVInstance {
   /**
    * Get an Object from storage for a given key.
    */
-  getMap = <T>(key: string, callback?: (error: any, value: T | undefined | null) => void) => {
+  getMap = <T>(
+    key: string,
+    callback?: (error: any, value: T | undefined | null) => void,
+    reviver?: Parameters<typeof JSON.parse>[1]
+  ) => {
     let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
-        let map: T = JSON.parse(json);
+        let map: T = JSON.parse(json, reviver);
         map = this.transactions.transact('object', 'onread', key, map) as T;
         callback && callback(null, map);
         return map;
