@@ -1,6 +1,6 @@
 import { handleActionAsync, handleAction } from '../handlers';
 import mmkvJsiModule from '../module';
-import { GenericReturnType } from '../types';
+import type { GenericReturnType, JsonReviver } from '../types';
 const INDEX_TYPE = 'arrayIndex';
 
 /**
@@ -29,7 +29,7 @@ export default class arrayIndex {
   /**
    * Get all arrays from storage.
    */
-  async getAll<T>() {
+  async getAll<T>(reviver?: JsonReviver) {
     return new Promise(resolve => {
       let keys = handleAction(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
       if (!keys) keys = [];
@@ -40,7 +40,7 @@ export default class arrayIndex {
         item[0] = keys[i];
         let array = mmkvJsiModule.getArrayMMKV(keys[i], this.instanceID);
 
-        item[1] = array ? JSON.parse(array) : null;
+        item[1] = array ? JSON.parse(array, reviver) : null;
         items.push(item);
       }
       resolve(items);

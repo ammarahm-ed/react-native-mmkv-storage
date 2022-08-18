@@ -1,6 +1,6 @@
 import { handleActionAsync, handleAction } from '../handlers';
 import mmkvJsiModule from '../module';
-import { GenericReturnType } from '../types';
+import type { GenericReturnType, JsonReviver } from '../types';
 const INDEX_TYPE = 'mapIndex';
 
 /**
@@ -31,7 +31,7 @@ export default class mapsIndex {
   /**
    * Get all objects stored in storage.
    */
-  async getAll<T>() {
+  async getAll<T>(reviver?: JsonReviver) {
     return new Promise(resolve => {
       let keys = handleAction(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
       if (!keys) keys = [];
@@ -41,7 +41,7 @@ export default class mapsIndex {
         let item: GenericReturnType<T> = [];
         item[0] = keys[i];
         let map = mmkvJsiModule.getMapMMKV(keys[i], this.instanceID);
-        item[1] = map ? JSON.parse(map) : null;
+        item[1] = map ? JSON.parse(map, reviver) : null;
         items.push(item);
       }
       resolve(items);
