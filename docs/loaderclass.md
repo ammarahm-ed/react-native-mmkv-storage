@@ -7,7 +7,7 @@ The `Loader Class` helps you create an MMKV Instance. Once the instance is loade
 You can simply create a new Loader as follows:
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 ```
@@ -17,7 +17,7 @@ const MMKV = new MMKVLoader();
 Initialize the MMKV Instance with the selected properties. Returns an MMKV Instance that you can use.
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
@@ -33,15 +33,15 @@ Specifies that the MMKV Instance should be created with the given ID. This way m
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | ID   | String |
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
-MMKV = MMKV.withInstanceID("mmkvInstanceWithID");
+MMKV = MMKV.withInstanceID('mmkvInstanceWithID');
 ```
 
 **Returns:** `this`;
@@ -53,11 +53,11 @@ Encrypt the MMKV instance on initialization. By default the library generates a 
 **Arguments**
 
 | Name | Type   |
-|------|--------|
+| ---- | ------ |
 | ID   | String |
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
@@ -73,17 +73,17 @@ You can also specify your own password to encrypt the storage.
 **Arguments**
 
 | Name             | Required | Type    | Description                                                                           |
-|------------------|----------|---------|---------------------------------------------------------------------------------------|
+| ---------------- | -------- | ------- | ------------------------------------------------------------------------------------- |
 | cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
-MMKV = MMKV.withEncryption().encryptWithCustomKey("encryptionKey");
+MMKV = MMKV.withEncryption().encryptWithCustomKey('encryptionKey');
 ```
 
 **Returns:** `this`;
@@ -95,15 +95,15 @@ You can choose between single process or multiprocess MMKV instance.
 **Arguments**
 
 | Name | Required | Type            | Description                |
-|------|----------|-----------------|----------------------------|
+| ---- | -------- | --------------- | -------------------------- |
 | mode | yes      | ProcessingModes | Select the processing mode |
 
 ```js
-import { MMKVLoader,ProcessingModes } from "react-native-mmkv-storage";
+import { MMKVLoader, ProcessingModes } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
-MMKV = MMKV.setProcessingMode( ProcessingModes.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
+MMKV = MMKV.setProcessingMode(ProcessingModes.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
 ```
 
 ## setAccessibleMode (iOS only)
@@ -113,11 +113,11 @@ Choose the accessibility mode for secure key storage (IOS ONLY);
 **Arguments**
 
 | Name       | Required | Type                   | Description                   |
-|------------|----------|------------------------|-------------------------------|
+| ---------- | -------- | ---------------------- | ----------------------------- |
 | accessible | yes      | MMKVStorage.ACCESSIBLE | Choose the accessibility mode |
 
 ```js
-import { MMKVLoader, IOSAccessibleStates } from "react-native-mmkv-storage";
+import { MMKVLoader, IOSAccessibleStates } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
@@ -147,15 +147,37 @@ Sets the [kSecAttrService](https://developer.apple.com/documentation/security/ks
 **Arguments**
 
 | Name        | Required | Type   | Description      |
-|-------------|----------|--------|------------------|
+| ----------- | -------- | ------ | ---------------- |
 | serviceName | yes      | String | The service name |
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 const MMKV = new MMKVLoader();
 
 MMKV = MMKV.withServiceName('com.MMKV.example');
+```
+
+**Returns:** `this`;
+
+## withReviver
+
+Specifies a reviver function (same as `JSON.parse`'s, [see docs for that](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse#reviver)) to be used when retrieving objects or arrays from storage.
+
+**Arguments**
+
+| Name    | Type     |
+| ------- | -------- |
+| reviver | Function |
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const MMKV = new MMKVLoader();
+
+const myReviver = (key, value) => (key === 'foo' ? 'bar' : value);
+
+MMKV = MMKV.withReviver(myReviver);
 ```
 
 **Returns:** `this`;
