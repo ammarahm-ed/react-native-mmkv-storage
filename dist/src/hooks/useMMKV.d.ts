@@ -1,3 +1,4 @@
+import type { JsonReviver } from 'src/types';
 import MMKVInstance from '../mmkvinstance';
 /**
  * A helper function which returns `useMMKVStorage` hook with a storage instance set.
@@ -31,10 +32,9 @@ declare type CreateType = (storage: MMKVInstance) => {
         value: T | undefined,
         setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
     ];
-    <T>(key: string, defaultValue: T): [
-        value: T,
-        setValue: (value: T | ((prevValue: T) => T)) => void
-    ];
+    <T>(key: string, defaultValue: T, options?: {
+        reviver?: JsonReviver;
+    }): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 /**
  *
@@ -58,6 +58,7 @@ declare type CreateType = (storage: MMKVInstance) => {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param options General options, currently only supporting a reviver function for object/array storage
  *
  * @returns `[value,setValue]`
  */
@@ -71,10 +72,9 @@ declare type UseMMKVStorageType = {
         value: T | undefined,
         setValue: (value: (T | undefined) | ((prevValue: T | undefined) => T | undefined)) => void
     ];
-    <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined): [
-        value: T,
-        setValue: (value: T | ((prevValue: T) => T)) => void
-    ];
+    <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined, options?: {
+        reviver?: JsonReviver;
+    }): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 export {};
 //# sourceMappingURL=useMMKV.d.ts.map

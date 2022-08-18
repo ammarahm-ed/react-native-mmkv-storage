@@ -59,10 +59,10 @@ import { getDataType, getInitialValue } from './functions';
  * @returns `useMMKVStorage` hook
  */
 export var create = function (storage) {
-    return function (key, defaultValue) {
+    return function (key, defaultValue, options) {
         if (!key || typeof key !== 'string' || !storage)
             throw new Error('Key and Storage are required parameters.');
-        return useMMKVStorage(key, storage, defaultValue);
+        return useMMKVStorage(key, storage, defaultValue, options);
     };
 };
 /**
@@ -87,11 +87,15 @@ export var create = function (storage) {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param options General options, currently only supporting a reviver function for object/array storage
  *
  * @returns `[value,setValue]`
  */
-export var useMMKVStorage = function (key, storage, defaultValue) {
-    var getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
+export var useMMKVStorage = function (key, storage, defaultValue, options) {
+    var getValue = useCallback(getInitialValue(key, storage, 'value', options === null || options === void 0 ? void 0 : options.reviver), [
+        key,
+        storage
+    ]);
     var getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
     var _a = useState(getValue), value = _a[0], setValue = _a[1];
     var _b = useState(getValueType), valueType = _b[0], setValueType = _b[1];

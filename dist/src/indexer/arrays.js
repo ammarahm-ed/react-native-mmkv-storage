@@ -68,7 +68,7 @@ var arrayIndex = /** @class */ (function () {
     /**
      * Get all arrays from storage.
      */
-    arrayIndex.prototype.getAll = function () {
+    arrayIndex.prototype.getAll = function (reviver) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -82,7 +82,7 @@ var arrayIndex = /** @class */ (function () {
                             var item = [];
                             item[0] = keys[i];
                             var array = mmkvJsiModule.getArrayMMKV(keys[i], _this.instanceID);
-                            item[1] = array ? JSON.parse(array) : null;
+                            item[1] = array ? JSON.parse(array, reviver) : null;
                             items.push(item);
                         }
                         resolve(items);

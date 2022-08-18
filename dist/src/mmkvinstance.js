@@ -144,11 +144,11 @@ var MMKVInstance = /** @class */ (function () {
         /**
          * Get an Object from storage for a given key.
          */
-        this.getMap = function (key, callback) {
+        this.getMap = function (key, callback, reviver) {
             var json = handleAction(mmkvJsiModule.getMapMMKV, key, _this.instanceID);
             try {
                 if (json) {
-                    var map = JSON.parse(json);
+                    var map = JSON.parse(json, reviver !== null && reviver !== void 0 ? reviver : _this.reviver);
                     map = _this.transactions.transact('object', 'onread', key, map);
                     callback && callback(null, map);
                     return map;
@@ -176,11 +176,11 @@ var MMKVInstance = /** @class */ (function () {
         /**
          * get an array from the storage for give key.
          */
-        this.getArray = function (key, callback) {
+        this.getArray = function (key, callback, reviver) {
             var json = handleAction(mmkvJsiModule.getMapMMKV, key, _this.instanceID);
             try {
                 if (json) {
-                    var array = JSON.parse(json);
+                    var array = JSON.parse(json, reviver !== null && reviver !== void 0 ? reviver : _this.reviver);
                     array = _this.transactions.transact('array', 'onread', key, array);
                     callback && callback(null, array);
                     return array;
@@ -195,7 +195,7 @@ var MMKVInstance = /** @class */ (function () {
          * Retrieve multiple items for the given array of keys.
          *
          */
-        this.getMultipleItems = function (keys, type) {
+        this.getMultipleItems = function (keys, type, reviver) {
             if (!type)
                 type = 'object';
             var func = function () {
@@ -219,7 +219,7 @@ var MMKVInstance = /** @class */ (function () {
                             var map = mmkvJsiModule.getMapMMKV(keys[i], _this.instanceID);
                             if (map) {
                                 try {
-                                    item[1] = JSON.parse(map);
+                                    item[1] = JSON.parse(map, reviver !== null && reviver !== void 0 ? reviver : _this.reviver);
                                 }
                                 catch (e) {
                                     if (__DEV__) {
@@ -236,7 +236,7 @@ var MMKVInstance = /** @class */ (function () {
                             var array = mmkvJsiModule.getArrayMMKV(keys[i], _this.instanceID);
                             if (array) {
                                 try {
-                                    item[1] = JSON.parse(array);
+                                    item[1] = JSON.parse(array, reviver !== null && reviver !== void 0 ? reviver : _this.reviver);
                                 }
                                 catch (e) {
                                     if (__DEV__) {
@@ -353,21 +353,21 @@ var MMKVInstance = /** @class */ (function () {
     /**
      * Get then Object from storage for the given key.
      */
-    MMKVInstance.prototype.getMapAsync = function (key) {
+    MMKVInstance.prototype.getMapAsync = function (key, reviver) {
         var _this = this;
         return new Promise(function (resolve) {
-            resolve(_this.getMap(key));
+            resolve(_this.getMap(key, undefined, reviver));
         });
     };
     /**
      * Retrieve multiple items for the given array of keys.
      */
-    MMKVInstance.prototype.getMultipleItemsAsync = function (keys, type) {
+    MMKVInstance.prototype.getMultipleItemsAsync = function (keys, type, reviver) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve) {
-                        resolve(_this.getMultipleItems(keys, type));
+                        resolve(_this.getMultipleItems(keys, type, reviver));
                     })];
             });
         });
@@ -388,12 +388,12 @@ var MMKVInstance = /** @class */ (function () {
     /**
      * Get the array from the storage for the given key.
      */
-    MMKVInstance.prototype.getArrayAsync = function (key) {
+    MMKVInstance.prototype.getArrayAsync = function (key, reviver) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve) {
-                        resolve(_this.getArray(key));
+                        resolve(_this.getArray(key, undefined, reviver));
                     })];
             });
         });

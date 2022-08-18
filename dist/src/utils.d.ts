@@ -22,11 +22,11 @@ export declare const ProcessingModes: {
     MULTI_PROCESS: number;
 };
 export declare const DATA_TYPES: Readonly<{
-    STRING: number;
-    NUMBER: number;
-    BOOL: number;
-    MAP: number;
-    ARRAY: number;
+    STRING: 1;
+    NUMBER: 2;
+    BOOL: 3;
+    MAP: 4;
+    ARRAY: 5;
 }>;
 /**
  * Information about all storage instances

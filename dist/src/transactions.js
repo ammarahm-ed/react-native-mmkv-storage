@@ -12,7 +12,7 @@
  *
  * const MMKV = new MMKVStorage.Loader().initialize();
  *
- * MMKV.transcations.register("object", "onwrite", ({ key, value }) => {
+ * MMKV.transactions.register("object", "onwrite", ({ key, value }) => {
  *    console.log(MMKV.instanceID, "object:onwrite: ", key, value)
  * });
  * ```

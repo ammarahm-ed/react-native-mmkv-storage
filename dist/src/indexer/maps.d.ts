@@ -1,3 +1,4 @@
+import type { JsonReviver } from '../types';
 /**
  * Index of all objects stored in storage.
  */
@@ -16,6 +17,6 @@ export default class mapsIndex {
     /**
      * Get all objects stored in storage.
      */
-    getAll<T>(): Promise<unknown>;
+    getAll<T>(reviver?: JsonReviver): Promise<unknown>;
 }
 //# sourceMappingURL=maps.d.ts.map

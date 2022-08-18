@@ -1,3 +1,4 @@
+import type { JsonReviver } from '../types';
 /**
  * Index of all array values stored in storage
  */
@@ -16,6 +17,6 @@ export default class arrayIndex {
     /**
      * Get all arrays from storage.
      */
-    getAll<T>(): Promise<unknown>;
+    getAll<T>(reviver?: JsonReviver): Promise<unknown>;
 }
 //# sourceMappingURL=arrays.d.ts.map

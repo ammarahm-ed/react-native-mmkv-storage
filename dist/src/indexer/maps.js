@@ -68,7 +68,7 @@ var mapsIndex = /** @class */ (function () {
     /**
      * Get all objects stored in storage.
      */
-    mapsIndex.prototype.getAll = function () {
+    mapsIndex.prototype.getAll = function (reviver) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -82,7 +82,7 @@ var mapsIndex = /** @class */ (function () {
                             var item = [];
                             item[0] = keys[i];
                             var map = mmkvJsiModule.getMapMMKV(keys[i], _this.instanceID);
-                            item[1] = map ? JSON.parse(map) : null;
+                            item[1] = map ? JSON.parse(map, reviver) : null;
                             items.push(item);
                         }
                         resolve(items);

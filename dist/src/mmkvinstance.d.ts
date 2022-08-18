@@ -2,8 +2,9 @@ import encryption from './encryption';
 import EventManager from './eventmanager';
 import indexer from './indexer/indexer';
 import transactions from './transactions';
-import { DataType, GenericReturnType, StorageOptions } from './types';
+import type { DataType, GenericReturnType, JsonReviver, StorageOptions } from './types';
 export default class MMKVInstance {
+    reviver: JsonReviver;
     transactions: transactions;
     instanceID: string;
     encryption: encryption;
@@ -57,11 +58,11 @@ export default class MMKVInstance {
     /**
      * Get then Object from storage for the given key.
      */
-    getMapAsync<T>(key: string): Promise<T | null | undefined>;
+    getMapAsync<T>(key: string, reviver?: JsonReviver): Promise<T | null | undefined>;
     /**
      * Retrieve multiple items for the given array of keys.
      */
-    getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map'): Promise<GenericReturnType<T>[]>;
+    getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map', reviver?: JsonReviver): Promise<GenericReturnType<T>[]>;
     /**
      * Set an array to storage for the given key.
      */
@@ -69,7 +70,7 @@ export default class MMKVInstance {
     /**
      * Get the array from the storage for the given key.
      */
-    getArrayAsync<T>(key: string): Promise<T[] | null | undefined>;
+    getArrayAsync<T>(key: string, reviver?: JsonReviver): Promise<T[] | null | undefined>;
     /**
      * Set a string value to storage for the given key.
      */
@@ -103,7 +104,7 @@ export default class MMKVInstance {
     /**
      * Get an Object from storage for a given key.
      */
-    getMap: <T>(key: string, callback?: ((error: any, value: T | null | undefined) => void) | undefined) => T | null;
+    getMap: <T>(key: string, callback?: ((error: any, value: T | null | undefined) => void) | undefined, reviver?: JsonReviver) => T | null;
     /**
      * Set an array to storage for the given key.
      */
@@ -111,12 +112,12 @@ export default class MMKVInstance {
     /**
      * get an array from the storage for give key.
      */
-    getArray: <T>(key: string, callback?: ((error: any, value: T[] | null | undefined) => void) | undefined) => T[] | null;
+    getArray: <T>(key: string, callback?: ((error: any, value: T[] | null | undefined) => void) | undefined, reviver?: JsonReviver) => T[] | null;
     /**
      * Retrieve multiple items for the given array of keys.
      *
      */
-    getMultipleItems: <T>(keys: string[], type: DataType | 'map') => GenericReturnType<T>[];
+    getMultipleItems: <T>(keys: string[], type: DataType | 'map', reviver?: JsonReviver) => GenericReturnType<T>[];
     /**
      *
      * Get all Storage Instance IDs that are currently loaded.

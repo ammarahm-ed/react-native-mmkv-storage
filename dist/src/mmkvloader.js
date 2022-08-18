@@ -17,7 +17,8 @@ var MMKVLoader = /** @class */ (function () {
             key: null,
             serviceName: null,
             initialized: false,
-            persistDefaults: false
+            persistDefaults: false,
+            defaultReviver: undefined
         };
     }
     /**
@@ -58,6 +59,17 @@ var MMKVLoader = /** @class */ (function () {
      */
     MMKVLoader.prototype.withServiceName = function (serviceName) {
         this.options.serviceName = serviceName;
+        return this;
+    };
+    /**
+     * Sets default reviver function when retrieving objects or arrays from storage.
+     * Even if not set, each function that calls `JSON.parse` can still receive a reviver parameter.
+     * Addresses https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/277 issue.
+     *
+     * @param reviver Same reviver parameter from `JSON.parse`
+     */
+    MMKVLoader.prototype.withDefaultReviver = function (reviver) {
+        this.options.defaultReviver = reviver;
         return this;
     };
     /**
@@ -114,6 +126,7 @@ var MMKVLoader = /** @class */ (function () {
         currentInstancesStatus[this.options.instanceID] = false;
         options[this.options.instanceID] = this.options;
         var instance = new MMKVInstance(this.options.instanceID);
+        instance.reviver = this.options.defaultReviver;
         //@ts-ignore
         handleAction(null, this.options.instanceID);
         return instance;

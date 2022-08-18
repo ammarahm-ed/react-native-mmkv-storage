@@ -45,7 +45,12 @@ export declare type StorageOptions = {
      * Persist default values in hooks
      */
     persistDefaults: boolean;
+    /**
+     * Default function to revive stringified objects when retrieving them from storage.
+     */
+    defaultReviver: JsonReviver;
 };
+export declare type JsonReviver = Parameters<typeof JSON.parse>[1];
 export declare type DataType = 'string' | 'number' | 'object' | 'array' | 'boolean';
 export declare type GenericReturnType<T> = [key: string, value: T | null | undefined];
 export declare type IndexType = 'stringIndex' | 'boolIndex' | 'numberIndex' | 'mapIndex' | 'arrayIndex';
