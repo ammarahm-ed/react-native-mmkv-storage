@@ -3,6 +3,15 @@ import MMKVStorage, {isLoaded} from '../../';
 
 const mmkvMock = require('../../jest/dist/jest/memoryStore.js');
 
+const dateReviver = (_, date) => {
+  const dateRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/;
+
+  if (typeof date === 'string' && dateRegex.exec(date)) {
+    return new Date(date);
+  }
+  return date;
+};
+
 describe('MMKVStorage mock functionality', () => {
   beforeEach(function () {
     // Reset the storage before each test.
@@ -102,7 +111,7 @@ describe('MMKVStorage mock functionality', () => {
     expect(instance.indexer.numbers.hasKey(testKey)).toBe(true);
   });
 
-  it('should get/set a object from storage', () => {
+  it('should get/set an object from storage', () => {
     let instance = new MMKVStorage.Loader().initialize();
     const testValue = {a: 'b'};
     const testKey = 'test';
@@ -115,7 +124,34 @@ describe('MMKVStorage mock functionality', () => {
     expect(instance.indexer.maps.hasKey(testKey)).toBe(true);
   });
 
-  it('should get/set a array from storage', () => {
+  it('should get/set an object from storage with reviver', () => {
+    let instance = new MMKVStorage.Loader().initialize();
+    const testValue = {a: new Date(0)};
+    const testKey = 'test';
+    let result = instance.setMap(testKey, testValue);
+    expect(result).toBe(true);
+    let value = instance.getMap(testKey, undefined, dateReviver);
+    expect(value).toStrictEqual(testValue);
+
+    expect(instance.indexer.hasKey(testKey)).toBe(true);
+    expect(instance.indexer.maps.hasKey(testKey)).toBe(true);
+  });
+
+  it('failt to get/set an object from storage without reviver', () => {
+    let instance = new MMKVStorage.Loader().initialize();
+    const testValue = {a: new Date(0)};
+    const testKey = 'test';
+    let result = instance.setMap(testKey, testValue);
+    expect(result).toBe(true);
+    let value = instance.getMap(testKey);
+    expect(value.a).not.toBe(testValue);
+    expect(typeof value.a).toBe('string');
+
+    expect(instance.indexer.hasKey(testKey)).toBe(true);
+    expect(instance.indexer.maps.hasKey(testKey)).toBe(true);
+  });
+
+  it('should get/set an array from storage', () => {
     let instance = new MMKVStorage.Loader().initialize();
     const testValue = ['a', 'b'];
     const testKey = 'test';
@@ -123,6 +159,37 @@ describe('MMKVStorage mock functionality', () => {
     expect(result).toBe(true);
     let value = instance.getArray(testKey);
     expect(value).toStrictEqual(testValue);
+
+    expect(instance.indexer.hasKey(testKey)).toBe(true);
+    expect(instance.indexer.arrays.hasKey(testKey)).toBe(true);
+  });
+
+  it('should get/set an array of dates from storage with reviver', () => {
+    let instance = new MMKVStorage.Loader().initialize();
+    const testValue = [new Date(0), new Date(100)];
+    const testKey = 'test';
+    let result = instance.setArray(testKey, testValue);
+
+    expect(result).toBe(true);
+
+    let value = instance.getArray(testKey, undefined, dateReviver);
+    expect(value).toStrictEqual(testValue);
+
+    expect(instance.indexer.hasKey(testKey)).toBe(true);
+    expect(instance.indexer.arrays.hasKey(testKey)).toBe(true);
+  });
+
+  it('should fail to get/set an array of dates from storage without reviver', () => {
+    let instance = new MMKVStorage.Loader().initialize();
+    const testValue = [new Date(0), new Date(100)];
+    const testKey = 'test';
+    let result = instance.setArray(testKey, testValue);
+
+    expect(result).toBe(true);
+    let value = instance.getArray(testKey, undefined);
+    expect(value).not.toBe(testValue);
+    expect(typeof value[0]).toBe('string');
+    expect(typeof value[1]).toBe('string');
 
     expect(instance.indexer.hasKey(testKey)).toBe(true);
     expect(instance.indexer.arrays.hasKey(testKey)).toBe(true);
@@ -167,7 +234,7 @@ describe('MMKVStorage mock functionality', () => {
     expect(instance.indexer.numbers.hasKey(testKey)).toBe(true);
   });
 
-  it('should get/set a object from storage async', async () => {
+  it('should get/set an object from storage async', async () => {
     let instance = new MMKVStorage.Loader().initialize();
     const testValue = {a: 'b'};
     const testKey = 'test';
@@ -180,7 +247,7 @@ describe('MMKVStorage mock functionality', () => {
     expect(instance.indexer.maps.hasKey(testKey)).toBe(true);
   });
 
-  it('should get/set a array from storage async', async () => {
+  it('should get/set an array from storage async', async () => {
     let instance = new MMKVStorage.Loader().initialize();
     const testValue = ['a', 'b'];
     const testKey = 'test';
