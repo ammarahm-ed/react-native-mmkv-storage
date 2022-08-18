@@ -4,7 +4,7 @@ import { currentInstancesStatus } from './initializer';
 import generatePassword from './keygen';
 import { init } from './mmkv/init';
 import { IOSAccessibleStates, ProcessingModes, options, stringToHex } from './utils';
-import { StorageOptions } from './types';
+import type { JsonReviver, StorageOptions } from './types';
 
 export default class MMKVLoader {
   options: StorageOptions;
@@ -20,7 +20,8 @@ export default class MMKVLoader {
       key: null,
       serviceName: null,
       initialized: false,
-      persistDefaults: false
+      persistDefaults: false,
+      defaultReviver: undefined
     };
   }
 
@@ -66,6 +67,19 @@ export default class MMKVLoader {
     this.options.serviceName = serviceName;
     return this;
   }
+
+  /**
+   * Sets default reviver function when retrieving objects or arrays from storage.
+   * Even if not set, each function that calls `JSON.parse` can still receive a reviver parameter.
+   * Addresses https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/277 issue.
+   *
+   * @param reviver Same reviver parameter from `JSON.parse`
+   */
+  withDefaultReviver(reviver: JsonReviver) {
+    this.options.defaultReviver = reviver;
+    return this;
+  }
+
   /**
    * Set accessible mode for secure storage on ios devices
    *
@@ -121,6 +135,7 @@ export default class MMKVLoader {
     currentInstancesStatus[this.options.instanceID] = false;
     options[this.options.instanceID] = this.options;
     let instance = new MMKVInstance(this.options.instanceID);
+    instance.reviver = this.options.defaultReviver;
     //@ts-ignore
     handleAction(null, this.options.instanceID);
     return instance;

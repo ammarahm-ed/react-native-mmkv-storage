@@ -6,7 +6,7 @@ import { getCurrentMMKVInstanceIDs } from './initializer';
 import { default as IDStore } from './mmkv/IDStore';
 import mmkvJsiModule from './module';
 import transactions from './transactions';
-import { DataType, GenericReturnType, StorageOptions } from './types';
+import type { DataType, GenericReturnType, JsonReviver, StorageOptions } from './types';
 import { options } from './utils';
 
 function assert(type: DataType, value: any) {
@@ -18,6 +18,7 @@ function assert(type: DataType, value: any) {
 }
 
 export default class MMKVInstance {
+  reviver: JsonReviver;
   transactions: transactions;
   instanceID: string;
   encryption: encryption;
@@ -112,9 +113,9 @@ export default class MMKVInstance {
   /**
    * Get then Object from storage for the given key.
    */
-  getMapAsync<T>(key: string): Promise<T | null | undefined> {
+  getMapAsync<T>(key: string, reviver?: JsonReviver): Promise<T | null | undefined> {
     return new Promise(resolve => {
-      resolve(this.getMap<T>(key));
+      resolve(this.getMap<T>(key, undefined, reviver));
     });
   }
 
@@ -123,10 +124,11 @@ export default class MMKVInstance {
    */
   async getMultipleItemsAsync<T>(
     keys: string[],
-    type: DataType | 'map'
+    type: DataType | 'map',
+    reviver?: JsonReviver
   ): Promise<GenericReturnType<T>[]> {
     return new Promise(resolve => {
-      resolve(this.getMultipleItems<T>(keys, type));
+      resolve(this.getMultipleItems<T>(keys, type, reviver));
     });
   }
   /**
@@ -140,9 +142,9 @@ export default class MMKVInstance {
   /**
    * Get the array from the storage for the given key.
    */
-  async getArrayAsync<T>(key: string): Promise<T[] | null | undefined> {
+  async getArrayAsync<T>(key: string, reviver?: JsonReviver): Promise<T[] | null | undefined> {
     return new Promise(resolve => {
-      resolve(this.getArray<T>(key));
+      resolve(this.getArray<T>(key, undefined, reviver));
     });
   }
   /**
@@ -248,12 +250,12 @@ export default class MMKVInstance {
   getMap = <T>(
     key: string,
     callback?: (error: any, value: T | undefined | null) => void,
-    reviver?: Parameters<typeof JSON.parse>[1]
+    reviver?: JsonReviver
   ) => {
     let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
-        let map: T = JSON.parse(json, reviver);
+        let map: T = JSON.parse(json, reviver ?? this.reviver);
         map = this.transactions.transact('object', 'onread', key, map) as T;
         callback && callback(null, map);
         return map;
@@ -289,11 +291,15 @@ export default class MMKVInstance {
   /**
    * get an array from the storage for give key.
    */
-  getArray = <T>(key: string, callback?: (error: any, value: T[] | undefined | null) => void) => {
+  getArray = <T>(
+    key: string,
+    callback?: (error: any, value: T[] | undefined | null) => void,
+    reviver?: JsonReviver
+  ) => {
     let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
-        let array: T[] = JSON.parse(json);
+        let array: T[] = JSON.parse(json, reviver ?? this.reviver);
         array = this.transactions.transact('array', 'onread', key, array) as T[];
         callback && callback(null, array);
         return array;
@@ -309,7 +315,7 @@ export default class MMKVInstance {
    * Retrieve multiple items for the given array of keys.
    *
    */
-  getMultipleItems = <T>(keys: string[], type: DataType | 'map') => {
+  getMultipleItems = <T>(keys: string[], type: DataType | 'map', reviver?: JsonReviver) => {
     if (!type) type = 'object';
     const func = (): GenericReturnType<T>[] => {
       //@ts-ignore
@@ -332,7 +338,7 @@ export default class MMKVInstance {
             let map = mmkvJsiModule.getMapMMKV(keys[i], this.instanceID);
             if (map) {
               try {
-                item[1] = JSON.parse(map);
+                item[1] = JSON.parse(map, reviver ?? this.reviver);
               } catch (e) {
                 if (__DEV__) {
                   console.warn(keys[i] + 'has a value that is not an object, returning null');
@@ -347,7 +353,7 @@ export default class MMKVInstance {
             let array = mmkvJsiModule.getArrayMMKV(keys[i], this.instanceID);
             if (array) {
               try {
-                item[1] = JSON.parse(array);
+                item[1] = JSON.parse(array, reviver ?? this.reviver);
               } catch (e) {
                 if (__DEV__) {
                   console.warn(keys[i] + 'has a value that is not an array, returning null');

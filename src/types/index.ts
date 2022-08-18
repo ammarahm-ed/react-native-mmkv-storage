@@ -45,7 +45,13 @@ export type StorageOptions = {
    * Persist default values in hooks
    */
   persistDefaults: boolean;
+  /**
+   * Default function to revive stringified objects when retrieving them from storage.
+   */
+  defaultReviver: JsonReviver;
 };
+
+export type JsonReviver = Parameters<typeof JSON.parse>[1];
 
 export type DataType = 'string' | 'number' | 'object' | 'array' | 'boolean';
 
