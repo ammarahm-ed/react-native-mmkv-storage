@@ -53,7 +53,7 @@
     "metro": "0.66.2",
     "metro-react-native-babel-preset": "^0.66.2",
     "react": "17.0.2",
-    "react-native": "0.66.4",
+    "react-native": "0.69.4",
     "typescript": "4.5.4",
     "eslint": "^8.7.0",
     "@react-native-community/eslint-config": "^2.0.0"
