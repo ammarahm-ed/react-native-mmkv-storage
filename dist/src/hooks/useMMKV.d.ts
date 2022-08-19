@@ -35,6 +35,7 @@ declare type CreateType = (storage: MMKVInstance) => {
         value: T,
         setValue: (value: T | ((prevValue: T) => T)) => void
     ];
+    <T>(key: string, defaultValue: T, equalityFn?: (prev: T | undefined, next: T | undefined) => boolean): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 /**
  *
@@ -58,6 +59,7 @@ declare type CreateType = (storage: MMKVInstance) => {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param equalityFn Provide a custom function to handle state update if value has changed.
  *
  * @returns `[value,setValue]`
  */
@@ -75,6 +77,7 @@ declare type UseMMKVStorageType = {
         value: T,
         setValue: (value: T | ((prevValue: T) => T)) => void
     ];
+    <T>(key: string, storage: MMKVInstance, defaultValue: T | undefined, equalityFn?: (prev: T | undefined, next: T | undefined) => boolean): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 export {};
 //# sourceMappingURL=useMMKV.d.ts.map

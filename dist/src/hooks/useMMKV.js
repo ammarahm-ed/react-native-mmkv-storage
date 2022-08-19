@@ -59,10 +59,10 @@ import { getDataType, getInitialValue } from './functions';
  * @returns `useMMKVStorage` hook
  */
 export var create = function (storage) {
-    return function (key, defaultValue) {
+    return function (key, defaultValue, equalityFn) {
         if (!key || typeof key !== 'string' || !storage)
             throw new Error('Key and Storage are required parameters.');
-        return useMMKVStorage(key, storage, defaultValue);
+        return useMMKVStorage(key, storage, defaultValue, equalityFn);
     };
 };
 /**
@@ -87,10 +87,11 @@ export var create = function (storage) {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param equalityFn Provide a custom function to handle state update if value has changed.
  *
  * @returns `[value,setValue]`
  */
-export var useMMKVStorage = function (key, storage, defaultValue) {
+export var useMMKVStorage = function (key, storage, defaultValue, equalityFn) {
     var getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
     var getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
     var _a = useState(getValue), value = _a[0], setValue = _a[1];
@@ -126,6 +127,8 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
         var type = getDataType(event.value);
         //@ts-ignore
         var _value = event.value ? methods[type]['copy'](event.value) : event.value;
+        if (prevValue.current === _value || (equalityFn === null || equalityFn === void 0 ? void 0 : equalityFn(prevValue.current, _value)))
+            return;
         setValue(_value);
         setValueType(type);
     }, []);
@@ -160,6 +163,9 @@ export var useMMKVStorage = function (key, storage, defaultValue) {
                 //@ts-ignore
                 storage[methods[_valueType]['set']](key, _value);
             }
+            //@ts-ignore
+            if (prevValue.current === _value || (equalityFn === null || equalityFn === void 0 ? void 0 : equalityFn(prevValue.current, _value)))
+                return [2 /*return*/];
             //@ts-ignore
             setValue(_value);
             setValueType(_valueType);

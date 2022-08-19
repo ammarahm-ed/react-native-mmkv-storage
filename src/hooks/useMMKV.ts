@@ -26,11 +26,15 @@ import { getDataType, getInitialValue } from './functions';
  */
 export const create: CreateType =
   (storage: MMKVInstance) =>
-  <T = undefined>(key: string, defaultValue?: T) => {
+  <T = undefined>(
+    key: string,
+    defaultValue?: T,
+    equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
+  ) => {
     if (!key || typeof key !== 'string' || !storage)
       throw new Error('Key and Storage are required parameters.');
 
-    return useMMKVStorage<T>(key, storage, defaultValue);
+    return useMMKVStorage<T>(key, storage, defaultValue, equalityFn);
   };
 
 /**
@@ -47,6 +51,11 @@ type CreateType = (storage: MMKVInstance) => {
     value: T,
     setValue: (value: T | ((prevValue: T) => T)) => void
   ];
+  <T>(
+    key: string,
+    defaultValue: T,
+    equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
+  ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
 
 /**
@@ -71,13 +80,15 @@ type CreateType = (storage: MMKVInstance) => {
  * @param key The key against which the hook should update
  * @param storage The storage instance
  * @param defaultValue Default value if any
+ * @param equalityFn Provide a custom function to handle state update if value has changed.
  *
  * @returns `[value,setValue]`
  */
 export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   key: string,
   storage: MMKVInstance,
-  defaultValue?: T
+  defaultValue?: T,
+  equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
 ) => {
   const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
   const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
@@ -89,6 +100,7 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   const prevStorage = usePrevious(storage);
 
   const prevValue = useRef(value);
+
   useEffect(() => {
     prevValue.current = value;
     if (
@@ -122,6 +134,9 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
     let type = getDataType(event.value);
     //@ts-ignore
     let _value = event.value ? methods[type]['copy'](event.value) : event.value;
+
+    if (prevValue.current === _value || equalityFn?.(prevValue.current, _value)) return;
+
     setValue(_value);
     setValueType(type);
   }, []);
@@ -161,6 +176,8 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
         storage[methods[_valueType]['set']](key, _value);
       }
       //@ts-ignore
+      if (prevValue.current === _value || equalityFn?.(prevValue.current, _value)) return;
+      //@ts-ignore
       setValue(_value);
       setValueType(_valueType);
       return;
@@ -197,4 +214,10 @@ type UseMMKVStorageType = {
     value: T,
     setValue: (value: T | ((prevValue: T) => T)) => void
   ];
+  <T>(
+    key: string,
+    storage: MMKVInstance,
+    defaultValue: T | undefined,
+    equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
+  ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 };
