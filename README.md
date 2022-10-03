@@ -131,7 +131,7 @@ const userStorage = new MMKVLoader()
   .withInstanceID('userdata')
   .initialize();
 
-const settingsStorage = new MMKVStorage.Loader().withInstanceID('settings').initialize();
+const settingsStorage = new MMKVLoader().withInstanceID('settings').initialize();
 ```
 
 ### **Full encryption support**
