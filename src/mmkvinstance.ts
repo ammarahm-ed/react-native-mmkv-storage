@@ -38,15 +38,21 @@ export default class MMKVInstance {
    * This method is added for redux-persist/zustand support.
    *
    */
-  setItem(key: string, value: string) {
-    return this.setStringAsync(key, value);
+  setItem(key: string, value: string, callback?: (err?: Error | null) => void) {
+    return new Promise(resolve => {
+      const result = this.setString(key, value);
+      callback && callback(null);
+      resolve(result);
+    });
   }
   /**
    * Get the string value for the given key.
    * This method is added for redux-persist/zustand support.
    */
-  getItem(key: string) {
-    return this.getStringAsync(key);
+  getItem(key: string, callback?: (error?: Error | null, result?: string | null) => void) {
+    return new Promise(resolve => {
+      resolve(this.getString(key, callback));
+    });
   }
 
   /**
