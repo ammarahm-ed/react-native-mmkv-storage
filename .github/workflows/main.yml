@@ -33,6 +33,12 @@ jobs:
             folder: "rn66"
           - version: "0.67.x"
             folder: "rn67"  
+          - version: "0.68.x"
+            folder: "rn68"
+          - version: "0.69.x"
+            folder: "rn69"
+          - version: "0.70.x"
+            folder: "rn70"  
           - version: "reanimated-2"
             folder: "reanimated2"
 
