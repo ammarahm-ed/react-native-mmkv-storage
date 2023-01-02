@@ -38,7 +38,7 @@ export default class MMKVInstance {
    * This method is added for redux-persist/zustand support.
    *
    */
-  setItem(key: string, value: string, callback?: (err?: Error | null) => void) {
+  setItem(key: string, value: string, callback?: (err?: Error | null) => void): Promise<boolean | undefined> {
     return new Promise(resolve => {
       const result = this.setString(key, value);
       callback && callback(null);
@@ -396,7 +396,7 @@ export default class MMKVInstance {
    * Remove an item from storage for a given key.
    *
    */
-  removeItem(key: string) {
+  removeItem(key: string): boolean | undefined {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
       this.ev.publish(`${key}:onwrite`, { key, value: null });

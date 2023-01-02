@@ -135,7 +135,7 @@ export default class MMKVInstance {
      * Remove an item from storage for a given key.
      *
      */
-    removeItem(key: string): boolean | null | undefined;
+    removeItem(key: string): boolean | undefined;
     /**
      * Remove all keys and values from storage.
      */
