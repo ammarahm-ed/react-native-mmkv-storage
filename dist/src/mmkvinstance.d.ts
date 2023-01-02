@@ -16,12 +16,12 @@ export default class MMKVInstance {
      * This method is added for redux-persist/zustand support.
      *
      */
-    setItem(key: string, value: string): Promise<boolean | null | undefined>;
+    setItem(key: string, value: string, callback?: (err?: Error | null) => void): Promise<unknown>;
     /**
      * Get the string value for the given key.
      * This method is added for redux-persist/zustand support.
      */
-    getItem(key: string): Promise<string | null | undefined>;
+    getItem(key: string, callback?: (error?: Error | null, result?: string | null) => void): Promise<unknown>;
     /**
      * Set a string value to storage for the given key.
      */
