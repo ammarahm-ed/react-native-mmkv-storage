@@ -33,6 +33,10 @@ export function initialize(id: string) {
     return initWithEncryptionWithoutSecureStorage(opts);
   }
 
+  if (opts.alias && !mmkvJsiModule.secureKeyExists(opts.alias)) {
+    return initWithEncryptionUsingNewKey(opts);
+  }
+
   if (IDStore.exists(id)) {
     if (!IDStore.encrypted(id)) {
       return initWithoutEncryption(opts);
@@ -43,9 +47,6 @@ export function initialize(id: string) {
 
   if (!opts.initWithEncryption) {
     return initWithoutEncryption(opts);
-  }
-  if (opts.alias && !mmkvJsiModule.secureKeyExists(opts.alias)) {
-    return initWithEncryptionUsingNewKey(opts);
   }
   return initWithEncryptionUsingOldKey(opts);
 }
