@@ -91,6 +91,8 @@ android {
 dependencies {
   //noinspection GradleDynamicVersion
   implementation 'com.facebook.react:react-native:+'
+  implementation "androidx.security:security-crypto:1.1.0-alpha03"
+  implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 // Resolves "LOCAL_SRC_FILES points to a missing file, Check that libfb.so exists or that its path is correct".
