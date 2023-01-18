@@ -11,7 +11,25 @@ buildscript {
   }
 }
 
-apply plugin: 'com.facebook.react'
+def resolveBuildType() {
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskRequests()['args'].toString()
+
+    return tskReqStr.contains('Release') ? 'release' : 'debug'
+}
+
+def isNewArchitectureEnabled() {
+  // To opt-in for the New Architecture, you can either:
+  // - Set `newArchEnabled` to true inside the `gradle.properties` file
+  // - Invoke gradle with `-newArchEnabled=true`
+  // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
+  return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: 'com.facebook.react'
+}
+
 apply plugin: 'com.android.library'
 
 def safeExtGet(prop, fallback) {
@@ -37,7 +55,7 @@ android {
   defaultConfig {
     minSdkVersion safeExtGet('minSdkVersion', 16)
     targetSdkVersion safeExtGet('targetSdkVersion', 28)
-
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     var appProject = rootProject.allprojects.find {it.plugins.hasPlugin('com.android.application')}
     externalNativeBuild {
       cmake {
@@ -45,6 +63,14 @@ android {
         arguments "-DANDROID_STL=c++_shared"
         abiFilters (*reactNativeArchitectures())
       }
+    }
+    packagingOptions {
+    doNotStrip resolveBuildType() == 'debug' ? "**/**/*.so" : ''
+    excludes = [
+            "META-INF",
+            "META-INF/**",
+            "**/libjsi.so",
+      ]
     }
   }
 
