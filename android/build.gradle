@@ -1,7 +1,4 @@
-import java.nio.file.Paths
-
 buildscript {
-
   repositories {
     maven {
       url "https://plugins.gradle.org/m2/"
@@ -12,27 +9,6 @@ buildscript {
   dependencies {
     classpath 'com.android.tools.build:gradle:7.2.2'
   }
-}
-
-static def findNodeModulePath(baseDir, packageName) {
-  def basePath = baseDir.toPath().normalize()
-  // Node's module resolution algorithm searches up to the root directory,
-  // after which the base path will be null
-  while (basePath) {
-    def candidatePath = Paths.get(basePath.toString(), "node_modules", packageName)
-    if (candidatePath.toFile().exists()) {
-      return candidatePath.toString()
-    }
-    basePath = basePath.getParent()
-  }
-  return null
-}
-
-def findNodeModulePath(packageName) {
-  // Don't start in the project dir, as its path ends with node_modules/react-native-gesture-handler/android
-  // we want to go two levels up, so we end up in the first_node modules and eventually
-  // search upwards if the package is not found there
-  return findNodeModulePath(projectDir.toPath().parent.parent.toFile(), packageName)
 }
 
 apply plugin: 'com.facebook.react'
@@ -46,8 +22,6 @@ def reactNativeArchitectures() {
   def value = project.getProperties().get("reactNativeArchitectures")
   return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
-
-def REACT_NATIVE_DIR = findNodeModulePath("react-native")
 
 repositories {
   mavenCentral()
@@ -68,9 +42,7 @@ android {
     externalNativeBuild {
       cmake {
         cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
-        arguments "-DAPP_BUILD_DIR=${appProject.buildDir}",
-                "-DREACT_NATIVE_DIR=${REACT_NATIVE_DIR}",
-                "-DANDROID_STL=c++_shared"
+        arguments "-DANDROID_STL=c++_shared"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -90,7 +62,7 @@ android {
 
 dependencies {
   //noinspection GradleDynamicVersion
-  implementation 'com.facebook.react:react-native:+'
+  implementation 'com.facebook.react:react-android:+'
   implementation "androidx.security:security-crypto:1.1.0-alpha03"
   implementation 'com.google.code.gson:gson:2.8.6'
 }
