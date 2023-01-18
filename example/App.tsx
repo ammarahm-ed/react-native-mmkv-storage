@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+// @ts-expect-error
 import MMKVStorage, {create} from 'react-native-mmkv-storage';
 
-const Button = ({title, onPress}) => {
+const Button = ({title, onPress}: {title: string; onPress: () => void}) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <Text style={{color: 'white'}}>{title}</Text>
@@ -49,7 +50,7 @@ const App = () => {
     {
       title: 'setAge',
       onPress: () => {
-        setAge(age => {
+        setAge((age: number) => {
           console.log(age);
           return age + 1;
         });
