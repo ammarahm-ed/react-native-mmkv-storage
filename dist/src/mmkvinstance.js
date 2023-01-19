@@ -273,15 +273,23 @@ var MMKVInstance = /** @class */ (function () {
      * This method is added for redux-persist/zustand support.
      *
      */
-    MMKVInstance.prototype.setItem = function (key, value) {
-        return this.setStringAsync(key, value);
+    MMKVInstance.prototype.setItem = function (key, value, callback) {
+        var _this = this;
+        return new Promise(function (resolve) {
+            var result = _this.setString(key, value);
+            callback && callback(null);
+            resolve(result);
+        });
     };
     /**
      * Get the string value for the given key.
      * This method is added for redux-persist/zustand support.
      */
-    MMKVInstance.prototype.getItem = function (key) {
-        return this.getStringAsync(key);
+    MMKVInstance.prototype.getItem = function (key, callback) {
+        var _this = this;
+        return new Promise(function (resolve) {
+            resolve(_this.getString(key, callback));
+        });
     };
     /**
      * Set a string value to storage for the given key.

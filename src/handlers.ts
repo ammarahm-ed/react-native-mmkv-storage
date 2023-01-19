@@ -15,7 +15,7 @@ import { currentInstancesStatus, initialize } from './initializer';
 export function handleAction<T extends (...args: any[]) => any | undefined | null>(
   action: T,
   ...args: any[]
-): ReturnType<T> | undefined | null {
+): ReturnType<T> | undefined {
   // The last argument is always the instance id.
   let id: string = args[args.length - 1];
   if (!currentInstancesStatus[id]) {
