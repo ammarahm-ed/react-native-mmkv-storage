@@ -1,78 +1,76 @@
-import groovy.json.JsonSlurper
-
 buildscript {
-
   repositories {
-    google()
-    mavenCentral()
-
     maven {
       url "https://plugins.gradle.org/m2/"
     }
+    mavenCentral()
+    google()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.1'
+    classpath 'com.android.tools.build:gradle:7.2.2'
   }
+}
+
+def resolveBuildType() {
+    Gradle gradle = getGradle()
+    String tskReqStr = gradle.getStartParameter().getTaskRequests()['args'].toString()
+
+    return tskReqStr.contains('Release') ? 'release' : 'debug'
+}
+
+def isNewArchitectureEnabled() {
+  // To opt-in for the New Architecture, you can either:
+  // - Set `newArchEnabled` to true inside the `gradle.properties` file
+  // - Invoke gradle with `-newArchEnabled=true`
+  // - Set an environment variable `ORG_GRADLE_PROJECT_newArchEnabled=true`
+  return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
+if (isNewArchitectureEnabled()) {
+  apply plugin: 'com.facebook.react'
 }
 
 apply plugin: 'com.android.library'
 
-def getExtOrDefault(name, defaultValue) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : defaultValue
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-def found = false
-def reactNativeDir = null
-def androidSourcesName = 'React Native sources'
-def parentDir = rootProject.projectDir
-
-if (rootProject.ext.has('reactNativeAndroidRoot')) {
-  reactNativeDir = rootProject.ext.get('reactNativeAndroidRoot')
-} else {
-  reactNativeDir = new File(
-          projectDir,
-          '/../../../node_modules/react-native/android'
-  )
-}
-if (reactNativeDir.exists()) {
-  found = true
-} else {
-  1.upto(5, {
-    if (found) return true
-    parentDir = reactNativeDir.parentFile
-
-    reactNativeDir = new File(
-            parentDir,
-            'node_modules/react-native/android'
-    )
-
-    if (reactNativeDir.exists()) {
-      found = true
-    }
-  })
+def reactNativeArchitectures() {
+  def value = project.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
-def reactNative = reactNativeDir.absolutePath;
-def reactNativeManifest = file("$reactNative/../package.json")
-def reactNativeManifestAsJson = new JsonSlurper().parseText(reactNativeManifest.text)
-def reactNativeVersion = reactNativeManifestAsJson.version as String
-def (major, minor, patch) = reactNativeVersion.tokenize('.')
-def rnMinorVersion = Integer.parseInt(minor)
+repositories {
+  mavenCentral()
+}
 
 android {
-  compileSdkVersion getExtOrDefault('compileSdkVersion', 28)
+  compileSdkVersion safeExtGet("compileSdkVersion", 28)
+
+  buildFeatures {
+    prefab true
+  }
 
   defaultConfig {
-    minSdkVersion getExtOrDefault('minSdkVersion', 21)
-    targetSdkVersion getExtOrDefault('targetSdkVersion', 28)
-    //ndkVersion "21.1.6352462"
-    
+    minSdkVersion safeExtGet('minSdkVersion', 16)
+    targetSdkVersion safeExtGet('targetSdkVersion', 28)
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+    var appProject = rootProject.allprojects.find {it.plugins.hasPlugin('com.android.application')}
     externalNativeBuild {
       cmake {
-        cppFlags "-fexceptions", "-frtti", "-std=c++1y", "-DONANDROID"
-        abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-        arguments '-DANDROID_STL=c++_shared', "-DNODE_MODULES_DIR=${reactNativeDir.parentFile.parentFile.toString()}", "-DRN_VERSION=${rnMinorVersion}"
+        cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
+        arguments "-DANDROID_STL=c++_shared"
+        abiFilters (*reactNativeArchitectures())
       }
+    }
+    packagingOptions {
+    doNotStrip resolveBuildType() == 'debug' ? "**/**/*.so" : ''
+    excludes = [
+            "META-INF",
+            "META-INF/**",
+            "**/libjsi.so",
+      ]
     }
   }
 
@@ -81,69 +79,31 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
-  lintOptions{
-    abortOnError false
-    disable 'GradleCompatible'
-  }
-
   externalNativeBuild {
      cmake {
           path "./src/main/rnmmkv/CMakeLists.txt"
       }
   }
-
-  packagingOptions {
-    excludes = ["**/libc++_shared.so","**/libjsi.so","**/libreactnativejni.so", "META-INF/MANIFEST.MF"]
-  }
-}
-
-repositories {
-  mavenCentral()
-  mavenLocal()
-  google()  
-
-  if (reactNativeDir.exists()) {
-    maven {
-      url reactNativeDir.toString()
-      name androidSourcesName
-    }
-    logger.info(":${project.name}:reactNativeAndroidRoot ${reactNativeDir.canonicalPath}")
-  }
-
-  if (!found) {
-    throw new GradleException(
-            "${project.name}: unable to locate React Native android sources. " +
-                    "Ensure you have you installed React Native as a dependency in your project and try again."
-    )
-  }
- 
 }
 
 dependencies {
   //noinspection GradleDynamicVersion
-  implementation 'com.facebook.react:react-native:+'
+  implementation 'com.facebook.react:react-android:+'
   implementation "androidx.security:security-crypto:1.1.0-alpha03"
   implementation 'com.google.code.gson:gson:2.8.6'
-  def buildType = "debug"
-    tasks.all({ task ->
-        if (task.name == "buildCMakeRelease") {
-            buildType = "release"
-        }
-    })
-    def rnAarMatcher = "**/react-native/**/*${buildType}.aar"
-    if (rnMinorVersion < 69) {
-        rnAarMatcher = "**/**/*.aar"
-    }
+}
 
-  def rnAAR = fileTree("$reactNative").matching({ it.include rnAarMatcher }).singleFile
-  files(rnAAR).each {
-      def file = it.absoluteFile
-      def aarFolder = new File("$buildDir/../$file.name");
-      if (aarFolder.exists()) return;
-      copy {
-        from zipTree(file)
-        into "$buildDir/../$file.name"
-        include "jni/**/*"
-      }
+// Resolves "LOCAL_SRC_FILES points to a missing file, Check that libfb.so exists or that its path is correct".
+tasks.whenTaskAdded { task ->
+  if (task.name.contains("configureCMakeDebug")) {
+    rootProject.getTasksByName("packageReactNdkDebugLibs", true).forEach {
+      task.dependsOn(it)
     }
+  }
+  // We want to add a dependency for both configureCMakeRelease and configureCMakeRelWithDebInfo
+  if (task.name.contains("configureCMakeRel")) {
+    rootProject.getTasksByName("packageReactNdkReleaseLibs", true).forEach {
+      task.dependsOn(it)
+    }
+  }
 }
