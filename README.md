@@ -35,6 +35,10 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 > Learn how to build your own module with JSI on my [blog](https://blog.notesnook.com/getting-started-react-native-jsi/)
 
+## 0.9.0 Breaking change
+
+Works only with react native 0.71.0 and above. If you are on older version of react native, keep using 0.8.x.
+
 ## Features
 
 ### **Written in C++ using JSI**
@@ -126,10 +130,7 @@ MMKV supports concurrent read-read and read-write access between processes. This
 You can create many database instances. This helps greatly if you have separate logics/modules in the same app that use data differently, It also helps in better performance since each database instance is small instead of a single bulky database which makes things slower as it grows.
 
 ```js
-const userStorage = new MMKVLoader()
-  .withEncryption()
-  .withInstanceID('userdata')
-  .initialize();
+const userStorage = new MMKVLoader().withEncryption().withInstanceID('userdata').initialize();
 
 const settingsStorage = new MMKVLoader().withInstanceID('settings').initialize();
 ```
