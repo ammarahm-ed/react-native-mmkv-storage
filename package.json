@@ -5,7 +5,8 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "bin": {
     "mmkv-link": "./autolink/postlink/run.js"
@@ -45,17 +46,17 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
-    "@types/react": "17.0.38",
-    "@types/react-native": "0.66.11",
+    "@types/react": "18.0.28",
+    "@types/react-native": "0.71.3",
     "babel-jest": "^26.6.3",
     "babel-plugin-module-resolver": "4.1.0",
     "jest": "27.4.7",
-    "metro": "0.66.2",
-    "metro-react-native-babel-preset": "^0.66.2",
-    "react": "17.0.2",
-    "react-native": "0.66.4",
-    "typescript": "4.5.4",
-    "eslint": "^8.7.0",
+    "metro": "0.76.0",
+    "metro-react-native-babel-preset": "0.76.0",
+    "react": "18.2.0",
+    "react-native": "0.71.4",
+    "typescript": "4.9.5",
+    "eslint": "^8.35.0",
     "@react-native-community/eslint-config": "^2.0.0"
   }
 }

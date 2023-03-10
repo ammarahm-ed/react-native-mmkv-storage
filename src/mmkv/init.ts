@@ -7,7 +7,7 @@ import mmkvJsiModule, { mmkvBridgeModule } from '../module/index';
  * Check if functions installed from JSI are present in global object.
  */
 export function isLoaded() {
-  return typeof mmkvJsiModule.getStringMMKV === 'function';
+  return typeof mmkvJsiModule?.getStringMMKV === 'function';
 }
 
 /**
