@@ -4,7 +4,7 @@
   - [Creating an MMKV Instance](creatinginstance.md)
   - [Working with Encryption](workingwithencryption.md)
   - [Reactive Apps with useMMKVStorage Hook](usemmkvstorage.md)
-  - [Value Lifecycle Control](transcationmanager.md)
+  - [Value Lifecycle Control](transactionmanager.md)
   - [Supported Data Types](datatypes.md)
   - [Redux persist support](redux-persist.md)
   - [Testing with Jest](mockjest.md)
