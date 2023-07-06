@@ -60,7 +60,7 @@ export default class encryption {
    * @param accessibleMode Set accessible mode for secure storage on ios devices
    * @returns An object with alias and key
    */
-  encrypt(key: string, secureKeyStorage = true, alias: string, accessibleMode: string) {
+  encrypt(key?: string, secureKeyStorage = true, alias?: string, accessibleMode?: string) {
     if (accessibleMode) {
       this.accessibleMode = accessibleMode;
     }
