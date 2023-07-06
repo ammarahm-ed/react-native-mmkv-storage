@@ -13,6 +13,7 @@ Encrypt an already created instance of MMKV.
 | cryptKey         | no       | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
+| accessibleMode   | no       | IOSAccessibleStates  | Choose the accessibility mode (iOS only)                                 |
 
 ```js
 import { MMKVLoader } from "react-native-mmkv-storage";
@@ -58,6 +59,7 @@ Change the encryption key of an encrypted instance of MMKV.
 | cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
 | secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
 | alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
+| accessibleMode   | no       | IOSAccessibleStates  | Choose the accessibility mode (iOS only)                                 |
 
 ```js
 // Create an instance that is encrypted
