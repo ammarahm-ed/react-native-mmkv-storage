@@ -108,7 +108,7 @@ export default class encryption {
    * @param alias Provide a custom alias to store the key with in secure storage
    * @param accessibleMode Set accessible mode for secure storage on ios devices
    */
-  changeEncryptionKey(key: string, secureKeyStorage = true, alias: string, accessibleMode: string) {
+  changeEncryptionKey(key: string, secureKeyStorage = true, alias?: string, accessibleMode?: string) {
     return this.encrypt(key, secureKeyStorage, alias, accessibleMode);
   }
 }
