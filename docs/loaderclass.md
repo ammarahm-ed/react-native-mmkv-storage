@@ -112,9 +112,9 @@ Choose the accessibility mode for secure key storage (IOS ONLY);
 
 **Arguments**
 
-| Name       | Required | Type                   | Description                   |
-|------------|----------|------------------------|-------------------------------|
-| accessible | yes      | MMKVStorage.ACCESSIBLE | Choose the accessibility mode |
+| Name       | Required | Type                 | Description                   |
+|------------|----------|----------------------|-------------------------------|
+| accessible | yes      | IOSAccessibleStates  | Choose the accessibility mode |
 
 ```js
 import { MMKVLoader, IOSAccessibleStates } from "react-native-mmkv-storage";

@@ -15,7 +15,7 @@ export type StorageOptions = {
   secureKeyStorage: boolean;
   /**
    * Set the AccessibleMode for iOS
-   * Import ACCESSIBLE from library to use it.
+   * Import IOSAccessibleStates from library to use it.
    */
   accessibleMode: string;
   /**
