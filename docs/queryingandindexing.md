@@ -41,9 +41,7 @@ MMKV.indexer.hasKey("your key").then((result) => {
 Get all the keys in the storage for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.getKeys();
-});
 ```
 
 **Returns**
