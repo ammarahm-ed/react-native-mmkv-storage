@@ -78,9 +78,7 @@ MMKV.indexer.strings.hasKey("your key").then((result) => {
 Get all the keys in the Storage indexer for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.strings.getKeys();
-});
 ```
 
 **Returns**
@@ -91,10 +89,7 @@ let keys = await MMKV.indexer.strings.getKeys();
 Get all strings in the storage.
 
 ```jsx
-
 let strings = await MMKV.indexer.strings.getAll();
-
-});
 ```
 
 **Returns**
@@ -142,9 +137,7 @@ MMKV.indexer.numbers.hasKey("your key").then((result) => {
 Get all the keys in the number indexer for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.numbers.getKeys();
-});
 ```
 
 **Returns**
@@ -155,10 +148,7 @@ let keys = await MMKV.indexer.numbers.getKeys();
 Get all numbers stored in the storage.
 
 ```jsx
-
 let numbers = await MMKV.indexer.numbers.getAll();
-
-});
 ```
 
 **Returns**
@@ -206,9 +196,7 @@ MMKV.indexer.booleans.hasKey("your key").then((result) => {
 Get all the keys in the boolean indexer for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.booleans.getKeys();
-});
 ```
 
 **Returns**
@@ -219,10 +207,7 @@ let keys = await MMKV.indexer.booleans.getKeys();
 Get all booleans stored in the storage.
 
 ```jsx
-
 let booleans = await MMKV.indexer.booleans.getAll();
-
-});
 ```
 
 **Returns**
@@ -270,9 +255,7 @@ MMKV.indexer.maps.hasKey("your key").then((result) => {
 Get all the keys in the objects indexer for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.maps.getKeys();
-});
 ```
 
 **Returns**
@@ -283,10 +266,7 @@ let keys = await MMKV.indexer.maps.getKeys();
 Get all objects stored in the storage.
 
 ```jsx
-
 let numbers = await MMKV.indexer.maps.getAll();
-
-});
 ```
 
 **Returns**
@@ -334,9 +314,7 @@ MMKV.indexer.arrays.hasKey("your key").then((result) => {
 Get all the keys in the array indexer for all stored items.
 
 ```jsx
-
 let keys = await MMKV.indexer.arrays.getKeys();
-});
 ```
 
 **Returns**
@@ -347,10 +325,7 @@ let keys = await MMKV.indexer.arrays.getKeys();
 Get all arrays stored in the storage.
 
 ```jsx
-
 let numbers = await MMKV.indexer.arrays.getAll();
-
-});
 ```
 
 **Returns**
