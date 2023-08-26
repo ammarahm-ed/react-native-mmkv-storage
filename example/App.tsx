@@ -8,23 +8,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-// @ts-expect-error
-import MMKVStorage, {create} from 'react-native-mmkv-storage';
+import {MMKVLoader, create} from 'react-native-mmkv-storage';
 
-const Button = ({title, onPress}: {title: string; onPress: () => void}) => {
-  return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
-      <Text style={{color: 'white'}}>{title}</Text>
-    </TouchableOpacity>
-  );
-};
+const storage = new MMKVLoader().withEncryption().initialize();
 
-const storage = new MMKVStorage.Loader().withEncryption().initialize();
+const storage2 = new MMKVLoader().withInstanceID('storage2').initialize();
+
 const useStorage = create(storage);
+const useStorage2 = create(storage2);
 
 const App = () => {
   const [user, setUser] = useStorage('user', 'robert');
-  const [age, setAge] = useStorage('age', 24);
+  const [age, setAge] = useStorage2('age', 24);
 
   const getUser = useCallback(() => {
     let users = ['andrew', 'robert', 'jack', 'alison'];
@@ -88,6 +83,14 @@ const App = () => {
         </ScrollView>
       </SafeAreaView>
     </>
+  );
+};
+
+const Button = ({title, onPress}: {title: string; onPress: () => void}) => {
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={{color: 'white'}}>{title}</Text>
+    </TouchableOpacity>
   );
 };
 
