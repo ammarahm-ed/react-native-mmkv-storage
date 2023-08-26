@@ -47,7 +47,7 @@ jobs:
         run: |
           echo $RN_VERSION $RN_FOLDER $ANDROID_NDK_HOME
           [[ "$RN_VERSION" == "reanimated-2" ]] && git clone --depth=1 https://github.com/software-mansion-labs/reanimated-2-playground.git "$RN_FOLDER" || npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
-          npm ci
+          npm ci --legacy-peer-deps
           npm run build
           rm -rf node_modules
           cd "$RN_FOLDER"

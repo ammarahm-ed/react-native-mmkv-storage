@@ -20,7 +20,7 @@ jobs:
       with:
         node-version: 14.x
     - run: |
-      npm ci
+      npm ci --legacy-peer-deps
       npm run build
       rm -rf node_modules
 
