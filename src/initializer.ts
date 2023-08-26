@@ -40,9 +40,11 @@ export function initialize(id: string) {
   if (!opts.initWithEncryption) {
     return initWithoutEncryption(opts);
   }
+
   if (!opts.secureKeyStorage) {
     return initWithEncryptionWithoutSecureStorage(opts);
   }
+
   if (opts.alias && !mmkvJsiModule.secureKeyExists(opts.alias)) {
     return initWithEncryptionUsingNewKey(opts);
   }
@@ -59,10 +61,12 @@ export function initialize(id: string) {
 
 function initWithEncryptionUsingOldKey(options: StorageOptions) {
   if (!options.alias) return false;
-  let key = mmkvJsiModule.getSecureKey(options.alias);
+  let key = !options.secureKeyStorage ? options.key : mmkvJsiModule.getSecureKey(options.alias);
+
   if (key) {
     return setupWithEncryption(options.instanceID, options.processingMode, key, options.alias);
   }
+
   return false;
 }
 
