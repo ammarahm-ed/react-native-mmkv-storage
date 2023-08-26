@@ -60,7 +60,9 @@ export const useIndex = <T>(
         if (index !== -1) {
           values[index][1] = value;
         } else {
-          setValues(storage.getMultipleItems(keys || [], type));
+          storage.getMultipleItemsAsync<T>(keys || [], type).then(data => {
+            setValues(data);
+          });
         }
       } else {
         values.splice(index);

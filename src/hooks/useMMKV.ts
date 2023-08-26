@@ -175,12 +175,6 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
         //@ts-ignore
         storage[methods[_valueType]['set']](key, _value);
       }
-      //@ts-ignore
-      if (prevValue.current === _value || equalityFn?.(prevValue.current, _value)) return;
-      //@ts-ignore
-      setValue(_value);
-      setValueType(_valueType);
-      return;
     },
     [key, storage, valueType]
   );

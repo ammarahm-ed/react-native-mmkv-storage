@@ -3,9 +3,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react-native",
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "lib": ["es2017", "DOM"],
+    "target": "ES2015",
     "declaration": true,
     "declarationMap": true,
     "outDir": "dist",

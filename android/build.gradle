@@ -29,6 +29,8 @@ def reactNativeArchitectures() {
   return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+def USE_HERMES = rootProject.ext.hermesEnabled
+
 repositories {
   mavenCentral()
 }
@@ -47,7 +49,7 @@ android {
     externalNativeBuild {
       cmake {
         cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
-        arguments "-DANDROID_STL=c++_shared"
+        arguments "-DANDROID_STL=c++_shared", "-DUSE_HERMES=${USE_HERMES}"
         abiFilters (*reactNativeArchitectures())
       }
     }
@@ -57,6 +59,8 @@ android {
             "META-INF",
             "META-INF/**",
             "**/libjsi.so",
+            "**/libreact_nativemodule_core.so",
+            "**/libturbomodulejsijni.so"
       ]
     }
   }

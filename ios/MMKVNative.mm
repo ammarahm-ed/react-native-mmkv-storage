@@ -3,13 +3,40 @@
 
 #import "SecureStorage.h"
 #import <MMKV/MMKV.h>
+#import <jsi/jsi.h>
+
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
-#import <jsi/jsi.h>
+#import <ReactCommon/RCTTurboModule.h>
+
+#include "ThreadPool.h"
 
 using namespace facebook;
 using namespace jsi;
 using namespace std;
+
+template <typename Lambda>
+void CreateFunction(jsi::Runtime &rt, const char* name, int count, Lambda &&callback) {
+    auto fn = Function::createFromHostFunction(rt, jsi::PropNameID::forAscii(rt, name), count, callback);
+    rt.global().setProperty(rt, name, move(fn));
+}
+
+#define CREATE_FUNCTION(name, argumentsCount, body) \
+CreateFunction(jsiRuntime, name, argumentsCount, [](Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value {    \
+body    \
+})
+
+#define CREATE_FUNCTION_CAPTURE(name, argumentsCount, body) \
+CreateFunction(jsiRuntime, name, argumentsCount, [=](Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value {    \
+body    \
+})
+
+#define nsstring(arg) \
+convertJSIStringToNSString(runtime, arg.getString(runtime))
+
+#define CALLBACK(returnValue) \
+invoker->invokeAsync([&runtime, cbref] { cbref->asFunction(runtime).call(runtime, returnValue); });
+
 
 @implementation MMKVNative
 @synthesize bridge = _bridge;
@@ -18,6 +45,7 @@ NSString *rPath = @"";
 NSMutableDictionary *mmkvInstances;
 NSMutableDictionary *serviceNames;
 SecureStorage *_secureStorage;
+NSString *appGroupId;
 
 RCT_EXPORT_MODULE()
 
@@ -30,15 +58,35 @@ RCT_EXPORT_MODULE()
 {
     self = [super init];
     RCTExecuteOnMainQueue(^{
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
-                                                             NSUserDomainMask, YES);
-        NSString *libraryPath = (NSString *)[paths firstObject];
-        NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-        rPath = rootDir;
+        
+        NSString *rootDir;
+        
+        appGroupId = [[NSBundle mainBundle].infoDictionary valueForKey:@"appGroupId"];
+        NSString *disableMMKVBackup = [[NSBundle mainBundle].infoDictionary valueForKey:@"disableMMKVBackup"];
+        
+        if (appGroupId != nil) {
+            NSURL *appGroup = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:appGroupId];
+            
+            rootDir = appGroup.path;
+            rPath = rootDir;
+            [MMKV initializeMMKV:nil groupDir:rootDir logLevel:MMKVLogInfo];
+        } else {
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                                 NSUserDomainMask, YES);
+            NSString *libraryPath = (NSString *)[paths firstObject];
+            rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
+            rPath = rootDir;
+            [MMKV initializeMMKV:rootDir];
+        }
+        
+        if (disableMMKVBackup) {
+            NSError *error = nil;
+            NSURL *url = [NSURL fileURLWithPath:rootDir isDirectory:YES];
+            [url setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:&error];
+        }
+        
         _secureStorage = [[SecureStorage alloc] init];
-        [MMKV initializeMMKV:rootDir];
     });
-    
     
     return self;
 }
@@ -74,7 +122,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     if (cxxBridge == nil) {
         return @false;
     }
-
+    
     auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
     if (jsiRuntime == nil) {
         return @false;
@@ -84,7 +132,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     serviceNames = [NSMutableDictionary dictionary];
     
     [self migrate];
-    install(*(jsi::Runtime *)jsiRuntime);
+    
+    RCTBridge *bridge = [RCTBridge currentBridge];
+    auto callInvoker = bridge.jsCallInvoker;
+    
+    install(*(jsi::Runtime *)jsiRuntime, callInvoker);
     return @true;
 }
 
@@ -108,293 +160,348 @@ MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
     return kv;
 }
 
+NSMutableDictionary *indexes;
+
 void setIndex(MMKV *kv, NSString *type, NSString *key) {
+    NSMutableDictionary *index = getIndex(kv, type);
     
-    NSMutableArray *indexer = [NSMutableArray array];
-    
-    if ([kv containsKey:type]) {
-        indexer = [kv getObjectOfClass:NSMutableArray.class forKey:type];
-    }
-    if (![indexer containsObject:key]) {
-        [indexer addObject:key];
-        [kv setObject:indexer forKey:type];
+    if (!index[key]) {
+        index[key] = @1;
+        [kv setObject:index forKey:type];
     }
 }
 
-NSMutableArray *getIndex(MMKV *kv, NSString *type) {
+NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
+    NSMutableDictionary *index;
     
-    NSMutableArray *indexer = [NSMutableArray array];
-    
-    if ([kv containsKey:type]) {
-        return [kv getObjectOfClass:NSMutableArray.class forKey:type];
+    if (!indexes[type] && [kv containsKey:type]) {
+        indexes[type] = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
+        return indexes[type];
     } else {
-        return indexer;
+        return [NSMutableDictionary dictionary];
     }
 }
 
 void removeKeyFromIndexer(MMKV *kv, NSString *key) {
+    NSMutableDictionary *index = getIndex(kv, @"stringIndex");
     
-    NSMutableArray *index = getIndex(kv, @"stringIndex");
-    
-    if (index != NULL && [index containsObject:key]) {
-        
-        [index removeObject:key];
+    if (index[key]) {
+        [index removeObjectForKey:key];
         [kv setObject:index forKey:@"stringIndex"];
-        return;
-    }
-    
-    index = getIndex(kv, @"numberIndex");
-    
-    if (index != NULL && [index containsObject:key]) {
-        
-        [index removeObject:key];
-        [kv setObject:index forKey:@"numberIndex"];
-        return;
-    }
-    
-    index = getIndex(kv, @"boolIndex");
-    
-    if (index != NULL && [index containsObject:key]) {
-        
-        [index removeObject:key];
-        [kv setObject:index forKey:@"boolIndex"];
         return;
     }
     
     index = getIndex(kv, @"mapIndex");
     
-    if (index != NULL && [index containsObject:key]) {
-        
-        [index removeObject:key];
+    if (index[key]) {
+        [index removeObjectForKey:key];
         [kv setObject:index forKey:@"mapIndex"];
         return;
     }
     
     index = getIndex(kv, @"arrayIndex");
     
-    if (index != NULL && [index containsObject:key]) {
-        
-        [index removeObject:key];
+    if (index[key]) {
+        [index removeObjectForKey:key];
         [kv setObject:index forKey:@"arrayIndex"];
+        return;
+    }
+    
+    index = getIndex(kv, @"numberIndex");
+    
+    if (index[key]) {
+        [index removeObjectForKey:key];
+        [kv setObject:index forKey:@"numberIndex"];
+        return;
+    }
+    
+    index = getIndex(kv, @"boolIndex");
+    
+    if (index[key]) {
+        [index removeObjectForKey:key];
+        [kv setObject:index forKey:@"boolIndex"];
         return;
     }
 }
 
-static void install(jsi::Runtime &jsiRuntime) {
+std::shared_ptr<react::CallInvoker> invoker;
+void upgradeIndex(MMKV *kv, NSString * type) {
+    if (![kv containsKey:type]) return;
+    NSMutableArray *array = [kv getObjectOfClass:NSMutableArray.class forKey:type];
+    if (array.count) {
+        NSDictionary *dic = [NSDictionary dictionary];
+        for (int i=0;i < array.count;i++) {
+            [dic setValue:0 forKey:array[i]];
+        }
+        [kv setObject:dic forKey:type];
+    }
+}
+
+void migrateKV(MMKV *kv) {
+    NSString *versionKey = @"___rn_mmkv_version";
+    bool hasVersion = [kv containsKey:versionKey];
+
+    int version = -1;
+    if (hasVersion) {
+        version = [kv getInt32ForKey:versionKey];
+    }
+
+    switch (version) {
+        case -1: {
+            @try {
+                upgradeIndex(kv, @"stringIndex");
+                upgradeIndex(kv, @"numberIndex");
+                upgradeIndex(kv, @"boolIndex");
+                upgradeIndex(kv, @"mapIndex");
+                upgradeIndex(kv, @"arrayIndex");
+            } @catch(NSException *e) {
+                NSLog(@"%@", e.reason);
+            }
+            [kv setInt32:9 forKey:versionKey];
+            break;
+        }
+        default:
+            break;
+    }
     
-    auto initializeMMKV = Function::createFromHostFunction(
-                                                           jsiRuntime, PropNameID::forAscii(jsiRuntime, "initializeMMKV"), 0,
-                                                           [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                              size_t count) -> Value {
+}
+
+static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> jsCallInvoker) {
+    auto pool = std::make_shared<ThreadPool>();
+    invoker = jsCallInvoker;
+    
+    CREATE_FUNCTION("initializeMMKV", 0, {
         [MMKV initializeMMKV:rPath];
         return Value::undefined();
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "initializeMMKV",
-                                    move(initializeMMKV));
     
-    auto setupMMKVInstance = Function::createFromHostFunction(
-                                                              jsiRuntime, PropNameID::forAscii(jsiRuntime, "setupMMKVInstance"), 4,
-                                                              [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                                 size_t count) -> Value {
-        NSString *ID = convertJSIStringToNSString(
-                                                  runtime, arguments[0].getString(runtime));
+    CREATE_FUNCTION("setupMMKVInstance", 4, {
+        NSString *ID = nsstring(arguments[0]);
         
         MMKVMode mode = (MMKVMode)(int)arguments[1].getNumber();
-        NSString *cryptKey = convertJSIStringToNSString(
-                                                        runtime, arguments[2].getString(runtime));
-        
-        NSString *path = convertJSIStringToNSString(
-                                                    runtime, arguments[3].getString(runtime));
+        NSString *cryptKey = nsstring(arguments[2]);
+        NSString *path = nsstring(arguments[3]);
         
         createInstance(ID, mode, cryptKey, path);
         
+        auto *kv = getInstance(ID);
+        
+        migrateKV(kv);
+        
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setupMMKVInstance",
-                                    move(setupMMKVInstance));
-
-    auto setMMKVServiceName = Function::createFromHostFunction(jsiRuntime, PropNameID::forAscii(jsiRuntime, "setMMKVServiceName"), 2,
-                                                                [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                                    size_t count) -> Value {
-        NSString *alias = convertJSIStringToNSString(
-                                                runtime, arguments[0].getString(runtime));
-        NSString *serviceName = convertJSIStringToNSString(
-                                                runtime, arguments[1].getString(runtime));
+    CREATE_FUNCTION("setMMKVServiceName", 2, {
+        NSString *alias = nsstring(arguments[0]);
+        NSString *serviceName = nsstring(arguments[1]);
         setServiceName(alias, serviceName);
-        // [_secureStorage setServiceName:serviceName];
         return Value::undefined();
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setMMKVServiceName",
-                                    move(setMMKVServiceName));
-
     
-    auto setStringMMKV = Function::createFromHostFunction(
-                                                          jsiRuntime, PropNameID::forAscii(jsiRuntime, "setStringMMKV"), 3,
-                                                          [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                             size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[2].getString(runtime)));
+    CREATE_FUNCTION("setStringMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
         
         if (!kv) {
             return Value::undefined();
         }
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
-        
+        NSString *key = nsstring(arguments[0]);
         setIndex(kv, @"stringIndex", key);
-        
-        [kv setString:convertJSIStringToNSString(
-                                                 runtime, arguments[1].getString(runtime))
-               forKey:key];
+        [kv setString:nsstring(arguments[1]) forKey:key];
         
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setStringMMKV",
-                                    move(setStringMMKV));
+    #define std_string(arg) \
+    arg.getString(runtime).utf8(runtime)
     
-    auto getStringMMKV = Function::createFromHostFunction(
-                                                          jsiRuntime, PropNameID::forAscii(jsiRuntime, "getStringMMKV"), 2,
-                                                          [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                             size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    #define HOSTFN(name, basecount) \
+    jsi::Function::createFromHostFunction( \
+    runtime, \
+    jsi::PropNameID::forAscii(runtime, name), \
+    basecount, \
+    [=](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value
+    
+    
+    CreateFunction(jsiRuntime, "setMultiMMKV", 4, [=](Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value {
+        auto keysRef =  arguments[0].getObject(runtime).asArray(runtime);
+        auto valuesRef =  arguments[1].getObject(runtime).asArray(runtime);
+        auto dataType = nsstring(arguments[2]);
+        auto kvName = nsstring(arguments[3]);
+        auto size = keysRef.length(runtime);
         
-        if (!kv) {
-            return Value::undefined();
+        NSMutableArray *keys = [NSMutableArray arrayWithCapacity:size];
+        NSMutableArray *values = [NSMutableArray arrayWithCapacity:size];
+        for (int i=0;i < size; i++) {
+            keys[i] = nsstring(keysRef.getValueAtIndex(runtime, i));
+            auto value = valuesRef.getValueAtIndex(runtime, i);
+            if (value.isString()) {
+                values[i] = nsstring(value);
+            } else {
+                values[i] = @"kv.null";
+            }
         }
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        
+        auto promiseCtr = runtime.global().getPropertyAsFunction(runtime, "Promise");
+        auto promise = promiseCtr.callAsConstructor(runtime, HOSTFN("executor", 2) {
+            auto resolve = std::make_shared<jsi::Value>(runtime, args[0]);
+            auto reject = std::make_shared<jsi::Value>(runtime, args[1]);
+            
+            pool->queueWork([&runtime,kvName, keys, values, size,dataType, resolve]() {
+                MMKV *kv = getInstance(kvName);
+                if (!kv) {
+                    invoker->invokeAsync([&runtime, resolve] {
+                        resolve->asObject(runtime).asFunction(runtime).call(runtime, Value::undefined());
+                    });
+                }
+                
+                for (int i=0;i < size;i++) {
+                    NSString *key = keys[i];
+                    NSString *value = values[i];
+                    if (![value isEqualToString:@"kv.null"]) {
+                        [kv setString:value forKey:key];
+                        setIndex(kv, dataType, key);
+                    }
+                }
+                
+                invoker->invokeAsync([&runtime,resolve] {
+                    resolve->asObject(runtime).asFunction(runtime).call(runtime, Value(true));
+                });
+            });
+            
+            return {};
+        }));
+        return promise;
+    
+    });
+    
+    CreateFunction(jsiRuntime, "getMultiMMKV", 2, [=](Runtime &runtime, const Value &thisValue, const Value *arguments, size_t count) -> Value {
+        auto keysRef =  arguments[0].getObject(runtime).asArray(runtime);
+        auto kvName = nsstring(arguments[1]);
+        auto size = keysRef.length(runtime);
+        
+        NSMutableArray *keys = [NSMutableArray arrayWithCapacity:size];
+        for (int i=0;i < size; i++) {
+            keys[i] = nsstring(keysRef.getValueAtIndex(runtime, i));
+        }
+        
+        auto promiseCtr = runtime.global().getPropertyAsFunction(runtime, "Promise");
+        auto promise = promiseCtr.callAsConstructor(runtime, HOSTFN("executor", 2) {
+            auto resolve = std::make_shared<jsi::Value>(runtime, args[0]);
+            auto reject = std::make_shared<jsi::Value>(runtime, args[1]);
+            
+            pool->queueWork([&runtime, kvName, keys, size, resolve]() {
+                MMKV *kv = getInstance(kvName);
+                if (!kv) {
+                    invoker->invokeAsync([&runtime, resolve] {
+                        resolve->asObject(runtime).asFunction(runtime).call(runtime, Value::undefined());
+                    });
+                }
+                NSMutableArray *values = [NSMutableArray arrayWithCapacity:size];
+                
+                for (int i=0;i < size;i++) {
+                    NSString *key = keys[i];
+                    if ([kv containsKey:key]) {
+                        values[i] = [kv getStringForKey:key];
+                    }
+                }
+                
+                invoker->invokeAsync([&runtime, values, resolve] {
+                    resolve->asObject(runtime).asFunction(runtime).call(runtime, convertNSArrayToJSIArray(runtime, values));
+                });
+            });
+            
+            return {};
+        }));
+        
+        return promise;
+    
+    });
+    
+    CREATE_FUNCTION("getStringMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
+        
+        if (!kv) return Value::undefined();
+        
+        NSString *key = nsstring(arguments[0]);
         
         if ([kv containsKey:key]) {
-            return Value(
-                         convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
+            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
         } else {
             return Value::null();
         }
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getStringMMKV",
-                                    move(getStringMMKV));
     
-    auto setMapMMKV = Function::createFromHostFunction(
-                                                       jsiRuntime, PropNameID::forAscii(jsiRuntime, "setMapMMKV"), 3,
-                                                       [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                          size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[2].getString(runtime)));
+    CREATE_FUNCTION("setMapMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         setIndex(kv, @"mapIndex", key);
         
-        [kv setString:convertJSIStringToNSString(
-                                                 runtime, arguments[1].getString(runtime))
-               forKey:key];
+        [kv setString:nsstring(arguments[1]) forKey:key];
         
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setMapMMKV", move(setMapMMKV));
     
-    auto getMapMMKV = Function::createFromHostFunction(
-                                                       jsiRuntime, PropNameID::forAscii(jsiRuntime, "getMapMMKV"), 2,
-                                                       [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                          size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    CREATE_FUNCTION("getMapMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         if ([kv containsKey:key]) {
-            return Value(
-                         convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
+            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
         } else {
             return Value::null();
         }
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getMapMMKV", move(getMapMMKV));
-    
-    auto setArrayMMKV = Function::createFromHostFunction(
-                                                         jsiRuntime, PropNameID::forAscii(jsiRuntime, "setArrayMMKV"), 3,
-                                                         [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                            size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[2].getString(runtime)));
+    CREATE_FUNCTION("setArrayMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         setIndex(kv, @"arrayIndex", key);
         
-        [kv setString:convertJSIStringToNSString(
-                                                 runtime, arguments[1].getString(runtime))
-               forKey:key];
+        [kv setString:nsstring(arguments[1]) forKey:key];
         
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setArrayMMKV",
-                                    move(setArrayMMKV));
     
-    auto getArrayMMKV = Function::createFromHostFunction(
-                                                         jsiRuntime, PropNameID::forAscii(jsiRuntime, "getArrayMMKV"), 2,
-                                                         [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                            size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    
+    CREATE_FUNCTION("getArrayMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         if ([kv containsKey:key]) {
-            return Value(
-                         convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
+            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
         } else {
             return Value::null();
         }
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getArrayMMKV",
-                                    move(getArrayMMKV));
     
-    auto setNumberMMKV = Function::createFromHostFunction(
-                                                          jsiRuntime, PropNameID::forAscii(jsiRuntime, "setNumberMMKV"), 3,
-                                                          [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                             size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[2].getString(runtime)));
+    CREATE_FUNCTION("setNumberMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         setIndex(kv, @"numberIndex", key);
         
@@ -403,22 +510,13 @@ static void install(jsi::Runtime &jsiRuntime) {
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setNumberMMKV",
-                                    move(setNumberMMKV));
     
-    auto getNumberMMKV = Function::createFromHostFunction(
-                                                          jsiRuntime, PropNameID::forAscii(jsiRuntime, "getNumberMMKV"), 2,
-                                                          [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                             size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    CREATE_FUNCTION("getNumberMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         if ([kv containsKey:key]) {
             return Value([kv getDoubleForKey:key]);
@@ -427,22 +525,12 @@ static void install(jsi::Runtime &jsiRuntime) {
         }
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getNumberMMKV",
-                                    move(getNumberMMKV));
-    
-    auto setBoolMMKV = Function::createFromHostFunction(
-                                                        jsiRuntime, PropNameID::forAscii(jsiRuntime, "setBoolMMKV"), 3,
-                                                        [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                           size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[2].getString(runtime)));
+    CREATE_FUNCTION("setBoolMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         setIndex(kv, @"boolIndex", key);
         
@@ -451,21 +539,13 @@ static void install(jsi::Runtime &jsiRuntime) {
         return Value(true);
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setBoolMMKV", move(setBoolMMKV));
     
-    auto getBoolMMKV = Function::createFromHostFunction(
-                                                        jsiRuntime, PropNameID::forAscii(jsiRuntime, "getBoolMMKV"), 2,
-                                                        [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                           size_t count) -> Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    CREATE_FUNCTION("getBoolMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         if ([kv containsKey:key]) {
             return Value([kv getBoolForKey:key]);
@@ -474,239 +554,151 @@ static void install(jsi::Runtime &jsiRuntime) {
         }
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getBoolMMKV", move(getBoolMMKV));
     
-    auto removeValueMMKV = jsi::Function::createFromHostFunction(
-                                                                 jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "removeValueMMKV"),
-                                                                 2, // key
-                                                                 [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                    const jsi::Value *arguments, size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
+    CREATE_FUNCTION("removeValueMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+        NSString *key = nsstring(arguments[0]);
         
         removeKeyFromIndexer(kv, key);
         [kv removeValueForKey:key];
         
         return Value(true);
     });
-    jsiRuntime.global().setProperty(jsiRuntime, "removeValueMMKV",
-                                    std::move(removeValueMMKV));
     
-    auto getAllKeysMMKV = jsi::Function::createFromHostFunction(
-                                                                jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "getAllKeysMMKV"), 1,
-                                                                [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                   const jsi::Value *arguments, size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[0].getString(runtime)));
+    CREATE_FUNCTION("getAllKeysMMKV", 1, {
+        MMKV *kv = getInstance(nsstring(arguments[0]));
         
-        if (!kv) {
-            return Value::undefined();
-        }
+        if (!kv) return Value::undefined();
         
         NSArray *keys = [kv allKeys];
         
         return Value(convertNSArrayToJSIArray(runtime, keys));
     });
-    jsiRuntime.global().setProperty(jsiRuntime, "getAllKeysMMKV",
-                                    std::move(getAllKeysMMKV));
     
-    auto getIndexMMKV = jsi::Function::createFromHostFunction(
-                                                              jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "getIndexMMKV"), 2,
-                                                              [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                 const jsi::Value *arguments, size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
+    CREATE_FUNCTION("getIndexMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
         
-        NSMutableArray *keys =
-        getIndex(kv, convertJSIStringToNSString(
-                                                runtime, arguments[0].getString(runtime)));
-        return Value(convertNSArrayToJSIArray(runtime, keys));
+        if (!kv) return Value::undefined();
+        
+        NSMutableDictionary *keys =
+        getIndex(kv, nsstring(arguments[0]));
+        
+        return Value(convertNSArrayToJSIArray(runtime, [keys allKeys]));
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getIndexMMKV",
-                                    std::move(getIndexMMKV));
-    
-    auto containsKeyMMKV = jsi::Function::createFromHostFunction(
-                                                                 jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "containsKeyMMKV"), 2,
-                                                                 [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                    const jsi::Value *arguments,
-                                                                    
-                                                                    size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
-        return Value(
-                     [kv containsKey:convertJSIStringToNSString(
-                                                                runtime, arguments[0].getString(runtime))]);
+    CREATE_FUNCTION("containsKeyMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
+        
+        if (!kv) return Value::undefined();
+        
+        return Value([kv containsKey:nsstring(arguments[0])]);
     });
-    jsiRuntime.global().setProperty(jsiRuntime, "containsKeyMMKV",
-                                    std::move(containsKeyMMKV));
     
-    auto clearMMKV = jsi::Function::createFromHostFunction(
-                                                           jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "clearMMKV"), 1,
-                                                           [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                              const jsi::Value *arguments,
-                                                              
-                                                              size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[0].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
+    CREATE_FUNCTION("clearMMKV", 1, {
+        MMKV *kv = getInstance(nsstring(arguments[0]));
+        
+        if (!kv) return Value::undefined();
         
         [kv clearAll];
         
         return Value(true);
+        
     });
-    jsiRuntime.global().setProperty(jsiRuntime, "clearMMKV",
-                                    std::move(clearMMKV));
-
-        auto clearMemoryCache = jsi::Function::createFromHostFunction(
-                                                           jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "clearMemoryCache"), 1,
-                                                           [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                              const jsi::Value *arguments,
-                                                              
-                                                              size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[0].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
+    
+    
+    CREATE_FUNCTION("clearMemoryCache", 1, {
+        MMKV *kv = getInstance(nsstring(arguments[0]));
+        
+        if (!kv) return Value::undefined();
         
         [kv clearMemoryCache];
         
         return Value(true);
-    });
-    jsiRuntime.global().setProperty(jsiRuntime, "clearMemoryCache",
-                                    std::move(clearMemoryCache));                                  
-    
-    auto encryptMMKV = jsi::Function::createFromHostFunction(
-                                                             jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "encryptMMKV"), 2,
-                                                             [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                const jsi::Value *arguments,
-                                                                
-                                                                size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
         
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[0].getString(runtime));
+    });
+    
+    CREATE_FUNCTION("encryptMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
+        
+        if (!kv) return Value::undefined();
+        
+        NSString *key = nsstring(arguments[0]);
         
         NSData *cryptKey = [key dataUsingEncoding:NSUTF8StringEncoding];
         [kv reKey:cryptKey];
         
         return Value(true);
+        
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "encryptMMKV",
-                                    std::move(encryptMMKV));
-    
-    auto decryptMMKV = jsi::Function::createFromHostFunction(
-                                                             jsiRuntime, jsi::PropNameID::forAscii(jsiRuntime, "decryptMMKV"), 2,
-                                                             [](jsi::Runtime &runtime, const jsi::Value &thisValue,
-                                                                const jsi::Value *arguments,
-                                                                
-                                                                size_t count) -> jsi::Value {
-        MMKV *kv = getInstance(convertJSIStringToNSString(
-                                                          runtime, arguments[1].getString(runtime)));
-        if (!kv) {
-            return Value::undefined();
-        }
+    CREATE_FUNCTION("decryptMMKV", 1, {
+        MMKV *kv = getInstance(nsstring(arguments[0]));
+        
+        if (!kv) return Value::undefined();
         
         [kv reKey:NULL];
         
         return Value(true);
+        
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "decryptMMKV",
-                                    std::move(decryptMMKV));
     
     // Secure Store
     
-    auto setSecureKey = Function::createFromHostFunction(
-                                                         jsiRuntime, PropNameID::forAscii(jsiRuntime, "setSecureKey"), 3,
-                                                         [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                            size_t count) -> Value {
-        NSString *alias = convertJSIStringToNSString(
-                                                     runtime, arguments[0].getString(runtime));
-        NSString *key = convertJSIStringToNSString(
-                                                   runtime, arguments[1].getString(runtime));
-        NSString *accValue = convertJSIStringToNSString(
-                                                        runtime, arguments[2].getString(runtime));
-                                                                [_secureStorage setServiceName: getServiceName(alias)];
-        [_secureStorage setSecureKey:alias
-                               value:key
-                             options:@{@"accessible" : accValue}];
+    
+    CREATE_FUNCTION("setSecureKey", 3, {
+        NSString *alias = nsstring(arguments[0]);
+        NSString *key = nsstring(arguments[1]);
+        NSString *accValue = nsstring(arguments[2]);
+        
+        [_secureStorage setServiceName: getServiceName(alias)];
+        [_secureStorage setSecureKey:alias value:key options:@{@"accessible" : accValue}];
         
         return Value(true);
+        
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "setSecureKey",
-                                    move(setSecureKey));
-    
-    auto getSecureKey = Function::createFromHostFunction(
-                                                         jsiRuntime, PropNameID::forAscii(jsiRuntime, "getSecureKey"), 3,
-                                                         [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                            size_t count) -> Value {
-        NSString *alias = convertJSIStringToNSString(
-                                                     runtime, arguments[0].getString(runtime));
+    CREATE_FUNCTION("getSecureKey", 1, {
+        NSString *alias = nsstring(arguments[0]);
         
-                                                                [_secureStorage setServiceName: getServiceName(alias)];
-        return Value(convertNSStringToJSIString(
-                                                runtime, [_secureStorage getSecureKey:alias]));
+        [_secureStorage setServiceName: getServiceName(alias)];
+        return Value(convertNSStringToJSIString(runtime, [_secureStorage getSecureKey:alias]));
+        
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "getSecureKey",
-                                    move(getSecureKey));
     
-    auto secureKeyExists = Function::createFromHostFunction(
-                                                            jsiRuntime, PropNameID::forAscii(jsiRuntime, "secureKeyExists"), 3,
-                                                            [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                               size_t count) -> Value {
-        NSString *alias = convertJSIStringToNSString(
-                                                     runtime, arguments[0].getString(runtime));
+    CREATE_FUNCTION("secureKeyExists", 1, {
+        NSString *alias = nsstring(arguments[0]);
         
-                                                                   [_secureStorage setServiceName: getServiceName(alias)];
+        [_secureStorage setServiceName: getServiceName(alias)];
         return Value([_secureStorage secureKeyExists:alias]);
+        
     });
     
-    jsiRuntime.global().setProperty(jsiRuntime, "secureKeyExists",
-                                    move(secureKeyExists));
-    
-    auto removeSecureKey = Function::createFromHostFunction(
-                                                            jsiRuntime, PropNameID::forAscii(jsiRuntime, "removeSecureKey"), 3,
-                                                            [](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                                                               size_t count) -> Value {
-        NSString *alias = convertJSIStringToNSString(
-                                                     runtime, arguments[0].getString(runtime));
-                                                                   [_secureStorage setServiceName: getServiceName(alias)];
+    CREATE_FUNCTION("removeSecureKey", 1, {
+        NSString *alias = nsstring(arguments[0]);
+        
+        [_secureStorage setServiceName: getServiceName(alias)];
         [_secureStorage removeSecureKey:alias];
         return Value(true);
+        
     });
-    
-    jsiRuntime.global().setProperty(jsiRuntime, "removeSecureKey",
-                                    move(removeSecureKey));
     
     // Secure Store End
 }
 
 - (void)migrate {
-    MMKV *kv = [MMKV mmkvWithID:@"mmkvIdStore"];
+    MMKV *kv;
+    
+    if (appGroupId != nil) {
+        kv = [MMKV mmkvWithID:@"mmkvIdStore" mode:MMKVMultiProcess];
+    } else {
+        kv = [MMKV mmkvWithID:@"mmkvIdStore" mode:MMKVSingleProcess];
+    }
+    
     [mmkvInstances setObject:kv forKey:@"mmkvIdStore"];
     if ([kv containsKey:@"mmkvIdData"]) {
         NSMutableDictionary *oldStore =
@@ -735,6 +727,7 @@ static void install(jsi::Runtime &jsiRuntime) {
                         MMKV *kvv = [MMKV mmkvWithID:storageKey
                                             cryptKey:cryptKey
                                                 mode:MMKVSingleProcess];
+                        
                         [self writeToJson:kvv];
                     }
                 };
@@ -749,9 +742,10 @@ static void install(jsi::Runtime &jsiRuntime) {
 }
 
 - (void)writeToJson:(MMKV *)kv {
-    NSArray *mapIndex = getIndex(kv, @"mapIndex");
+    upgradeIndex(kv, @"mapIndex");
+    NSDictionary *mapIndex = getIndex(kv, @"mapIndex");
     if (mapIndex != nil) {
-        for (NSString *key in mapIndex) {
+        for (NSString *key in [mapIndex allKeys]) {
             NSDictionary *data = [kv getObjectOfClass:NSDictionary.class forKey:key];
             if (data != nil) {
                 NSError *error;
@@ -765,10 +759,10 @@ static void install(jsi::Runtime &jsiRuntime) {
             }
         }
     }
-    
-    NSArray *arrayIndex = getIndex(kv, @"arrayIndex");
+    upgradeIndex(kv, @"arrayIndex");
+    NSDictionary *arrayIndex = getIndex(kv, @"arrayIndex");
     if (arrayIndex != nil) {
-        for (NSString *key in arrayIndex) {
+        for (NSString *key in [arrayIndex allKeys]) {
             NSDictionary *data =
             [kv getObjectOfClass:NSDictionary.class forKey:key];
             
@@ -788,14 +782,14 @@ static void install(jsi::Runtime &jsiRuntime) {
         }
     }
     
-    NSArray *intIndex =
-    [kv getObjectOfClass:NSMutableArray.class forKey:@"intIndex"];
+    NSMutableArray *intIndex = [kv getObjectOfClass:NSMutableArray.class forKey:@"intIndex"];
     if (intIndex != nil) {
         for (NSString *key in intIndex) {
             int64_t intVal = [kv getInt64ForKey:key];
             [kv setDouble:double(intVal) forKey:key];
         }
         [kv setObject:intIndex forKey:@"numberIndex"];
+        upgradeIndex(kv, @"numberIndex");
         [kv removeValueForKey:@"intIndex"];
     }
 }

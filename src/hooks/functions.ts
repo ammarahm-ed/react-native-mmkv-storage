@@ -16,7 +16,7 @@ export const getInitialValue =
       for (let i = 0; i < types.length; i++) {
         let type: string = types[i];
         //@ts-ignore
-        if (indexer[methods[type].indexer].hasKey(key)) {
+        if (indexer.hasKey(key)) {
           if (initialValueType === 'value') {
             //@ts-ignore
             return storage[methods[type]['get']](key);

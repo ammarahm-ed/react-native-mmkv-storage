@@ -1,15 +1,16 @@
 import encryption from './encryption';
 import EventManager from './eventmanager';
-import { handleAction } from './handlers';
+import { handleAction, handlePromise } from './handlers';
 import indexer from './indexer/indexer';
 import { getCurrentMMKVInstanceIDs } from './initializer';
 import { default as IDStore } from './mmkv/IDStore';
 import mmkvJsiModule from './module';
 import transactions from './transactions';
-import { DataType, GenericReturnType, StorageOptions } from './types';
+import { DataType, StorageOptions } from './types';
 import { options } from './utils';
 
 function assert(type: DataType, value: any) {
+  if (typeof value === 'undefined' || value === null) return;
   if (type === 'array') {
     if (!Array.isArray(value)) throw new Error(`Trying to set ${typeof value} as a ${type}.`);
   } else {
@@ -33,12 +34,16 @@ export default class MMKVInstance {
     this.options = options[id];
   }
 
+  isRegisterd(key: string) {
+    return this.ev._registry[`${key}:onwrite`];
+  }
+
   /**
    * Set a string value to storage for the given key.
    * This method is added for redux-persist/zustand support.
    *
    */
-  setItem(key: string, value: string, callback?: (err?: Error | null) => void) {
+  async setItem(key: string, value: string, callback?: (err?: Error | null) => void) {
     return new Promise(resolve => {
       const result = this.setString(key, value);
       callback && callback(null);
@@ -49,7 +54,7 @@ export default class MMKVInstance {
    * Get the string value for the given key.
    * This method is added for redux-persist/zustand support.
    */
-  getItem(key: string, callback?: (error?: Error | null, result?: string | null) => void) {
+  async getItem(key: string, callback?: (error?: Error | null, result?: string | null) => void) {
     return new Promise(resolve => {
       resolve(this.getString(key, callback));
     });
@@ -125,16 +130,124 @@ export default class MMKVInstance {
   }
 
   /**
-   * Retrieve multiple items for the given array of keys.
+   * Set items in bulk of same type at once
+   * using async threads without blocking JS.
+   *
+   * If a value against a key is null/undefined, it will be
+   * set as null.
+   *
+   * @param keys Array of keys
+   * @param values Array of values
+   * @param type
    */
-  async getMultipleItemsAsync<T>(
-    keys: string[],
-    type: DataType | 'map'
-  ): Promise<GenericReturnType<T>[]> {
-    return new Promise(resolve => {
-      resolve(this.getMultipleItems<T>(keys, type));
+  async setMultipleItemsAsync(items: [string, any][], type: DataType | 'map') {
+    if (type === 'object') type = 'map';
+
+    if (type === 'string' || type === 'array' || type === 'map') {
+      await handlePromise(
+        mmkvJsiModule.setMultiMMKV,
+        items.map(item => item[0]),
+        items.map(item => {
+          let value = item[1];
+
+          if (this.transactions.beforewrite[type]) {
+            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
+          }
+
+          if (type === 'string') return value;
+          return value ? JSON.stringify(value) : value;
+        }),
+        `${type}Index`,
+        this.instanceID
+      );
+    } else {
+      if (type === 'boolean') {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          let value = item[1];
+
+          if (this.transactions.beforewrite[type]) {
+            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
+          }
+          this.setBool(item[0], value);
+        }
+      } else if (type === 'number') {
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          let value = item[1];
+
+          if (this.transactions.beforewrite[type]) {
+            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
+          }
+
+          this.setInt(item[0], value);
+        }
+      }
+    }
+    queueMicrotask(() => {
+      items?.forEach(item => {
+        if (this.isRegisterd(item[0])) {
+          this.ev.publish(`${item[0]}:onwrite`, { key: item[0] });
+        }
+
+        if (this.transactions.onwrite[type]) {
+          this.transactions.transact(type as DataType, 'onwrite', item[0], item[1]);
+        }
+      });
     });
+    return true;
   }
+
+  /**
+   * Retrieve multiple items for the given array of keys
+   * without blocking the JS thread.
+   */
+  async getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map'): Promise<[string, T][]> {
+    let items: [string, T][] = [];
+
+    if (type === 'map') type = 'object';
+    if (type === 'array' || type === 'string' || type === 'object') {
+      const result = await handlePromise(mmkvJsiModule.getMultiMMKV, keys, this.instanceID);
+      if (type === 'string') return keys.map((key, index) => [key, result[index] as T]);
+
+      return keys.map((key, index) => {
+        let value = result[index] ? JSON.parse(result[index]) : result[index];
+
+        if (this.transactions.onread[type]) {
+          value = this.transactions.transact(type as DataType, 'onread', key, value);
+        }
+
+        return [key, value];
+      });
+    }
+
+    if (type === 'boolean') {
+      for (let i = 0; i < keys.length; i++) {
+        let value = this.getBool(keys[i]);
+
+        if (this.transactions.onread[type]) {
+          value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
+        }
+
+        const item: [string, T] = [keys[i], value as T];
+        items.push(item);
+      }
+      return items;
+    } else if (type === 'number') {
+      for (let i = 0; i < keys.length; i++) {
+        let value = this.getInt(keys[i]);
+
+        if (this.transactions.onread[type]) {
+          value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
+        }
+
+        const item: [string, T] = [keys[i], value as T];
+        items.push(item);
+      }
+      return items;
+    }
+  }
+
   /**
    * Set an array to storage for the given key.
    */
@@ -156,13 +269,21 @@ export default class MMKVInstance {
    */
   setString = (key: string, value: string) => {
     assert('string', value);
-    let _value = this.transactions.transact('string', 'beforewrite', key, value);
-    assert('string', _value);
 
-    let result = handleAction(mmkvJsiModule.setStringMMKV, key, _value, this.instanceID);
+    if (this.transactions.beforewrite['string']) {
+      value = this.transactions.transact('string', 'beforewrite', key, value);
+      assert('string', value);
+    }
+
+    let result = handleAction(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      this.transactions.transact('string', 'onwrite', key, _value);
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      }
+
+      if (this.transactions.onwrite['string']) {
+        this.transactions.transact('string', 'onwrite', key, value);
+      }
     }
 
     return result;
@@ -173,7 +294,11 @@ export default class MMKVInstance {
    */
   getString = (key: string, callback?: (error: any, value: string | undefined | null) => void) => {
     let string = handleAction(mmkvJsiModule.getStringMMKV, key, this.instanceID);
-    string = this.transactions.transact('string', 'onread', key, string);
+
+    if (this.transactions.onread['string']) {
+      string = this.transactions.transact('string', 'onread', key, string);
+    }
+
     callback && callback(null, string);
     return string;
   };
@@ -182,12 +307,18 @@ export default class MMKVInstance {
    */
   setInt = (key: string, value: number) => {
     assert('number', value);
-    let _value = this.transactions.transact('number', 'beforewrite', key, value);
-    assert('number', _value);
-    let result = handleAction(mmkvJsiModule.setNumberMMKV, key, _value, this.instanceID);
+
+    if (this.transactions.beforewrite['number']) {
+      value = this.transactions.transact('number', 'beforewrite', key, value);
+      assert('number', value);
+    }
+
+    let result = handleAction(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      this.transactions.transact('number', 'onwrite', key, _value);
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      }
+      this.transactions.transact('number', 'onwrite', key, value);
     }
 
     return result;
@@ -197,7 +328,11 @@ export default class MMKVInstance {
    */
   getInt = (key: string, callback?: (error: any, value: number | undefined | null) => void) => {
     let int = handleAction(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
-    int = this.transactions.transact('number', 'onread', key, int);
+
+    if (this.transactions.onread['number']) {
+      int = this.transactions.transact('number', 'onread', key, int);
+    }
+
     callback && callback(null, int);
 
     return int;
@@ -207,12 +342,19 @@ export default class MMKVInstance {
    */
   setBool = (key: string, value: boolean) => {
     assert('boolean', value);
-    let _value = this.transactions.transact('boolean', 'beforewrite', key, value);
-    assert('boolean', _value);
-    let result = handleAction(mmkvJsiModule.setBoolMMKV, key, _value, this.instanceID);
+
+    if (this.transactions.beforewrite['boolean']) {
+      value = this.transactions.transact('boolean', 'beforewrite', key, value);
+      assert('boolean', value);
+    }
+
+    let result = handleAction(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: value });
-      this.transactions.transact('boolean', 'onwrite', key, _value);
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      }
+
+      this.transactions.transact('boolean', 'onwrite', key, value);
     }
 
     return result;
@@ -222,7 +364,11 @@ export default class MMKVInstance {
    */
   getBool = (key: string, callback?: (error: any, value: boolean | undefined | null) => void) => {
     let bool = handleAction(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
-    bool = this.transactions.transact('boolean', 'onread', key, bool);
+
+    if (this.transactions.onread['boolean']) {
+      bool = this.transactions.transact('boolean', 'onread', key, bool);
+    }
+
     callback && callback(null, bool);
     return bool;
   };
@@ -233,17 +379,26 @@ export default class MMKVInstance {
    */
   setMap = (key: string, value: object) => {
     assert('object', value);
-    let _value = this.transactions.transact('object', 'beforewrite', key, value);
-    assert('object', _value);
+
+    if (this.transactions.beforewrite['object']) {
+      value = this.transactions.transact('object', 'beforewrite', key, value);
+
+      assert('object', value);
+    }
+
     let result = handleAction(
       mmkvJsiModule.setMapMMKV,
       key,
-      JSON.stringify(_value),
+      JSON.stringify(value),
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      this.transactions.transact('object', 'onwrite', key, _value);
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      }
+      if (this.transactions.onwrite['object']) {
+        this.transactions.transact('object', 'onwrite', key, value);
+      }
     }
 
     return result;
@@ -256,12 +411,18 @@ export default class MMKVInstance {
     try {
       if (json) {
         let map: T = JSON.parse(json);
-        map = this.transactions.transact('object', 'onread', key, map) as T;
+
+        if (this.transactions.onread['object']) {
+          map = this.transactions.transact('object', 'onread', key, map) as T;
+        }
+
         callback && callback(null, map);
         return map;
       }
     } catch (e) {}
+
     this.transactions.transact('object', 'onread', key);
+
     callback && callback(null, null);
     return null;
   };
@@ -271,8 +432,11 @@ export default class MMKVInstance {
    */
   setArray = (key: string, value: any[]) => {
     assert('array', value);
-    let _value = this.transactions.transact('array', 'beforewrite', key, value);
-    assert('array', _value);
+
+    if (this.transactions.beforewrite['array']) {
+      value = this.transactions.transact('array', 'beforewrite', key, value);
+      assert('array', value);
+    }
 
     let result = handleAction(
       mmkvJsiModule.setArrayMMKV,
@@ -281,8 +445,12 @@ export default class MMKVInstance {
       this.instanceID
     );
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: _value });
-      this.transactions.transact('array', 'onwrite', key, _value);
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      }
+      if (this.transactions.onwrite['array']) {
+        this.transactions.transact('array', 'onwrite', key, value);
+      }
     }
 
     return result;
@@ -296,7 +464,11 @@ export default class MMKVInstance {
     try {
       if (json) {
         let array: T[] = JSON.parse(json);
-        array = this.transactions.transact('array', 'onread', key, array) as T[];
+
+        if (this.transactions.onread['array']) {
+          array = this.transactions.transact('array', 'onread', key, array) as T[];
+        }
+
         callback && callback(null, array);
         return array;
       }
@@ -312,66 +484,65 @@ export default class MMKVInstance {
    *
    */
   getMultipleItems = <T>(keys: string[], type: DataType | 'map') => {
-    if (!type) type = 'object';
-    const func = (): GenericReturnType<T>[] => {
-      //@ts-ignore
-      let items: GenericReturnType<T>[] = [];
+    let items: [string, T][] = [];
+    if (type === 'map') type = 'object';
+
+    if (type === 'string') {
       for (let i = 0; i < keys.length; i++) {
-        let item = [];
-        item[0] = keys[i];
-        switch (type) {
-          case 'string':
-            item[1] = mmkvJsiModule.getStringMMKV(keys[i], this.instanceID);
-            break;
-          case 'boolean':
-            item[1] = mmkvJsiModule.getBoolMMKV(keys[i], this.instanceID);
-            break;
-          case 'number':
-            item[1] = mmkvJsiModule.getNumberMMKV(keys[i], this.instanceID);
-            break;
-          case 'object':
-          case 'map':
-            let map = mmkvJsiModule.getMapMMKV(keys[i], this.instanceID);
-            if (map) {
-              try {
-                item[1] = JSON.parse(map);
-              } catch (e) {
-                if (__DEV__) {
-                  console.warn(keys[i] + 'has a value that is not an object, returning null');
-                }
-                item[1] = null;
-              }
-            } else {
-              item[1] = null;
-            }
-            break;
-          case 'array':
-            let array = mmkvJsiModule.getArrayMMKV(keys[i], this.instanceID);
-            if (array) {
-              try {
-                item[1] = JSON.parse(array);
-              } catch (e) {
-                if (__DEV__) {
-                  console.warn(keys[i] + 'has a value that is not an array, returning null');
-                }
-                item[1] = null;
-              }
-            } else {
-              item[1] = null;
-            }
-            break;
-          default:
-            item[1] = null;
-            break;
+        const item: [string, T] = [keys[i], this.getString(keys[i]) as T];
+
+        if (this.transactions.onread[type]) {
+          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
         }
-        //@ts-ignore
+
         items.push(item);
       }
       return items;
-    };
+    } else if (type === 'array') {
+      for (let i = 0; i < keys.length; i++) {
+        const item: [string, T] = [keys[i], this.getArray(keys[i]) as T];
 
-    handleAction(() => null, keys, this.instanceID);
-    return func();
+        if (this.transactions.onread[type]) {
+          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+        }
+
+        items.push(item);
+      }
+      return items;
+    } else if (type === 'object') {
+      for (let i = 0; i < keys.length; i++) {
+        const item: [string, T] = [keys[i], this.getMap(keys[i]) as T];
+
+        if (this.transactions.onread[type]) {
+          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+        }
+
+        items.push(item);
+      }
+      return items;
+    } else if (type === 'boolean') {
+      for (let i = 0; i < keys.length; i++) {
+        const item: [string, T] = [keys[i], this.getBool(keys[i]) as T];
+
+        if (this.transactions.onread[type]) {
+          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+        }
+
+        items.push(item);
+      }
+      return items;
+    } else if (type === 'number') {
+      for (let i = 0; i < keys.length; i++) {
+        const item: [string, T] = [keys[i], this.getInt(keys[i]) as T];
+
+        if (this.transactions.onread[type]) {
+          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+        }
+
+        items.push(item);
+      }
+      return items;
+    }
   };
 
   /**
@@ -399,9 +570,14 @@ export default class MMKVInstance {
   removeItem(key: string) {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
-      this.ev.publish(`${key}:onwrite`, { key, value: null });
+      if (this.isRegisterd(key)) {
+        this.ev.publish(`${key}:onwrite`, { key, value: null });
+      }
     }
-    this.transactions.transact('string', 'ondelete', key);
+
+    if (this.transactions.ondelete) {
+      this.transactions.transact('string', 'ondelete', key);
+    }
 
     return result;
   }
@@ -413,7 +589,18 @@ export default class MMKVInstance {
     let keys = handleAction(mmkvJsiModule.getAllKeysMMKV, this.instanceID);
     let cleared = handleAction(mmkvJsiModule.clearMMKV, this.instanceID);
     mmkvJsiModule.setBoolMMKV(this.instanceID, true, this.instanceID);
-    keys?.forEach((key: string) => this.ev.publish(`${key}:onwrite`, { key }));
+
+    queueMicrotask(() => {
+      keys?.forEach((key: string) => {
+        if (this.isRegisterd(key)) {
+          this.ev.publish(`${key}:onwrite`, { key });
+        }
+
+        if (this.transactions.ondelete) {
+          this.transactions.transact('string', 'ondelete', key);
+        }
+      });
+    });
 
     return cleared;
   }

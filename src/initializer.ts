@@ -116,7 +116,7 @@ function initWithoutEncryption(options: StorageOptions) {
 }
 
 function setup(id: string, mode: number) {
-  mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+  mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
   if (!IDStore.exists(id)) {
     mmkvJsiModule.setBoolMMKV(id, true, id);
     IDStore.add(id, false, null);
@@ -131,7 +131,7 @@ function setup(id: string, mode: number) {
 }
 
 function setupWithEncryption(id: string, mode: number, key: string, alias: string) {
-  mmkvJsiModule.setupMMKVInstance(id, mode, key, '');
+  mmkvJsiModule.setupMMKVInstance(id, mode, key, '', options[id].enableIndexing);
   if (!IDStore.exists(id)) {
     mmkvJsiModule.setBoolMMKV(id, true, id);
     IDStore.add(id, true, alias);
@@ -152,14 +152,14 @@ function setupWithEncryption(id: string, mode: number, key: string, alias: strin
  */
 function encryptionHandler(id: string, mode: number) {
   let alias = IDStore.getAlias(id);
-  if (!alias) return mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+  if (!alias) return mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
   let exists = mmkvJsiModule.secureKeyExists(alias);
   let key = exists && mmkvJsiModule.getSecureKey(alias);
 
   if (IDStore.encrypted(id) && key) {
     options[id].key = key;
-    return mmkvJsiModule.setupMMKVInstance(id, mode, key, '');
+    return mmkvJsiModule.setupMMKVInstance(id, mode, key, '', options[id].enableIndexing);
   } else {
-    return mmkvJsiModule.setupMMKVInstance(id, mode, '', '');
+    return mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
   }
 }

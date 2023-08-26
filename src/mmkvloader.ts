@@ -20,7 +20,8 @@ export default class MMKVLoader {
       key: null,
       serviceName: null,
       initialized: false,
-      persistDefaults: false
+      persistDefaults: false,
+      enableIndexing: true
     };
   }
 
@@ -124,6 +125,13 @@ export default class MMKVLoader {
     //@ts-ignore
     handleAction(null, this.options.instanceID);
     return instance;
+  }
+
+  /**
+   * Disable indexing values by data type.
+   */
+  disableIndexing() {
+    this.options.enableIndexing = false;
   }
 
   generateKey() {

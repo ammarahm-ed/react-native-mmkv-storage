@@ -181,6 +181,10 @@ That is awesome news! There is a lot happening at a very fast pace in this libra
 - [Open an issue](https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/) if you want to make a pull request, and tell me what you want to improve or add so we can discuss
 - I am always open to new ideas
 
+## Special thanks to
+
+- [ospfranco](https://github.com/ospfranco) and his work on [react-native-quick-sqlite](https://github.com/ospfranco/react-native-quick-sqlite) library which inspired async read/write.
+
 ## License
 
 This library is licensed under the [MIT license](https://github.com/ammarahm-ed/react-native-mmkv-storage/blob/master/LICENSE).

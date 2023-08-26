@@ -45,6 +45,12 @@ export type StorageOptions = {
    * Persist default values in hooks
    */
   persistDefaults: boolean;
+  /**
+   * Toggle indexing of values by type.
+   *
+   * @default true
+   */
+  enableIndexing: boolean;
 };
 
 export type DataType = 'string' | 'number' | 'object' | 'array' | 'boolean';
@@ -54,13 +60,28 @@ export type GenericReturnType<T> = [key: string, value: T | null | undefined];
 export type IndexType = 'stringIndex' | 'boolIndex' | 'numberIndex' | 'mapIndex' | 'arrayIndex';
 
 export type MMKVJsiModule = {
-  setupMMKVInstance: (id: string, mode?: number, cryptKey?: string, path?: string) => boolean;
+  setupMMKVInstance: (
+    id: string,
+    mode?: number,
+    cryptKey?: string,
+    path?: string,
+    indexing?: boolean
+  ) => boolean;
 
   setMMKVServiceName: (alias: string, serviceName: string) => string;
   getSecureKey: (alias: string) => string | null;
   setSecureKey: (alias: string, key: string, accessibleMode: string) => boolean;
   secureKeyExists: (alias: string) => boolean;
   removeSecureKey: (alias: string) => boolean;
+
+  setMultiMMKV: (
+    key: string[],
+    value: string[],
+    type: string,
+    id: string
+  ) => Promise<boolean | undefined>;
+
+  getMultiMMKV: (keys: string[], id: string) => Promise<string[]>;
 
   setStringMMKV: (key: string, value: string, id: string) => boolean | undefined;
   getStringMMKV: (key: string, id: string) => string | null | undefined;

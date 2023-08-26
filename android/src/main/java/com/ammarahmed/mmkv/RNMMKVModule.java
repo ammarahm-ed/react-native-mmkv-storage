@@ -17,6 +17,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.turbomodule.core.CallInvokerHolderImpl;
 import com.google.gson.Gson;
 import com.ammarahmed.mmkv.MMKV;
 
@@ -38,7 +39,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         System.loadLibrary("rnmmkv");
     }
 
-    private native void nativeInstall(long jsi, String rootPath);
+    private native void nativeInstall(long jsi, CallInvokerHolderImpl jsCallInvokerHolder, String rootPath);
 
     private native void destroy();
 
@@ -57,11 +58,13 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
         String rootPath = reactContext.getFilesDir().getAbsolutePath() + "/mmkv";
         JavaScriptContextHolder jsContext = getReactApplicationContext().getJavaScriptContextHolder();
+        CallInvokerHolderImpl jsCallInvokerHolder = (CallInvokerHolderImpl)reactContext.getCatalystInstance().getJSCallInvokerHolder();
 
         if (jsContext.get() != 0) {
             migrate();
             this.nativeInstall(
                     jsContext.get(),
+                    jsCallInvokerHolder,
                     rootPath
             );
             return true;

@@ -56,3 +56,19 @@ export async function handleActionAsync<T extends (...args: any[]) => any | unde
     resolve(result);
   });
 }
+
+export async function handlePromise<T extends (...args: any[]) => any | undefined | null>(
+  action: T,
+  ...args: any[]
+): Promise<ReturnType<T> | undefined> {
+  // The last argument is always the instance id.
+  let id: string = args[args.length - 1];
+  if (!currentInstancesStatus[id]) {
+    currentInstancesStatus[id] = initialize(id);
+  }
+  if (!action) return undefined;
+  let result = await action(...args);
+  if (result === undefined) currentInstancesStatus[id] = initialize(id);
+  result = await action(...args);
+  return result;
+}
