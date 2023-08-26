@@ -6,39 +6,39 @@ on:
       - fix-ci
   pull_request:
     paths:
-      - ".github/workflows/ios.yml"
-      - "src/**"
-      - "ios/**"
-      - "MMKV/**"
+      - '.github/workflows/ios.yml'
+      - 'src/**'
+      - 'ios/**'
+      - 'MMKV/**'
 jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x
-    - run: |
-      npm ci --legacy-peer-deps
-      npm run build
-      rm -rf node_modules
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
 
-    - run: yarn
-      working-directory: example
+      - run: npm ci --legacy-peer-deps
+      - run: npm run build
+      - run: rm -rf node_modules
 
-    - run: xcode-select -p
+      - run: yarn
+        working-directory: example
 
-    - run: pod install
-      working-directory: example/ios
-      name: Install pod dependencies
-    - name: Build iOS (debug)
-      working-directory: example/ios
-      run: "xcodebuild \
-        -workspace example.xcworkspace \
-        -scheme example \
-        clean archive \
-        -sdk iphonesimulator \
-        -configuration Debug \
-        -UseModernBuildSystem=YES \
-        CODE_SIGNING_ALLOWED=NO"
+      - run: xcode-select -p
+
+      - run: pod install
+        working-directory: example/ios
+        name: Install pod dependencies
+      - name: Build iOS (debug)
+        working-directory: example/ios
+        run: "xcodebuild \
+          -workspace example.xcworkspace \
+          -scheme example \
+          clean archive \
+          -sdk iphonesimulator \
+          -configuration Debug \
+          -UseModernBuildSystem=YES \
+          CODE_SIGNING_ALLOWED=NO"
