@@ -46,6 +46,9 @@ NSMutableDictionary *mmkvInstances;
 NSMutableDictionary *serviceNames;
 SecureStorage *_secureStorage;
 NSString *appGroupId;
+NSMutableDictionary *indexes;
+NSMutableDictionary *indexingEnabled;
+
 
 RCT_EXPORT_MODULE()
 
@@ -57,6 +60,7 @@ RCT_EXPORT_MODULE()
 - (instancetype)init
 {
     self = [super init];
+    indexingEnabled = [NSMutableDictionary dictionary];
     RCTExecuteOnMainQueue(^{
         
         NSString *rootDir;
@@ -157,12 +161,12 @@ MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
         kv = [MMKV mmkvWithID:ID mode:mode];
     }
     [mmkvInstances setObject:kv forKey:ID];
+    
     return kv;
 }
 
-NSMutableDictionary *indexes;
-
 void setIndex(MMKV *kv, NSString *type, NSString *key) {
+    if (!indexingEnabled[[kv mmapID]]) return;
     NSMutableDictionary *index = getIndex(kv, type);
     
     if (!index[key]) {
@@ -172,6 +176,8 @@ void setIndex(MMKV *kv, NSString *type, NSString *key) {
 }
 
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
+    if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
+        
     NSMutableDictionary *index;
     
     if (!indexes[type] && [kv containsKey:type]) {
@@ -183,6 +189,7 @@ NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
 }
 
 void removeKeyFromIndexer(MMKV *kv, NSString *key) {
+    if (!indexingEnabled[[kv mmapID]]) return;
     NSMutableDictionary *index = getIndex(kv, @"stringIndex");
     
     if (index[key]) {
@@ -276,7 +283,7 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
     });
     
     
-    CREATE_FUNCTION("setupMMKVInstance", 4, {
+    CREATE_FUNCTION("setupMMKVInstance", 5, {
         NSString *ID = nsstring(arguments[0]);
         
         MMKVMode mode = (MMKVMode)(int)arguments[1].getNumber();
@@ -286,6 +293,8 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
         createInstance(ID, mode, cryptKey, path);
         
         auto *kv = getInstance(ID);
+        
+        indexingEnabled[ID] = arguments[4].getBool() ? @YES : @NO;
         
         migrateKV(kv);
         

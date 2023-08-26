@@ -79,7 +79,6 @@ export default class MMKVLoader {
   /**
    * Provide a custom key to encrypt the storage. Use this if you dont want to generate the key automatically.
    * You must call withEncryption() to use this.
-   * To store your key for later use call withSecureKeyStorage() too.
    *
    * @param key the key to encrypt the storage with
    * @param secureKeyStorage Should the key be stored securely.
