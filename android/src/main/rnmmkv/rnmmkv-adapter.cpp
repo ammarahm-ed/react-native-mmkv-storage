@@ -648,7 +648,8 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
         }
 
         string key = std_string(arguments[0]);
-        kv->removeValueForKey(arguments[0].getString(runtime).utf8(runtime));
+
+        kv->removeValueForKey(key);
         removeFromIndex(kv, key);
 
         return Value(true);
@@ -662,7 +663,8 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
         auto keys = kv->allKeys();
 
         auto array = jsi::Array(runtime, keys.size());
-        for (int i = 0; i < keys.size(); i++) {
+        auto size = keys.size();
+        for (int i = 0; i < size; i++) {
             auto string = jsi::String::createFromUtf8(runtime, keys[i]);
             array.setValueAtIndex(runtime, i, string);
         }
