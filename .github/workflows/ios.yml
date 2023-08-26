@@ -19,6 +19,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
+    - run: |
+      npm ci
+      npm run build
+      rm -rf node_modules
+
     - run: yarn
       working-directory: example
 

@@ -47,11 +47,11 @@ jobs:
         run: |
           echo $RN_VERSION $RN_FOLDER $ANDROID_NDK_HOME
           [[ "$RN_VERSION" == "reanimated-2" ]] && git clone --depth=1 https://github.com/software-mansion-labs/reanimated-2-playground.git "$RN_FOLDER" || npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
+          npm ci
+          npm run build
+          rm -rf node_modules
           cd "$RN_FOLDER"
           yarn add file:..
-          yarn add metro-react-native-babel-preset@0.66.2 -D
-          npx mmkv-link
           cd ./android
-          echo "cmake.dir=/usr/local/lib/android/sdk/cmake/3.10.2.4988404" >> local.properties
           ./gradlew assembleRelease
           ./gradlew assembleDebug
