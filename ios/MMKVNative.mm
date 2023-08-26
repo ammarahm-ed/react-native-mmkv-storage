@@ -61,6 +61,8 @@ RCT_EXPORT_MODULE()
 {
     self = [super init];
     indexingEnabled = [NSMutableDictionary dictionary];
+    indexes = [NSMutableDictionary dictionary];
+    
     RCTExecuteOnMainQueue(^{
         
         NSString *rootDir;
@@ -171,21 +173,24 @@ void setIndex(MMKV *kv, NSString *type, NSString *key) {
     
     if (!index[key]) {
         index[key] = @1;
+        
         [kv setObject:index forKey:type];
     }
 }
 
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
     if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
-        
-    NSMutableDictionary *index;
     
-    if (!indexes[type] && [kv containsKey:type]) {
-        indexes[type] = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
-        return indexes[type];
-    } else {
-        return [NSMutableDictionary dictionary];
+    NSMutableDictionary *kvIndexes = indexes[[kv mmapID]];
+    
+    if (!kvIndexes[type]) {
+        if (![kv containsKey:type]) {
+            kvIndexes[type] = [NSMutableDictionary dictionary];
+        } else {
+            kvIndexes[type] = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
+        }
     }
+    return kvIndexes[type];
 }
 
 void removeKeyFromIndexer(MMKV *kv, NSString *key) {
@@ -295,8 +300,10 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
         auto *kv = getInstance(ID);
         
         indexingEnabled[ID] = arguments[4].getBool() ? @YES : @NO;
+        indexes[ID] = [NSMutableDictionary dictionary];
         
         migrateKV(kv);
+        
         
         return Value(true);
     });
@@ -592,8 +599,7 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
         
         if (!kv) return Value::undefined();
         
-        NSMutableDictionary *keys =
-        getIndex(kv, nsstring(arguments[0]));
+        NSMutableDictionary *keys = getIndex(kv, nsstring(arguments[0]));
         
         return Value(convertNSArrayToJSIArray(runtime, [keys allKeys]));
     });
@@ -612,6 +618,7 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
         if (!kv) return Value::undefined();
         
         [kv clearAll];
+        indexes[[kv mmapID]] = [NSMutableDictionary dictionary];
         
         return Value(true);
         

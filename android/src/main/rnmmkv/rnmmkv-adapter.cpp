@@ -33,7 +33,6 @@ static string jstring2string(JNIEnv *env, jstring str) {
     return result;
 }
 
-std::mutex _testMutex;
 
 static std::string j_string_to_string(JNIEnv *env, jstring jStr) {
     if (!jStr) return {};
@@ -143,21 +142,23 @@ bool hasValue(const std::vector<std::string> &vec, std::string value) {
 }
 
 std::unordered_map<std::string, bool> indexing_enabled = {};
-std::unordered_map<std::string, std::vector<std::string>> index_cache = {};
+std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>> index_cache = {};
 
 static vector<string> getIndex(MMKV *kv, const string &type) {
     if (!indexing_enabled[kv->mmapID()]) return {};
 
-    if (index_cache.count(type) == 0) {
-        auto exists = kv->getVector(type, index_cache[type]);
+    auto kvIndex = index_cache[kv->mmapID()];
+
+    if (kvIndex.count(type) == 0) {
+        auto exists = kv->getVector(type, kvIndex[type]);
         if (!exists) {
-            index_cache[type] = std::vector<std::string>();
+            kvIndex[type] = std::vector<std::string>();
         } else {
-            sortVector(index_cache[type]);
+            sortVector(kvIndex[type]);
         }
     }
 
-    return index_cache[type];
+    return kvIndex[type];
 }
 
 static const string dataTypes[] = {"stringIndex", "numberIndex", "boolIndex", "mapIndex",
@@ -219,8 +220,12 @@ jsi::PropNameID::forAscii(runtime, name), \
 basecount, \
 [=](jsi::Runtime &runtime, const jsi::Value &thisValue, const jsi::Value *args, size_t count) -> jsi::Value
 
-std::shared_ptr<react::CallInvoker> invoker;
 
+void initIndexForId(std::string id) {
+    index_cache[id] = unordered_map<std::string, std::vector<std::string>>();
+}
+
+std::shared_ptr<react::CallInvoker> invoker;
 void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> jsCallInvoker) {
     auto pool = std::make_shared<ThreadPool>();
     invoker = jsCallInvoker;
@@ -231,13 +236,14 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
     });
 
     CREATE_FUNCTION("setupMMKVInstance", 5, {
-        string ID = std_string(arguments[0]);
+        string id = std_string(arguments[0]);
         auto mode = (MMKVMode) (int) arguments[1].getNumber();
         string cryptKey = std_string(arguments[2]);
         MMKVPath_t path = std_string(arguments[3]);
-        createInstance(ID, mode, cryptKey, path);
+        createInstance(id, mode, cryptKey, path);
 
-        indexing_enabled[ID] = arguments[4].getBool();
+        indexing_enabled[id] = arguments[4].getBool();
+        initIndexForId(id);
 
         return Value(true);
     });
@@ -641,9 +647,10 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
             return Value::undefined();
         }
 
-        string key = std_string(arguments[1]);
-        removeFromIndex(kv, key);
+        string key = std_string(arguments[0]);
         kv->removeValueForKey(arguments[0].getString(runtime).utf8(runtime));
+        removeFromIndex(kv, key);
+
         return Value(true);
     });
 
@@ -692,6 +699,8 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
             return Value::undefined();
         }
         kv->clearAll();
+        initIndexForId(kv->mmapID());
+
         return Value(true);
     });
 

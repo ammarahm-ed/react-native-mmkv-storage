@@ -1,6 +1,7 @@
 import React, {useCallback} from 'react';
 import {
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -51,9 +52,14 @@ const App = () => {
       title: 'setAge',
       onPress: () => {
         setAge((age: number) => {
-          console.log(age);
           return age + 1;
         });
+      },
+    },
+    {
+      title: 'clearAll',
+      onPress: () => {
+        storage.clearStore();
       },
     },
   ];
@@ -67,10 +73,19 @@ const App = () => {
             I am {user} and I am {age} years old.
           </Text>
         </View>
-
-        {buttons.map(item => (
-          <Button key={item.title} title={item.title} onPress={item.onPress} />
-        ))}
+        <ScrollView
+          style={{
+            width: '100%',
+            paddingHorizontal: 12,
+          }}>
+          {buttons.map(item => (
+            <Button
+              key={item.title}
+              title={item.title}
+              onPress={item.onPress}
+            />
+          ))}
+        </ScrollView>
       </SafeAreaView>
     </>
   );
@@ -93,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
   },
   button: {
-    width: '95%',
+    width: '100%',
     height: 50,
     backgroundColor: 'orange',
     justifyContent: 'center',
