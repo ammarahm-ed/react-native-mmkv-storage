@@ -72,8 +72,7 @@ RCT_EXPORT_MODULE()
         
         if (appGroupId != nil) {
             NSURL *appGroup = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:appGroupId];
-            
-            rootDir = appGroup.path;
+            rootDir = [appGroup.path stringByAppendingPathComponent:@"mmkv"];
             rPath = rootDir;
             [MMKV initializeMMKV:nil groupDir:rootDir logLevel:MMKVLogInfo];
         } else {
