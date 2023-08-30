@@ -240,9 +240,9 @@ void upgradeIndex(MMKV *kv, NSString * type) {
     if (![kv containsKey:type]) return;
     NSMutableArray *array = [kv getObjectOfClass:NSMutableArray.class forKey:type];
     if (array.count) {
-        NSDictionary *dic = [NSDictionary dictionary];
+        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
         for (int i=0;i < array.count;i++) {
-            [dic setValue:0 forKey:array[i]];
+            [dic setValue:@1 forKey:array[i]];
         }
         [kv setObject:dic forKey:type];
     }
