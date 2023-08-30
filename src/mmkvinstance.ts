@@ -267,7 +267,7 @@ export default class MMKVInstance {
   /**
    * Set a string value to storage for the given key.
    */
-  setString = (key: string, value: string) => {
+  setString = (key: string, value: string): boolean | undefined => {
     assert('string', value);
 
     if (this.transactions.beforewrite['string']) {
@@ -292,7 +292,10 @@ export default class MMKVInstance {
   /**
    * Get the string value for the given key.
    */
-  getString = (key: string, callback?: (error: any, value: string | undefined | null) => void) => {
+  getString = (
+    key: string,
+    callback?: (error: any, value: string | undefined | null) => void
+  ): string | null | undefined => {
     let string = handleAction(mmkvJsiModule.getStringMMKV, key, this.instanceID);
 
     if (this.transactions.onread['string']) {
@@ -305,7 +308,7 @@ export default class MMKVInstance {
   /**
    * Set a number value to storage for the given key.
    */
-  setInt = (key: string, value: number) => {
+  setInt = (key: string, value: number): boolean | undefined => {
     assert('number', value);
 
     if (this.transactions.beforewrite['number']) {
@@ -326,7 +329,10 @@ export default class MMKVInstance {
   /**
    * Get the number value for the given key
    */
-  getInt = (key: string, callback?: (error: any, value: number | undefined | null) => void) => {
+  getInt = (
+    key: string,
+    callback?: (error: any, value: number | undefined | null) => void
+  ): number | null | undefined => {
     let int = handleAction(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
 
     if (this.transactions.onread['number']) {
@@ -340,7 +346,7 @@ export default class MMKVInstance {
   /**
    * Set a boolean value to storage for the given key
    */
-  setBool = (key: string, value: boolean) => {
+  setBool = (key: string, value: boolean): boolean | undefined => {
     assert('boolean', value);
 
     if (this.transactions.beforewrite['boolean']) {
@@ -362,7 +368,10 @@ export default class MMKVInstance {
   /**
    * Get the boolean value for the given key.
    */
-  getBool = (key: string, callback?: (error: any, value: boolean | undefined | null) => void) => {
+  getBool = (
+    key: string,
+    callback?: (error: any, value: boolean | undefined | null) => void
+  ): boolean | null | undefined => {
     let bool = handleAction(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
 
     if (this.transactions.onread['boolean']) {
@@ -377,7 +386,7 @@ export default class MMKVInstance {
    *
    * Note that this function does **not** work with the Map data type
    */
-  setMap = (key: string, value: object) => {
+  setMap = (key: string, value: object): boolean | undefined => {
     assert('object', value);
 
     if (this.transactions.beforewrite['object']) {
@@ -406,7 +415,10 @@ export default class MMKVInstance {
   /**
    * Get an Object from storage for a given key.
    */
-  getMap = <T>(key: string, callback?: (error: any, value: T | undefined | null) => void) => {
+  getMap = <T>(
+    key: string,
+    callback?: (error: any, value: T | undefined | null) => void
+  ): T | null | undefined => {
     let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
@@ -430,7 +442,7 @@ export default class MMKVInstance {
   /**
    * Set an array to storage for the given key.
    */
-  setArray = (key: string, value: any[]) => {
+  setArray = (key: string, value: any[]): boolean | undefined => {
     assert('array', value);
 
     if (this.transactions.beforewrite['array']) {
@@ -459,7 +471,10 @@ export default class MMKVInstance {
   /**
    * get an array from the storage for give key.
    */
-  getArray = <T>(key: string, callback?: (error: any, value: T[] | undefined | null) => void) => {
+  getArray = <T>(
+    key: string,
+    callback?: (error: any, value: T[] | undefined | null) => void
+  ): T[] | null | undefined => {
     let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
