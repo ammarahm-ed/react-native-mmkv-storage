@@ -406,6 +406,11 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
                                                                                                                               kv,
                                                                                                                               dataType,
                                                                                                                               key);
+                                                                                                                  } else {
+                                                                                                                      if (kv->containsKey(key)) {
+                                                                                                                          kv->removeValueForKey(key);
+                                                                                                                          removeFromIndex(kv, key);
+                                                                                                                      }
                                                                                                                   }
                                                                                                               }
 

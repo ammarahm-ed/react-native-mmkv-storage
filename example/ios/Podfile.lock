@@ -236,7 +236,7 @@ PODS:
   - React-jsinspector (0.71.8)
   - React-logger (0.71.8):
     - glog
-  - react-native-mmkv-storage (0.10.0-alpha.1):
+  - react-native-mmkv-storage (0.10.0-alpha.5):
     - MMKV (~> 1.3.1)
     - React
     - React-Core
@@ -459,7 +459,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 9101857bcffac8dae43d76a7bc0a39bda593c756
   React-jsinspector: c712f9e3bb9ba4122d6b82b4f906448b8a281580
   React-logger: 342f358b8decfbf8f272367f4eacf4b6154061be
-  react-native-mmkv-storage: f628bc42318dbb51b66c6b3e21d14ceee2322189
+  react-native-mmkv-storage: 47f3054a7ab997881fd4b8941c8a51fa49102793
   React-perflogger: d21f182895de9d1b077f8a3cd00011095c8c9100
   React-RCTActionSheet: 0151f83ef92d2a7139bba7dfdbc8066632a6d47b
   React-RCTAnimation: 5ec9c0705bb2297549c120fe6473aa3e4a01e215

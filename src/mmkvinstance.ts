@@ -10,7 +10,6 @@ import { DataType, StorageOptions } from './types';
 import { options } from './utils';
 
 function assert(type: DataType, value: any) {
-  if (typeof value === 'undefined' || value === null) return;
   if (type === 'array') {
     if (!Array.isArray(value)) throw new Error(`Trying to set ${typeof value} as a ${type}.`);
   } else {
@@ -36,6 +35,14 @@ export default class MMKVInstance {
 
   isRegisterd(key: string) {
     return this.ev._registry[`${key}:onwrite`];
+  }
+
+  handleNullOrUndefined(key: string, value: any) {
+    if (value === null || value === undefined) {
+      this.removeItem(key);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -268,13 +275,12 @@ export default class MMKVInstance {
    * Set a string value to storage for the given key.
    */
   setString = (key: string, value: string): boolean | undefined => {
-    assert('string', value);
-
     if (this.transactions.beforewrite['string']) {
       value = this.transactions.transact('string', 'beforewrite', key, value);
-      assert('string', value);
     }
+    if (this.handleNullOrUndefined(key, value)) return true;
 
+    assert('string', value);
     let result = handleAction(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
     if (result) {
       if (this.isRegisterd(key)) {
@@ -309,12 +315,12 @@ export default class MMKVInstance {
    * Set a number value to storage for the given key.
    */
   setInt = (key: string, value: number): boolean | undefined => {
-    assert('number', value);
-
     if (this.transactions.beforewrite['number']) {
       value = this.transactions.transact('number', 'beforewrite', key, value);
-      assert('number', value);
     }
+
+    if (this.handleNullOrUndefined(key, value)) return true;
+    assert('number', value);
 
     let result = handleAction(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
     if (result) {
@@ -347,12 +353,12 @@ export default class MMKVInstance {
    * Set a boolean value to storage for the given key
    */
   setBool = (key: string, value: boolean): boolean | undefined => {
-    assert('boolean', value);
-
     if (this.transactions.beforewrite['boolean']) {
       value = this.transactions.transact('boolean', 'beforewrite', key, value);
-      assert('boolean', value);
     }
+
+    if (this.handleNullOrUndefined(key, value)) return true;
+    assert('boolean', value);
 
     let result = handleAction(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
     if (result) {
@@ -387,13 +393,12 @@ export default class MMKVInstance {
    * Note that this function does **not** work with the Map data type
    */
   setMap = (key: string, value: object): boolean | undefined => {
-    assert('object', value);
-
     if (this.transactions.beforewrite['object']) {
       value = this.transactions.transact('object', 'beforewrite', key, value);
-
-      assert('object', value);
     }
+
+    if (this.handleNullOrUndefined(key, value)) return true;
+    assert('object', value);
 
     let result = handleAction(
       mmkvJsiModule.setMapMMKV,
@@ -443,12 +448,12 @@ export default class MMKVInstance {
    * Set an array to storage for the given key.
    */
   setArray = (key: string, value: any[]): boolean | undefined => {
-    assert('array', value);
-
     if (this.transactions.beforewrite['array']) {
       value = this.transactions.transact('array', 'beforewrite', key, value);
-      assert('array', value);
     }
+
+    if (this.handleNullOrUndefined(key, value)) return true;
+    assert('array', value);
 
     let result = handleAction(
       mmkvJsiModule.setArrayMMKV,

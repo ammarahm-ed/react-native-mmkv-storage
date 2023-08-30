@@ -379,6 +379,11 @@ static void install(jsi::Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker
                     if (![value isEqualToString:@"kv.null"]) {
                         [kv setString:value forKey:key];
                         setIndex(kv, dataType, key);
+                    } else {
+                        if ([kv containsKey:key]) {
+                            [kv removeValueForKey:key];
+                            removeKeyFromIndexer(kv, key);
+                        }
                     }
                 }
                 
