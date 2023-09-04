@@ -38,6 +38,20 @@ const App = () => {
       },
     },
     {
+      title: 'setMulti',
+      onPress: () => {
+        const user = getUser();
+        console.log('setting user to', user);
+        storage.setMultipleItemsAsync([['user', user]], 'string');
+      },
+    },
+    {
+      title: 'getMulti',
+      onPress: async () => {
+        console.log(await storage.getMultipleItemsAsync(['user'], 'string'));
+      },
+    },
+    {
       title: 'setUser',
       onPress: () => {
         setUser(getUser());

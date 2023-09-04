@@ -1,6 +1,6 @@
 import encryption from './encryption';
 import EventManager from './eventmanager';
-import { handleAction, handlePromise } from './handlers';
+import { handleAction } from './handlers';
 import indexer from './indexer/indexer';
 import { getCurrentMMKVInstanceIDs } from './initializer';
 import { default as IDStore } from './mmkv/IDStore';
@@ -138,7 +138,6 @@ export default class MMKVInstance {
 
   /**
    * Set items in bulk of same type at once
-   * using async threads without blocking JS.
    *
    * If a value against a key is null/undefined, it will be
    * set as null.
@@ -150,20 +149,23 @@ export default class MMKVInstance {
   async setMultipleItemsAsync(items: [string, any][], type: DataType | 'map') {
     if (type === 'object') type = 'map';
 
+    let values = [];
+
     if (type === 'string' || type === 'array' || type === 'map') {
-      await handlePromise(
+      values = items.map(item => {
+        let value = item[1];
+
+        if (this.transactions.beforewrite[type]) {
+          value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
+        }
+
+        if (type === 'string') return value;
+        return value ? JSON.stringify(value) : value;
+      });
+      handleAction(
         mmkvJsiModule.setMultiMMKV,
         items.map(item => item[0]),
-        items.map(item => {
-          let value = item[1];
-
-          if (this.transactions.beforewrite[type]) {
-            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
-          }
-
-          if (type === 'string') return value;
-          return value ? JSON.stringify(value) : value;
-        }),
+        values,
         `${type}Index`,
         this.instanceID
       );
@@ -176,6 +178,7 @@ export default class MMKVInstance {
           if (this.transactions.beforewrite[type]) {
             value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
           }
+          values[i] = value;
           this.setBool(item[0], value);
         }
       } else if (type === 'number') {
@@ -186,19 +189,19 @@ export default class MMKVInstance {
           if (this.transactions.beforewrite[type]) {
             value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
           }
-
+          values[i] = value;
           this.setInt(item[0], value);
         }
       }
     }
     queueMicrotask(() => {
-      items?.forEach(item => {
+      items?.forEach((item, index) => {
         if (this.isRegisterd(item[0])) {
-          this.ev.publish(`${item[0]}:onwrite`, { key: item[0] });
+          this.ev.publish(`${item[0]}:onwrite`, { key: item[0], value: values[index] });
         }
 
         if (this.transactions.onwrite[type]) {
-          this.transactions.transact(type as DataType, 'onwrite', item[0], item[1]);
+          this.transactions.transact(type as DataType, 'onwrite', item[0], values[index]);
         }
       });
     });
@@ -207,14 +210,13 @@ export default class MMKVInstance {
 
   /**
    * Retrieve multiple items for the given array of keys
-   * without blocking the JS thread.
    */
   async getMultipleItemsAsync<T>(keys: string[], type: DataType | 'map'): Promise<[string, T][]> {
     let items: [string, T][] = [];
 
     if (type === 'map') type = 'object';
     if (type === 'array' || type === 'string' || type === 'object') {
-      const result = await handlePromise(mmkvJsiModule.getMultiMMKV, keys, this.instanceID);
+      const result = handleAction(mmkvJsiModule.getMultiMMKV, keys, this.instanceID);
       if (type === 'string') return keys.map((key, index) => [key, result[index] as T]);
 
       return keys.map((key, index) => {

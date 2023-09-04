@@ -224,13 +224,6 @@ NSString *serviceName = nil;
     serviceName = _serviceName;
 }
 
-NSError * secureKeyStoreError(NSString *errMsg)
-{
-    NSError *error = [NSError errorWithDomain:serviceName code:200 userInfo:@{@"reason": errMsg}];
-    return error;
-}
-
-
 
 CFStringRef _accessibleValue(NSDictionary *options)
 {

@@ -12,7 +12,6 @@ add_library(
         ${PACKAGE_NAME}
         SHARED
         ./rnmmkv-adapter.cpp
-        ./ThreadPool.cpp
 )
 
 set_target_properties(

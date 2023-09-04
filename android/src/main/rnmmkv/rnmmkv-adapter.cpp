@@ -5,7 +5,6 @@
 #include "MMKV.h"
 #include "MMKVPredef.h"
 #include "MMBuffer.h"
-#include "ThreadPool.h"
 #include <algorithm>
 
 using namespace facebook;
@@ -225,10 +224,9 @@ void initIndexForId(std::string id) {
     index_cache[id] = unordered_map<std::string, std::vector<std::string>>();
 }
 
-std::shared_ptr<react::CallInvoker> invoker;
-void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> jsCallInvoker) {
-    auto pool = std::make_shared<ThreadPool>();
-    invoker = jsCallInvoker;
+
+void installBindings(Runtime &jsiRuntime) {
+ ;
 
     CREATE_FUNCTION("initializeMMKV", 0, {
         MMKV::initializeMMKV(rPath);
@@ -346,88 +344,32 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
         return Value(true);
     });
 
-    createFunc(jsiRuntime, "setMultiMMKV", 4,
-               [=](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                   size_t count) -> Value {
-                   auto keysRef = arguments[0].getObject(runtime).asArray(runtime);
-                   auto valuesRef = arguments[1].getObject(runtime).asArray(runtime);
-                   auto dataType = std_string(arguments[2]);
-                   auto kvName = std_string(arguments[3]);
-                   auto size = keysRef.length(runtime);
+    CREATE_FUNCTION("setMultiMMKV", 4, {
+        auto keys = arguments[0].getObject(runtime).asArray(runtime);
+        auto values = arguments[1].getObject(runtime).asArray(runtime);
+        auto dataType = std_string(arguments[2]);
+        auto kvName = std_string(arguments[3]);
+        auto kv = getInstance(kvName);
+        auto size = keys.length(runtime);
 
-                   auto keys = std::vector<std::string>(size);
-                   auto values = std::vector<std::string>(size);
-                   for (int i = 0; i < size; i++) {
-                       keys[i] = std_string(keysRef.getValueAtIndex(runtime, i));
-                       auto value = valuesRef.getValueAtIndex(runtime, i);
-                       if (value.isString()) {
-                           values[i] = std_string(value);
-                       } else {
-                           values[i] = "kv.null";
-                       }
-                   }
+        for (int i=0;i < size;i++) {
+            auto key = std_string(keys.getValueAtIndex(runtime, i));
 
-                   auto promiseCtr = runtime.global().getPropertyAsFunction(runtime, "Promise");
-                   auto promise = promiseCtr.callAsConstructor(runtime, HOSTFN("executor", 2) {
-                                                                                                  auto resolve = std::make_shared<jsi::Value>(
-                                                                                                          runtime,
-                                                                                                          args[0]);
-                                                                                                  auto reject = std::make_shared<jsi::Value>(
-                                                                                                          runtime,
-                                                                                                          args[1]);
+            if (values.getValueAtIndex(runtime, i).isString()) {
+                auto value = std_string(values.getValueAtIndex(runtime, i));
+                kv->set(value, key);
+                setIndex(kv, dataType, key);
+            } else {
+                if (kv->containsKey(key)) {
+                    kv->removeValueForKey(key);
+                    removeFromIndex(kv, key);
+                }
+            }
 
-                                                                                                  pool->queueWork(
-                                                                                                          [&runtime, kvName, keys, values, size, dataType, resolve]() {
+        }
 
-                                                                                                              MMKV *kv = getInstance(
-                                                                                                                      kvName);
-                                                                                                              if (!kv) {
-                                                                                                                  invoker->invokeAsync(
-                                                                                                                          [&runtime, resolve] {
-                                                                                                                              resolve->asObject(
-                                                                                                                                      runtime).asFunction(
-                                                                                                                                      runtime).call(
-                                                                                                                                      runtime,
-                                                                                                                                      Value::undefined());
-                                                                                                                          });
-                                                                                                              }
-
-
-                                                                                                              for (int i = 0;
-                                                                                                                   i <
-                                                                                                                   size; i++) {
-                                                                                                                  auto key = keys[i];
-                                                                                                                  auto value = values[i];
-                                                                                                                  if (value !=
-                                                                                                                      "kv.null") {
-                                                                                                                      kv->set(value,
-                                                                                                                              key);
-                                                                                                                      setIndex(
-                                                                                                                              kv,
-                                                                                                                              dataType,
-                                                                                                                              key);
-                                                                                                                  } else {
-                                                                                                                      if (kv->containsKey(key)) {
-                                                                                                                          kv->removeValueForKey(key);
-                                                                                                                          removeFromIndex(kv, key);
-                                                                                                                      }
-                                                                                                                  }
-                                                                                                              }
-
-                                                                                                              invoker->invokeAsync(
-                                                                                                                      [&runtime, resolve] {
-                                                                                                                          resolve->asObject(
-                                                                                                                                  runtime).asFunction(
-                                                                                                                                  runtime).call(
-                                                                                                                                  runtime,
-                                                                                                                                  Value(true));
-                                                                                                                      });
-                                                                                                          });
-
-                                                                                                  return {};
-                                                                                              }));
-                   return promise;
-               });
+        return jsi::Value(true);
+    });
 
     CREATE_FUNCTION("getStringMMKV", 2, {
         MMKV *kv = getInstance(std_string(arguments[1]));
@@ -444,99 +386,27 @@ void installBindings(Runtime &jsiRuntime, std::shared_ptr<react::CallInvoker> js
     });
 
 
-    createFunc(jsiRuntime, "getMultiMMKV", 2,
-               [=](Runtime &runtime, const Value &thisValue, const Value *arguments,
-                   size_t count) -> Value {
-                   auto keysRef = arguments[0].getObject(runtime).asArray(runtime);
+    CREATE_FUNCTION("getMultiMMKV", 2, {
+                   auto keys = arguments[0].getObject(runtime).asArray(runtime);
                    auto kvName = std_string(arguments[1]);
-                   auto promiseCtr = runtime.global().getPropertyAsFunction(runtime, "Promise");
-                   auto size = keysRef.length(runtime);
+                   auto kv = getInstance(kvName);
+                   auto size = keys.length(runtime);
 
-                   auto keys = std::vector<std::string>(size);
+                   jsi::Array values = jsi::Array(runtime, size);
 
-                   for (int i = 0; i < size; i++) {
-                       keys[i] = std_string(keysRef.getValueAtIndex(runtime, i));
+                   for (int i=0;i < size;i++) {
+                       auto key =  std_string(keys.getValueAtIndex(runtime, i));
+                       if (kv->containsKey(key)) {
+                           std::string result;
+                           kv->getString(key, result);
+                           values.setValueAtIndex(runtime, i, String::createFromUtf8(runtime, result));
+                       } else {
+                           values.setValueAtIndex(runtime, i,  jsi::Value::null());
+                       }
                    }
 
-                   auto promise = promiseCtr.callAsConstructor(runtime, HOSTFN("executor", 2) {
-                                                                                                  auto resolve = std::make_shared<jsi::Value>(
-                                                                                                          runtime,
-                                                                                                          args[0]);
-                                                                                                  auto reject = std::make_shared<jsi::Value>(
-                                                                                                          runtime,
-                                                                                                          args[1]);
-
-                                                                                                  pool->queueWork(
-                                                                                                          [&runtime, kvName, keys, size, resolve, reject]() {
-
-                                                                                                              MMKV *kv = getInstance(
-                                                                                                                      kvName);
-                                                                                                              if (!kv) {
-                                                                                                                  invoker->invokeAsync(
-                                                                                                                          [&runtime, resolve, reject] {
-                                                                                                                              resolve->asObject(
-                                                                                                                                      runtime).asFunction(
-                                                                                                                                      runtime).call(
-                                                                                                                                      runtime,
-                                                                                                                                      Value::undefined());
-                                                                                                                          });
-                                                                                                              }
-
-                                                                                                              auto result = std::vector<std::string>(
-                                                                                                                      size);
-
-                                                                                                              for (int i = 0;
-                                                                                                                   i <
-                                                                                                                   size; i++) {
-                                                                                                                  auto key = keys[i];
-                                                                                                                  string value;
-                                                                                                                  bool exists = kv->getString(
-                                                                                                                          key,
-                                                                                                                          value);
-                                                                                                                  if (exists) {
-                                                                                                                      result[i] = value;
-                                                                                                                  } else {
-                                                                                                                      result[i] = "kv.null";
-                                                                                                                  }
-                                                                                                              }
-
-                                                                                                              invoker->invokeAsync(
-                                                                                                                      [&runtime, result, size, resolve, reject] {
-                                                                                                                          jsi::Array values = jsi::Array(
-                                                                                                                                  runtime,
-                                                                                                                                  size);
-                                                                                                                          for (int i = 0;
-                                                                                                                               i <
-                                                                                                                               size; i++) {
-                                                                                                                              auto value = result[i];
-                                                                                                                              if (value ==
-                                                                                                                                  "kv.null") {
-                                                                                                                                  values.setValueAtIndex(
-                                                                                                                                          runtime,
-                                                                                                                                          i,
-                                                                                                                                          Value::null());
-                                                                                                                              } else {
-                                                                                                                                  values.setValueAtIndex(
-                                                                                                                                          runtime,
-                                                                                                                                          i,
-                                                                                                                                          String::createFromUtf8(
-                                                                                                                                                  runtime,
-                                                                                                                                                  value));
-                                                                                                                              }
-                                                                                                                          }
-                                                                                                                          resolve->asObject(
-                                                                                                                                  runtime).asFunction(
-                                                                                                                                  runtime).call(
-                                                                                                                                  runtime,
-                                                                                                                                  std::move(
-                                                                                                                                          values));
-                                                                                                                      });
-                                                                                                          });
-
-                                                                                                  return {};
-                                                                                              }));
-                   return promise;
-               });
+                   return values;
+    });
 
     CREATE_FUNCTION("setMapMMKV", 3, {
         MMKV *kv = getInstance(std_string(arguments[2]));
@@ -939,11 +809,9 @@ struct RNMMKVModule : jni::JavaClass<RNMMKVModule> {
 private:
     static void install(
             jni::alias_ref<jni::JObject> thiz, jlong jsi,
-            jni::alias_ref<react::CallInvokerHolder::javaobject> jsCallInvokerHolder,
             jni::alias_ref<jni::JString> rootPath) {
 
         rPath = rootPath->toStdString();
-        auto jsCallInvoker = jsCallInvokerHolder->cthis()->getCallInvoker();
 
         MMKV::initializeMMKV(rPath);
 
@@ -952,7 +820,7 @@ private:
 
         mmkvobject = jni::Environment::current()->NewGlobalRef(thiz.get());
         if (runtime) {
-            installBindings(*runtime, jsCallInvoker);
+            installBindings(*runtime);
         }
         createInstance("mmkvIDStore", MMKV_SINGLE_PROCESS, "", "");
     }

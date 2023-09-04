@@ -39,7 +39,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
         System.loadLibrary("rnmmkv");
     }
 
-    private native void nativeInstall(long jsi, CallInvokerHolderImpl jsCallInvokerHolder, String rootPath);
+    private native void nativeInstall(long jsi, String rootPath);
 
     private native void destroy();
 
@@ -64,7 +64,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
             migrate();
             this.nativeInstall(
                     jsContext.get(),
-                    jsCallInvokerHolder,
                     rootPath
             );
             return true;
