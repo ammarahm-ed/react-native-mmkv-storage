@@ -166,6 +166,17 @@ void setIndex(MMKV *kv, NSString *type, NSString *key) {
     }
 }
 
+void setIndexes(MMKV *kv, NSString *type, NSArray *keys) {
+    if (!indexingEnabled[[kv mmapID]]) return;
+    NSMutableDictionary *index = getIndex(kv, type);
+    
+    for (int i=0;i < keys.count; i++) {
+        index[keys[i]] = @1;
+    }
+    
+    [kv setObject:index forKey:type];
+}
+
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
     if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
     
@@ -341,16 +352,14 @@ static void install(jsi::Runtime &jsiRuntime) {
             if (values.getValueAtIndex(runtime, i).isString()) {
                 NSString *value = nsstring(values.getValueAtIndex(runtime, i));
                 [kv setString:value forKey:key];
-                setIndex(kv, dataType, key);
             } else {
                 if ([kv containsKey:key]) {
                     [kv removeValueForKey:key];
                     removeKeyFromIndexer(kv, key);
                 }
             }
-            
         }
-        
+        setIndexes(kv, dataType, convertJSIArrayToNSArray(runtime, keys));
         return jsi::Value(true);
     
     });

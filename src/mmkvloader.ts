@@ -131,6 +131,7 @@ export default class MMKVLoader {
    */
   disableIndexing() {
     this.options.enableIndexing = false;
+    return this;
   }
 
   generateKey() {
