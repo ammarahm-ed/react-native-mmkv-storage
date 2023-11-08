@@ -58,6 +58,7 @@ android {
     excludes = [
             "META-INF",
             "META-INF/**",
+            "**/libfbjni.so",
             "**/libjsi.so",
             "**/libreact_nativemodule_core.so",
             "**/libturbomodulejsijni.so",
