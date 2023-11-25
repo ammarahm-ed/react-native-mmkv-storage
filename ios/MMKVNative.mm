@@ -192,47 +192,66 @@ NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
     return kvIndexes[type];
 }
 
-void removeKeyFromIndexer(MMKV *kv, NSString *key) {
+void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     if (!indexingEnabled[[kv mmapID]]) return;
-    NSMutableDictionary *index = getIndex(kv, @"stringIndex");
     
-    if (index[key]) {
-        [index removeObjectForKey:key];
-        [kv setObject:index forKey:@"stringIndex"];
-        return;
+    bool strings = false;
+    bool objects = false;
+    bool arrays = false;
+    bool numbers = false;
+    bool booleans = false;
+    
+    
+    for (int i=0;i < keys.count; i++) {
+        NSString *key = keys[i];
+        NSMutableDictionary *index = getIndex(kv, @"stringIndex");
+        
+        if (index[key]) {
+            [index removeObjectForKey:key];
+            strings = true;
+            continue;
+        }
+        
+        index = getIndex(kv, @"mapIndex");
+        
+        if (index[key]) {
+            [index removeObjectForKey:key];
+            objects = true;
+            continue;
+        }
+        
+        index = getIndex(kv, @"arrayIndex");
+        
+        if (index[key]) {
+            [index removeObjectForKey:key];
+            arrays = true;
+            continue;
+        }
+        
+        index = getIndex(kv, @"numberIndex");
+        
+        if (index[key]) {
+            [index removeObjectForKey:key];
+            numbers = true;
+            continue;
+        }
+        
+        index = getIndex(kv, @"boolIndex");
+        
+        if (index[key]) {
+            [index removeObjectForKey:key];
+            booleans = true;
+            continue;
+        }
     }
     
-    index = getIndex(kv, @"mapIndex");
     
-    if (index[key]) {
-        [index removeObjectForKey:key];
-        [kv setObject:index forKey:@"mapIndex"];
-        return;
-    }
+    if (strings) [kv setObject:getIndex(kv, @"stringIndex") forKey:@"stringIndex"];
+    if (objects) [kv setObject:getIndex(kv, @"mapIndex") forKey:@"mapIndex"];
+    if (arrays) [kv setObject:getIndex(kv, @"arrayIndex") forKey:@"arrayIndex"];
+    if (numbers) [kv setObject:getIndex(kv, @"numberIndex") forKey:@"numberIndex"];
+    if (booleans) [kv setObject:getIndex(kv, @"boolIndex") forKey:@"boolIndex"];
     
-    index = getIndex(kv, @"arrayIndex");
-    
-    if (index[key]) {
-        [index removeObjectForKey:key];
-        [kv setObject:index forKey:@"arrayIndex"];
-        return;
-    }
-    
-    index = getIndex(kv, @"numberIndex");
-    
-    if (index[key]) {
-        [index removeObjectForKey:key];
-        [kv setObject:index forKey:@"numberIndex"];
-        return;
-    }
-    
-    index = getIndex(kv, @"boolIndex");
-    
-    if (index[key]) {
-        [index removeObjectForKey:key];
-        [kv setObject:index forKey:@"boolIndex"];
-        return;
-    }
 }
 
 void upgradeIndex(MMKV *kv, NSString * type) {
@@ -345,6 +364,7 @@ static void install(jsi::Runtime &jsiRuntime) {
         auto kv = getInstance(kvName);
         auto size = keys.length(runtime);
         
+        NSMutableArray *keysToRemove = [NSMutableArray array];
         
         for (int i=0;i < size;i++) {
             NSString *key = nsstring(keys.getValueAtIndex(runtime, i));
@@ -354,11 +374,13 @@ static void install(jsi::Runtime &jsiRuntime) {
                 [kv setString:value forKey:key];
             } else {
                 if ([kv containsKey:key]) {
-                    [kv removeValueForKey:key];
-                    removeKeyFromIndexer(kv, key);
+                    [keysToRemove addObject:key];
                 }
             }
         }
+        
+        [kv removeValuesForKeys:keysToRemove];
+        removeKeysFromIndexer(kv, keysToRemove);
         setIndexes(kv, dataType, convertJSIArrayToNSArray(runtime, keys));
         return jsi::Value(true);
     
@@ -527,8 +549,20 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        removeKeyFromIndexer(kv, key);
+        removeKeysFromIndexer(kv, [NSArray arrayWithObject:key]);
         [kv removeValueForKey:key];
+        
+        return Value(true);
+    });
+    
+    CREATE_FUNCTION("removeValuesMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
+        
+        if (!kv) return Value::undefined();
+        
+        auto keys =  convertJSIArrayToNSArray(runtime, arguments[0].getObject(runtime).asArray(runtime));
+        [kv removeValuesForKeys:keys];
+        removeKeysFromIndexer(kv, keys);
         
         return Value(true);
     });

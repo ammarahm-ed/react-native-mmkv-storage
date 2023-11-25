@@ -588,6 +588,7 @@ export default class MMKVInstance {
   /**
    * Remove an item from storage for a given key.
    *
+   * If you are removing large number of keys, use `removeItems` instead.
    */
   removeItem(key: string) {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
@@ -601,6 +602,25 @@ export default class MMKVInstance {
       this.transactions.transact('string', 'ondelete', key);
     }
 
+    return result;
+  }
+
+  /**
+   * Remove multiple items from storage for given keys
+   *
+   */
+  removeItems(...keys: string[]) {
+    let result = handleAction(mmkvJsiModule.removeValuesMMKV, keys, this.instanceID);
+    for (const key of keys) {
+      if (result) {
+        if (this.isRegisterd(key)) {
+          this.ev.publish(`${key}:onwrite`, { key, value: null });
+        }
+      }
+      if (this.transactions.ondelete) {
+        this.transactions.transact('string', 'ondelete', key);
+      }
+    }
     return result;
   }
 

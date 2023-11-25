@@ -206,6 +206,46 @@ static void removeFromIndex(MMKV *kv, const string &key)
     }
 }
 
+static void removeKeysFromIndex(MMKV *kv, const vector<string> &arrKeys)
+{
+    if (!indexing_enabled[kv->mmapID()])
+        return;
+
+    auto strings = false;
+    auto objects = false;
+    auto arrays = false;
+    auto numbers = false;
+    auto booleans = false;
+
+    for (const auto &key : arrKeys) {
+        auto removed = false;
+        for (const auto &idx : dataTypes)
+        {
+            if (removed) continue;
+
+            auto index = getIndex(kv, idx);
+            if (hasValue(index, key))
+            {
+                removeValue(index, key);
+
+                if (idx == "stringIndex") strings = true;
+                if (idx == "numberIndex") numbers = true;
+                if (idx == "boolIndex") booleans = true;
+                if (idx == "mapIndex") objects = true;
+                if (idx == "arrayIndex") arrays = true;
+                removed = true;
+            }
+        }
+    }
+
+    if (strings) kv->set(getIndex(kv, "stringIndex"), "stringIndex");
+    if (objects) kv->set(getIndex(kv, "mapIndex"), "mapIndex");
+    if (arrays) kv->set(getIndex(kv, "arrayIndex"), "arrayIndex");
+    if (numbers) kv->set(getIndex(kv, "numberIndex"), "numberIndex");
+    if (booleans) kv->set(getIndex(kv, "boolIndex"), "boolIndex");
+
+}
+
 static void setIndex(MMKV *kv, const string &type, const string &key)
 {
     if (!indexing_enabled[kv->mmapID()])
@@ -399,6 +439,7 @@ void installBindings(Runtime &jsiRuntime)
         auto size = keys.length(runtime);
 
         std::vector<std::string> keysArray = {};
+        std::vector<std::string> keysToRemove = {};
 
         for (int i = 0; i < size; i++)
         {
@@ -413,11 +454,12 @@ void installBindings(Runtime &jsiRuntime)
             {
                 if (kv->containsKey(key))
                 {
-                    kv->removeValueForKey(key);
-                    removeFromIndex(kv, key);
+                    keysToRemove.push_back(key);
                 }
             }
         }
+        kv->removeValuesForKeys(keysToRemove);
+        removeKeysFromIndex(kv, keysToRemove);
         setIndexes(kv, dataType, &keysArray);
         return jsi::Value(true);
     });
@@ -593,6 +635,29 @@ void installBindings(Runtime &jsiRuntime)
 
         kv->removeValueForKey(key);
         removeFromIndex(kv, key);
+
+        return Value(true);
+    });
+
+    CREATE_FUNCTION("removeValuesMMKV", 2, {
+        MMKV *kv = getInstance(std_string(arguments[1]));
+        auto keys = arguments[0].getObject(runtime).asArray(runtime);
+
+        if (!kv)
+        {
+            return Value::undefined();
+        }
+
+        std::vector<std::string> keys_vec = {};
+        auto size = keys.length(runtime);
+        for (int i = 0; i < size; i++)
+        {
+            auto key = std_string(keys.getValueAtIndex(runtime, i));
+            keys_vec.push_back(key);
+        }
+
+        kv->removeValuesForKeys(keys_vec);
+        removeKeysFromIndex(kv, keys_vec);
 
         return Value(true);
     });

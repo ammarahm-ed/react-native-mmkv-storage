@@ -99,6 +99,7 @@ export type MMKVJsiModule = {
   getBoolMMKV: (key: string, id: string) => boolean | null | undefined;
 
   removeValueMMKV: (key: string, id: string) => boolean | undefined;
+  removeValuesMMKV: (...keys: string[]) => boolean | undefined;
 
   getAllKeysMMKV: (id: string) => string[] | undefined;
   getIndexMMKV: (type: IndexType, id: string) => string[] | undefined;
