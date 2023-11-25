@@ -71,6 +71,16 @@ const App = () => {
         storage.clearStore();
       },
     },
+    {
+      title: 'removeByKeys',
+      onPress: async () => {
+        const keys = await storage.indexer.getKeys();
+        console.log(keys);
+        storage.removeItems(keys);
+        storage.clearStore();
+        console.log(await storage.indexer.getKeys());
+      },
+    },
   ];
 
   return (

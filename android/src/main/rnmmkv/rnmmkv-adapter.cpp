@@ -307,7 +307,6 @@ void initIndexForId(std::string id)
 
 void installBindings(Runtime &jsiRuntime)
 {
-    ;
 
     CREATE_FUNCTION("initializeMMKV", 0, {
         MMKV::initializeMMKV(rPath);

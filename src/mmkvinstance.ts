@@ -609,8 +609,12 @@ export default class MMKVInstance {
    * Remove multiple items from storage for given keys
    *
    */
-  removeItems(...keys: string[]) {
-    let result = handleAction(mmkvJsiModule.removeValuesMMKV, keys, this.instanceID);
+  removeItems(keys: string[]) {
+    let result = handleAction(
+      mmkvJsiModule.removeValuesMMKV,
+      keys.filter(key => key !== this.instanceID),
+      this.instanceID
+    );
     for (const key of keys) {
       if (result) {
         if (this.isRegisterd(key)) {
@@ -621,6 +625,7 @@ export default class MMKVInstance {
         this.transactions.transact('string', 'ondelete', key);
       }
     }
+
     return result;
   }
 
