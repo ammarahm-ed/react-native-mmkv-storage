@@ -215,9 +215,8 @@ public class MMKV {
 
     private native double decodeDouble(long handle, String key, double defaultValue);
 
-    public void putString(String key, @Nullable String value) {
-        encodeString(nativeHandle, key, value);
-
+    public void encode(String key, @Nullable String value) {
+        return encodeString(nativeHandle, key, value);
     }
 
     private native boolean encodeString(long handle, String key, @Nullable String value);
@@ -228,6 +227,11 @@ public class MMKV {
 
     private native boolean encodeDouble(long handle, String key, double value);
 
+    public boolean encode(String key, int value) {
+        return encodeInt(nativeHandle, key, value);
+    }
+
+    private native boolean encodeInt(long handle, String key, int value);
 
     public boolean encode(String key, @Nullable Set<String> value) {
         return encodeSet(nativeHandle, key, (value == null) ? null : value.toArray(new String[0]));

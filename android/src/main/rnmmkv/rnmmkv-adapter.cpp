@@ -949,6 +949,17 @@ Java_com_ammarahmed_mmkv_MMKV_encodeDouble(JNIEnv *env, jobject thiz, jlong hand
     return (jboolean) false;
 }
 
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_com_ammarahmed_mmkv_MMKV_encodeInt(JNIEnv *env, jobject thiz, jlong handle, jstring oKey, jint value) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        return (jboolean) kv->set((int) value, key);
+    }
+    return (jboolean) false;
+}
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_ammarahmed_mmkv_MMKV_encodeSet(JNIEnv *env, jobject thiz, jlong handle, jstring oKey,
                                         jobjectArray arrStr)
