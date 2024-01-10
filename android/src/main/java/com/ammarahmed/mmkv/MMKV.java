@@ -205,6 +205,16 @@ public class MMKV {
 
     private native int decodeInt(long handle, String key, int defaultValue);
 
+    public double decodeDouble(String key) {
+        return decodeDouble(nativeHandle, key, 0);
+    }
+
+    public double decodeDouble(String key, double defaultValue) {
+        return decodeDouble(nativeHandle, key, defaultValue);
+    }
+
+    private native double decodeDouble(long handle, String key, double defaultValue);
+
     public void putString(String key, @Nullable String value) {
         encodeString(nativeHandle, key, value);
 

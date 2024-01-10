@@ -885,6 +885,24 @@ Java_com_ammarahmed_mmkv_MMKV_decodeInt(JNIEnv *env, jobject obj, jlong handle, 
     return defaultValue;
 }
 
+extern "C"
+JNIEXPORT jdouble JNICALL
+Java_com_ammarahmed_mmkv_MMKV_decodeDouble(JNIEnv *env, jobject obj, jlong handle, jstring oKey,
+                                           jdouble default_value) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        bool hasValue;
+        double value = kv->getDouble(key, 0, &hasValue);
+
+        if (hasValue) {
+            return value;
+        }
+    }
+    return default_value;
+}
+
+
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_ammarahmed_mmkv_MMKV_checkProcessMode(JNIEnv *env, jclass clazz, jlong handle)
 {
