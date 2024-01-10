@@ -840,6 +840,21 @@ Java_com_ammarahmed_mmkv_MMKV_removeValueForKey(JNIEnv *env, jobject instance, j
     }
 }
 
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_ammarahmed_mmkv_MMKV_decodeString(JNIEnv *env, jobject obj, jlong handle, jstring oKey,
+                                           jstring default_value) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (kv && oKey) {
+        string key = jstring2string(env, oKey);
+        string value;
+        if (kv->getString(key, value)) {
+            return string2jstring(env, value);
+        }
+    }
+    return default_value;
+}
+
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_ammarahmed_mmkv_MMKV_decodeStringSet(JNIEnv *env, jobject, jlong handle, jstring oKey)
 {
@@ -936,6 +951,18 @@ Java_com_ammarahmed_mmkv_MMKV_encodeSet(JNIEnv *env, jobject thiz, jlong handle,
         }
     }
     return (jboolean) false;
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_ammarahmed_mmkv_MMKV_getAllKeys(JNIEnv *env, jobject obj, jlong handle) {
+    MMKV *kv = reinterpret_cast<MMKV *>(handle);
+    if (!kv) {
+        return nullptr;
+    }
+    auto keys = kv->allKeys();
+
+    return vector2jarray(env, keys);
 }
 
 extern "C" JNIEXPORT void JNICALL

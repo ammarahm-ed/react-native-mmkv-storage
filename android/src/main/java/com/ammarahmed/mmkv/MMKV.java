@@ -225,6 +225,25 @@ public class MMKV {
 
     private native boolean encodeSet(long handle, String key, @Nullable String[] value);
 
+    @Nullable
+    public native String[] getAllKeys(long handle);
 
+    @NonNull
+    public Set<String> getAllKeys() {
+        String[] result = getAllKeys(nativeHandle);
 
+        if(result == null) {
+            return Collections.emptySet();
+        }
+
+        return new HashSet<>(Arrays.asList(result));
+    }
+
+    @Nullable
+    private native String decodeString(long handle, String key, String defaultValue);
+
+    @Nullable
+    public String decodeString(String key, @Nullable String defaultValue) {
+        return decodeString(nativeHandle, key, defaultValue);
+    }
 }
