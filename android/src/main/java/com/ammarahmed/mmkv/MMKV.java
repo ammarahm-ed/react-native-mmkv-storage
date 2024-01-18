@@ -3,10 +3,8 @@ package com.ammarahmed.mmkv;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -215,7 +213,7 @@ public class MMKV {
 
     private native double decodeDouble(long handle, String key, double defaultValue);
 
-    public void encode(String key, @Nullable String value) {
+    public boolean encode(String key, @Nullable String value) {
         return encodeString(nativeHandle, key, value);
     }
 
