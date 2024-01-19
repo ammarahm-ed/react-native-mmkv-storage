@@ -108,7 +108,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 }
                 Gson gson = new Gson();
                 String json = gson.toJson(child);
-                kv.putString(key, json);
+                kv.encode(key, json);
                 
                 if (isEncrypted) {
                     String alias = (String) child.get("alias");
@@ -137,7 +137,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                 if (bundle != null) {
                     WritableMap map = Arguments.fromBundle(bundle);
                     String obj = gson.toJson(map.toHashMap());
-                    kvv.putString(string, obj);
+                    kvv.encode(string, obj);
                 }
 
             }
@@ -152,7 +152,7 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
                     if (map.getArray(string) != null) {
                         ArrayList<Object> list = map.getArray(string).toArrayList();
                         String obj = gson.toJson(list);
-                        kvv.putString(string, obj);
+                        kvv.encode(string, obj);
                     }
 
                 }
