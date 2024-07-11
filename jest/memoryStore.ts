@@ -124,7 +124,7 @@ export const mock = (): boolean => {
   mmkvJsiModule.getStringMMKV = (key, id) => {
     if (!MEMORY_STORE[id]) return undefined;
     let value = MEMORY_STORE[id].storage[key];
-    if (!value) return null;
+    if (typeof value != 'string') return null;
     return value;
   };
 
@@ -138,7 +138,7 @@ export const mock = (): boolean => {
   mmkvJsiModule.getNumberMMKV = (key, id) => {
     if (!MEMORY_STORE[id]) return undefined;
     let value = MEMORY_STORE[id].storage[key];
-    if (!value) return null;
+    if (typeof value != 'number') return null;
     return value;
   };
 
@@ -152,7 +152,7 @@ export const mock = (): boolean => {
   mmkvJsiModule.getBoolMMKV = (key, id) => {
     if (!MEMORY_STORE[id]) return undefined;
     let value = MEMORY_STORE[id].storage[key];
-    if (!value) return null;
+    if (typeof value != 'boolean') return null;
     return value;
   };
 
