@@ -38,6 +38,11 @@ repositories {
 android {
   compileSdkVersion safeExtGet("compileSdkVersion", 31)
 
+  def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+        namespace "com.ammarahmed.mmkv"
+    }
+
   if (rootProject.hasProperty("ndkPath")) {
         ndkPath rootProject.ext.ndkPath
     }
@@ -48,6 +53,8 @@ android {
   buildFeatures {
     prefab true
   }
+
+  
 
   defaultConfig {
     minSdkVersion safeExtGet('minSdkVersion', 19)
