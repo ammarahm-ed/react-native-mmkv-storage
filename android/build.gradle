@@ -38,6 +38,13 @@ repositories {
 android {
   compileSdkVersion safeExtGet("compileSdkVersion", 31)
 
+  if (rootProject.hasProperty("ndkPath")) {
+        ndkPath rootProject.ext.ndkPath
+    }
+    if (rootProject.hasProperty("ndkVersion")) {
+        ndkVersion rootProject.ext.ndkVersion
+    }
+
   buildFeatures {
     prefab true
   }
