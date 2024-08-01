@@ -20,6 +20,7 @@
   - [Querying and Indexing](queryingandindexing.md)
   - [useMMKVStorage](usemmkvstorage.md)
   - [useIndex](useindex.md)
+  - [useMMKVRef](usemmkvref.md)
   - [Transcation Manager](transactionmanager.md)
 
 - [Changelog](changelog.md)
