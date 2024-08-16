@@ -9,9 +9,9 @@ Allows you to register a lifecycle function for a given data type.
 **Arguments**
 
 | Name                              | Required | Type                                                 | Description                                             |
-|-----------------------------------|----------|------------------------------------------------------|---------------------------------------------------------|
+| --------------------------------- | -------- | ---------------------------------------------------- | ------------------------------------------------------- |
 | type                              | yes      | "string" / "number" / "object" / "array" / "boolean" | The type of data you want to register the function for. |
-| transcation                       | yes      | "beforewrite" / "onwrite" /"onread" / "ondelete"     | When should the function be called                      |
+| transaction                       | yes      | "beforewrite" / "onwrite" /"onread" / "ondelete"     | When should the function be called                      |
 | `mutator({key:string,value:any})` | no       | function                                             | The function that allows to mutate the value            |
 
 ### `unregister`
@@ -21,9 +21,9 @@ Unregister a lifecycle function for a given data type.
 **Arguments**
 
 | Name        | Required | Type                                                 | Description                                               |
-|-------------|----------|------------------------------------------------------|-----------------------------------------------------------|
+| ----------- | -------- | ---------------------------------------------------- | --------------------------------------------------------- |
 | type        | yes      | "string" / "number" / "object" / "array" / "boolean" | The type of data you want to unregister the function for. |
-| transcation | yes      | "beforewrite" / "onwrite" / "onread" / "ondelete"    | type of transaction to unregister                         |
+| transaction | yes      | "beforewrite" / "onwrite" / "onread" / "ondelete"    | type of transaction to unregister                         |
 
 ### `clear`
 
@@ -34,7 +34,7 @@ Clear all registered functions.
 Import `MMKVStorage` and `useMMKVStorage` Hook.
 
 ```js
-import { MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
 ```
 
 Initialize the `MMKVStorage` instance.
@@ -48,8 +48,8 @@ const MMKV = new MMKVLoader().initialize();
 Debug what is happening during the lifecycle of your app. Track every single change and have better control and understanding your storage.
 
 ```js
-MMKV.transcations.register("object", "onwrite", ({ key, value }) => {
-  console.log(MMKV.instanceID, "object:onwrite: ", key, value);
+MMKV.transactions.register('object', 'onwrite', ({ key, value }) => {
+  console.log(MMKV.instanceID, 'object:onwrite: ', key, value);
 });
 ```
 
@@ -60,8 +60,8 @@ Building and storing custom indexes with a simple key/value storage can become d
 Let's assume that we are storing user posts in storage and each post as a specific tag.
 
 ```js
-MMKV.transcations.register("object", "beforewrite", ({ key, value }) => {
-  if (key.startsWith("post.")) {
+MMKV.transactions.register('object', 'beforewrite', ({ key, value }) => {
+  if (key.startsWith('post.')) {
     // Call this only when the key has the post prefix.
     let indexForTag = MMKV.getArray(`${value.tag}-index`) || [];
     MMKV.setArray(indexForTag.push(key));
@@ -93,16 +93,16 @@ This is a basic example but you can imagine the level of control you can achieve
 Abstraction of data in your storage. Anything that is affected by multiple factors in your storage can be put here. This also allows for easier debugging since such data is mutated in one place instead of tens of different places in the app, you can know exactly what is happening.
 
 ```js
-MMKV.transcations.register("object", "onwrite", ({ key, value }) => {
-  if (!key.startsWith("posts.")) return; // only look at "posts." prefix keys
+MMKV.transactions.register('object', 'onwrite', ({ key, value }) => {
+  if (!key.startsWith('posts.')) return; // only look at "posts." prefix keys
   // developer can update other fields based on this transaction
-  MMKV.setIntAsync("postsCount", oldValue + 1);
+  MMKV.setIntAsync('postsCount', oldValue + 1);
 });
 
-MMKV.transcations.register("object", "ondelete", ({ key }) => {
-  if (!key.startsWith("posts.")) return; // only look at "posts." prefix keys
+MMKV.transactions.register('object', 'ondelete', ({ key }) => {
+  if (!key.startsWith('posts.')) return; // only look at "posts." prefix keys
   // developer can update other fields based on this transaction
-  MMKV.setIntAsync("postsCount", oldValue - 1);
+  MMKV.setIntAsync('postsCount', oldValue - 1);
 });
 ```
 
@@ -111,10 +111,10 @@ MMKV.transcations.register("object", "ondelete", ({ key }) => {
 Mutate a value before read/write.
 
 ```js
-const injectTimestamp = (record) => ({ ...record, timestamp: Date.now() });
+const injectTimestamp = record => ({ ...record, timestamp: Date.now() });
 
-MMKV.transcations.register("object", "beforewrite", ({ key, value }) => {
-  if (!key.startsWith("posts.")) return; // only look at "posts." namespace
+MMKV.transactions.register('object', 'beforewrite', ({ key, value }) => {
+  if (!key.startsWith('posts.')) return; // only look at "posts." namespace
   if (!!value.timestamp) return; // only run if timestamp is not in record already
 
   // Setup new transaction with properly structured data
