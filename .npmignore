@@ -1,4 +1,7 @@
 src/
+!dist/src
+!android/src
+
 index.ts
 
 jest/memoryStore.ts

@@ -24,20 +24,8 @@ Sets a string value in storage for the given key.
 |----------|----------|
 | key      | String   |
 | value    | String   |
-| callback | Function |
 
 ```js
-// WITH CALLBACK
-MMKV.setString("string", "string", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result);
-});
-
-// WITHOUT CALLBACK
 MMKV.setString("string", "string");
 ```
 
@@ -50,21 +38,9 @@ Gets a string value for a given key.
 | Name     | Type     |
 |----------|----------|
 | key      | String   |
-| callback | Function |
 
 ```js
-MMKV.getString("string", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // Logs 'string';
-});
-
-// WITHOUT CALLBACK
-
-let string = MMKV.getString("string");
+MMKV.getString("string");
 ```
 
 **Returns**
@@ -83,16 +59,6 @@ Sets a number value in storage for the given key.
 | callback | Function |
 
 ```js
-MMKV.setInt("number", 10, (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); //Logs true;
-});
-
-// WITHOUT CALLBACK
 MMKV.setInt("number", 10);
 ```
 
@@ -108,17 +74,7 @@ Gets a number value for a given key.
 | callback | Function |
 
 ```js
-MMKV.getInt("number", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // logs 10;
-});
-
-// WITHOUT CALLBACK
-let number = MMKV.getInt("number");
+MMKV.getInt("number");
 ```
 
 **Returns**
@@ -137,17 +93,6 @@ Sets a boolean value in storage for the given key.
 | callback | Function |
 
 ```js
-MMKV.setBool("boolean", true, (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // logs true;
-});
-
-// WITHOUT CALLBACK
-
 MMKV.setBool("boolean", true);
 ```
 
@@ -163,18 +108,7 @@ Gets a boolean value for a given key.
 | callback | Function |
 
 ```js
-MMKV.getBool("boolean", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // logs true;
-});
-
-// WITHOUT CALLBACK
-
-let boolean = MMKV.getBool("boolean");
+MMKV.getBool("boolean");
 ```
 
 **Returns**
@@ -198,17 +132,6 @@ let object = {
   bar: "bar",
 };
 
-MMKV.setMap("object", object, (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // logs true;
-});
-
-// WITHOUT CALLBACK
-
 MMKV.setMap("object", object);
 ```
 
@@ -224,19 +147,6 @@ Gets an object from storage.
 | callback | Function |
 
 ```js
-MMKV.getMap("object", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  let object = result;
-
-  console.log(object); // logs object
-});
-
-// WITHOUT CALLBACK
-
 let object = MMKV.getMap("object");
 ```
 
@@ -258,17 +168,6 @@ Sets an array to storage for the given key.
 ```js
 let array = ["foo", "bar"];
 
-MMKV.setArray("array", array, (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  console.log(result); // logs true
-});
-
-// WITHOUT CALLBACK
-
 MMKV.setArray("array", array);
 ```
 
@@ -284,19 +183,6 @@ Sets an array to storage for the given key.
 | callback | Function |
 
 ```js
-MMKV.getArray("array", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  let array = result;
-
-  console.log(array); // logs array
-});
-
-// WITHOUT CALLBACK
-
 let array = MMKV.getArray("array");
 ```
 
@@ -317,19 +203,6 @@ Retrieve multiple Objects for a given array of keys. **Currently will work only 
 
 ```js
 import MMKV from "react-native-mmkv-storage";
-
-MMKV.getMultipleItems(["foo", "bar", "loo"], "map", (error, result) => {
-  if (error) {
-    console.log(error);
-    return;
-  }
-
-  let objects = result;
-
-  console.log(objects); // logs objects
-});
-
-// WITHOUT CALLBACK
 
 let items = MMKV.getMultipleItems(["foo", "bar", "loo"], "map");
 ```
