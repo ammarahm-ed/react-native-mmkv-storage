@@ -3,10 +3,8 @@ package com.ammarahmed.mmkv;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
@@ -205,9 +203,18 @@ public class MMKV {
 
     private native int decodeInt(long handle, String key, int defaultValue);
 
-    public void putString(String key, @Nullable String value) {
-        encodeString(nativeHandle, key, value);
+    public double decodeDouble(String key) {
+        return decodeDouble(nativeHandle, key, 0);
+    }
 
+    public double decodeDouble(String key, double defaultValue) {
+        return decodeDouble(nativeHandle, key, defaultValue);
+    }
+
+    private native double decodeDouble(long handle, String key, double defaultValue);
+
+    public boolean encode(String key, @Nullable String value) {
+        return encodeString(nativeHandle, key, value);
     }
 
     private native boolean encodeString(long handle, String key, @Nullable String value);
@@ -218,6 +225,11 @@ public class MMKV {
 
     private native boolean encodeDouble(long handle, String key, double value);
 
+    public boolean encode(String key, int value) {
+        return encodeInt(nativeHandle, key, value);
+    }
+
+    private native boolean encodeInt(long handle, String key, int value);
 
     public boolean encode(String key, @Nullable Set<String> value) {
         return encodeSet(nativeHandle, key, (value == null) ? null : value.toArray(new String[0]));
@@ -225,6 +237,25 @@ public class MMKV {
 
     private native boolean encodeSet(long handle, String key, @Nullable String[] value);
 
+    @Nullable
+    public native String[] getAllKeys(long handle);
 
+    @NonNull
+    public Set<String> getAllKeys() {
+        String[] result = getAllKeys(nativeHandle);
 
+        if(result == null) {
+            return Collections.emptySet();
+        }
+
+        return new HashSet<>(Arrays.asList(result));
+    }
+
+    @Nullable
+    private native String decodeString(long handle, String key, String defaultValue);
+
+    @Nullable
+    public String decodeString(String key, @Nullable String defaultValue) {
+        return decodeString(nativeHandle, key, defaultValue);
+    }
 }
