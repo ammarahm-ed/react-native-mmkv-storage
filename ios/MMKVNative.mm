@@ -7,7 +7,6 @@
 
 #import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
-#import <ReactCommon/RCTTurboModule.h>
 
 
 using namespace facebook;
