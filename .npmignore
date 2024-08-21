@@ -1,8 +1,12 @@
 src/
 !dist/src
 !android/src
-
+.github
+.vscode
+.yarn
 index.ts
+tsconfig.json
+jest/tsconfig.json
 
 jest/memoryStore.ts
 
