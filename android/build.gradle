@@ -69,7 +69,7 @@ android {
     externalNativeBuild {
       cmake {
         cppFlags "-O2 -frtti -fexceptions -Wall -Wno-unused-variable -fstack-protector-all"
-        arguments "-DANDROID_STL=c++_shared", "-DUSE_HERMES=${USE_HERMES}"
+        arguments "-DANDROID_STL=c++_shared"
         abiFilters (*reactNativeArchitectures())
       }
     }

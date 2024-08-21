@@ -25,12 +25,6 @@ find_package(ReactAndroid REQUIRED CONFIG)
 find_library(log-lib log)
 find_package(fbjni REQUIRED CONFIG)
 
-#if(${USE_HERMES})
-#  set(JSEXECUTOR_LIB ReactAndroid::hermes_executor)
-#else()
-#  set(JSEXECUTOR_LIB ReactAndroid::jscexecutor)
-#endif()
-
 target_link_libraries(
         ${PACKAGE_NAME}
         core               
@@ -39,6 +33,5 @@ target_link_libraries(
         ReactAndroid::jsi
         ReactAndroid::turbomodulejsijni
         ReactAndroid::react_nativemodule_core
-#        ${JSEXECUTOR_LIB}
         android
 )

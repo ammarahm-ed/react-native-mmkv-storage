@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "example.app"
-               BlueprintName = "example"
-               ReferencedContainer = "container:example.xcodeproj">
+               BuildableName = "MmkvStorageExample.app"
+               BlueprintName = "MmkvStorageExample"
+               ReferencedContainer = "container:MmkvStorageExample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "exampleTests.xctest"
-               BlueprintName = "exampleTests"
-               ReferencedContainer = "container:example.xcodeproj">
+               BuildableName = "MmkvStorageExampleTests.xctest"
+               BlueprintName = "MmkvStorageExampleTests"
+               ReferencedContainer = "container:MmkvStorageExample.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "example.app"
-            BlueprintName = "example"
-            ReferencedContainer = "container:example.xcodeproj">
+            BuildableName = "MmkvStorageExample.app"
+            BlueprintName = "MmkvStorageExample"
+            ReferencedContainer = "container:MmkvStorageExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "example.app"
-            BlueprintName = "example"
-            ReferencedContainer = "container:example.xcodeproj">
+            BuildableName = "MmkvStorageExample.app"
+            BlueprintName = "MmkvStorageExample"
+            ReferencedContainer = "container:MmkvStorageExample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
