@@ -25,13 +25,29 @@ find_package(ReactAndroid REQUIRED CONFIG)
 find_library(log-lib log)
 find_package(fbjni REQUIRED CONFIG)
 
-target_link_libraries(
-        ${PACKAGE_NAME}
-        core               
-        ${log-lib}
-        fbjni::fbjni
-        ReactAndroid::jsi
-        ReactAndroid::turbomodulejsijni
-        ReactAndroid::react_nativemodule_core
-        android
-)
+# Ideally we would just depend on `REACTNATIVE_MERGED_SO`
+# See https://github.com/react-native-community/discussions-and-proposals/discussions/816
+# For some reason (yet to be determined) we don't have REACTNATIVE_MERGED_SO set here.
+# See https://github.com/react-native-community/discussions-and-proposals/discussions/816#discussioncomment-10659654
+if (REACTNATIVE_MERGED_SO OR ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
+        target_link_libraries(
+                ${PACKAGE_NAME}
+                core               
+                ${log-lib}
+                fbjni::fbjni
+                ReactAndroid::jsi
+                ReactAndroid::reactnative
+                android
+        )
+else()
+        target_link_libraries(
+                ${PACKAGE_NAME}
+                core               
+                ${log-lib}
+                fbjni::fbjni
+                ReactAndroid::jsi
+                ReactAndroid::turbomodulejsijni
+                ReactAndroid::react_nativemodule_core
+                android
+        )
+endif()
