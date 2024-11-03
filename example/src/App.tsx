@@ -20,6 +20,7 @@ const useStorage2 = create(storage2);
 const App = () => {
   const [user, setUser] = useStorage('user', 'robert');
   const [age, setAge] = useStorage2('age', 24);
+  const [test, setTest] = useStorage2('test', false);
 
   const getUser = useCallback(() => {
     let users = ['andrew', 'robert', 'jack', 'alison'];
@@ -73,7 +74,9 @@ const App = () => {
       onPress: async () => {
         const keys = await storage.indexer.getKeys();
         console.log(keys);
-        storage.removeItems(keys);
+        for (const key of keys) {
+          storage.removeItem(key);
+        }
         storage.clearStore();
         console.log(await storage.indexer.getKeys());
       }

@@ -27,7 +27,7 @@ body    \
 #define nsstring(arg) \
 convertJSIStringToNSString(runtime, arg.getString(runtime))
 
-@implementation MMKVNative
+@implementation MMKVStorage
 @synthesize bridge = _bridge;
 @synthesize methodQueue = _methodQueue;
 NSString *rPath = @"";
@@ -37,7 +37,6 @@ SecureStorage *_secureStorage;
 NSString *appGroupId;
 NSMutableDictionary *indexes;
 NSMutableDictionary *indexingEnabled;
-
 
 RCT_EXPORT_MODULE(MMKVStorage)
 
@@ -177,18 +176,28 @@ void setIndexes(MMKV *kv, NSString *type, NSArray *keys) {
 }
 
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
-    if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
-    
-    NSMutableDictionary *kvIndexes = indexes[[kv mmapID]];
-    
-    if (!kvIndexes[type]) {
-        if (![kv containsKey:type]) {
-            kvIndexes[type] = [NSMutableDictionary dictionary];
-        } else {
-            kvIndexes[type] = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
+    @try {
+        if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
+        
+        NSMutableDictionary *kvIndexes = indexes[[kv mmapID]];
+        if (!kvIndexes[type]) {
+            if (![kv containsKey:type]) {
+                kvIndexes[type] = [NSMutableDictionary dictionary];
+            } else {
+                id object = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
+                if ([object isKindOfClass:NSMutableDictionary.class]) {
+                    kvIndexes[type] = object;
+                } else if ([object isKindOfClass:NSMutableArray.class]) {
+                    upgradeIndex(kv, type);
+                    kvIndexes[type] = [kv getObjectOfClass:NSMutableDictionary.class forKey:type];
+                }
+            }
         }
+        return kvIndexes[type];
+    } @catch(NSException *e) {
+        
+        return [NSMutableDictionary dictionary];
     }
-    return kvIndexes[type];
 }
 
 void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
@@ -200,7 +209,6 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     bool numbers = false;
     bool booleans = false;
     
-    NSMutableDictionary *index = [NSMutableDictionary dictionary];
     for (int i=0;i < keys.count; i++) {
         NSString *key = keys[i];
         NSMutableDictionary *index = getIndex(kv, @"stringIndex");
@@ -256,30 +264,20 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
 void upgradeIndex(MMKV *kv, NSString *type) {
     @try {
         if (![kv containsKey:type]) return;
-        NSMutableArray *array = [kv getObjectOfClass:NSMutableArray.class forKey:type];
-        if (array.count) {
-            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-            for (int i=0;i < array.count;i++) {
-                [dic setValue:@1 forKey:array[i]];
+        id object = [kv getObjectOfClass:NSMutableArray.class forKey:type];
+        if ([object isKindOfClass:NSMutableArray.class]) {
+            NSMutableArray *array = (NSMutableArray*) object;
+            if (array.count) {
+                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+                for (int i=0;i < array.count;i++) {
+                    [dic setValue:@1 forKey:array[i]];
+                }
+                [kv removeValueForKey:type];
+                [kv setObject:dic forKey:type];
             }
-            [kv removeValueForKey:type];
-            [kv setObject:dic forKey:type];
         }
     } @catch(NSException *e) {
         NSLog(@"%@", e.reason);
-    }
-}
-
-void migrateKV(MMKV *kv) {
-    NSString *versionKey = @"___rn_mmkv_version";
-    bool hasVersion = [kv containsKey:versionKey];
-    if (!hasVersion) {
-        upgradeIndex(kv, @"stringIndex");
-        upgradeIndex(kv, @"numberIndex");
-        upgradeIndex(kv, @"boolIndex");
-        upgradeIndex(kv, @"mapIndex");
-        upgradeIndex(kv, @"arrayIndex");
-        [kv setInt32:9 forKey:versionKey];
     }
 }
 
@@ -304,9 +302,6 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         indexingEnabled[ID] = arguments[4].getBool() ? @YES : @NO;
         indexes[ID] = [NSMutableDictionary dictionary];
-        
-        migrateKV(kv);
-        
         
         return Value(true);
     });
@@ -780,6 +775,8 @@ static void install(jsi::Runtime &jsiRuntime) {
         [kv removeValueForKey:@"intIndex"];
     }
 }
+
+
 
 // Don't compile this code when we build for the old architecture.
 #ifdef RCT_NEW_ARCH_ENABLED
