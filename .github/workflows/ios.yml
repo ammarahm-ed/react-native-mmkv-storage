@@ -29,11 +29,4 @@ jobs:
         name: Install pod dependencies
       - name: Build iOS (debug)
         working-directory: example/ios
-        run: "xcodebuild \
-          -workspace example.xcworkspace \
-          -scheme example \
-          clean archive \
-          -sdk iphonesimulator \
-          -configuration Debug \
-          -UseModernBuildSystem=YES \
-          CODE_SIGNING_ALLOWED=NO"
+        run: xcodebuild -workspace MmkvStorageExample.xcworkspace -scheme MmkvStorageExample clean archive -sdk iphonesimulator -configuration Debug -UseModernBuildSystem=YES CODE_SIGNING_ALLOWED=NO
