@@ -15,43 +15,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - version: '0.75.x'
-            folder: 'rn75'
 
     steps:
       - uses: actions/checkout@v2
 
       - run: printenv
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v2
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ matrix.version }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Build Android apk (release & debug)
+      - name: Build Android apk (release)
         env:
-          RN_VERSION: ${{ matrix.version }}
-          RN_FOLDER: ${{ matrix.folder }}
           ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/26.1.10909125
         run: |
-          echo $RN_VERSION $RN_FOLDER $ANDROID_NDK_HOME
-          [[ "$RN_VERSION" == "reanimated-2" ]] && git clone --depth=1 https://github.com/software-mansion-labs/reanimated-2-playground.git "$RN_FOLDER" || npx react-native init "$RN_FOLDER" --version "$RN_VERSION"
           npm ci --legacy-peer-deps
           npm run build
-          rm -rf node_modules
-          cd "$RN_FOLDER"
-          yarn add file:..
-          cd ./android
+          cd example
+          npm ci --legacy-peer-deps
           ./gradlew assembleRelease
-          ./gradlew assembleDebug
