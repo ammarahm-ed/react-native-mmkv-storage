@@ -29,4 +29,5 @@ jobs:
           npm run build
           cd example
           npm ci --legacy-peer-deps
+          cd android
           ./gradlew assembleRelease
