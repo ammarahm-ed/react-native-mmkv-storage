@@ -19,7 +19,7 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - run: npm run build
 
-      - run: yarn
+      - run: npm ci
         working-directory: example
 
       - run: xcode-select -p
