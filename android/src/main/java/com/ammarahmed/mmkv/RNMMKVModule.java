@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Set;
 
 @ReactModule(name = RNMMKVModule.NAME)
-public class RNMMKVModule extends ReactContextBaseJavaModule {
+public class RNMMKVModule extends MmkvStorageSpec {
 
-    public static final String NAME =  "MMKVNative";
+    public static final String NAME = "MMKVStorage";
 
     private final ReactApplicationContext reactContext;
     private SecureKeystore secureKeystore;
@@ -58,8 +58,6 @@ public class RNMMKVModule extends ReactContextBaseJavaModule {
 
         String rootPath = reactContext.getFilesDir().getAbsolutePath() + "/mmkv";
         JavaScriptContextHolder jsContext = getReactApplicationContext().getJavaScriptContextHolder();
-        CallInvokerHolderImpl jsCallInvokerHolder = (CallInvokerHolderImpl)reactContext.getCatalystInstance().getJSCallInvokerHolder();
-
         if (jsContext.get() != 0) {
             migrate();
             this.nativeInstall(

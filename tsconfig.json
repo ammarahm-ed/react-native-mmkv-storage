@@ -1,5 +1,5 @@
 {
-  "include": ["index.ts"],
+  "include": ["index.ts","./src/module/NativeMMKVStorage.ts"],
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react-native",
@@ -22,5 +22,5 @@
     "skipLibCheck": true,
     "strict": false,
     "allowJs": true
-  }
+  },
 }

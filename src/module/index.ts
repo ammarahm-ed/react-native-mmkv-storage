@@ -1,7 +1,10 @@
 import { MMKVJsiModule } from '../types';
 
 //@ts-ignore
-const isDebugMode = global.location && global.location.pathname && global.location.pathname.includes('/debugger-ui');
+const isDebugMode =
+  global.location && global.location.pathname && global.location.pathname.includes('/debugger-ui');
+
+const isTurboModuleEnabled = global.__turboModuleProxy != null;
 
 export const mmkvBridgeModule: {
   /**
@@ -9,7 +12,9 @@ export const mmkvBridgeModule: {
    */
   install: () => boolean;
 } = !isDebugMode
-  ? require('react-native').NativeModules.MMKVNative
+  ? isTurboModuleEnabled
+    ? require('./NativeMMKVStorage').default
+    : require('react-native').NativeModules.MMKVNative
   : {
       install: () => {
         console.warn(
