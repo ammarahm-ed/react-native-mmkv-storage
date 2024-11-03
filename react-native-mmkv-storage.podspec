@@ -14,9 +14,9 @@ Pod::Spec.new do |s|
   s.requires_arc  = true
 
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
-      s.source_files = "ios/**/*.{h,mm,cpp}"
+      s.source_files = "ios/**/*.{h,m,mm,cpp}"
   else
-      s.source_files = "ios/*.{h,mm,cpp}"
+      s.source_files = "ios/*.{h,m,mm,cpp}"
   end
 
   s.dependency 'MMKV', '~> 1.3.9'
