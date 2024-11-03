@@ -7,14 +7,14 @@ const isDebugMode =
 const isTurboModuleEnabled = global.__turboModuleProxy != null;
 
 export const mmkvBridgeModule: {
-  /**
+  /*
    * Install JSI bindings
    */
   install: () => boolean;
 } = !isDebugMode
   ? isTurboModuleEnabled
     ? require('./NativeMMKVStorage').default
-    : require('react-native').NativeModules.MMKVNative
+    : require('react-native').NativeModules.MMKVStorage
   : {
       install: () => {
         console.warn(

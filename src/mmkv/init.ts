@@ -19,16 +19,16 @@ export function init() {
   try {
     if (!isLoaded()) {
       const installed = mmkvBridgeModule.install();
-      if (!installed) throw new Error('JSI bindings were not installed for: MMKVNative');
+      if (!installed) throw new Error('JSI bindings were not installed for: MMKVStorage');
 
       if (!isLoaded()) {
-        throw new Error('JSI bindings installation failed for: MMKVNative');
+        throw new Error('JSI bindings installation failed for: MMKVStorage');
       }
       return installed;
     }
     return true;
   } catch (e) {
-    console.log('JSI bindings were not installed for: MMKVNative');
+    console.error('JSI bindings were not installed for: MMKVStorage', e);
     return false;
   }
 }

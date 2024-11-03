@@ -110,15 +110,17 @@ void setServiceName(NSString *alias, NSString *serviceName) {
 // Installing JSI Bindings as done by
 // https://github.com/mrousavy/react-native-mmkv
 
+#ifdef RCT_NEW_ARCH_ENABLED
+
 - (NSNumber *)install {
     RCTCxxBridge* cxxBridge = (RCTCxxBridge*)_bridge;
     if (cxxBridge == nil) {
-        return @YES;
+        return @NO;
     }
     
     auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
     if (jsiRuntime == nil) {
-        return @YES;
+        return @NO;
     }
     
     mmkvInstances = [NSMutableDictionary dictionary];
@@ -131,6 +133,30 @@ void setServiceName(NSString *alias, NSString *serviceName) {
     install(*(jsi::Runtime *)jsiRuntime);
     return @YES;
 }
+
+#else
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install) {
+    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)_bridge;
+    if (cxxBridge == nil) {
+        return @false;
+    }
+    
+    auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
+    if (jsiRuntime == nil) {
+        return @false;
+    }
+    
+    mmkvInstances = [NSMutableDictionary dictionary];
+    serviceNames = [NSMutableDictionary dictionary];
+    
+    [self migrate];
+    
+    RCTBridge *bridge = [RCTBridge currentBridge];
+    
+    install(*(jsi::Runtime *)jsiRuntime);
+    return @true;
+}
+#endif
 
 MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
                      NSString *path) {
