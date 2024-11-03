@@ -11,8 +11,13 @@ Pod::Spec.new do |s|
   s.authors       = package["author"]
   s.platform      = :ios, "12.4"
   s.source        = { :git => "#{s.homepage}", :tag => "V#{s.version}" }
-  s.source_files  = "ios/**/*.{h,m,mm,cpp}"
   s.requires_arc  = true
+
+  if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
+      s.source_files = "ios/**/*.{h,mm,cpp}"
+  else
+      s.source_files = "ios/*.{h,mm,cpp}"
+  end
 
   s.dependency 'MMKV', '~> 1.3.9'
   if respond_to?(:install_modules_dependencies, true)

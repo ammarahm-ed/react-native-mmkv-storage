@@ -1245,7 +1245,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-mmkv-storage (0.11.0-alpha.0):
+  - react-native-mmkv-storage (0.11.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1575,7 +1575,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
-  - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
+  - react-native-mmkv-storage (from `../..`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1684,7 +1684,7 @@ EXTERNAL SOURCES:
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-mmkv-storage:
-    :path: "../node_modules/react-native-mmkv-storage"
+    :path: "../.."
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1780,7 +1780,7 @@ SPEC CHECKSUMS:
   React-logger: 97c9dafae1f1a638001a9d1d0e93d431f2f9cb7b
   React-Mapbuffer: 3146a13424f9fec2ea1f1462d49d566e4d69b732
   React-microtasksnativemodule: 02d218c79c72d373a92a8552183f4ead0d1c6e05
-  react-native-mmkv-storage: b0c41424145fdac4d9ae100b3967cbc0103bbd3a
+  react-native-mmkv-storage: 05ef240fe45d4aa0f37c645b15f9cb5d99f2c4a1
   React-nativeconfig: 93fe8c85a8c40820c57814e30f3e44b94c995a7b
   React-NativeModulesApple: b3e076fd0d7b73417fe1e8c8b26e3c57ae9b74aa
   React-perflogger: 1c55bcd3c392137cbaf0d21d8bb87ce9a0cebb15
