@@ -1,4 +1,4 @@
-#import "MMKVNative.h"
+#import "MMKVStorage.h"
 #import "YeetJSIUtils.h"
 
 #import "SecureStorage.h"
@@ -39,7 +39,7 @@ NSMutableDictionary *indexes;
 NSMutableDictionary *indexingEnabled;
 
 
-RCT_EXPORT_MODULE()
+RCT_EXPORT_MODULE(MMKVStorage)
 
 + (BOOL)requiresMainQueueSetup {
     
@@ -110,16 +110,16 @@ void setServiceName(NSString *alias, NSString *serviceName) {
 
 // Installing JSI Bindings as done by
 // https://github.com/mrousavy/react-native-mmkv
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
-{
+
+- (NSNumber *)install {
     RCTCxxBridge* cxxBridge = (RCTCxxBridge*)_bridge;
     if (cxxBridge == nil) {
-        return @false;
+        return @YES;
     }
     
     auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
     if (jsiRuntime == nil) {
-        return @false;
+        return @YES;
     }
     
     mmkvInstances = [NSMutableDictionary dictionary];
@@ -130,7 +130,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(install)
     RCTBridge *bridge = [RCTBridge currentBridge];
     
     install(*(jsi::Runtime *)jsiRuntime);
-    return @true;
+    return @YES;
 }
 
 MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
@@ -200,7 +200,7 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     bool numbers = false;
     bool booleans = false;
     
-    
+    NSMutableDictionary *index = [NSMutableDictionary dictionary];
     for (int i=0;i < keys.count; i++) {
         NSString *key = keys[i];
         NSMutableDictionary *index = getIndex(kv, @"stringIndex");
@@ -253,45 +253,34 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     
 }
 
-void upgradeIndex(MMKV *kv, NSString * type) {
-    if (![kv containsKey:type]) return;
-    NSMutableArray *array = [kv getObjectOfClass:NSMutableArray.class forKey:type];
-    if (array.count) {
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-        for (int i=0;i < array.count;i++) {
-            [dic setValue:@1 forKey:array[i]];
+void upgradeIndex(MMKV *kv, NSString *type) {
+    @try {
+        if (![kv containsKey:type]) return;
+        NSMutableArray *array = [kv getObjectOfClass:NSMutableArray.class forKey:type];
+        if (array.count) {
+            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            for (int i=0;i < array.count;i++) {
+                [dic setValue:@1 forKey:array[i]];
+            }
+            [kv removeValueForKey:type];
+            [kv setObject:dic forKey:type];
         }
-        [kv setObject:dic forKey:type];
+    } @catch(NSException *e) {
+        NSLog(@"%@", e.reason);
     }
 }
 
 void migrateKV(MMKV *kv) {
     NSString *versionKey = @"___rn_mmkv_version";
     bool hasVersion = [kv containsKey:versionKey];
-
-    int version = -1;
-    if (hasVersion) {
-        version = [kv getInt32ForKey:versionKey];
+    if (!hasVersion) {
+        upgradeIndex(kv, @"stringIndex");
+        upgradeIndex(kv, @"numberIndex");
+        upgradeIndex(kv, @"boolIndex");
+        upgradeIndex(kv, @"mapIndex");
+        upgradeIndex(kv, @"arrayIndex");
+        [kv setInt32:9 forKey:versionKey];
     }
-
-    switch (version) {
-        case -1: {
-            @try {
-                upgradeIndex(kv, @"stringIndex");
-                upgradeIndex(kv, @"numberIndex");
-                upgradeIndex(kv, @"boolIndex");
-                upgradeIndex(kv, @"mapIndex");
-                upgradeIndex(kv, @"arrayIndex");
-            } @catch(NSException *e) {
-                NSLog(@"%@", e.reason);
-            }
-            [kv setInt32:9 forKey:versionKey];
-            break;
-        }
-        default:
-            break;
-    }
-    
 }
 
 static void install(jsi::Runtime &jsiRuntime) {
@@ -791,5 +780,14 @@ static void install(jsi::Runtime &jsiRuntime) {
         [kv removeValueForKey:@"intIndex"];
     }
 }
+
+// Don't compile this code when we build for the old architecture.
+#ifdef RCT_NEW_ARCH_ENABLED
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+    return std::make_shared<facebook::react::NativeMMKVStorageSpecJSI>(params);
+}
+#endif
 
 @end
