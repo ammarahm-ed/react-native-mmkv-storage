@@ -117,7 +117,7 @@ export default class MMKVLoader {
    * Create the instance with the given options.
    */
   initialize() {
-    if (!init()) throw new Error('MMKVNative bindings not installed');
+    if (!init()) throw new Error('MMKVStorage bindings not installed');
     currentInstancesStatus[this.options.instanceID] = false;
     options[this.options.instanceID] = this.options;
     let instance = new MMKVInstance(this.options.instanceID);
