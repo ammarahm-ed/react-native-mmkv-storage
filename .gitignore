@@ -8,7 +8,7 @@
 node_modules/
 npm-debug.log
 yarn-error.log
-.xcode.env.local
+**/.xcode.env.local
   
 
 # Xcode
