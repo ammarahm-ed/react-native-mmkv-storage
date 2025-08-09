@@ -6,6 +6,10 @@
 cmake_minimum_required(VERSION 3.13)
 set(CMAKE_VERBOSE_MAKEFILE on)
 
+# https://github.com/android/ndk/wiki/Changelog-r27
+# Enable Android 16KB page size compatibility (NDK r27+)
+set(ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES ON)
+
 file(GLOB react_codegen_SRCS CONFIGURE_DEPENDS *.cpp react/renderer/components/MMKVStorageSpec/*.cpp)
 
 add_library(
