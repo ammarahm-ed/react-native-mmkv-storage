@@ -591,7 +591,6 @@
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx appletvsimulator appletvos xrsimulator xros";
 				TARGETED_DEVICE_FAMILY = "1,2,3";
-                SUPPORTS_MACCATALYST = YES;
 			};
 			name = Debug;
 		};
@@ -618,7 +617,6 @@
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx appletvsimulator appletvos xrsimulator xros";
 				TARGETED_DEVICE_FAMILY = "1,2,3";
-                SUPPORTS_MACCATALYST = YES;
 			};
 			name = Release;
 		};
