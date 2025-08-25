@@ -1,6 +1,6 @@
 {
   "name": "react-native-mmkv-storage",
-  "version": "0.11.2",
+  "version": "12.0.0",
   "description": "This library aims to provide a fast & reliable solution for you data storage needs in react-native apps. It uses [MMKV](https://github.com/Tencent/MMKV) by Tencent under the hood on Android and iOS both that is used by their WeChat app(more than 1 Billion users). Unlike other storage solutions for React Native, this library lets you store any kind of data type, in any number of database instances, with or without encryption in a very fast and efficient way.",
   "main": "./dist/index.js",
   "scripts": {
@@ -73,5 +73,6 @@
       "javaPackageName": "com.ammarahmed.mmkv"
     },
     "includesGeneratedCode": true
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
