@@ -96,7 +96,7 @@ export var mock = function () {
         if (!MEMORY_STORE[id])
             return undefined;
         var value = MEMORY_STORE[id].storage[key];
-        if (!value)
+        if (typeof value != 'string')
             return null;
         return value;
     };
@@ -111,7 +111,7 @@ export var mock = function () {
         if (!MEMORY_STORE[id])
             return undefined;
         var value = MEMORY_STORE[id].storage[key];
-        if (!value)
+        if (typeof value != 'number')
             return null;
         return value;
     };
@@ -126,7 +126,7 @@ export var mock = function () {
         if (!MEMORY_STORE[id])
             return undefined;
         var value = MEMORY_STORE[id].storage[key];
-        if (!value)
+        if (typeof value != 'boolean')
             return null;
         return value;
     };
@@ -164,6 +164,14 @@ export var mock = function () {
         if (!MEMORY_STORE[id])
             return undefined;
         return Object.keys(MEMORY_STORE[id].storage);
+    };
+    mmkvJsiModule.removeValuesMMKV = function (keys, id) {
+        if (!MEMORY_STORE[id])
+            return undefined;
+        for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+            var key = keys_1[_i];
+            mmkvJsiModule.removeValueMMKV(key, id);
+        }
     };
     mmkvJsiModule.setupMMKVInstance('mmkvIdStore');
     return true;
