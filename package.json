@@ -8,9 +8,6 @@
     "build": "tsc",
     "watch": "tsc --watch"
   },
-  "bin": {
-    "mmkv-link": "./autolink/postlink/run.js"
-  },
   "keywords": [
     "react-native",
     "fast-storage",
