@@ -189,6 +189,13 @@ export const mock = (): boolean => {
     return Object.keys(MEMORY_STORE[id].storage);
   };
 
+  mmkvJsiModule.removeValuesMMKV = (keys, id) => {
+    if (!MEMORY_STORE[id]) return undefined;
+    for (let key of keys) {
+      mmkvJsiModule.removeValueMMKV(key, id);
+    }
+  };
+
   mmkvJsiModule.setupMMKVInstance('mmkvIdStore');
   return true;
 };
