@@ -137,7 +137,7 @@ const settingsStorage = new MMKVLoader().withInstanceID('settings').initialize()
 
 ### **Full encryption support**
 
-The library supports full encryption (AES CFB-128) on Android and iOS. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). Encrypting an instance is simple:
+The library supports full encryption (AES CFB-128) on iOS. On Android AES/ECB/PKCS5Padding is used. You can choose to store your encryption key securely for continuious usage. The library uses Keychain on iOS and Android Keystore on android (API 23 and above). Encrypting an instance is simple:
 
 ```js
 const storage = new MMKVLoader()
