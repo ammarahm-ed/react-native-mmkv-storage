@@ -221,7 +221,6 @@ NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
         }
         return kvIndexes[type];
     } @catch(NSException *e) {
-        
         return [NSMutableDictionary dictionary];
     }
 }
@@ -290,17 +289,18 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
 void upgradeIndex(MMKV *kv, NSString *type) {
     @try {
         if (![kv containsKey:type]) return;
+        
         id object = [kv getObjectOfClass:NSMutableArray.class forKey:type];
         if ([object isKindOfClass:NSMutableArray.class]) {
             NSMutableArray *array = (NSMutableArray*) object;
+            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
             if (array.count) {
-                NSMutableDictionary *dic = [NSMutableDictionary dictionary];
                 for (int i=0;i < array.count;i++) {
                     [dic setValue:@1 forKey:array[i]];
                 }
-                [kv removeValueForKey:type];
-                [kv setObject:dic forKey:type];
             }
+            [kv removeValueForKey:type];
+            [kv setObject:dic forKey:type];
         }
     } @catch(NSException *e) {
         NSLog(@"%@", e.reason);
