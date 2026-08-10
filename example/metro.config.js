@@ -23,7 +23,7 @@ module.exports = {
     resolveRequest: (context, moduleName, platform) => {
       if (moduleName === 'react') {
         return {
-          filePath: path.resolve(path.join(__dirname, '../node_modules', 'react', 'index.js')),
+          filePath: path.resolve(path.join(__dirname, 'node_modules', 'react', 'index.js')),
           type: 'sourceFile'
         };
       }

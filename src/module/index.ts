@@ -4,7 +4,12 @@ import { MMKVJsiModule } from '../types';
 const isDebugMode =
   global.location && global.location.pathname && global.location.pathname.includes('/debugger-ui');
 
-const isTurboModuleEnabled = global.__turboModuleProxy != null;
+// `__turboModuleProxy` is only set on the legacy bridge. In bridgeless mode
+// (the default since RN 0.80, and the only mode in RN 0.87+) it is null,
+// so check for bridgeless explicitly as well.
+const isTurboModuleEnabled =
+  //@ts-ignore
+  global.RN$Bridgeless === true || global.__turboModuleProxy != null;
 
 export const mmkvBridgeModule: {
   /*

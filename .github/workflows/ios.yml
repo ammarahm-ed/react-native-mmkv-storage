@@ -10,23 +10,29 @@ on:
       - 'src/**'
       - 'ios/**'
       - 'MMKV/**'
+      - 'react-native-mmkv-storage.podspec'
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - run: npm ci --legacy-peer-deps
       - run: npm run build
 
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
         working-directory: example
 
       - run: xcode-select -p
 
-      - run: pod install
+      - name: Install pod dependencies
         working-directory: example/ios
-        name: Install pod dependencies
+        run: pod install
+
       - name: Build iOS (debug)
         working-directory: example/ios
-        run: xcodebuild -workspace MmkvStorageExample.xcworkspace -scheme MmkvStorageExample clean archive -sdk iphonesimulator -configuration Debug -UseModernBuildSystem=YES CODE_SIGNING_ALLOWED=NO
+        run: xcodebuild -workspace MmkvStorageExample.xcworkspace -scheme MmkvStorageExample clean build -sdk iphonesimulator -configuration Debug -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
