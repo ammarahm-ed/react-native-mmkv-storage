@@ -10,6 +10,8 @@ const config = getConfig(getDefaultConfig(__dirname), {
   project: __dirname
 });
 
+const mode = `${process.env.E2E_TEST ?? '0'}-${process.env.BENCHMARK ?? '0'}`;
+
 /**
  * Metro configuration
  * https://facebook.github.io/metro/docs/configuration
@@ -18,6 +20,7 @@ const config = getConfig(getDefaultConfig(__dirname), {
  */
 module.exports = {
   ...config,
+  cacheVersion: `${config.cacheVersion ?? 'mmkv-example'}-${mode}`,
   resolver: {
     ...config.resolver,
     resolveRequest: (context, moduleName, platform) => {
