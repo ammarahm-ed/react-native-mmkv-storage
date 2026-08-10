@@ -211,39 +211,33 @@ static void removeKeysFromIndex(MMKV *kv, const vector<string> &arrKeys)
     if (!indexing_enabled[kv->mmapID()])
         return;
 
-    auto strings = false;
-    auto objects = false;
-    auto arrays = false;
-    auto numbers = false;
-    auto booleans = false;
+    std::unordered_map<std::string, std::vector<std::string>> indexes;
+    std::unordered_map<std::string, bool> modified;
 
-    for (const auto &key : arrKeys) {
-        auto removed = false;
+    for (const auto &idx : dataTypes)
+    {
+        indexes[idx] = getIndex(kv, idx);
+        modified[idx] = false;
+    }
+
+    for (const auto &key : arrKeys)
+    {
         for (const auto &idx : dataTypes)
         {
-            if (removed) continue;
-
-            auto index = getIndex(kv, idx);
-            if (hasValue(index, key))
+            if (hasValue(indexes[idx], key))
             {
-                removeValue(index, key);
-
-                if (idx == "stringIndex") strings = true;
-                if (idx == "numberIndex") numbers = true;
-                if (idx == "boolIndex") booleans = true;
-                if (idx == "mapIndex") objects = true;
-                if (idx == "arrayIndex") arrays = true;
-                removed = true;
+                removeValue(indexes[idx], key);
+                modified[idx] = true;
+                break;
             }
         }
     }
 
-    if (strings) kv->set(getIndex(kv, "stringIndex"), "stringIndex");
-    if (objects) kv->set(getIndex(kv, "mapIndex"), "mapIndex");
-    if (arrays) kv->set(getIndex(kv, "arrayIndex"), "arrayIndex");
-    if (numbers) kv->set(getIndex(kv, "numberIndex"), "numberIndex");
-    if (booleans) kv->set(getIndex(kv, "boolIndex"), "boolIndex");
-
+    for (const auto &idx : dataTypes)
+    {
+        if (modified[idx])
+            kv->set(indexes[idx], idx);
+    }
 }
 
 static void setIndex(MMKV *kv, const string &type, const string &key)
@@ -266,7 +260,10 @@ static void setIndexes(MMKV *kv, const string &type, const std::vector<std::stri
     int size = keys->size();
     for (int i = 0; i < size; i++)
     {
-        addValue(index, keys->at(i));
+        if (!hasValue(index, keys->at(i)))
+        {
+            addValue(index, keys->at(i));
+        }
     }
     kv->set(index, type);
 }

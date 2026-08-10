@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "keywords": [
     "react-native",
@@ -55,7 +58,8 @@
     "react-native": "0.87.0-rc.4",
     "typescript": "^5.1.6",
     "eslint": "^8.57.1",
-    "@react-native-community/eslint-config": "^3.2.0"
+    "@react-native-community/eslint-config": "^3.2.0",
+    "vitepress": "^1.6.3"
   },
   "codegenConfig": {
     "name": "MMKVStorageSpec",
