@@ -5,8 +5,14 @@
 #import <MMKV/MMKV.h>
 #import <jsi/jsi.h>
 
-#import <React/RCTBridge+Private.h>
 #import <React/RCTUtils.h>
+
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
+#else
+// RCTCxxBridge only exists on the legacy architecture (removed in RN 0.87).
+#import <React/RCTBridge+Private.h>
+#endif
 
 
 using namespace facebook;
@@ -26,6 +32,11 @@ body    \
 
 #define nsstring(arg) \
 convertJSIStringToNSString(runtime, arg.getString(runtime))
+
+#ifdef RCT_NEW_ARCH_ENABLED
+@interface MMKVStorage () <RCTTurboModuleWithJSIBindings>
+@end
+#endif
 
 @implementation MMKVStorage
 @synthesize bridge = _bridge;
@@ -50,37 +61,37 @@ RCT_EXPORT_MODULE(MMKVStorage)
     self = [super init];
     indexingEnabled = [NSMutableDictionary dictionary];
     indexes = [NSMutableDictionary dictionary];
-    
-    RCTExecuteOnMainQueue(^{
-        
-        NSString *rootDir;
-        
-        appGroupId = [[NSBundle mainBundle].infoDictionary valueForKey:@"appGroupId"];
-        NSString *disableMMKVBackup = [[NSBundle mainBundle].infoDictionary valueForKey:@"disableMMKVBackup"];
-        
-        if (appGroupId != nil) {
-            NSURL *appGroup = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:appGroupId];
-            rootDir = [appGroup.path stringByAppendingPathComponent:@"mmkv"];
-            rPath = rootDir;
-            [MMKV initializeMMKV:nil groupDir:rootDir logLevel:MMKVLogInfo];
-        } else {
-            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
-                                                                 NSUserDomainMask, YES);
-            NSString *libraryPath = (NSString *)[paths firstObject];
-            rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-            rPath = rootDir;
-            [MMKV initializeMMKV:rootDir];
-        }
-        
-        if (disableMMKVBackup) {
-            NSError *error = nil;
-            NSURL *url = [NSURL fileURLWithPath:rootDir isDirectory:YES];
-            [url setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:&error];
-        }
-        
-        _secureStorage = [[SecureStorage alloc] init];
-    });
-    
+
+    // MMKV initialization is thread-safe and has no main-thread requirement.
+    // It must complete before install()/migrate runs on the JS thread, so it
+    // is done synchronously here instead of being dispatched to the main queue.
+    NSString *rootDir;
+
+    appGroupId = [[NSBundle mainBundle].infoDictionary valueForKey:@"appGroupId"];
+    NSString *disableMMKVBackup = [[NSBundle mainBundle].infoDictionary valueForKey:@"disableMMKVBackup"];
+
+    if (appGroupId != nil) {
+        NSURL *appGroup = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:appGroupId];
+        rootDir = [appGroup.path stringByAppendingPathComponent:@"mmkv"];
+        rPath = rootDir;
+        [MMKV initializeMMKV:nil groupDir:rootDir logLevel:MMKVLogInfo];
+    } else {
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                             NSUserDomainMask, YES);
+        NSString *libraryPath = (NSString *)[paths firstObject];
+        rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
+        rPath = rootDir;
+        [MMKV initializeMMKV:rootDir];
+    }
+
+    if (disableMMKVBackup) {
+        NSError *error = nil;
+        NSURL *url = [NSURL fileURLWithPath:rootDir isDirectory:YES];
+        [url setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:&error];
+    }
+
+    _secureStorage = [[SecureStorage alloc] init];
+
     return self;
 }
 
@@ -112,25 +123,37 @@ void setServiceName(NSString *alias, NSString *serviceName) {
 
 #ifdef RCT_NEW_ARCH_ENABLED
 
+// Called by RCTTurboModuleManager with the JSI runtime right after this
+// TurboModule is created, before it is returned to JS. This replaces the
+// former RCTCxxBridge.runtime access, which no longer exists in RN 0.87+.
+// Everything must be set up here: because the bindings are already present
+// by the time JS runs, the JS side never calls install() on this path.
+- (void)setupWithRuntime:(facebook::jsi::Runtime &)runtime
+{
+    if (mmkvInstances == nil) {
+        mmkvInstances = [NSMutableDictionary dictionary];
+        serviceNames = [NSMutableDictionary dictionary];
+        [self migrate];
+    }
+    install(runtime);
+}
+
+// RN >= 0.79
+- (void)installJSIBindingsWithRuntime:(facebook::jsi::Runtime &)runtime
+                          callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker
+{
+    [self setupWithRuntime:runtime];
+}
+
+// RN < 0.79 called the protocol method without the callInvoker argument.
+- (void)installJSIBindingsWithRuntime:(facebook::jsi::Runtime &)runtime
+{
+    [self setupWithRuntime:runtime];
+}
+
 - (NSNumber *)install {
-    RCTCxxBridge* cxxBridge = (RCTCxxBridge*)_bridge;
-    if (cxxBridge == nil) {
-        return @NO;
-    }
-    
-    auto jsiRuntime = (jsi::Runtime*) cxxBridge.runtime;
-    if (jsiRuntime == nil) {
-        return @NO;
-    }
-    
-    mmkvInstances = [NSMutableDictionary dictionary];
-    serviceNames = [NSMutableDictionary dictionary];
-    
-    [self migrate];
-    
-    RCTBridge *bridge = [RCTBridge currentBridge];
-    
-    install(*(jsi::Runtime *)jsiRuntime);
+    // Everything was installed via installJSIBindingsWithRuntime when this
+    // module was created; this remains only for API compatibility.
     return @YES;
 }
 
