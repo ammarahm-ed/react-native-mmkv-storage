@@ -134,14 +134,14 @@ void sortVector(std::vector<std::string> &vec)
 }
 
 // Function to add a value to the vector while maintaining sorting order
-void addValue(std::vector<std::string> &vec, std::string value)
+void addValue(std::vector<std::string> &vec, const std::string &value)
 {
     auto insertPosition = std::lower_bound(vec.begin(), vec.end(), value);
     vec.insert(insertPosition, value);
 }
 
 // Function to remove a value from the vector
-void removeValue(std::vector<std::string> &vec, std::string value)
+void removeValue(std::vector<std::string> &vec, const std::string &value)
 {
     auto position = std::lower_bound(vec.begin(), vec.end(), value);
     if (position != vec.end() && *position == value)
@@ -151,7 +151,7 @@ void removeValue(std::vector<std::string> &vec, std::string value)
 }
 
 // Function to search for a value in the vector
-bool hasValue(const std::vector<std::string> &vec, std::string value)
+bool hasValue(const std::vector<std::string> &vec, const std::string &value)
 {
     return std::binary_search(vec.begin(), vec.end(), value);
 }
@@ -159,27 +159,34 @@ bool hasValue(const std::vector<std::string> &vec, std::string value)
 std::unordered_map<std::string, bool> indexing_enabled = {};
 std::unordered_map<std::string, std::unordered_map<std::string, std::vector<std::string>>> index_cache = {};
 
-static vector<string> getIndex(MMKV *kv, const string &type)
+static std::vector<std::string> emptyIndex;
+
+static std::vector<std::string> &getIndex(MMKV *kv, const string &type)
 {
     if (!indexing_enabled[kv->mmapID()])
-        return {};
-
-    auto kvIndex = index_cache[kv->mmapID()];
-
-    if (kvIndex.count(type) == 0)
     {
-        auto exists = kv->getVector(type, kvIndex[type]);
-        if (!exists)
+        emptyIndex.clear();
+        return emptyIndex;
+    }
+
+    auto &kvIndex = index_cache[kv->mmapID()];
+
+    auto it = kvIndex.find(type);
+    if (it == kvIndex.end())
+    {
+        std::vector<std::string> loaded;
+        if (kv->getVector(type, loaded))
         {
-            kvIndex[type] = std::vector<std::string>();
+            sortVector(loaded);
         }
         else
         {
-            sortVector(kvIndex[type]);
+            loaded.clear();
         }
+        it = kvIndex.emplace(type, std::move(loaded)).first;
     }
 
-    return kvIndex[type];
+    return it->second;
 }
 
 static const string dataTypes[] = {
@@ -196,7 +203,7 @@ static void removeFromIndex(MMKV *kv, const string &key)
         return;
     for (const auto &idx : dataTypes)
     {
-        auto index = getIndex(kv, idx);
+        auto &index = getIndex(kv, idx);
         if (hasValue(index, key))
         {
             removeValue(index, key);
@@ -211,22 +218,16 @@ static void removeKeysFromIndex(MMKV *kv, const vector<string> &arrKeys)
     if (!indexing_enabled[kv->mmapID()])
         return;
 
-    std::unordered_map<std::string, std::vector<std::string>> indexes;
     std::unordered_map<std::string, bool> modified;
-
-    for (const auto &idx : dataTypes)
-    {
-        indexes[idx] = getIndex(kv, idx);
-        modified[idx] = false;
-    }
 
     for (const auto &key : arrKeys)
     {
         for (const auto &idx : dataTypes)
         {
-            if (hasValue(indexes[idx], key))
+            auto &index = getIndex(kv, idx);
+            if (hasValue(index, key))
             {
-                removeValue(indexes[idx], key);
+                removeValue(index, key);
                 modified[idx] = true;
                 break;
             }
@@ -236,7 +237,7 @@ static void removeKeysFromIndex(MMKV *kv, const vector<string> &arrKeys)
     for (const auto &idx : dataTypes)
     {
         if (modified[idx])
-            kv->set(indexes[idx], idx);
+            kv->set(getIndex(kv, idx), idx);
     }
 }
 
@@ -244,7 +245,7 @@ static void setIndex(MMKV *kv, const string &type, const string &key)
 {
     if (!indexing_enabled[kv->mmapID()])
         return;
-    auto index = getIndex(kv, type);
+    auto &index = getIndex(kv, type);
     if (!hasValue(index, key))
     {
         addValue(index, key);
@@ -256,7 +257,7 @@ static void setIndexes(MMKV *kv, const string &type, const std::vector<std::stri
 {
     if (!indexing_enabled[kv->mmapID()])
         return;
-    auto index = getIndex(kv, type);
+    auto &index = getIndex(kv, type);
     int size = keys->size();
     for (int i = 0; i < size; i++)
     {
@@ -683,7 +684,7 @@ void installBindings(Runtime &jsiRuntime)
             return Value::undefined();
         }
 
-        auto keys = getIndex(kv, std_string(arguments[0]));
+        const auto &keys = getIndex(kv, std_string(arguments[0]));
         auto size = keys.size();
         auto array = jsi::Array(runtime, size);
         for (int i = 0; i < size; i++)
