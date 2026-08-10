@@ -1,80 +1,115 @@
 # Encryption
 
-MMKV uses AES_CFB for encryption. The encryption keys are stored in Keychain on iOS and Android Keystore in android but if you are using your own secure storage solution, you can opt this out and save your keys there.
+MMKV encrypts with AES CFB-128. Keys are stored in the Keychain on iOS and the Keystore on Android, or kept out of secure storage entirely if you manage them with your own solution.
+
+These methods live on the `encryption` property of a loaded instance and let you encrypt, decrypt or re-key a storage **after** it has been created. To create a storage that is encrypted from the start, use [`withEncryption()`](/loaderclass#withencryption) on the loader instead.
+
+All three methods are synchronous — do not `await` them.
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().initialize();
+```
 
 ## encrypt
 
-Encrypt an already created instance of MMKV.
+Encrypts an existing, unencrypted instance. When called without a key, a strong key is generated for you.
 
-**Arguments**
+```ts
+encrypt(
+  key?: string,
+  secureKeyStorage?: boolean,
+  alias?: string,
+  accessibleMode?: string
+): boolean
+```
 
-| Name             | Required | Type    | Description                                                                           |
-|------------------|----------|---------|---------------------------------------------------------------------------------------|
-| cryptKey         | no       | String  | Password to encrypt the storage                                                       |
-| secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
-| alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
-| accessibleMode   | no       | IOSAccessibleStates  | Choose the accessibility mode (iOS only)                                 |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | no | Key to encrypt the storage with. A random key is generated if omitted. |
+| `secureKeyStorage` | `boolean` | no | Store the key in the Keychain/Keystore. Defaults to `true`. |
+| `alias` | `string` | no | Alias to store the key under. Defaults to the instance ID. |
+| `accessibleMode` | `string` | no | One of the [`IOSAccessibleStates`](/loaderclass#setaccessibleios) values. iOS only. |
+
+**Returns:** `boolean` — `true`. It does not return the key or alias; read those back with [`getKey()`](/generalmethods#getkey).
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader, IOSAccessibleStates } from 'react-native-mmkv-storage';
 
-// A simple MMKV Instance();
-MMKV = new MMKVLoader().initialize();
+const storage = new MMKVLoader().initialize();
 
-await MMKV.encryption.encrypt();
+storage.encryption.encrypt(); // => true
 
-// or if you want to provide your own key
+storage.encryption.encrypt('encryptionKey');
 
-await MMKV.encryption.encrypt("encryptionKey");
+storage.encryption.encrypt('encryptionKey', true, 'customAlias', IOSAccessibleStates.WHEN_UNLOCKED);
 
-// if you want to store it
-
-MMKV.encryption.encrypt("encryptionKey", true);
+storage.getKey(); // => { alias: '636f6d2e...', key: 'encryptionKey' }
 ```
+
+::: tip
+If you pass `secureKeyStorage: false`, the key is never persisted and you must supply it yourself on every app launch, via [`encryptWithCustomKey()`](/loaderclass#encryptwithcustomkey) on the loader.
+:::
 
 ## decrypt
 
-Removes encryption from an encrypted instance of MMKV.
+Removes encryption from an encrypted instance and deletes the key it was encrypted with.
 
-```js
-// Create an instance that is encrypted
-
-MMKV = new MMKVLoader().withEncryption().initialize();
-
-// Remove encryption from an encrypted instance of MMKV.
-
-await MMKV.encryption.decrypt();
+```ts
+decrypt(): boolean
 ```
 
-!> Once you have decrypted an already created instance, the loader will not encrypt it when you reload the your app. If you want to encrypt again, you will now call `encrypt()`. Only new created instances are encrypted with the loader class. Once you modify that, it will have no effect.
+**Parameters:** none.
+
+**Returns:** `boolean` — `true`.
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().withInstanceID('secure').withEncryption().initialize();
+
+storage.encryption.decrypt(); // => true
+```
+
+::: warning
+Once you have decrypted an already created instance, the loader will not encrypt it again when you reload your app. To encrypt it again you must call `encrypt()`. Only newly created instances are encrypted by the loader class — once you modify an existing instance at runtime, `withEncryption()` has no effect on it.
+:::
 
 ## changeEncryptionKey
 
-Change the encryption key of an encrypted instance of MMKV.
+Replaces the encryption key of an encrypted instance, for example after the old key has been compromised.
 
-**Arguments**
-
-| Name             | Required | Type    | Description                                                                           |
-|------------------|----------|---------|---------------------------------------------------------------------------------------|
-| cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
-| secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
-| alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
-| accessibleMode   | no       | IOSAccessibleStates  | Choose the accessibility mode (iOS only)                                 |
-
-```js
-// Create an instance that is encrypted
-
-MMKV = new MMKVLoader().withEncryption().initialize();
-
-await MMKV.encryption.changeEncryptionKey();
-
-// or if you want to provide your own key
-
-await MMKV.encryption.changeEncryptionKey("encryptionKey");
-
-// if you  want to store it
-
-MMKV.encryption.changeEncryptionKey("encryptionKey", true);
+```ts
+changeEncryptionKey(
+  key: string,
+  secureKeyStorage?: boolean,
+  alias?: string,
+  accessibleMode?: string
+): boolean
 ```
 
-!> After changing the encryption key, you will need to change your key or provide a key in the loader method above or it will throw error and not load the database.
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | The new key to encrypt the storage with. |
+| `secureKeyStorage` | `boolean` | no | Store the new key in the Keychain/Keystore. Defaults to `true`. |
+| `alias` | `string` | no | Alias to store the key under. Defaults to the instance ID. |
+| `accessibleMode` | `string` | no | One of the [`IOSAccessibleStates`](/loaderclass#setaccessibleios) values. iOS only. |
+
+**Returns:** `boolean` — `true`.
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().withInstanceID('secure').withEncryption().initialize();
+
+storage.encryption.changeEncryptionKey('newEncryptionKey'); // => true
+
+storage.encryption.changeEncryptionKey('newEncryptionKey', true, 'customAlias');
+```
+
+::: warning
+After changing the encryption key, you must use the new key wherever you load this instance — including any `encryptWithCustomKey()` call in your loader setup. Loading it with the old key throws and the storage will not load.
+:::
+
+For a walkthrough of the common encryption workflows, see [Working with encryption](/workingwithencryption).

@@ -1,0 +1,60 @@
+:root {
+  --vp-c-brand-1: #2f7ff0;
+  --vp-c-brand-2: #3b82f6;
+  --vp-c-brand-3: #60a5fa;
+  --vp-c-brand-soft: rgba(59, 130, 246, 0.14);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #38bdf8 0%, #3b82f6 45%, #7c3aed 100%);
+
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #38bdf855 20%, #7c3aed55 80%);
+  --vp-home-hero-image-filter: blur(48px);
+
+  --vp-button-brand-bg: #2f7ff0;
+  --vp-button-brand-hover-bg: #1d6ce0;
+  --vp-button-brand-active-bg: #175bc0;
+}
+
+.dark {
+  --vp-c-brand-1: #7cb6ff;
+  --vp-c-brand-2: #5aa1ff;
+  --vp-c-brand-3: #3b82f6;
+  --vp-c-brand-soft: rgba(96, 165, 250, 0.18);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --vp-home-hero-image-filter: blur(64px);
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(80px);
+  }
+}
+
+.VPFeature {
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.VPHero .name {
+  font-size: clamp(2.2rem, 6vw, 3.4rem);
+  letter-spacing: -0.02em;
+}
+
+.vp-doc table {
+  display: table;
+  width: 100%;
+}
+
+.vp-doc td,
+.vp-doc th {
+  word-break: normal;
+  overflow-wrap: anywhere;
+}

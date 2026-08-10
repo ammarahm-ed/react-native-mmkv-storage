@@ -1,227 +1,265 @@
-# Synchronous API
+# Sync API
 
-Synchronous calls is 8 to 10 times faster than Asynchronous calls. 
+All reads and writes are synchronous and run directly over JSI, which makes them several times faster than the promise-based [Async API](/asyncapi). Prefer these methods unless you need a promise for interoperability.
 
-However If you are on <=0.5.3 at the very start of your app lifecycle, you cannot use Synchronous API with return values, only callbacks. A callback function can be optionally provided in case you need some value at the very beginning of app load, usually you won't need to.
-
-Starting from `0.5.4` all calls are Synchronous and you should not use the callbacks anymore.
-
-First we create a default MMKV Instance
+Every example below assumes a loaded instance:
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
-MMKV = new MMKVLoader().initialize();
+const storage = new MMKVLoader().initialize();
 ```
+
+::: tip
+Setting a key to `null` or `undefined` removes it and returns `true`. Setters throw when the value does not match the method's type — `storage.setString('user', 5)` throws `Trying to set number as a string.`
+:::
 
 ## setString
 
-Sets a string value in storage for the given key.
+Stores a string.
 
-**Arguments**
+```ts
+setString(key: string, value: string): boolean | undefined
+```
 
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| value    | String   |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `string` | yes | The string to store. |
+
+**Returns:** `boolean | undefined` — `true` on success, `undefined` if the instance is not loaded.
 
 ```js
-MMKV.setString("string", "string");
+storage.setString('user', 'robert'); // => true
 ```
 
 ## getString
 
-Gets a string value for a given key.
+Reads a string.
 
-**Arguments**
-
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-
-```js
-MMKV.getString("string");
+```ts
+getString(
+  key: string,
+  callback?: (error: any, value: string | null | undefined) => void
+): string | null | undefined
 ```
 
-**Returns**
-`string`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+| `callback` | `(error, value) => void` | no | Called synchronously with the value. Provided for convenience only; the value is also returned. |
+
+**Returns:** `string | null | undefined` — the stored string, `null` if the key does not exist, `undefined` if the instance is not loaded.
+
+```js
+storage.getString('user'); // => 'robert'
+
+storage.getString('user', (error, value) => {
+  console.log(value); // => 'robert'
+});
+```
 
 ## setInt
 
-Sets a number value in storage for the given key.
+Stores a number.
 
-**Arguments**
+```ts
+setInt(key: string, value: number): boolean | undefined
+```
 
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| value    | Number   |
-| callback | Function |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `number` | yes | The number to store. |
+
+**Returns:** `boolean | undefined`
 
 ```js
-MMKV.setInt("number", 10);
+storage.setInt('age', 24); // => true
 ```
 
 ## getInt
 
-Gets a number value for a given key.
+Reads a number.
 
-**Arguments**
-
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| callback | Function |
-
-```js
-MMKV.getInt("number");
+```ts
+getInt(
+  key: string,
+  callback?: (error: any, value: number | null | undefined) => void
+): number | null | undefined
 ```
 
-**Returns**
-`number`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+| `callback` | `(error, value) => void` | no | Called synchronously with the value. |
+
+**Returns:** `number | null | undefined`
+
+```js
+storage.getInt('age'); // => 24
+```
 
 ## setBool
 
-Sets a boolean value in storage for the given key.
+Stores a boolean.
 
-**Arguments**
+```ts
+setBool(key: string, value: boolean): boolean | undefined
+```
 
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| value    | boolean  |
-| callback | Function |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `boolean` | yes | The boolean to store. |
+
+**Returns:** `boolean | undefined`
 
 ```js
-MMKV.setBool("boolean", true);
+storage.setBool('darkMode', true); // => true
 ```
 
 ## getBool
 
-Gets a boolean value for a given key.
+Reads a boolean.
 
-**Arguments**
-
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| callback | Function |
-
-```js
-MMKV.getBool("boolean");
+```ts
+getBool(
+  key: string,
+  callback?: (error: any, value: boolean | null | undefined) => void
+): boolean | null | undefined
 ```
 
-**Returns**
-`boolean`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+| `callback` | `(error, value) => void` | no | Called synchronously with the value. |
+
+**Returns:** `boolean | null | undefined`
+
+```js
+storage.getBool('darkMode'); // => true
+```
 
 ## setMap
 
-Sets an object to storage for the given key.
+Stores a plain object. The value is serialized with `JSON.stringify`.
 
-**Arguments**
+```ts
+setMap(key: string, value: object): boolean | undefined
+```
 
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| value    | Object   |
-| callback | Function |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `object` | yes | The object to store. |
+
+**Returns:** `boolean | undefined`
+
+::: warning
+This does not work with the JavaScript `Map` data type — only plain, JSON-serializable objects.
+:::
 
 ```js
-let object = {
-  foo: "foo",
-  bar: "bar",
-};
-
-MMKV.setMap("object", object);
+storage.setMap('profile', { name: 'robert', age: 24 }); // => true
 ```
 
 ## getMap
 
-Gets an object from storage.
+Reads an object.
 
-**Arguments**
-
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| callback | Function |
-
-```js
-let object = MMKV.getMap("object");
+```ts
+getMap<T>(
+  key: string,
+  callback?: (error: any, value: T | null | undefined) => void
+): T | null | undefined
 ```
 
-**Returns**
-`object`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+| `callback` | `(error, value) => void` | no | Called synchronously with the value. |
+
+**Returns:** `T | null | undefined` — `null` if the key does not exist or the stored value is not valid JSON.
+
+```ts
+const profile = storage.getMap<{ name: string; age: number }>('profile');
+
+profile.name; // => 'robert'
+```
 
 ## setArray
 
-Sets an array to storage for the given key.
+Stores an array. The value is serialized with `JSON.stringify`.
 
-**Arguments**
+```ts
+setArray(key: string, value: any[]): boolean | undefined
+```
 
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| value    | Array    |
-| callback | Function |
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `any[]` | yes | The array to store. |
+
+**Returns:** `boolean | undefined`
 
 ```js
-let array = ["foo", "bar"];
-
-MMKV.setArray("array", array);
+storage.setArray('tags', ['foo', 'bar']); // => true
 ```
 
 ## getArray
 
-Sets an array to storage for the given key.
+Reads an array.
 
-**Arguments**
-
-| Name     | Type     |
-|----------|----------|
-| key      | String   |
-| callback | Function |
-
-```js
-let array = MMKV.getArray("array");
+```ts
+getArray<T>(
+  key: string,
+  callback?: (error: any, value: T[] | null | undefined) => void
+): T[] | null | undefined
 ```
 
-**Returns**
-`Array<>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+| `callback` | `(error, value) => void` | no | Called synchronously with the value. |
+
+**Returns:** `T[] | null | undefined`
+
+```ts
+const tags = storage.getArray<string>('tags'); // => ['foo', 'bar']
+```
 
 ## getMultipleItems
 
-Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
+Reads several keys of the same type at once. This call is synchronous.
 
-**Arguments**
-
-| Name     | Type                                   |
-|----------|----------------------------------------|
-| keys     | Array of Keys                          |
-| type     | "string","bool","number","map","array" |
-| callback | Function                               |
-
-```js
-import MMKV from "react-native-mmkv-storage";
-
-let items = MMKV.getMultipleItems(["foo", "bar", "loo"], "map");
+```ts
+getMultipleItems<T>(
+  keys: string[],
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'map'
+): [string, T][] | undefined
 ```
 
-**Returns**
-`Array<[]>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `keys` | `string[]` | yes | Keys to read. |
+| `type` | `'string' \| 'number' \| 'boolean' \| 'object' \| 'array' \| 'map'` | yes | The data type stored under every key. `'map'` is an alias for `'object'`. |
 
-The Array returned has the following structure:
+**Returns:** `[string, T][] | undefined` — one `[key, value]` tuple per requested key, in the order the keys were given. Returns `undefined` if `type` is not one of the values above.
 
 ```js
-[
-    ["foo", Object < any > ],
-    ["bar", Object < any > ]
-];
+storage.setMap('user1', { name: 'robert' });
+storage.setMap('user2', { name: 'alex' });
+
+const items = storage.getMultipleItems(['user1', 'user2'], 'object');
+// => [['user1', { name: 'robert' }], ['user2', { name: 'alex' }]]
+
+items[0][0]; // => 'user1'
+items[0][1]; // => { name: 'robert' }
 ```
 
-The first item in each array is the `key` for the object, and the second item is object itself.
+::: warning
+Use `'boolean'`, not `'bool'`. An unrecognised type returns `undefined` rather than throwing.
+:::
 
-If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
-
-**Returns**
-`Promise<boolean>`
+Mixed-type keys are not supported in a single call — group your keys by type and call once per type.
