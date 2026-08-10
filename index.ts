@@ -62,3 +62,13 @@ export {
   createMMKVRefHookForStorage,
   useMMKVRef
 };
+
+export type {
+  StorageOptions,
+  DataType,
+  IndexType,
+  GenericReturnType,
+  MMKVJsiModule
+} from './src/types';
+
+export type { MutatorFunction, Transaction, TransactionType } from './src/transactions';

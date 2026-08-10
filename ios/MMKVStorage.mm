@@ -10,7 +10,6 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <ReactCommon/RCTTurboModuleWithJSIBindings.h>
 #else
-// RCTCxxBridge only exists on the legacy architecture (removed in RN 0.87).
 #import <React/RCTBridge+Private.h>
 #endif
 
@@ -62,9 +61,6 @@ RCT_EXPORT_MODULE(MMKVStorage)
     indexingEnabled = [NSMutableDictionary dictionary];
     indexes = [NSMutableDictionary dictionary];
 
-    // MMKV initialization is thread-safe and has no main-thread requirement.
-    // It must complete before install()/migrate runs on the JS thread, so it
-    // is done synchronously here instead of being dispatched to the main queue.
     NSString *rootDir;
 
     appGroupId = [[NSBundle mainBundle].infoDictionary valueForKey:@"appGroupId"];
@@ -123,11 +119,6 @@ void setServiceName(NSString *alias, NSString *serviceName) {
 
 #ifdef RCT_NEW_ARCH_ENABLED
 
-// Called by RCTTurboModuleManager with the JSI runtime right after this
-// TurboModule is created, before it is returned to JS. This replaces the
-// former RCTCxxBridge.runtime access, which no longer exists in RN 0.87+.
-// Everything must be set up here: because the bindings are already present
-// by the time JS runs, the JS side never calls install() on this path.
 - (void)setupWithRuntime:(facebook::jsi::Runtime &)runtime
 {
     if (mmkvInstances == nil) {
@@ -138,22 +129,18 @@ void setServiceName(NSString *alias, NSString *serviceName) {
     install(runtime);
 }
 
-// RN >= 0.79
 - (void)installJSIBindingsWithRuntime:(facebook::jsi::Runtime &)runtime
                           callInvoker:(const std::shared_ptr<facebook::react::CallInvoker> &)callInvoker
 {
     [self setupWithRuntime:runtime];
 }
 
-// RN < 0.79 called the protocol method without the callInvoker argument.
 - (void)installJSIBindingsWithRuntime:(facebook::jsi::Runtime &)runtime
 {
     [self setupWithRuntime:runtime];
 }
 
 - (NSNumber *)install {
-    // Everything was installed via installJSIBindingsWithRuntime when this
-    // module was created; this remains only for API compatibility.
     return @YES;
 }
 
@@ -203,7 +190,7 @@ MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
 }
 
 void setIndex(MMKV *kv, NSString *type, NSString *key) {
-    if (!indexingEnabled[[kv mmapID]]) return;
+    if (![indexingEnabled[[kv mmapID]] boolValue]) return;
     NSMutableDictionary *index = getIndex(kv, type);
     
     if (!index[key]) {
@@ -214,7 +201,7 @@ void setIndex(MMKV *kv, NSString *type, NSString *key) {
 }
 
 void setIndexes(MMKV *kv, NSString *type, NSArray *keys) {
-    if (!indexingEnabled[[kv mmapID]]) return;
+    if (![indexingEnabled[[kv mmapID]] boolValue]) return;
     NSMutableDictionary *index = getIndex(kv, type);
     
     for (int i=0;i < keys.count; i++) {
@@ -226,7 +213,7 @@ void setIndexes(MMKV *kv, NSString *type, NSArray *keys) {
 
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
     @try {
-        if (!indexingEnabled[[kv mmapID]]) return [NSMutableDictionary dictionary];
+        if (![indexingEnabled[[kv mmapID]] boolValue]) return [NSMutableDictionary dictionary];
         
         NSMutableDictionary *kvIndexes = indexes[[kv mmapID]];
         if (!kvIndexes[type]) {
@@ -249,7 +236,7 @@ NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
 }
 
 void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
-    if (!indexingEnabled[[kv mmapID]]) return;
+    if (![indexingEnabled[[kv mmapID]] boolValue]) return;
     
     bool strings = false;
     bool objects = false;
