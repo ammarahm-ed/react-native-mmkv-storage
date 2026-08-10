@@ -7,7 +7,13 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "start:e2e": "E2E_TEST=1 react-native start --reset-cache",
+    "start:benchmark": "BENCHMARK=1 react-native start --reset-cache",
+    "e2e:ios": "E2E_TEST=1 react-native run-ios",
+    "e2e:android": "E2E_TEST=1 react-native run-android",
+    "benchmark:ios": "BENCHMARK=1 react-native run-ios",
+    "benchmark:android": "BENCHMARK=1 react-native run-android"
   },
   "dependencies": {
     "react": "19.2.3",
@@ -35,7 +41,8 @@
     "prettier": "2.8.8",
     "react-test-renderer": "19.2.3",
     "typescript": "^6.0.3",
-    "react-native-builder-bob": "^0.30.3"
+    "react-native-builder-bob": "^0.30.3",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.4"
   },
   "engines": {
     "node": ">= 22.11.0"
