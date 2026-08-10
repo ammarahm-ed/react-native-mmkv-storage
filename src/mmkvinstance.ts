@@ -38,6 +38,11 @@ export default class MMKVInstance {
     return this.ev._registry[`${key}:onwrite`];
   }
 
+  publishWrite(key: string, value: any) {
+    const name = `${key}:onwrite`;
+    if (this.ev._registry[name]) this.ev.publish(name, { key, value });
+  }
+
   scheduleIndexFlush() {
     if (this.indexFlushScheduled || !this.options?.enableIndexing) return;
     this.indexFlushScheduled = true;
@@ -61,70 +66,54 @@ export default class MMKVInstance {
    *
    */
   async setItem(key: string, value: string, callback?: (err?: Error | null) => void) {
-    return new Promise(resolve => {
-      const result = this.setString(key, value);
-      callback && callback(null);
-      resolve(result);
-    });
+    const result = this.setString(key, value);
+    callback && callback(null);
+    return result;
   }
   /**
    * Get the string value for the given key.
    * This method is added for redux-persist/zustand support.
    */
   async getItem(key: string, callback?: (error?: Error | null, result?: string | null) => void) {
-    return new Promise(resolve => {
-      resolve(this.getString(key, callback));
-    });
+    return this.getString(key, callback);
   }
 
   /**
    * Set a string value to storage for the given key.
    */
   setStringAsync(key: string, value: string): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.setString(key, value));
-    });
+    return Promise.resolve(this.setString(key, value));
   }
   /**
    * Get the string value for the given key.
    */
   getStringAsync(key: string): Promise<string | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.getString(key));
-    });
+    return Promise.resolve(this.getString(key));
   }
   /**
    * Set a number value to storage for the given key.
    */
   setIntAsync(key: string, value: number): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.setInt(key, value));
-    });
+    return Promise.resolve(this.setInt(key, value));
   }
   /**
    * Get the number value for the given key.
    */
   getIntAsync(key: string): Promise<number | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.getInt(key));
-    });
+    return Promise.resolve(this.getInt(key));
   }
   /**
    * Set a boolean value to storage for the given key.
    *
    */
   setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.setBool(key, value));
-    });
+    return Promise.resolve(this.setBool(key, value));
   }
   /**
    * Get the boolean value for the given key.
    */
   getBoolAsync(key: string): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.getBool(key));
-    });
+    return Promise.resolve(this.getBool(key));
   }
   /**
    * Set an Object to storage for the given key.
@@ -133,17 +122,13 @@ export default class MMKVInstance {
    *
    */
   setMapAsync(key: string, value: object): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.setMap(key, value));
-    });
+    return Promise.resolve(this.setMap(key, value));
   }
   /**
    * Get then Object from storage for the given key.
    */
   getMapAsync<T>(key: string): Promise<T | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.getMap<T>(key));
-    });
+    return Promise.resolve(this.getMap<T>(key));
   }
 
   /**
@@ -207,9 +192,7 @@ export default class MMKVInstance {
     this.scheduleIndexFlush();
     queueMicrotask(() => {
       items?.forEach((item, index) => {
-        if (this.isRegisterd(item[0])) {
-          this.ev.publish(`${item[0]}:onwrite`, { key: item[0], value: values[index] });
-        }
+        this.publishWrite(item[0], values[index]);
 
         if (this.transactions.onwrite[type]) {
           this.transactions.transact(type as DataType, 'onwrite', item[0], values[index]);
@@ -272,17 +255,13 @@ export default class MMKVInstance {
    * Set an array to storage for the given key.
    */
   async setArrayAsync(key: string, value: any[]): Promise<boolean | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.setArray(key, value));
-    });
+    return this.setArray(key, value);
   }
   /**
    * Get the array from the storage for the given key.
    */
   async getArrayAsync<T>(key: string): Promise<T[] | null | undefined> {
-    return new Promise(resolve => {
-      resolve(this.getArray<T>(key));
-    });
+    return this.getArray<T>(key);
   }
   /**
    * Set a string value to storage for the given key.
@@ -297,9 +276,7 @@ export default class MMKVInstance {
     let result = handleAction(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: value });
-      }
+      this.publishWrite(key, value);
 
       if (this.transactions.onwrite['string']) {
         this.transactions.transact('string', 'onwrite', key, value);
@@ -339,10 +316,10 @@ export default class MMKVInstance {
     let result = handleAction(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: value });
+      this.publishWrite(key, value);
+      if (this.transactions.onwrite['number']) {
+        this.transactions.transact('number', 'onwrite', key, value);
       }
-      this.transactions.transact('number', 'onwrite', key, value);
     }
 
     return result;
@@ -378,11 +355,11 @@ export default class MMKVInstance {
     let result = handleAction(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: value });
-      }
+      this.publishWrite(key, value);
 
-      this.transactions.transact('boolean', 'onwrite', key, value);
+      if (this.transactions.onwrite['boolean']) {
+        this.transactions.transact('boolean', 'onwrite', key, value);
+      }
     }
 
     return result;
@@ -424,9 +401,7 @@ export default class MMKVInstance {
     );
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: value });
-      }
+      this.publishWrite(key, value);
       if (this.transactions.onwrite['object']) {
         this.transactions.transact('object', 'onwrite', key, value);
       }
@@ -455,7 +430,9 @@ export default class MMKVInstance {
       }
     } catch (e) {}
 
-    this.transactions.transact('object', 'onread', key);
+    if (this.transactions.onread['object']) {
+      this.transactions.transact('object', 'onread', key);
+    }
 
     callback && callback(null, null);
     return null;
@@ -480,9 +457,7 @@ export default class MMKVInstance {
     );
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: value });
-      }
+      this.publishWrite(key, value);
       if (this.transactions.onwrite['array']) {
         this.transactions.transact('array', 'onwrite', key, value);
       }
@@ -511,7 +486,9 @@ export default class MMKVInstance {
         return array;
       }
     } catch (e) {}
-    this.transactions.transact('array', 'onread', key);
+    if (this.transactions.onread['array']) {
+      this.transactions.transact('array', 'onread', key);
+    }
     callback && callback(null, null);
 
     return null;
@@ -525,37 +502,25 @@ export default class MMKVInstance {
     let items: [string, T][] = [];
     if (type === 'map') type = 'object';
 
-    if (type === 'string') {
-      for (let i = 0; i < keys.length; i++) {
-        const item: [string, T] = [keys[i], this.getString(keys[i]) as T];
+    if (type === 'string' || type === 'array' || type === 'object') {
+      const result = handleAction(mmkvJsiModule.getMultiMMKV, keys, this.instanceID) || [];
 
-        if (this.transactions.onread[type]) {
-          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+      for (let i = 0; i < keys.length; i++) {
+        let value: any = result[i] === undefined ? null : result[i];
+
+        if (value !== null && type !== 'string') {
+          try {
+            value = JSON.parse(value);
+          } catch (e) {
+            value = null;
+          }
         }
 
-        items.push(item);
-      }
-      return items;
-    } else if (type === 'array') {
-      for (let i = 0; i < keys.length; i++) {
-        const item: [string, T] = [keys[i], this.getArray(keys[i]) as T];
-
         if (this.transactions.onread[type]) {
-          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
+          value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
         }
 
-        items.push(item);
-      }
-      return items;
-    } else if (type === 'object') {
-      for (let i = 0; i < keys.length; i++) {
-        const item: [string, T] = [keys[i], this.getMap(keys[i]) as T];
-
-        if (this.transactions.onread[type]) {
-          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
-        }
-
-        items.push(item);
+        items.push([keys[i], value as T]);
       }
       return items;
     } else if (type === 'boolean') {
@@ -610,9 +575,7 @@ export default class MMKVInstance {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
-      if (this.isRegisterd(key)) {
-        this.ev.publish(`${key}:onwrite`, { key, value: null });
-      }
+      this.publishWrite(key, null);
     }
 
     if (this.transactions.ondelete) {
@@ -635,9 +598,7 @@ export default class MMKVInstance {
     if (result) this.scheduleIndexFlush();
     for (const key of keys) {
       if (result) {
-        if (this.isRegisterd(key)) {
-          this.ev.publish(`${key}:onwrite`, { key, value: null });
-        }
+        this.publishWrite(key, null);
       }
       if (this.transactions.ondelete) {
         this.transactions.transact('string', 'ondelete', key);
@@ -657,9 +618,8 @@ export default class MMKVInstance {
 
     queueMicrotask(() => {
       keys?.forEach((key: string) => {
-        if (this.isRegisterd(key)) {
-          this.ev.publish(`${key}:onwrite`, { key });
-        }
+        const name = `${key}:onwrite`;
+        if (this.ev._registry[name]) this.ev.publish(name, { key });
 
         if (this.transactions.ondelete) {
           this.transactions.transact('string', 'ondelete', key);
