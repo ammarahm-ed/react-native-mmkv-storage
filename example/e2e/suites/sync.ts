@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import { suite, test, expect } from '../../testing/framework';
 import { uniqueKey } from '../../testing/async';
 import { plain } from '../storages';
@@ -40,10 +39,10 @@ suite('Sync API', () => {
     expect(plain.getString(key)).toBe(value);
   });
 
-  test('NUL bytes truncate on iOS and are preserved on Android', () => {
+  test('NUL bytes are preserved on both platforms', () => {
     const key = uniqueKey('nul');
     plain.setString(key, 'before\u0000after');
-    expect(plain.getString(key)).toBe(Platform.OS === 'ios' ? 'before' : 'before\u0000after');
+    expect(plain.getString(key)).toBe('before\u0000after');
   });
 
   test('setInt and getInt round-trip', () => {
