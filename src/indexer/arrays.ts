@@ -23,8 +23,7 @@ export default class arrayIndex {
    * Check if a key exists.
    */
   hasKey(key: string) {
-    let keys = handleAction(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
-    return keys && keys.indexOf(key) > -1;
+    return handleAction(mmkvJsiModule.indexContainsKeyMMKV, INDEX_TYPE, key, this.instanceID);
   }
   /**
    * Get all arrays from storage.

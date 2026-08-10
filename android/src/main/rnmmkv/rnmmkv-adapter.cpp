@@ -711,6 +711,36 @@ void installBindings(Runtime &jsiRuntime)
         return array;
     });
 
+    CREATE_FUNCTION("indexContainsKeyMMKV", 3, {
+        MMKV *kv = getInstance(std_string(arguments[2]));
+        if (!kv)
+        {
+            return Value::undefined();
+        }
+        return Value(hasValue(getIndex(kv, std_string(arguments[0])), std_string(arguments[1])));
+    });
+
+    CREATE_FUNCTION("getValueTypeMMKV", 2, {
+        MMKV *kv = getInstance(std_string(arguments[1]));
+        if (!kv)
+        {
+            return Value::undefined();
+        }
+
+        static const string typeNames[] = {"string", "number", "boolean", "object", "array"};
+        string key = std_string(arguments[0]);
+
+        for (int i = 0; i < 5; i++)
+        {
+            if (hasValue(getIndex(kv, dataTypes[i]), key))
+            {
+                return Value(runtime, String::createFromUtf8(runtime, typeNames[i]));
+            }
+        }
+
+        return Value::null();
+    });
+
     CREATE_FUNCTION("containsKeyMMKV", 2, {
         MMKV *kv = getInstance(std_string(arguments[1]));
         if (!kv)

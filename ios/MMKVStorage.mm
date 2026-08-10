@@ -621,6 +621,35 @@ static void install(jsi::Runtime &jsiRuntime) {
         return Value(convertNSArrayToJSIArray(runtime, [keys allKeys]));
     });
     
+    CREATE_FUNCTION("indexContainsKeyMMKV", 3, {
+        MMKV *kv = getInstance(nsstring(arguments[2]));
+        
+        if (!kv) return Value::undefined();
+        
+        NSMutableDictionary *index = getIndex(kv, nsstring(arguments[0]));
+        
+        return Value(index[nsstring(arguments[1])] != nil);
+    });
+    
+    CREATE_FUNCTION("getValueTypeMMKV", 2, {
+        MMKV *kv = getInstance(nsstring(arguments[1]));
+        
+        if (!kv) return Value::undefined();
+        
+        NSString *key = nsstring(arguments[0]);
+        NSArray *indexNames = @[@"stringIndex", @"numberIndex", @"boolIndex", @"mapIndex", @"arrayIndex"];
+        NSArray *typeNames = @[@"string", @"number", @"boolean", @"object", @"array"];
+        
+        for (int i = 0; i < indexNames.count; i++) {
+            NSMutableDictionary *index = getIndex(kv, indexNames[i]);
+            if (index[key] != nil) {
+                return Value(convertNSStringToJSIString(runtime, typeNames[i]));
+            }
+        }
+        
+        return Value::null();
+    });
+    
     CREATE_FUNCTION("containsKeyMMKV", 2, {
         MMKV *kv = getInstance(nsstring(arguments[1]));
         
