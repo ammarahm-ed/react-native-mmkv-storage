@@ -1,102 +1,164 @@
-# Reactive Apps with useMMKVStorage Hook
+# useMMKVStorage
 
-Starting from `v0.5.5`, thanks to the power of JSI, we now have our very own `useMMKVStorage` Hook. Think of it like a persisted state that will always write every change in storage and update your app UI instantly. It doesn't matter if you reload the app or restart it. Everything will be in place on app load. Let's see how this works:
-
-### `useMMKVStorage`
-A `useState` like hook that allows you to easily manage values in storage.
-
-**Arguments**
-
-| Name              | Required | Type              | Description                                                        |
-|-------------------|----------|-------------------|--------------------------------------------------------------------|
-| key               | yes      | String            | The key against which to get the value                             |
-| `MMKVStorage.API` | yes      | `MMKVStorage.API` | MMKV storage instance created from `new MMKVLoader().initialize()` |
-| defaultValue      | no       | String            | Pass a default value for the hook if any                           |
-
-**returns:** A pair of `value` & `setValue`. 
-
-### `create`
-A helper function that returns `useMMKVStorage` which can then be used inside a functional component.
-**Arguments**
-
-| Name              | Required | Type    | Description                                                        |
-|-------------------|----------|---------|--------------------------------------------------------------------|
-| `MMKVStorage.API` | yes      | boolean | MMKV storage instance created from `new MMKVLoader().initialize()` |
-
-**returns:** `useMMKVStorage(key:string,defaultValue:any)`
-
-### How to use
-
-Import `MMKVStorage` and `useMMKVStorage` Hook.
-
-```js
-import { MMKVLoader, useMMKVStorage } from "react-native-mmkv-storage";
-```
-
-Initialize the `MMKVStorage` instance.
-
-```js
-const MMKV = new MMKVLoader().initialize();
-```
-
-Next, in our component we are going to register our hook.
+`useMMKVStorage` is a `useState` like hook backed by storage. Every change is written to the MMKV instance and every component using the same key updates instantly. It does not matter if you reload or restart the app, the value will be there on the next load.
 
 ```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
+
+const MMKV = new MMKVLoader().initialize();
+
 const App = () => {
-  const [user, setUser] = useMMKVStorage("user", MMKV, "robert"); // robert is the default value
+  const [user, setUser] = useMMKVStorage('user', MMKV, 'robert');
 
   return (
     <View>
-      <Text>{user}</Text>
+      <Text onPress={() => setUser('andrew')}>{user}</Text>
     </View>
   );
 };
+
+export default App;
 ```
 
-Now whenever you update value of `"user"` in storage, your `App` component will automatically rerender.
+## Signature
 
-```jsx
-setUser("andrew");
-//or you cal call setUser without a value to remove the value
-setUser(); //removes the value from storage.
-
-// or you can do this too anywhere in your app:
-MMKV.setString("user", "andrew");
+```ts
+function useMMKVStorage<T>(
+  key: string,
+  storage: MMKVInstance,
+  defaultValue?: T,
+  equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
+): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
 ```
 
-Simple right? now refresh the app or restart it. When it loads, it will always show andrew as the user until you update it.
-The ideal way which I would recommend for better development experience would to wrap `useMMKVStorage` hook in a custom hook as follows:
+**Arguments**
+
+| Name         | Required | Type                                                  | Description                                                          |
+| ------------ | -------- | ----------------------------------------------------- | -------------------------------------------------------------------- |
+| key          | yes      | `string`                                              | The key to read and write.                                           |
+| storage      | yes      | `MMKVInstance`                                        | Instance created with `new MMKVLoader().initialize()`.               |
+| defaultValue | no       | any supported type                                    | Returned when the key holds no value. See [Data types](/datatypes).  |
+| equalityFn   | no       | `(prev, next) => boolean`                             | Return `true` to skip the state update for an incoming change.       |
+
+**Returns:** `[value, setValue]`
+
+## Updating the value
+
+The setter accepts a value or an updater function, just like `useState`:
 
 ```jsx
+setUser('andrew');
+setUser(prev => prev.toUpperCase());
+```
+
+Writing to the same key anywhere else in the app updates the hook too:
+
+```js
+MMKV.setString('user', 'andrew');
+```
+
+Passing `null` or `undefined` removes the key from storage:
+
+```jsx
+setUser(null);
+```
+
+## equalityFn
+
+`equalityFn` is called with the previous and the incoming value whenever a write for the key is observed. Returning `true` means "these are equal", so the component does not re-render. This is useful for objects, where a rewrite of an identical payload would otherwise render again.
+
+```jsx
+import React from 'react';
+import { Text, View } from 'react-native';
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
+
 const MMKV = new MMKVLoader().initialize();
 
-export const useStorage = (key, defaultValue) => {
-  const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
-  return [value, setValue];
+const Profile = () => {
+  const [user, setUser] = useMMKVStorage(
+    'user',
+    MMKV,
+    { name: 'robert', age: 30 },
+    (prev, next) => prev?.name === next?.name
+  );
+
+  return (
+    <View>
+      <Text onPress={() => setUser({ ...user, age: user.age + 1 })}>{user.name}</Text>
+    </View>
+  );
 };
+
+export default Profile;
 ```
 
-You should use the `create` function from `v0.5.9` onwards:
+## create
+
+`create` binds a storage instance to the hook so you only import the instance once.
+
+```ts
+function create(storage: MMKVInstance): <T>(
+  key: string,
+  defaultValue?: T,
+  equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
+) => [value: T, setValue: (value: T | ((prevValue: T) => T)) => void];
+```
 
 ```jsx
-import {MMKVLoader, create } from "react-native-mmkv-storage";
+import React from 'react';
+import { Text, View } from 'react-native';
+import { MMKVLoader, create } from 'react-native-mmkv-storage';
+
 const MMKV = new MMKVLoader().initialize();
 
 export const useStorage = create(MMKV);
+
+const App = () => {
+  const [user, setUser] = useStorage('user', 'robert');
+
+  return (
+    <View>
+      <Text onPress={() => setUser('andrew')}>{user}</Text>
+    </View>
+  );
+};
+
+export default App;
 ```
 
-Now you don't have to import `MMKV` everywhere in your app but only once. If you use TypeScript you can do something like below to get nice intellisense in your editor.
+The returned hook throws `Key and Storage are required parameters.` if it is called without a key, or if `create` was given no storage instance.
+
+## TypeScript
+
+Type the instance with `MMKVInstance` and let the hook infer or receive the value type:
 
 ```tsx
-const MMKV: MMKVStorage.API = new MMKVLoader().initialize();
-type LiteralUnion<T extends U, U = string> = T | (U & {});
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
+import type { MMKVInstance } from 'react-native-mmkv-storage';
 
-export const useStorage = (
-  key: LiteralUnion<"user" | "password">,
-  defaultValue?: string
-) => {
-  const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
-  return [value, setValue];
-};
+const MMKV: MMKVInstance = new MMKVLoader().initialize();
+
+type User = { name: string; age: number };
+
+export const useUser = () => useMMKVStorage<User>('user', MMKV, { name: 'robert', age: 30 });
 ```
 
+::: warning
+`MMKVStorage.API` is deprecated. Use the named `MMKVInstance` type instead.
+:::
+
+## Behaviour to keep in mind
+
+- **The type is locked to the first value observed for a key.** Once the hook has seen a string for `"user"`, setting a number logs a warning in `__DEV__` and does nothing. Setting `null` or `undefined` removes the key and clears the type lock, so the next write can use a different type.
+- **Async functions are not accepted as setters.** Passing one logs a `__DEV__` warning and the write is skipped. Resolve the value first, then call the setter.
+- **The initial value is resolved through the indexer.** The hook uses the type indexes to work out how to read the key on mount, so an instance created with `disableIndexing()` will not restore values into the hook. See [Querying and indexing](/queryingandindexing).
+- **Default values are not persisted by default.** `getItem` for an unwritten key returns `null` even though the hook returns the default. Use `new MMKVLoader().withPersistedDefaultValues().initialize()` to have the default written to storage on mount.
+- **Booleans and numbers bypass the default fallback once set.** A stored `false` or `0` is returned as-is rather than falling back to `defaultValue`.
+
+## See also
+
+- [useIndex](/useindex)
+- [useMMKVRef](/usemmkvref)
+- [Events](/events) for reacting to changes outside React.

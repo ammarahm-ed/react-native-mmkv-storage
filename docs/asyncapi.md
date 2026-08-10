@@ -1,227 +1,249 @@
 # Async API
 
-A promise or `async/await` api is available. 
-
-If you are on <=0.5.3, when the application loads, your first call to get/set data should be asynchronous because we will init the database in the first call.
-
-
-First we create a default MMKV Instance
+Every method on the [Sync API](/callbackapi) has a promise-returning counterpart, for code that is already written against `async/await` or an `AsyncStorage`-shaped interface.
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
-MMKV = new MMKVLoader().initialize();
+const storage = new MMKVLoader().initialize();
 ```
+
+::: tip
+These are thin wrappers: the underlying read or write still happens synchronously on the JS thread and the promise resolves with the result. They exist for ergonomic parity, not to move work off the JS thread. If you have the choice, use the [Sync API](/callbackapi).
+:::
+
+Across this page:
+
+- Setters resolve `boolean | null | undefined`.
+- Getters resolve `null` when the key does not exist, and `undefined` when the instance is not loaded.
 
 ## setStringAsync
 
-Sets a string value in storage for the given key.
-
-**Arguments**
-
-| Name  | Type   |
-|-------|--------|
-| key   | String |
-| value | String |
-
-```js
-await MMKV.setStringAsync("string", "string");
+```ts
+setStringAsync(key: string, value: string): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `string` | yes | The string to store. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+await storage.setStringAsync('user', 'robert'); // => true
+```
 
 ## getStringAsync
 
-Gets a string value for a given key.
-
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```js
-let string = await MMKV.getStringAsync("string");
+```ts
+getStringAsync(key: string): Promise<string | null | undefined>
 ```
 
-**Returns**
-`Promise<string>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+
+**Returns:** `Promise<string | null | undefined>`
+
+```js
+const user = await storage.getStringAsync('user'); // => 'robert'
+```
 
 ## setIntAsync
 
-Sets a number value in storage for the given key.
-
-**Arguments**
-
-| Name  | Type   |
-|-------|--------|
-| key   | String |
-| value | Number |
-
-```js
-await MMKV.setIntAsync("number", 10);
+```ts
+setIntAsync(key: string, value: number): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `number` | yes | The number to store. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+await storage.setIntAsync('age', 24); // => true
+```
 
 ## getIntAsync
 
-Gets a number value for a given key.
-
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```js
-let number = await MMKV.getIntAsync("number");
+```ts
+getIntAsync(key: string): Promise<number | null | undefined>
 ```
 
-**Returns**
-`Promise<number>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+
+**Returns:** `Promise<number | null | undefined>`
+
+```js
+const age = await storage.getIntAsync('age'); // => 24
+```
 
 ## setBoolAsync
 
-Sets a boolean value in storage for the given key.
-
-**Arguments**
-
-| Name  | Type    |
-|-------|---------|
-| key   | String  |
-| value | boolean |
-
-```js
-await MMKV.setBoolAsync("myBooleanValue", false);
+```ts
+setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `boolean` | yes | The boolean to store. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+await storage.setBoolAsync('darkMode', true); // => true
+```
 
 ## getBoolAsync
 
-Gets a boolean value for a given key.
-
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```js
-let boolean = await MMKV.getBoolAsync("myBooleanValue");
+```ts
+getBoolAsync(key: string): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+const darkMode = await storage.getBoolAsync('darkMode'); // => true
+```
 
 ## setMapAsync
 
-Sets an object to storage for the given key.
+Stores a plain, JSON-serializable object. Does not work with the JavaScript `Map` data type.
 
-**Arguments**
-
-| Name  | Type   |
-|-------|--------|
-| key   | String |
-| value | Object |
-
-```js
-let myObject = { foo: "foo", bar: "bar" };
-
-await MMKV.setMapAsync("myobject", myObject);
+```ts
+setMapAsync(key: string, value: object): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `object` | yes | The object to store. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+await storage.setMapAsync('profile', { name: 'robert', age: 24 }); // => true
+```
 
 ## getMapAsync
 
-Gets an object from storage.
-
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```js
-let object = await MMKV.getMapAsync("object");
+```ts
+getMapAsync<T>(key: string): Promise<T | null | undefined>
 ```
 
-**Returns**
-`Promise<object>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+
+**Returns:** `Promise<T | null | undefined>`
+
+```ts
+const profile = await storage.getMapAsync<{ name: string; age: number }>('profile');
+
+profile.name; // => 'robert'
+```
 
 ## setArrayAsync
 
-Sets an array to storage for the given key.
-
-**Arguments**
-
-| Name  | Type   |
-|-------|--------|
-| key   | String |
-| value | Array  |
-
-```js
-let array = ["foo", "bar"];
-
-await MMKV.setArrayAsync("array", array);
+```ts
+setArrayAsync(key: string, value: any[]): Promise<boolean | null | undefined>
 ```
 
-**Returns**
-`Promise<boolean>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to write to. |
+| `value` | `any[]` | yes | The array to store. |
+
+**Returns:** `Promise<boolean | null | undefined>`
+
+```js
+await storage.setArrayAsync('tags', ['foo', 'bar']); // => true
+```
 
 ## getArrayAsync
 
-Sets an array to storage for the given key.
-
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```js
-let myArray = await MMKV.getArrayAsync("array");
+```ts
+getArrayAsync<T>(key: string): Promise<T[] | null | undefined>
 ```
 
-**Returns**
-`Promise<Array<>>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | Key to read. |
+
+**Returns:** `Promise<T[] | null | undefined>`
+
+```ts
+const tags = await storage.getArrayAsync<string>('tags'); // => ['foo', 'bar']
+```
+
+## setMultipleItemsAsync
+
+Writes several keys of the same type in one call.
+
+```ts
+setMultipleItemsAsync(
+  items: [string, any][],
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'map'
+): Promise<true>
+```
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `items` | `[string, any][]` | yes | `[key, value]` tuples to write. |
+| `type` | `'string' \| 'number' \| 'boolean' \| 'object' \| 'array' \| 'map'` | yes | The data type of every value. `'object'` is normalised to `'map'`. |
+
+**Returns:** `Promise<true>` — always resolves `true`, regardless of whether each individual write succeeded.
+
+`'string'`, `'array'` and `'map'`/`'object'` values go through a single native bulk write, which is why this is the fastest way to store many values at once. `'boolean'` and `'number'` are looped internally and offer no advantage over calling `setBool`/`setInt` yourself.
+
+```js
+await storage.setMultipleItemsAsync(
+  [
+    ['user1', { name: 'robert' }],
+    ['user2', { name: 'alex' }]
+  ],
+  'object'
+); // => true
+
+storage.getMap('user1'); // => { name: 'robert' }
+```
 
 ## getMultipleItemsAsync
 
-Retrieve multiple Objects for a given array of keys. **Currently will work only if data for all keys is an Object.**
+Reads several keys of the same type at once.
 
-**Arguments**
-
-| Name | Type                                   |
-|------|----------------------------------------|
-| keys | Array of Keys                          |
-| type | "string","bool","number","map","array" |
-
-```js
-let multipleItems = await MMKV.getMultipleItemsAsync(
-  ["foo", "bar", "loo"],
-  "map"
-);
+```ts
+getMultipleItemsAsync<T>(
+  keys: string[],
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'map'
+): Promise<[string, T][]>
 ```
 
-**Returns**
-`Promise<Array<[]>>`
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `keys` | `string[]` | yes | Keys to read. |
+| `type` | `'string' \| 'number' \| 'boolean' \| 'object' \| 'array' \| 'map'` | yes | The data type stored under every key. `'map'` is an alias for `'object'`. |
 
-The Array returned has the following structure:
+**Returns:** `Promise<[string, T][]>` — one `[key, value]` tuple per requested key, in the order the keys were given.
 
 ```js
-[
-  ["foo", Object<any>],
-  ["bar", Object<any>]
-];
+const items = await storage.getMultipleItemsAsync(['user1', 'user2'], 'object');
+// => [['user1', { name: 'robert' }], ['user2', { name: 'alex' }]]
+
+items[0][0]; // => 'user1'
+items[0][1]; // => { name: 'robert' }
 ```
 
-The first item in each array is the `key` for the object, and the second item is object itself.
-
-If the value for the key is not an object but an array, the array will be wrapped in an object having key as the key in database and its value as the Array.
+::: warning
+Use `'boolean'`, not `'bool'`. An unrecognised type resolves `undefined` rather than throwing. Mixed-type keys are not supported — group keys by type and call once per type.
+:::

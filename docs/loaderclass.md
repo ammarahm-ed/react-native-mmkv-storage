@@ -1,184 +1,311 @@
-# Loader Class
+# MMKVLoader
 
-The `Loader Class` helps you create an MMKV Instance. Once the instance is loaded, you can then use it to read and write data in database. It follows a builder pattern. You need to tell the Loader class everything about the MMKV Instance you want to create and then finally call `initialize` to create and get the instance.
-
-## Create a Loader
-
-You can simply create a new Loader as follows:
+`MMKVLoader` creates and loads an MMKV storage instance. It follows a builder pattern: you describe the instance you want with chainable methods, then call [`initialize()`](#initialize) to get an `MMKVInstance` back.
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
-const MMKV = new MMKVLoader();
+const storage = new MMKVLoader()
+  .withInstanceID('user-storage')
+  .withEncryption()
+  .initialize();
 ```
+
+Every builder method is synchronous and returns `this`, so calls can be chained in any order except where noted under [Ordering constraints](#ordering-constraints).
+
+::: warning
+Do not reassign the loader to a `const`. Chain the calls instead — `const storage = new MMKVLoader(); storage = storage.withInstanceID('id')` is an assignment to a constant and will throw.
+:::
 
 ## initialize
 
-Initialize the MMKV Instance with the selected properties. Returns an MMKV Instance that you can use.
+Creates the storage with the configured options and returns the instance you use to read and write data.
 
-```js
-import { MMKVLoader } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV.initialize();
+```ts
+initialize(): MMKVInstance
 ```
 
-**Returns:** `API`
+**Parameters:** none.
+
+**Returns:** `MMKVInstance`
+
+**Throws:**
+
+| Error | When |
+| --- | --- |
+| `MMKVStorage bindings not installed` | The JSI bindings could not be installed. See [`init()`](/generalmethods#init). |
+| `Key is null or too short` | Encryption was requested with a key shorter than 3 characters. |
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().initialize();
+
+storage.setString('user', 'robert');
+```
 
 ## withInstanceID
 
-Specifies that the MMKV Instance should be created with the given ID. This way multiple intances can be created.
+Loads the storage with the given ID. If no instance with this ID exists yet, a new one is created. Use this to keep multiple independent storages in one app. The default ID is `default`.
 
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| ID   | String |
-
-```js
-import { MMKVLoader } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.withInstanceID("mmkvInstanceWithID");
+```ts
+withInstanceID(id: string): this
 ```
 
-**Returns:** `this`;
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | yes | Unique ID of the storage instance. |
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().withInstanceID('user-storage').initialize();
+```
 
 ## withEncryption
 
-Encrypt the MMKV instance on initialization. By default the library generates a strong password and stores it in Keychain on iOS and Android Keystore in Android.
+Encrypts the instance on creation. A strong key is generated for you and stored in the Keychain on iOS and the Keystore on Android, under an alias derived from the instance ID.
 
-**Arguments**
-
-| Name | Type   |
-|------|--------|
-| ID   | String |
-
-```js
-import { MMKVLoader } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.withEncryption();
+```ts
+withEncryption(): this
 ```
 
-**Returns:** `this`;
+**Parameters:** none. To supply your own key, chain [`encryptWithCustomKey()`](#encryptwithcustomkey) after this call.
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .initialize();
+```
 
 ## encryptWithCustomKey
 
-You can also specify your own password to encrypt the storage.
+Encrypts the storage with a key you provide instead of a generated one.
 
-**Arguments**
-
-| Name             | Required | Type    | Description                                                                           |
-|------------------|----------|---------|---------------------------------------------------------------------------------------|
-| cryptKey         | yes      | String  | Password to encrypt the storage                                                       |
-| secureKeyStorage | no       | boolean | Set to true of you want the library to store the password securely                    |
-| alias            | no       | String  | You can provide a custom alias for storage of password, by default instanceID is used |
-
-```js
-import { MMKVLoader } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.withEncryption().encryptWithCustomKey("encryptionKey");
+```ts
+encryptWithCustomKey(key: string, secureKeyStorage?: boolean, alias?: string): this
 ```
 
-**Returns:** `this`;
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `key` | `string` | yes | The key to encrypt the storage with. Must be at least 3 characters. |
+| `secureKeyStorage` | `boolean` | no | Store the key in the Keychain/Keystore. Defaults to `false`, meaning you are responsible for storing it. |
+| `alias` | `string` | no | Alias to store the key under when `secureKeyStorage` is `true`. Defaults to the instance ID. |
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .encryptWithCustomKey('encryptionKey', true, 'customAlias')
+  .initialize();
+```
+
+::: warning
+If you pass `secureKeyStorage: false`, the key is never persisted. You must supply the same key on every app launch or the storage will not load.
+:::
 
 ## setProcessingMode
 
-You can choose between single process or multiprocess MMKV instance.
-
-**Arguments**
-
-| Name | Required | Type            | Description                |
-|------|----------|-----------------|----------------------------|
-| mode | yes      | ProcessingModes | Select the processing mode |
-
-```js
-import { MMKVLoader,ProcessingModes } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.setProcessingMode( ProcessingModes.SINGLE_PROCESS); // OR MMKVStorage.MODES.MULTI_PROCESS
-```
-
-## setAccessibleMode (iOS only)
-
-Choose the accessibility mode for secure key storage (IOS ONLY);
-
-**Arguments**
-
-| Name       | Required | Type                 | Description                   |
-|------------|----------|----------------------|-------------------------------|
-| accessible | yes      | IOSAccessibleStates  | Choose the accessibility mode |
-
-```js
-import { MMKVLoader, IOSAccessibleStates } from "react-native-mmkv-storage";
-
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.setAccessibleMode(IOSAccessibleStates.WHEN_UNLOCKED);
-```
+Selects whether the storage is accessed by a single process or shared across processes (app widgets, extensions, background services).
 
 ```ts
-type IOSAccessibleStates = {
-  WHEN_UNLOCKED: string;
-  AFTER_FIRST_UNLOCK: string;
-  /** @deprected in iOS 16+ */
-  ALWAYS: string;
-  WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: string;
-  WHEN_UNLOCKED_THIS_DEVICE_ONLY: string;
-  AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: string;
-  /** @deprected in iOS 16+ */
-  ALWAYS_THIS_DEVICE_ONLY: string;
-};
+setProcessingMode(mode: number): this
 ```
 
-**Returns:** `this`;
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `mode` | `number` | yes | One of the `ProcessingModes` values. |
 
-## withServiceName (iOS only)
+`ProcessingModes` values:
 
-Sets the [kSecAttrService](https://developer.apple.com/documentation/security/ksecattrservice) option for secure key storage (IOS ONLY);
+| Name | Value |
+| --- | --- |
+| `SINGLE_PROCESS` | `1` |
+| `MULTI_PROCESS` | `2` |
 
-**Arguments**
-
-| Name        | Required | Type   | Description      |
-|-------------|----------|--------|------------------|
-| serviceName | yes      | String | The service name |
+**Returns:** `this`
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader, ProcessingModes } from 'react-native-mmkv-storage';
 
-const MMKV = new MMKVLoader();
-
-MMKV = MMKV.withServiceName('com.MMKV.example');
+const storage = new MMKVLoader()
+  .withInstanceID('shared-storage')
+  .setProcessingMode(ProcessingModes.MULTI_PROCESS)
+  .initialize();
 ```
 
-**Returns:** `this`;
+## setAccessibleIOS
 
-## Putting it together
+Sets the Keychain accessibility attribute used when storing the encryption key. iOS only; it has no effect on Android.
 
-Now you know about the loader class, lets create a MMKV Instance with an ID.
+```ts
+setAccessibleIOS(accessible: string): this
+```
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `accessible` | `string` | yes | One of the `IOSAccessibleStates` values. Defaults to `AFTER_FIRST_UNLOCK`. |
+
+`IOSAccessibleStates` values:
+
+| Name | Value | Notes |
+| --- | --- | --- |
+| `WHEN_UNLOCKED` | `AccessibleWhenUnlocked` | |
+| `AFTER_FIRST_UNLOCK` | `AccessibleAfterFirstUnlock` | Default |
+| `ALWAYS` | `AccessibleAlways` | Deprecated in iOS 16+ |
+| `WHEN_PASSCODE_SET_THIS_DEVICE_ONLY` | `AccessibleWhenPasscodeSetThisDeviceOnly` | |
+| `WHEN_UNLOCKED_THIS_DEVICE_ONLY` | `AccessibleWhenUnlockedThisDeviceOnly` | |
+| `AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY` | `AccessibleAfterFirstUnlockThisDeviceOnly` | |
+| `ALWAYS_THIS_DEVICE_ONLY` | `AccessibleAlwaysThisDeviceOnly` | Deprecated in iOS 16+ |
+
+**Returns:** `this`
 
 ```js
-import { MMKVLoader } from "react-native-mmkv-storage";
+import { MMKVLoader, IOSAccessibleStates } from 'react-native-mmkv-storage';
 
-MMKV = new MMKVLoader().
-.withInstanceID('mmkvInstanceID')
-.setProcessingMode(MMKVStorage.MODES.MULTI_PROCESS)
-.withEncryption()
-.encryptWithCustomKey('encryptionKey',true, 'customAlias')
-.initialize()
-
-// then use it
-
-
-  await MMKV.setStringAsync("string", "string");
-
-  let string = await MMKV.getStringAsync("string");
-
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .setAccessibleIOS(IOSAccessibleStates.WHEN_UNLOCKED)
+  .initialize();
 ```
+
+::: tip
+Pick the strictest state your app can tolerate. `WHEN_UNLOCKED` prevents the key from being read while the device is locked, so avoid it if the storage is read from a background task.
+:::
+
+## withServiceName
+
+Sets the [`kSecAttrService`](https://developer.apple.com/documentation/security/ksecattrservice) attribute on the Keychain entry holding the encryption key. iOS only. Useful when you also read the key through `react-native-keychain`, which expects a service name.
+
+```ts
+withServiceName(serviceName: string): this
+```
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `serviceName` | `string` | yes | The Keychain service name. |
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .withServiceName('com.MMKV.example')
+  .initialize();
+```
+
+## withPersistedDefaultValues
+
+By default, a default value passed to [`useMMKVStorage`](/usemmkvstorage) is returned by the hook but never written to storage, so a later `getItem` call returns `null`. Enabling this option writes the default value to storage the first time the hook renders with an empty key.
+
+```ts
+withPersistedDefaultValues(): this
+```
+
+**Parameters:** none.
+
+**Returns:** `this`
+
+```jsx
+import React from 'react';
+import { Text } from 'react-native';
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader().withPersistedDefaultValues().initialize();
+
+export default function App() {
+  const [theme] = useMMKVStorage('theme', storage, 'dark');
+
+  return <Text>{theme}</Text>;
+}
+
+storage.getString('theme'); // => 'dark' after App has rendered once
+```
+
+## disableIndexing
+
+Turns off indexing of keys by data type. Indexing costs a little write time and storage, so disabling it can help for very large storages that never query by type.
+
+```ts
+disableIndexing(): this
+```
+
+**Parameters:** none.
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('logs')
+  .disableIndexing()
+  .initialize();
+```
+
+::: warning
+With indexing disabled, the type indexers described in [Querying and indexing](/queryingandindexing) are unavailable, and [`useMMKVStorage`](/usemmkvstorage) can no longer resolve a key's initial value or its type on mount — the hook starts with `null` until the key is written. Only disable indexing if you use neither.
+:::
+
+## generateKey
+
+Generates a random encryption key and stores it on the loader options, replacing any key set earlier. This is done for you by [`withEncryption()`](#withencryption); call it explicitly only when you want a fresh key on an otherwise custom-keyed configuration.
+
+```ts
+generateKey(): this
+```
+
+**Parameters:** none.
+
+**Returns:** `this`
+
+```js
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .generateKey()
+  .initialize();
+
+storage.getKey(); // => { alias: '...', key: '...' }
+```
+
+## Ordering constraints
+
+The builder mutates a single options object, so a few calls depend on order:
+
+- Call `withInstanceID()` **before** `withEncryption()`. `withEncryption()` derives the Keychain alias from the current instance ID, so calling it first would bind the key to the `default` instance.
+- Call `withEncryption()` **before** `encryptWithCustomKey()`. `withEncryption()` generates and assigns a key, which would overwrite your custom key if called afterwards.
+- `initialize()` must be last — it consumes the options and returns the instance.
+
+```js
+import { MMKVLoader, ProcessingModes } from 'react-native-mmkv-storage';
+
+const storage = new MMKVLoader()
+  .withInstanceID('user-storage')
+  .setProcessingMode(ProcessingModes.MULTI_PROCESS)
+  .withEncryption()
+  .encryptWithCustomKey('encryptionKey', true, 'customAlias')
+  .initialize();
+
+storage.setString('user', 'robert');
+storage.getString('user'); // => 'robert'
+```
+
+Next, see the [Sync API](/callbackapi) and [Async API](/asyncapi) for reading and writing data.

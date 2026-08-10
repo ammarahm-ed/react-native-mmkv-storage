@@ -1,343 +1,145 @@
-# Querying and Indexing
+# Querying and indexing
 
-MMKV provides a simple querying system. You can check if a key exists in the database and you can query all keys. This library adds an extra layer of indexing. Each data type for every instance of MMKV maintains its own index. Hence you can also check if a key exists in a specific data type index, for example you can check if a key exists in strings or maps etc. Also you can query all keys for a specific data type.
+MMKV provides a simple querying system: you can check whether a key exists and you can list all keys in an instance. On top of that, this library maintains a separate index per data type for every storage instance, so you can also list only the string keys, only the object keys, and so on, or read every value of a given type in one call.
 
-First we create a default MMKV Instance
-
-```js
-import { MMKVLoader } from "react-native-mmkv-storage";
-
-MMKV = new MMKVLoader().initialize();
-```
-
-# Instance Indexer
-
-Stores keys of all types in one place.
-
-##### hasKey
-
-Check if any data exists for a given key.
-
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```jsx
-MMKV.indexer.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the storage for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.getKeys();
-```
-
-**Returns**
-`Promise<string[]>`
-
-# Strings Indexer
-
-Index of all the strings in storage.
-
-##### hasKey
-
-Check if any data exists for a given key.
-
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```jsx
-MMKV.indexer.strings.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the Storage indexer for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.strings.getKeys();
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getAll
-
-Get all strings in the storage.
-
-```jsx
-let strings = await MMKV.indexer.strings.getAll();
-```
-
-**Returns**
-`Promise<Array<>>`
-
-The Array returned has the following structure:
+All examples on this page assume an initialized instance:
 
 ```js
-[
-  [key, data],
-  [key, data],
-];
+import { MMKVLoader } from 'react-native-mmkv-storage';
+
+const MMKV = new MMKVLoader().initialize();
 ```
 
-The first item in each array is the `key` for the data, and the second item is object itself.
+::: warning
+Indexing can be turned off with `new MMKVLoader().disableIndexing().initialize()`. With indexing disabled, the type indexers (`strings`, `numbers`, `booleans`, `maps`, `arrays`) have nothing to read from and return empty or `undefined` results. `indexer.getKeys()` and `indexer.hasKey()` keep working because they query the storage itself, not the index.
+:::
 
-# Number Indexer
+## indexer
 
-Index of all the numbers in storage.
+Available on every instance as `MMKV.indexer`. It covers all keys in the instance regardless of their data type.
 
-##### hasKey
+### getKeys
 
-Check if any number exists for a given key.
-
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```jsx
-MMKV.indexer.numbers.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the number indexer for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.numbers.getKeys();
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getAll
-
-Get all numbers stored in the storage.
-
-```jsx
-let numbers = await MMKV.indexer.numbers.getAll();
-```
-
-**Returns**
-`Promise<Array<>>`
-
-The Array returned has the following structure:
+Get every key stored in the instance.
 
 ```js
-[
-  [key, data],
-  [key, data],
-];
+const keys = await MMKV.indexer.getKeys();
+// => ["user", "settings", "posts"]
 ```
 
-The first item in each array is the `key` for the data, and the second item is object itself.
+**Returns:** `Promise<string[] | undefined | null>`
 
-# Boolean Indexer
+### hasKey
 
-Index of all the booleans in storage.
+Check whether a key exists in the instance.
 
-##### hasKey
-
-Check if any boolean exists for a given key.
-
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```jsx
-MMKV.indexer.booleans.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the boolean indexer for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.booleans.getKeys();
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getAll
-
-Get all booleans stored in the storage.
-
-```jsx
-let booleans = await MMKV.indexer.booleans.getAll();
-```
-
-**Returns**
-`Promise<Array<>>`
-
-The Array returned has the following structure:
+| Name | Type     | Required |
+| ---- | -------- | -------- |
+| key  | `string` | yes      |
 
 ```js
-[
-  [key, data],
-  [key, data],
-];
+if (MMKV.indexer.hasKey('user')) {
+  console.log(MMKV.getMap('user'));
+}
 ```
 
-The first item in each array is the `key` for the data, and the second item is object itself.
+**Returns:** `boolean | undefined`
 
-# Map Indexer
+::: warning
+`hasKey` is **synchronous**. It returns a boolean, not a promise, so `MMKV.indexer.hasKey('user').then(...)` throws `TypeError: .then is not a function`. The same applies to `hasKey` on every type indexer below.
+:::
 
-Index of all the objects in storage.
+## Type indexers
 
-##### hasKey
+Each data type has its own indexer, reachable from `MMKV.indexer`:
 
-Check if any objects exists for a given key.
+| Indexer                  | Data type | Values returned by `getAll`      |
+| ------------------------ | --------- | -------------------------------- |
+| `MMKV.indexer.strings`   | `string`  | `string`                         |
+| `MMKV.indexer.numbers`   | `number`  | `number`                         |
+| `MMKV.indexer.booleans`  | `boolean` | `boolean`                        |
+| `MMKV.indexer.maps`      | `object`  | parsed object, or `null`         |
+| `MMKV.indexer.arrays`    | `array`   | parsed array, or `null`          |
 
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
+They all expose the same three methods.
 
-```jsx
-MMKV.indexer.maps.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
+### getKeys
 
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the objects indexer for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.maps.getKeys();
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getAll
-
-Get all objects stored in the storage.
-
-```jsx
-let numbers = await MMKV.indexer.maps.getAll();
-```
-
-**Returns**
-`Promise<Array<>>`
-
-The Array returned has the following structure:
+Get all keys of that type.
 
 ```js
-[
-  [key, data],
-  [key, data],
-];
+const stringKeys = await MMKV.indexer.strings.getKeys();
+// => ["username", "token"]
+
+const objectKeys = await MMKV.indexer.maps.getKeys();
+// => ["user", "settings"]
 ```
 
-The first item in each array is the `key` for the data, and the second item is object itself.
+**Returns:** `Promise<string[] | undefined | null>`
 
-# Arrays Indexer
+### hasKey
 
-Index of all the arrays in storage.
-
-##### hasKey
-
-Check if any array exists for a given key.
-
-**Arguments**
-| Name | Type   |
-|------|--------|
-| key  | String |
-
-```jsx
-MMKV.indexer.arrays.hasKey("your key").then((result) => {
-  if (result) {
-    // if true do this.
-  } else {
-    // if false do this.
-  }
-});
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getKeys
-
-Get all the keys in the array indexer for all stored items.
-
-```jsx
-let keys = await MMKV.indexer.arrays.getKeys();
-```
-
-**Returns**
-`Promise<boolean>`
-
-##### getAll
-
-Get all arrays stored in the storage.
-
-```jsx
-let numbers = await MMKV.indexer.arrays.getAll();
-```
-
-**Returns**
-`Promise<Array<>>`
-
-The Array returned has the following structure:
+Check whether a key exists in that type's index. This is a synchronous linear scan over the index, so prefer `MMKV.indexer.hasKey` when you do not care about the type.
 
 ```js
-[
-  [key, data],
-  [key, data],
-];
+if (MMKV.indexer.maps.hasKey('user')) {
+  console.log('user is stored as an object');
+}
 ```
 
-The first item in each array is the `key` for the data, and the second item is object itself.
+**Returns:** `boolean | undefined`
+
+### getAll
+
+Read every key/value pair of that type.
+
+```js
+const users = await MMKV.indexer.maps.getAll();
+// => [["user", { name: "robert" }], ["admin", { name: "andrew" }]]
+```
+
+**Returns:** `Promise<[key: string, value: T | null | undefined][]>`
+
+Each entry is a `[key, value]` pair: the first item is the key, the second is the value.
+
+```js
+const numbers = await MMKV.indexer.numbers.getAll();
+
+for (const [key, value] of numbers) {
+  console.log(key, value);
+}
+```
+
+::: tip
+`maps.getAll()` and `arrays.getAll()` `JSON.parse` each stored value. If a value cannot be parsed the entry's value is `null`, so guard for it before using the result.
+:::
+
+`getAll` on `maps` and `arrays` accepts a type parameter so the resulting pairs are typed:
+
+```ts
+type User = { name: string; age: number };
+
+const users = await MMKV.indexer.maps.getAll<User>();
+// users: [key: string, value: User | null | undefined][]
+```
+
+## Listing every value of every type
+
+```js
+const dump = async () => {
+  const [strings, numbers, booleans, maps, arrays] = await Promise.all([
+    MMKV.indexer.strings.getAll(),
+    MMKV.indexer.numbers.getAll(),
+    MMKV.indexer.booleans.getAll(),
+    MMKV.indexer.maps.getAll(),
+    MMKV.indexer.arrays.getAll()
+  ]);
+
+  return { strings, numbers, booleans, maps, arrays };
+};
+```
+
+## See also
+
+- [Transactions](/transactionmanager) for building your own custom indexes.
+- [useIndex](/useindex) for loading the values of an index inside a component.

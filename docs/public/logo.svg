@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="react-native-mmkv-storage">
+  <defs>
+    <linearGradient id="mmkvBg" x1="8" y1="4" x2="118" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8" />
+      <stop offset="0.48" stop-color="#3B82F6" />
+      <stop offset="1" stop-color="#7C3AED" />
+    </linearGradient>
+    <linearGradient id="mmkvBolt" x1="46" y1="18" x2="92" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FEF9C3" />
+      <stop offset="0.35" stop-color="#FDE047" />
+      <stop offset="1" stop-color="#FBBF24" />
+    </linearGradient>
+    <filter id="mmkvShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0B1020" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <rect width="128" height="128" rx="30" fill="url(#mmkvBg)" />
+  <rect width="128" height="128" rx="30" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="2" />
+
+  <g stroke="#ffffff" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round" fill="none">
+    <ellipse cx="64" cy="38" rx="31" ry="11" />
+    <path d="M33 38v52c0 6 13.9 11 31 11s31-5 31-11V38" />
+    <path d="M33 64c0 6 13.9 11 31 11s31-5 31-11" />
+  </g>
+
+  <path
+    d="M71 22 40.5 71.5h18.2L57 106l30.5-49.5H69.3L71 22Z"
+    fill="url(#mmkvBolt)"
+    filter="url(#mmkvShadow)"
+  />
+</svg>
