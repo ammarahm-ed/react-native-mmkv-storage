@@ -427,10 +427,11 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         for (int i=0;i < size;i++) {
             NSString *key =  convertJSIStringToNSString(runtime, keys.getValueAtIndex(runtime, i).asString(runtime));
-            if ([kv containsKey:key]) {
-                values.setValueAtIndex(runtime, i, convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
+            NSString *value = [kv getStringForKey:key];
+            if (value != nil) {
+                values.setValueAtIndex(runtime, i, convertNSStringToJSIString(runtime, value));
             } else {
-                values.setValueAtIndex(runtime, i,  jsi::Value::undefined());
+                values.setValueAtIndex(runtime, i,  jsi::Value::null());
             }
         }
         
@@ -446,11 +447,11 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        if ([kv containsKey:key]) {
-            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
-        } else {
-            return Value::null();
-        }
+        NSString *value = [kv getStringForKey:key];
+        
+        if (value == nil) return Value::null();
+        
+        return Value(convertNSStringToJSIString(runtime, value));
     });
     
     
@@ -476,11 +477,11 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        if ([kv containsKey:key]) {
-            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
-        } else {
-            return Value::null();
-        }
+        NSString *value = [kv getStringForKey:key];
+        
+        if (value == nil) return Value::null();
+        
+        return Value(convertNSStringToJSIString(runtime, value));
     });
     
     CREATE_FUNCTION("setArrayMMKV", 3, {
@@ -506,11 +507,11 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        if ([kv containsKey:key]) {
-            return Value(convertNSStringToJSIString(runtime, [kv getStringForKey:key]));
-        } else {
-            return Value::null();
-        }
+        NSString *value = [kv getStringForKey:key];
+        
+        if (value == nil) return Value::null();
+        
+        return Value(convertNSStringToJSIString(runtime, value));
     });
     
     
@@ -536,11 +537,12 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        if ([kv containsKey:key]) {
-            return Value([kv getDoubleForKey:key]);
-        } else {
-            return Value::null();
-        }
+        BOOL hasValue = NO;
+        double value = [kv getDoubleForKey:key defaultValue:0 hasValue:&hasValue];
+        
+        if (!hasValue) return Value::null();
+        
+        return Value(value);
     });
     
     CREATE_FUNCTION("setBoolMMKV", 3, {
@@ -565,11 +567,12 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         NSString *key = nsstring(arguments[0]);
         
-        if ([kv containsKey:key]) {
-            return Value([kv getBoolForKey:key]);
-        } else {
-            return Value::null();
-        }
+        BOOL hasValue = NO;
+        BOOL value = [kv getBoolForKey:key defaultValue:NO hasValue:&hasValue];
+        
+        if (!hasValue) return Value::null();
+        
+        return Value((bool)value);
     });
     
     

@@ -505,10 +505,9 @@ void installBindings(Runtime &jsiRuntime)
         for (int i = 0; i < size; i++)
         {
             auto key = std_string(keys.getValueAtIndex(runtime, i));
-            if (kv->containsKey(key))
+            std::string result;
+            if (kv->getString(key, result))
             {
-                std::string result;
-                kv->getString(key, result);
                 values.setValueAtIndex(runtime, i, String::createFromUtf8(runtime, result));
             }
             else
@@ -600,13 +599,13 @@ void installBindings(Runtime &jsiRuntime)
             return Value::undefined();
         }
         string key = std_string(arguments[0]);
-        string result;
-        bool exists = kv->containsKey(key);
+        bool exists = false;
+        double result = kv->getDouble(key, 0, &exists);
         if (!exists)
         {
             return Value::null();
         }
-        return Value(kv->getDouble(key));
+        return Value(result);
     });
 
     CREATE_FUNCTION("setBoolMMKV", 3, {
@@ -629,13 +628,13 @@ void installBindings(Runtime &jsiRuntime)
         }
 
         string key = std_string(arguments[0]);
-        string result;
-        bool exists = kv->containsKey(key);
+        bool exists = false;
+        bool result = kv->getBool(key, false, &exists);
         if (!exists)
         {
             return Value::null();
         }
-        return Value(kv->getBool(key));
+        return Value(result);
     });
 
     CREATE_FUNCTION("removeValueMMKV", 2, {
