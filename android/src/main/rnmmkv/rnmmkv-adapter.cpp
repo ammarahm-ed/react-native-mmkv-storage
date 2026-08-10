@@ -217,6 +217,26 @@ static const string dataTypes[] = {
     "arrayIndex",
 };
 
+static const string typeNames[] = {
+    "string",
+    "number",
+    "boolean",
+    "object",
+    "array",
+};
+
+static const string *valueTypeForKey(MMKV *kv, const string &key)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        if (hasValue(getIndex(kv, dataTypes[i]), key))
+        {
+            return &typeNames[i];
+        }
+    }
+    return nullptr;
+}
+
 static void removeFromIndex(MMKV *kv, const string &key)
 {
     if (!indexing_enabled[kv->mmapID()])
@@ -727,18 +747,14 @@ void installBindings(Runtime &jsiRuntime)
             return Value::undefined();
         }
 
-        static const string typeNames[] = {"string", "number", "boolean", "object", "array"};
-        string key = std_string(arguments[0]);
+        const string *type = valueTypeForKey(kv, std_string(arguments[0]));
 
-        for (int i = 0; i < 5; i++)
+        if (type == nullptr)
         {
-            if (hasValue(getIndex(kv, dataTypes[i]), key))
-            {
-                return Value(runtime, String::createFromUtf8(runtime, typeNames[i]));
-            }
+            return Value::null();
         }
 
-        return Value::null();
+        return Value(runtime, String::createFromUtf8(runtime, *type));
     });
 
     CREATE_FUNCTION("containsKeyMMKV", 2, {

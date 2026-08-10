@@ -307,6 +307,25 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     
 }
 
+NSString *valueTypeForKey(MMKV *kv, NSString *key) {
+    static NSArray *indexNames = nil;
+    static NSArray *typeNames = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        indexNames = @[@"stringIndex", @"numberIndex", @"boolIndex", @"mapIndex", @"arrayIndex"];
+        typeNames = @[@"string", @"number", @"boolean", @"object", @"array"];
+    });
+
+    for (NSUInteger i = 0; i < indexNames.count; i++) {
+        NSMutableDictionary *index = getIndex(kv, indexNames[i]);
+        if (index[key] != nil) {
+            return typeNames[i];
+        }
+    }
+
+    return nil;
+}
+
 void upgradeIndex(MMKV *kv, NSString *type) {
     @try {
         if (![kv containsKey:type]) return;
@@ -636,18 +655,11 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         if (!kv) return Value::undefined();
         
-        NSString *key = nsstring(arguments[0]);
-        NSArray *indexNames = @[@"stringIndex", @"numberIndex", @"boolIndex", @"mapIndex", @"arrayIndex"];
-        NSArray *typeNames = @[@"string", @"number", @"boolean", @"object", @"array"];
+        NSString *type = valueTypeForKey(kv, nsstring(arguments[0]));
         
-        for (int i = 0; i < indexNames.count; i++) {
-            NSMutableDictionary *index = getIndex(kv, indexNames[i]);
-            if (index[key] != nil) {
-                return Value(convertNSStringToJSIString(runtime, typeNames[i]));
-            }
-        }
+        if (type == nil) return Value::null();
         
-        return Value::null();
+        return Value(convertNSStringToJSIString(runtime, type));
     });
     
     CREATE_FUNCTION("containsKeyMMKV", 2, {
