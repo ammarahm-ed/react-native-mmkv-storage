@@ -6,12 +6,14 @@
 #include "MMKVPredef.h"
 #include "MMBuffer.h"
 #include <algorithm>
+#include <unordered_map>
+#include <vector>
 
 using namespace facebook;
 using namespace jsi;
 using namespace std;
 
-static vector<MMKV *> mmkvInstances;
+static std::unordered_map<std::string, MMKV *> mmkvInstances;
 
 static string rPath = "";
 static JavaVM *vm;
@@ -102,28 +104,21 @@ static vector<string> jarray2vector(JNIEnv *env, jobjectArray array)
 
 static MMKV *getInstance(const string &ID)
 {
-    auto kv = std::find_if(mmkvInstances.begin(), mmkvInstances.end(), [&ID](MMKV *inst)
-                           { return inst->mmapID() == ID; });
-
+    auto kv = mmkvInstances.find(ID);
     if (kv == mmkvInstances.end())
     {
         return nullptr;
     }
-    return *kv;
+    return kv->second;
 }
 
 static MMKV *createInstance(const string &ID, MMKVMode mode, string key, string path)
 {
-    auto it = find_if(mmkvInstances.begin(), mmkvInstances.end(), [&ID](MMKV *inst)
-                      { return inst->mmapID() == ID; });
-    if (it != mmkvInstances.end())
-        mmkvInstances.erase(it);
-
     MMKV *kv = MMKV::mmkvWithID(ID, mmkv::DEFAULT_MMAP_SIZE, mode,
                                 key.empty() ? nullptr : &key,
                                 path.empty() ? nullptr : &path);
 
-    mmkvInstances.push_back(kv);
+    mmkvInstances[ID] = kv;
     return kv;
 }
 

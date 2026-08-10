@@ -94,22 +94,11 @@ RCT_EXPORT_MODULE(MMKVStorage)
 }
 
 MMKV *getInstance(NSString *ID) {
-    if ([[mmkvInstances allKeys] containsObject:ID]) {
-        MMKV *kv = [mmkvInstances objectForKey:ID];
-        
-        return kv;
-    } else {
-        return NULL;
-    }
+    return mmkvInstances[ID];
 }
 
 NSString *getServiceName(NSString *alias) {
-    if ([[serviceNames allKeys] containsObject:alias]) {
-        NSString *serviceName = [serviceNames objectForKey:alias];
-        return serviceName;
-    } else {
-        return nil;
-    }
+    return serviceNames[alias];
 }
 
 void setServiceName(NSString *alias, NSString *serviceName) {
