@@ -23,8 +23,10 @@ export function handleAction<T extends (...args: any[]) => any | undefined | nul
   }
   if (!action) return undefined;
   let result = action(...args);
-  if (result === undefined) currentInstancesStatus[id] = initialize(id);
-  result = action(...args);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = action(...args);
+  }
   return result;
 }
 
@@ -51,8 +53,10 @@ export async function handleActionAsync<T extends (...args: any[]) => any | unde
     }
     if (!action) return resolve(undefined);
     let result = action(...args);
-    if (result === undefined) currentInstancesStatus[id] = initialize(id);
-    result = action(...args);
+    if (result === undefined) {
+      currentInstancesStatus[id] = initialize(id);
+      result = action(...args);
+    }
     resolve(result);
   });
 }
@@ -68,7 +72,9 @@ export async function handlePromise<T extends (...args: any[]) => any | undefine
   }
   if (!action) return undefined;
   let result = await action(...args);
-  if (result === undefined) currentInstancesStatus[id] = initialize(id);
-  result = await action(...args);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = await action(...args);
+  }
   return result;
 }
