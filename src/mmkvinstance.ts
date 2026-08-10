@@ -24,6 +24,7 @@ export default class MMKVInstance {
   indexer: indexer;
   ev: EventManager;
   options: StorageOptions;
+  indexFlushScheduled: boolean = false;
   constructor(id: string) {
     this.instanceID = id;
     this.encryption = new encryption(id);
@@ -35,6 +36,15 @@ export default class MMKVInstance {
 
   isRegisterd(key: string) {
     return this.ev._registry[`${key}:onwrite`];
+  }
+
+  scheduleIndexFlush() {
+    if (this.indexFlushScheduled || !this.options?.enableIndexing) return;
+    this.indexFlushScheduled = true;
+    queueMicrotask(() => {
+      this.indexFlushScheduled = false;
+      mmkvJsiModule.flushIndexesMMKV?.(this.instanceID);
+    });
   }
 
   handleNullOrUndefined(key: string, value: any) {
@@ -194,6 +204,7 @@ export default class MMKVInstance {
         }
       }
     }
+    this.scheduleIndexFlush();
     queueMicrotask(() => {
       items?.forEach((item, index) => {
         if (this.isRegisterd(item[0])) {
@@ -285,6 +296,7 @@ export default class MMKVInstance {
     assert('string', value);
     let result = handleAction(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: value });
       }
@@ -326,6 +338,7 @@ export default class MMKVInstance {
 
     let result = handleAction(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: value });
       }
@@ -364,6 +377,7 @@ export default class MMKVInstance {
 
     let result = handleAction(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: value });
       }
@@ -409,6 +423,7 @@ export default class MMKVInstance {
       this.instanceID
     );
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: value });
       }
@@ -464,6 +479,7 @@ export default class MMKVInstance {
       this.instanceID
     );
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: value });
       }
@@ -593,6 +609,7 @@ export default class MMKVInstance {
   removeItem(key: string) {
     let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
+      this.scheduleIndexFlush();
       if (this.isRegisterd(key)) {
         this.ev.publish(`${key}:onwrite`, { key, value: null });
       }
@@ -615,6 +632,7 @@ export default class MMKVInstance {
       keys.filter(key => key !== this.instanceID),
       this.instanceID
     );
+    if (result) this.scheduleIndexFlush();
     for (const key of keys) {
       if (result) {
         if (this.isRegisterd(key)) {

@@ -105,6 +105,8 @@ export type MMKVJsiModule = {
   getIndexMMKV: (type: IndexType, id: string) => string[] | undefined;
   containsKeyMMKV: (key: string, id: string) => boolean | undefined;
 
+  flushIndexesMMKV: (id: string) => boolean | undefined;
+
   clearMMKV: (id: string) => boolean | undefined;
   clearMemoryCache: (id: string) => boolean | undefined;
 
