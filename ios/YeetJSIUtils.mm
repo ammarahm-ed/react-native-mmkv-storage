@@ -26,7 +26,12 @@ jsi::Value convertNSNumberToJSINumber(jsi::Runtime &runtime, NSNumber *value)
 
 jsi::String convertNSStringToJSIString(jsi::Runtime &runtime, NSString *value)
 {
-    return jsi::String::createFromUtf8(runtime, [value UTF8String] ?: "");
+    const char *utf8 = [value UTF8String];
+    if (utf8 == nullptr) {
+        return jsi::String::createFromUtf8(runtime, "");
+    }
+    NSUInteger length = [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+    return jsi::String::createFromUtf8(runtime, (const uint8_t *)utf8, length);
 }
 
 jsi::Value convertObjCObjectToJSIValue(jsi::Runtime &runtime, id value);
@@ -81,7 +86,10 @@ id convertJSIValueToObjCObject(
                                const jsi::Value &value);
 NSString *convertJSIStringToNSString(jsi::Runtime &runtime, const jsi::String &value)
 {
-    return [NSString stringWithUTF8String:value.utf8(runtime).c_str()];
+    std::string utf8 = value.utf8(runtime);
+    return [[NSString alloc] initWithBytes:utf8.data()
+                                    length:utf8.size()
+                                  encoding:NSUTF8StringEncoding];
 }
 
 NSArray *convertJSIArrayToNSArray(
