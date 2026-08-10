@@ -100,6 +100,8 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   const prevStorage = usePrevious(storage);
 
   const prevValue = useRef(value);
+  const equalityFnRef = useRef(equalityFn);
+  equalityFnRef.current = equalityFn;
 
   useEffect(() => {
     prevValue.current = value;
@@ -131,18 +133,21 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   }, [prevKey, key, prevStorage, storage, getValue, getValueType]);
 
   const updateValue = useCallback(event => {
-    let type = getDataType(event.value);
-    //@ts-ignore
-    let _value = event.value ? methods[type]['copy'](event.value) : event.value;
+    const type = getDataType(event.value);
+    const next = event.value;
 
-    if (prevValue.current === _value || equalityFn?.(prevValue.current, _value)) return;
+    if (equalityFnRef.current?.(prevValue.current, next)) return;
+    if (next === prevValue.current && type !== 'object' && type !== 'array') return;
+
+    //@ts-ignore
+    const _value = next ? methods[type]['copy'](next) : next;
 
     setValue(_value);
     setValueType(type);
   }, []);
 
   const setNewValue = useCallback(
-    async nextValue => {
+    nextValue => {
       let updatedValue = nextValue;
       if (typeof nextValue === 'function') {
         if (nextValue.constructor.name === 'AsyncFunction') {

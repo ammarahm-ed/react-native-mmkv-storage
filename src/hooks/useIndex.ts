@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MMKVInstance from '../mmkvinstance';
 import { DataType } from '../types';
 import { methods } from './constants';
@@ -51,6 +51,11 @@ export const useIndex = <T>(
     storage.getMultipleItems(keys || [], type)
   );
 
+  const keysRef = useRef(keys);
+  keysRef.current = keys;
+
+  const keysKey = keys ? keys.join('\u0000') : '';
+
   const onChange = useCallback(({ key }) => {
     setValues(values => {
       let index = values.findIndex(v => v[0] === key);
@@ -60,7 +65,7 @@ export const useIndex = <T>(
         if (index !== -1) {
           values[index][1] = value;
         } else {
-          storage.getMultipleItemsAsync<T>(keys || [], type).then(data => {
+          storage.getMultipleItemsAsync<T>(keysRef.current || [], type).then(data => {
             setValues(data);
           });
         }
@@ -69,10 +74,10 @@ export const useIndex = <T>(
       }
       return [...values];
     });
-  }, []);
+  }, [storage, type]);
 
   useEffect(() => {
-    let names = keys.map(v => `${v}:onwrite`);
+    let names = (keysRef.current || []).map(v => `${v}:onwrite`);
     storage.ev.subscribeMulti(names, onChange);
 
     return () => {
@@ -80,17 +85,25 @@ export const useIndex = <T>(
         storage.ev.unsubscribe(name, onChange);
       });
     };
-  }, [keys, type]);
+  }, [keysKey, storage, onChange]);
 
-  const update = useCallback((key, value) => {
-    if (!value) return remove(key);
-    //@ts-ignore
-    storage[methods[type]['set']](key, value);
-  }, []);
+  const remove = useCallback(
+    key => {
+      storage.removeItem(key);
+    },
+    [storage]
+  );
 
-  const remove = useCallback(key => {
-    storage.removeItem(key);
-  }, []);
+  const update = useCallback(
+    (key, value) => {
+      if (!value) return remove(key);
+      //@ts-ignore
+      storage[methods[type]['set']](key, value);
+    },
+    [storage, type, remove]
+  );
 
-  return [values.map(v => v[1]).filter(v => v !== null), update, remove];
+  const result = useMemo(() => values.map(v => v[1]).filter(v => v !== null), [values]);
+
+  return [result, update, remove];
 };
