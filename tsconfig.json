@@ -1,5 +1,5 @@
 {
-  "include": ["index.ts","./src/module/NativeMMKVStorage.ts"],
+  "include": ["index.ts", "globals.d.ts", "./src/module/NativeMMKVStorage.ts"],
   "compilerOptions": {
     "baseUrl": "./",
     "jsx": "react-native",

@@ -154,12 +154,9 @@ android {
   sourceSets {
     main {
       if (isNewArchitectureEnabled()) {
-        java.srcDirs += [
-          "src/newarch",
-          // Codegen specs
-          "generated/java",
-          "generated/jni"
-        ]
+        // Codegen specs are generated into build/generated/source/codegen by
+        // the react gradle plugin and wired into the source sets automatically.
+        java.srcDirs += ["src/newarch"]
       } else {
         java.srcDirs += ["src/oldarch"]
       }

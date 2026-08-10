@@ -1,5 +1,7 @@
 # Installation
 
+> **Supported React Native versions:** on the new architecture (the default since RN 0.76 and the only mode since RN 0.82) the library requires React Native **0.75+** and is tested up to **0.87**. Codegen specs are generated at build time by your app. On the old architecture, React Native 0.71+ is required.
+
 Add the library to your React Native project.
 
 ```bash

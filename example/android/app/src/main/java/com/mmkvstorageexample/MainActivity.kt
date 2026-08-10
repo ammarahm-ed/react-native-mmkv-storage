@@ -1,4 +1,4 @@
-package mmkvstorage.example
+package com.mmkvstorageexample
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

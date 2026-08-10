@@ -35,9 +35,10 @@ This library aims to provide a fast & reliable solution for you data storage nee
 
 > Learn how to build your own module with JSI on my [blog](https://blog.notesnook.com/getting-started-react-native-jsi/)
 
-## 0.9.0 Breaking change
+## Supported React Native versions
 
-Works only with react native 0.71.0 and above. If you are on older version of react native, keep using 0.8.x.
+- **New architecture (default since RN 0.76, the only mode since RN 0.82):** requires React Native **0.75 or above**. Tested up to React Native 0.87. Codegen specs are generated at build time by your app, so the library always matches your React Native version.
+- **Old architecture:** requires React Native 0.71.0 and above. If you are on an older version of react native, keep using 0.8.x.
 
 ## Features
 

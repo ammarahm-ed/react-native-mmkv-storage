@@ -1,6 +1,5 @@
 /**
  * Sample React Native App with MMKV Storage
- * Updated for React Native 0.79.5 template style
  */
 
 import React, { useCallback } from 'react';
@@ -15,8 +14,14 @@ import {
   View,
 } from 'react-native';
 
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { MMKVLoader, create } from 'react-native-mmkv-storage';
+
+const Colors = {
+  white: '#ffffff',
+  black: '#000000',
+  lighter: '#f3f3f3',
+  darker: '#222222',
+};
 
 const storage = new MMKVLoader().withEncryption().initialize();
 const storage2 = new MMKVLoader().withInstanceID('storage2').initialize();
@@ -107,7 +112,7 @@ function App(): React.JSX.Element {
           }}
         >
           <Section title="MMKV Storage Example">
-            <Text style={styles.headerText}>
+            <Text style={[styles.headerText, { color: isDarkMode ? 'white' : 'black' }]}>
               I am {user} and I am {age} years old.
             </Text>
             {buttons.map((item) => (
@@ -150,7 +155,6 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     textAlign: 'center',
-    color: 'black',
     marginBottom: 20,
   },
 });

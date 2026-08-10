@@ -1,6 +1,9 @@
 src/
 !dist/src
 !android/src
+# Codegen runs against the TypeScript spec at build time in the consuming app,
+# so the spec source must be published (codegenConfig.jsSrcsDir = ./src).
+!src/module/NativeMMKVStorage.ts
 .github
 .vscode
 .yarn
