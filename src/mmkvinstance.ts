@@ -81,39 +81,39 @@ export default class MMKVInstance {
   /**
    * Set a string value to storage for the given key.
    */
-  setStringAsync(key: string, value: string): Promise<boolean | null | undefined> {
-    return Promise.resolve(this.setString(key, value));
+  async setStringAsync(key: string, value: string): Promise<boolean | null | undefined> {
+    return this.setString(key, value);
   }
   /**
    * Get the string value for the given key.
    */
-  getStringAsync(key: string): Promise<string | null | undefined> {
-    return Promise.resolve(this.getString(key));
+  async getStringAsync(key: string): Promise<string | null | undefined> {
+    return this.getString(key);
   }
   /**
    * Set a number value to storage for the given key.
    */
-  setIntAsync(key: string, value: number): Promise<boolean | null | undefined> {
-    return Promise.resolve(this.setInt(key, value));
+  async setIntAsync(key: string, value: number): Promise<boolean | null | undefined> {
+    return this.setInt(key, value);
   }
   /**
    * Get the number value for the given key.
    */
-  getIntAsync(key: string): Promise<number | null | undefined> {
-    return Promise.resolve(this.getInt(key));
+  async getIntAsync(key: string): Promise<number | null | undefined> {
+    return this.getInt(key);
   }
   /**
    * Set a boolean value to storage for the given key.
    *
    */
-  setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined> {
-    return Promise.resolve(this.setBool(key, value));
+  async setBoolAsync(key: string, value: boolean): Promise<boolean | null | undefined> {
+    return this.setBool(key, value);
   }
   /**
    * Get the boolean value for the given key.
    */
-  getBoolAsync(key: string): Promise<boolean | null | undefined> {
-    return Promise.resolve(this.getBool(key));
+  async getBoolAsync(key: string): Promise<boolean | null | undefined> {
+    return this.getBool(key);
   }
   /**
    * Set an Object to storage for the given key.
@@ -121,14 +121,14 @@ export default class MMKVInstance {
    * Note that this function does **not** work with the Map data type.
    *
    */
-  setMapAsync(key: string, value: object): Promise<boolean | null | undefined> {
-    return Promise.resolve(this.setMap(key, value));
+  async setMapAsync(key: string, value: object): Promise<boolean | null | undefined> {
+    return this.setMap(key, value);
   }
   /**
    * Get then Object from storage for the given key.
    */
-  getMapAsync<T>(key: string): Promise<T | null | undefined> {
-    return Promise.resolve(this.getMap<T>(key));
+  async getMapAsync<T>(key: string): Promise<T | null | undefined> {
+    return this.getMap<T>(key);
   }
 
   /**
