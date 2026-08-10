@@ -19,6 +19,10 @@ static string rPath = "";
 static JavaVM *vm;
 static jclass mmkvclass;
 static jobject mmkvobject;
+static jmethodID getSecureKeyMethod;
+static jmethodID setSecureKeyMethod;
+static jmethodID secureKeyExistsMethod;
+static jmethodID removeSecureKeyMethod;
 
 static string jstring2string(JNIEnv *env, jstring str)
 {
@@ -346,16 +350,17 @@ void installBindings(Runtime &jsiRuntime)
 
         JNIEnv *env;
         bool attached = vm->AttachCurrentThread(&env, NULL);
-        mmkvclass = env->GetObjectClass(mmkvobject);
 
         jstring jstr1 = string2jstring(env, alias);
         jvalue params[1];
         params[0].l = jstr1;
-        jmethodID getSecureKey = env->GetMethodID(mmkvclass, "getSecureKey",
-                                                  "(Ljava/lang/String;)Ljava/lang/String;");
-        jobject result = env->CallObjectMethodA(mmkvobject, getSecureKey, params);
-        const char *str = env->GetStringUTFChars((jstring)result, NULL);
-        string cryptKey = j_string_to_string(env, env->NewStringUTF(str));
+        jobject result = env->CallObjectMethodA(mmkvobject, getSecureKeyMethod, params);
+        string cryptKey = j_string_to_string(env, (jstring)result);
+        env->DeleteLocalRef(jstr1);
+        if (result)
+        {
+            env->DeleteLocalRef(result);
+        }
         if (attached)
         {
             vm->DetachCurrentThread();
@@ -369,7 +374,6 @@ void installBindings(Runtime &jsiRuntime)
 
         JNIEnv *env;
         bool attached = vm->AttachCurrentThread(&env, NULL);
-        mmkvclass = env->GetObjectClass(mmkvobject);
 
         jstring jstr1 = string2jstring(env, alias);
         jstring jstr2 = string2jstring(env, key);
@@ -378,9 +382,9 @@ void installBindings(Runtime &jsiRuntime)
         params[0].l = jstr1;
         params[1].l = jstr2;
 
-        jmethodID setSecureKey = env->GetMethodID(mmkvclass, "setSecureKey",
-                                                  "(Ljava/lang/String;Ljava/lang/String;)V");
-        env->CallVoidMethodA(mmkvobject, setSecureKey, params);
+        env->CallVoidMethodA(mmkvobject, setSecureKeyMethod, params);
+        env->DeleteLocalRef(jstr1);
+        env->DeleteLocalRef(jstr2);
         if (attached)
         {
             vm->DetachCurrentThread();
@@ -394,15 +398,13 @@ void installBindings(Runtime &jsiRuntime)
 
         JNIEnv *env;
         bool attached = vm->AttachCurrentThread(&env, NULL);
-        mmkvclass = env->GetObjectClass(mmkvobject);
 
         jstring jstr1 = string2jstring(env, alias);
         jvalue params[1];
         params[0].l = jstr1;
 
-        jmethodID secureKeyExists = env->GetMethodID(mmkvclass, "secureKeyExists",
-                                                     "(Ljava/lang/String;)Z");
-        bool exists = env->CallBooleanMethodA(mmkvobject, secureKeyExists, params);
+        bool exists = env->CallBooleanMethodA(mmkvobject, secureKeyExistsMethod, params);
+        env->DeleteLocalRef(jstr1);
         if (attached)
         {
             vm->DetachCurrentThread();
@@ -415,15 +417,13 @@ void installBindings(Runtime &jsiRuntime)
 
         JNIEnv *env;
         bool attached = vm->AttachCurrentThread(&env, NULL);
-        mmkvclass = env->GetObjectClass(mmkvobject);
 
         jstring jstr1 = string2jstring(env, alias);
         jvalue params[1];
         params[0].l = jstr1;
 
-        jmethodID removeSecureKey = env->GetMethodID(mmkvclass, "removeSecureKey",
-                                                     "(Ljava/lang/String;)V");
-        env->CallVoidMethodA(mmkvobject, removeSecureKey, params);
+        env->CallVoidMethodA(mmkvobject, removeSecureKeyMethod, params);
+        env->DeleteLocalRef(jstr1);
         if (attached)
         {
             vm->DetachCurrentThread();
@@ -1069,6 +1069,11 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_ammarahmed_mmkv_RNMMKVModule_destroy(JNIEnv *env, jobject thiz)
 {
     env->DeleteGlobalRef(mmkvobject);
+    if (mmkvclass)
+    {
+        env->DeleteGlobalRef(mmkvclass);
+        mmkvclass = nullptr;
+    }
     vm = nullptr;
 }
 
@@ -1097,7 +1102,21 @@ private:
         jni::Environment::current()->GetJavaVM(&vm);
         auto runtime = reinterpret_cast<jsi::Runtime *>(jsi);
 
-        mmkvobject = jni::Environment::current()->NewGlobalRef(thiz.get());
+        JNIEnv *env = jni::Environment::current();
+        mmkvobject = env->NewGlobalRef(thiz.get());
+
+        jclass localClass = env->GetObjectClass(mmkvobject);
+        mmkvclass = (jclass)env->NewGlobalRef(localClass);
+        env->DeleteLocalRef(localClass);
+
+        getSecureKeyMethod = env->GetMethodID(mmkvclass, "getSecureKey",
+                                              "(Ljava/lang/String;)Ljava/lang/String;");
+        setSecureKeyMethod = env->GetMethodID(mmkvclass, "setSecureKey",
+                                              "(Ljava/lang/String;Ljava/lang/String;)V");
+        secureKeyExistsMethod = env->GetMethodID(mmkvclass, "secureKeyExists",
+                                                 "(Ljava/lang/String;)Z");
+        removeSecureKeyMethod = env->GetMethodID(mmkvclass, "removeSecureKey",
+                                                 "(Ljava/lang/String;)V");
         if (runtime)
         {
             installBindings(*runtime);
