@@ -189,6 +189,27 @@ static std::vector<std::string> &getIndex(MMKV *kv, const string &type)
     return it->second;
 }
 
+std::unordered_map<std::string, std::unordered_map<std::string, bool>> index_dirty = {};
+
+static void markIndexDirty(MMKV *kv, const string &type)
+{
+    index_dirty[kv->mmapID()][type] = true;
+}
+
+static void flushIndexes(MMKV *kv)
+{
+    auto it = index_dirty.find(kv->mmapID());
+    if (it == index_dirty.end())
+        return;
+
+    for (auto &entry : it->second)
+    {
+        if (entry.second)
+            kv->set(getIndex(kv, entry.first), entry.first);
+    }
+    it->second.clear();
+}
+
 static const string dataTypes[] = {
     "stringIndex",
     "numberIndex",
@@ -207,7 +228,7 @@ static void removeFromIndex(MMKV *kv, const string &key)
         if (hasValue(index, key))
         {
             removeValue(index, key);
-            kv->set(index, idx);
+            markIndexDirty(kv, idx);
             return;
         }
     }
@@ -237,7 +258,7 @@ static void removeKeysFromIndex(MMKV *kv, const vector<string> &arrKeys)
     for (const auto &idx : dataTypes)
     {
         if (modified[idx])
-            kv->set(getIndex(kv, idx), idx);
+            markIndexDirty(kv, idx);
     }
 }
 
@@ -249,7 +270,7 @@ static void setIndex(MMKV *kv, const string &type, const string &key)
     if (!hasValue(index, key))
     {
         addValue(index, key);
-        kv->set(index, type);
+        markIndexDirty(kv, type);
     }
 }
 
@@ -266,7 +287,7 @@ static void setIndexes(MMKV *kv, const string &type, const std::vector<std::stri
             addValue(index, keys->at(i));
         }
     }
-    kv->set(index, type);
+    markIndexDirty(kv, type);
 }
 
 template <typename NativeFunc>
@@ -301,6 +322,7 @@ basecount, \
 void initIndexForId(std::string id)
 {
     index_cache[id] = unordered_map<std::string, std::vector<std::string>>();
+    index_dirty[id] = unordered_map<std::string, bool>();
 }
 
 void installBindings(Runtime &jsiRuntime)
@@ -713,6 +735,16 @@ void installBindings(Runtime &jsiRuntime)
         kv->clearAll();
         initIndexForId(kv->mmapID());
 
+        return Value(true);
+    });
+
+    CREATE_FUNCTION("flushIndexesMMKV", 1, {
+        MMKV *kv = getInstance(std_string(arguments[0]));
+        if (!kv)
+        {
+            return Value::undefined();
+        }
+        flushIndexes(kv);
         return Value(true);
     });
 

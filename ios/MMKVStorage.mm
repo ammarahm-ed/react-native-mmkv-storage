@@ -47,6 +47,7 @@ SecureStorage *_secureStorage;
 NSString *appGroupId;
 NSMutableDictionary *indexes;
 NSMutableDictionary *indexingEnabled;
+NSMutableDictionary *indexesDirty;
 
 RCT_EXPORT_MODULE(MMKVStorage)
 
@@ -60,6 +61,7 @@ RCT_EXPORT_MODULE(MMKVStorage)
     self = [super init];
     indexingEnabled = [NSMutableDictionary dictionary];
     indexes = [NSMutableDictionary dictionary];
+    indexesDirty = [NSMutableDictionary dictionary];
 
     NSString *rootDir;
 
@@ -189,14 +191,34 @@ MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
     return kv;
 }
 
+void markIndexDirty(MMKV *kv, NSString *type) {
+    NSMutableDictionary *dirty = indexesDirty[[kv mmapID]];
+    if (!dirty) {
+        dirty = [NSMutableDictionary dictionary];
+        indexesDirty[[kv mmapID]] = dirty;
+    }
+    dirty[type] = @YES;
+}
+
+void flushIndexes(MMKV *kv) {
+    NSMutableDictionary *dirty = indexesDirty[[kv mmapID]];
+    if (!dirty || dirty.count == 0) return;
+
+    NSMutableDictionary *kvIndexes = indexes[[kv mmapID]];
+    for (NSString *type in [dirty allKeys]) {
+        NSMutableDictionary *index = kvIndexes[type];
+        if (index) [kv setObject:index forKey:type];
+    }
+    [dirty removeAllObjects];
+}
+
 void setIndex(MMKV *kv, NSString *type, NSString *key) {
     if (![indexingEnabled[[kv mmapID]] boolValue]) return;
     NSMutableDictionary *index = getIndex(kv, type);
     
     if (!index[key]) {
         index[key] = @1;
-        
-        [kv setObject:index forKey:type];
+        markIndexDirty(kv, type);
     }
 }
 
@@ -208,7 +230,7 @@ void setIndexes(MMKV *kv, NSString *type, NSArray *keys) {
         index[keys[i]] = @1;
     }
     
-    [kv setObject:index forKey:type];
+    markIndexDirty(kv, type);
 }
 
 NSMutableDictionary *getIndex(MMKV *kv, NSString *type) {
@@ -288,11 +310,11 @@ void removeKeysFromIndexer(MMKV *kv, NSArray *keys) {
     }
     
     
-    if (strings) [kv setObject:getIndex(kv, @"stringIndex") forKey:@"stringIndex"];
-    if (objects) [kv setObject:getIndex(kv, @"mapIndex") forKey:@"mapIndex"];
-    if (arrays) [kv setObject:getIndex(kv, @"arrayIndex") forKey:@"arrayIndex"];
-    if (numbers) [kv setObject:getIndex(kv, @"numberIndex") forKey:@"numberIndex"];
-    if (booleans) [kv setObject:getIndex(kv, @"boolIndex") forKey:@"boolIndex"];
+    if (strings) markIndexDirty(kv, @"stringIndex");
+    if (objects) markIndexDirty(kv, @"mapIndex");
+    if (arrays) markIndexDirty(kv, @"arrayIndex");
+    if (numbers) markIndexDirty(kv, @"numberIndex");
+    if (booleans) markIndexDirty(kv, @"boolIndex");
     
 }
 
@@ -338,6 +360,7 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         indexingEnabled[ID] = arguments[4].getBool() ? @YES : @NO;
         indexes[ID] = [NSMutableDictionary dictionary];
+        indexesDirty[ID] = [NSMutableDictionary dictionary];
         
         return Value(true);
     });
@@ -621,11 +644,22 @@ static void install(jsi::Runtime &jsiRuntime) {
         
         [kv clearAll];
         indexes[[kv mmapID]] = [NSMutableDictionary dictionary];
+        indexesDirty[[kv mmapID]] = [NSMutableDictionary dictionary];
         
         return Value(true);
         
     });
     
+    
+    CREATE_FUNCTION("flushIndexesMMKV", 1, {
+        MMKV *kv = getInstance(nsstring(arguments[0]));
+        
+        if (!kv) return Value::undefined();
+        
+        flushIndexes(kv);
+        
+        return Value(true);
+    });
     
     CREATE_FUNCTION("clearMemoryCache", 1, {
         MMKV *kv = getInstance(nsstring(arguments[0]));
