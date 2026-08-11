@@ -3,6 +3,8 @@ import MMKVInstance from '../mmkvinstance';
 import mmkvJsiModule from '../module';
 import { methods, types } from './constants';
 
+export type InitialState = { value: any; type: string | null };
+
 export const getDataType = (value: any) => {
   if (value === null || value === undefined) return null;
   let type = Array.isArray(value) ? 'array' : typeof value;
@@ -25,17 +27,18 @@ const getValueType = (key: string, storage: MMKVInstance) => {
   return null;
 };
 
+export const getInitialState = (key: string, storage: MMKVInstance): InitialState => {
+  if (!storage?.indexer) return { value: null, type: null };
+
+  const type = getValueType(key, storage);
+  if (!type) return { value: null, type: null };
+
+  //@ts-ignore
+  return { value: storage[methods[type]['get']](key), type };
+};
+
 export const getInitialValue =
   (key: string, storage: MMKVInstance, initialValueType: 'type' | 'value') => () => {
-    if (!storage?.indexer) {
-      return null;
-    }
-
-    const type = getValueType(key, storage);
-    if (!type) return null;
-
-    if (initialValueType === 'type') return type;
-
-    //@ts-ignore
-    return storage[methods[type]['get']](key);
+    const state = getInitialState(key, storage);
+    return initialValueType === 'type' ? state.type : state.value;
   };

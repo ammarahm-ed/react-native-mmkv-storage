@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MMKVInstance from '../mmkvinstance';
 import { methods } from './constants';
-import { getDataType, getInitialValue } from './functions';
+import { getDataType, getInitialState, InitialState } from './functions';
 
 /**
  * A helper function which returns `useMMKVStorage` hook with a storage instance set.
@@ -90,114 +90,115 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
   defaultValue?: T,
   equalityFn?: (prev: T | undefined, next: T | undefined) => boolean
 ): [value: T, setValue: (value: T | ((prevValue: T) => T)) => void] => {
-  const getValue = useCallback(getInitialValue(key, storage, 'value'), [key, storage]);
-  const getValueType = useCallback(getInitialValue(key, storage, 'type'), [key, storage]);
+  const [state, setState] = useState<InitialState>(() => getInitialState(key, storage));
 
-  const [value, setValue] = useState<typeof defaultValue>(getValue);
-  const [valueType, setValueType] = useState(getValueType);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
-  const prevKey = usePrevious(key);
-  const prevStorage = usePrevious(storage);
-
-  const prevValue = useRef(value);
   const equalityFnRef = useRef(equalityFn);
   equalityFnRef.current = equalityFn;
 
-  useEffect(() => {
-    prevValue.current = value;
-    if (
-      storage.options.persistDefaults &&
-      defaultValue !== undefined &&
-      defaultValue !== null &&
-      (value === null || value === undefined)
-    ) {
-      setNewValue(defaultValue);
-    }
-  }, [value]);
+  const defaultValueRef = useRef(defaultValue);
+  defaultValueRef.current = defaultValue;
 
-  useEffect(() => {
-    if (storage !== null) {
-      // This check prevents getInitialValue from being called twice when this hook intially loads
-      if (prevKey !== key || prevStorage !== storage) {
-        setValue(getValue);
-        setValueType(getValueType);
-      }
+  const sourceRef = useRef({ key, storage });
+  if (sourceRef.current.key !== key || sourceRef.current.storage !== storage) {
+    sourceRef.current = { key, storage };
+    const next = getInitialState(key, storage);
+    stateRef.current = next;
+    setState(next);
+  }
 
-      storage.ev.subscribe(`${key}:onwrite`, updateValue);
-    }
-    return () => {
-      if (storage != null) {
-        storage.ev.unsubscribe(`${key}:onwrite`, updateValue);
-      }
-    };
-  }, [prevKey, key, prevStorage, storage, getValue, getValueType]);
-
-  const updateValue = useCallback(event => {
-    const type = getDataType(event.value);
+  const updateValue = useCallback((event: any) => {
     const next = event.value;
+    const type = getDataType(next);
+    const current = stateRef.current;
 
-    if (equalityFnRef.current?.(prevValue.current, next)) return;
-    if (next === prevValue.current && type !== 'object' && type !== 'array') return;
+    if (equalityFnRef.current?.(current.value, next)) return;
+    if (next === current.value && type !== 'object' && type !== 'array') return;
 
-    //@ts-ignore
-    const _value = next ? methods[type]['copy'](next) : next;
+    let value = next;
+    if (next !== null && next !== undefined && (type === 'object' || type === 'array')) {
+      const cached = clonedValues.get(event);
+      if (cached !== undefined) {
+        value = cached;
+      } else {
+        //@ts-ignore
+        value = methods[type]['copy'](next);
+        clonedValues.set(event, value);
+      }
+    }
 
-    setValue(_value);
-    setValueType(type);
+    setState({ value, type });
   }, []);
 
   const setNewValue = useCallback(
-    nextValue => {
+    (nextValue: any) => {
+      const current = stateRef.current;
       let updatedValue = nextValue;
+
       if (typeof nextValue === 'function') {
-        if (nextValue.constructor.name === 'AsyncFunction') {
+        if (isAsyncFunction(nextValue)) {
           __DEV__ &&
             console.warn(`Attempting to use an async function as state setter is not allowed.`);
           return;
         }
-        updatedValue = nextValue(prevValue.current || defaultValue);
+        updatedValue = nextValue(
+          current.value === null || current.value === undefined
+            ? defaultValueRef.current
+            : current.value
+        );
       }
 
-      let _value: T;
-      let _valueType: string | null = valueType;
       if (updatedValue === null || updatedValue === undefined) {
         storage.removeItem(key);
-        _valueType = null;
-      } else {
-        let _dataType = getDataType(updatedValue);
-
-        if (_valueType && _dataType !== valueType) {
-          __DEV__ &&
-            console.warn(
-              `Trying to set a ${_dataType} value to hook for type ${_valueType} is not allowed.`
-            );
-          return;
-        }
-        if (!valueType) {
-          _valueType = _dataType;
-        }
-        _value = updatedValue;
-        //@ts-ignore
-        storage[methods[_valueType]['set']](key, _value);
+        return;
       }
+
+      const dataType = getDataType(updatedValue);
+
+      if (current.type && dataType !== current.type) {
+        __DEV__ &&
+          console.warn(
+            `Trying to set a ${dataType} value to hook for type ${current.type} is not allowed.`
+          );
+        return;
+      }
+
+      //@ts-ignore
+      storage[methods[dataType]['set']](key, updatedValue);
     },
-    [key, storage, valueType]
+    [key, storage]
   );
 
-  return [
-    valueType === 'boolean' || valueType === 'number' ? value : value || defaultValue,
-    setNewValue
-  ];
-};
+  useEffect(() => {
+    if (!storage) return;
 
-function usePrevious(value: any) {
-  const ref = useRef(value);
+    const name = `${key}:onwrite`;
+    storage.ev.subscribe(name, updateValue);
+
+    return () => {
+      storage.ev.unsubscribe(name, updateValue);
+    };
+  }, [key, storage, updateValue]);
 
   useEffect(() => {
-    ref.current = value;
-  }, [value]);
+    if (state.value !== null && state.value !== undefined) return;
+    if (!storage?.options?.persistDefaults) return;
+    if (defaultValue === null || defaultValue === undefined) return;
 
-  return ref.current;
+    setNewValue(defaultValue);
+  }, [state.value, storage, defaultValue, setNewValue]);
+
+  const value = state.value === null || state.value === undefined ? defaultValue : state.value;
+
+  return useMemo(() => [value as T, setNewValue], [value, setNewValue]);
+};
+
+const clonedValues = new WeakMap<object, any>();
+
+function isAsyncFunction(value: any) {
+  return Object.prototype.toString.call(value) === '[object AsyncFunction]';
 }
 
 /**
