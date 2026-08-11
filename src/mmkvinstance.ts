@@ -144,10 +144,8 @@ export default class MMKVInstance {
   async setMultipleItemsAsync(items: [string, any][], type: DataType | 'map') {
     if (type === 'object') type = 'map';
 
-    let values = [];
-
     if (type === 'string' || type === 'array' || type === 'map') {
-      values = items.map(item => {
+      const values = items.map(item => {
         let value = item[1];
 
         if (this.transactions.beforewrite[type]) {
@@ -157,6 +155,7 @@ export default class MMKVInstance {
         if (type === 'string') return value;
         return value ? JSON.stringify(value) : value;
       });
+
       handleAction4(
         mmkvJsiModule.setMultiMMKV,
         items.map(item => item[0]),
@@ -164,41 +163,31 @@ export default class MMKVInstance {
         `${type}Index`,
         this.instanceID
       );
-    } else {
+
+      this.scheduleIndexFlush();
+
+      queueMicrotask(() => {
+        items?.forEach((item, index) => {
+          this.publishWrite(item[0], values[index]);
+
+          if (this.transactions.onwrite[type]) {
+            this.transactions.transact(type as DataType, 'onwrite', item[0], values[index]);
+          }
+        });
+      });
+
+      return true;
+    }
+
+    for (let i = 0; i < items.length; i++) {
       if (type === 'boolean') {
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          let value = item[1];
-
-          if (this.transactions.beforewrite[type]) {
-            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
-          }
-          values[i] = value;
-          this.setBool(item[0], value);
-        }
+        this.setBool(items[i][0], items[i][1]);
       } else if (type === 'number') {
-        for (let i = 0; i < items.length; i++) {
-          const item = items[i];
-          let value = item[1];
-
-          if (this.transactions.beforewrite[type]) {
-            value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
-          }
-          values[i] = value;
-          this.setInt(item[0], value);
-        }
+        this.setInt(items[i][0], items[i][1]);
       }
     }
-    this.scheduleIndexFlush();
-    queueMicrotask(() => {
-      items?.forEach((item, index) => {
-        this.publishWrite(item[0], values[index]);
 
-        if (this.transactions.onwrite[type]) {
-          this.transactions.transact(type as DataType, 'onwrite', item[0], values[index]);
-        }
-      });
-    });
+    this.scheduleIndexFlush();
     return true;
   }
 
@@ -224,31 +213,11 @@ export default class MMKVInstance {
       });
     }
 
-    if (type === 'boolean') {
-      for (let i = 0; i < keys.length; i++) {
-        let value = this.getBool(keys[i]);
-
-        if (this.transactions.onread[type]) {
-          value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
-        }
-
-        const item: [string, T] = [keys[i], value as T];
-        items.push(item);
-      }
-      return items;
-    } else if (type === 'number') {
-      for (let i = 0; i < keys.length; i++) {
-        let value = this.getInt(keys[i]);
-
-        if (this.transactions.onread[type]) {
-          value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
-        }
-
-        const item: [string, T] = [keys[i], value as T];
-        items.push(item);
-      }
-      return items;
+    for (let i = 0; i < keys.length; i++) {
+      const value = type === 'boolean' ? this.getBool(keys[i]) : this.getInt(keys[i]);
+      items.push([keys[i], value as T]);
     }
+    return items;
   }
 
   /**
@@ -523,26 +492,10 @@ export default class MMKVInstance {
         items.push([keys[i], value as T]);
       }
       return items;
-    } else if (type === 'boolean') {
+    } else if (type === 'boolean' || type === 'number') {
       for (let i = 0; i < keys.length; i++) {
-        const item: [string, T] = [keys[i], this.getBool(keys[i]) as T];
-
-        if (this.transactions.onread[type]) {
-          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
-        }
-
-        items.push(item);
-      }
-      return items;
-    } else if (type === 'number') {
-      for (let i = 0; i < keys.length; i++) {
-        const item: [string, T] = [keys[i], this.getInt(keys[i]) as T];
-
-        if (this.transactions.onread[type]) {
-          item[1] = this.transactions.transact(type as DataType, 'onread', item[0], item[1]) as T;
-        }
-
-        items.push(item);
+        const value = type === 'boolean' ? this.getBool(keys[i]) : this.getInt(keys[i]);
+        items.push([keys[i], value as T]);
       }
       return items;
     }
