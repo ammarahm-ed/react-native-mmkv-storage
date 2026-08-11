@@ -61,7 +61,6 @@ useMMKVDevTools({
 | --- | --- | --- |
 | `storages` | `MMKVInstance[] \| Record<string, MMKVInstance>` | Instances to inspect. An array labels each one with its `instanceID`. |
 | `blacklist` | `RegExp` | Hides matching entries. Tested against `instanceId:key`. |
-| `rescanIntervalMs` | `number` | How often to re-scan for added or removed keys. Defaults to `1000`. `0` disables it. |
 
 ```tsx
 useMMKVDevTools({
@@ -76,9 +75,11 @@ The package entry becomes a no-op when `NODE_ENV` is `production`, so the hook c
 
 ## How the panel stays current
 
-Writes to a key already on screen are pushed immediately through the instance's [event manager](/events). Keys that appear or disappear are caught by a re-scan on `rescanIntervalMs` — a key with no subscribers cannot publish a write event, so a newly created key has nothing to announce it.
+The panel observes the instance's [transactions](/transactionmanager) — one `onwrite` observer per data type plus one `ondelete` observer. Transactions run on every write and every delete regardless of who is listening, so added and removed keys show up immediately with no polling.
 
-The panel reads values directly from storage, which means `onread` [transaction](/transactionmanager) mutators do not run. What you see is what is stored.
+Observers are used rather than `register` deliberately: a mutator registered by the panel would replace whatever your app had registered for that type. `subscribe` is additive and cannot change values, so the panel can never alter the behaviour of the app it is inspecting.
+
+The initial snapshot reads values directly from the type indexes, which means `onread` mutators do not run on it. What you see is what is stored.
 
 ## Editing values
 

@@ -47,7 +47,10 @@ export type StorageView = {
   get: (key: string) => MMKVEntry | null;
   set: (key: string, type: MMKVEntryType, value: MMKVEntryValue) => void;
   remove: (key: string) => void;
-  subscribe: (keys: string[], handler: (key: string) => void) => () => void;
+  observe: (handlers: {
+    onWrite: (entry: MMKVEntry) => void;
+    onDelete: (key: string) => void;
+  }) => () => void;
 };
 
 export const createStorageView = (
@@ -95,13 +98,26 @@ export const createStorageView = (
     binding.write(storage, key, value);
   };
 
-  const subscribe = (keys: string[], handler: (key: string) => void) => {
-    const names = keys.map(key => `${key}:onwrite`);
-    const listener = (event: { key: string }) => handler(event.key);
+  const observe = (handlers: {
+    onWrite: (entry: MMKVEntry) => void;
+    onDelete: (key: string) => void;
+  }) => {
+    const unsubscribers = BINDINGS.map(binding =>
+      storage.transactions.subscribe(binding.type, 'onwrite', (key, value) => {
+        if (isHidden(key)) return;
+        if (value === null || value === undefined) return;
+        handlers.onWrite({ key, type: binding.type, value } as MMKVEntry);
+      })
+    );
 
-    storage.ev.subscribeMulti(names, listener);
+    unsubscribers.push(
+      storage.transactions.subscribe('string', 'ondelete', key => {
+        if (isHidden(key)) return;
+        handlers.onDelete(key);
+      })
+    );
 
-    return () => storage.ev.unsubscribeMulti(names, listener);
+    return () => unsubscribers.forEach(unsubscribe => unsubscribe());
   };
 
   return {
@@ -110,6 +126,6 @@ export const createStorageView = (
     get,
     set,
     remove: (key: string) => storage.removeItem(key),
-    subscribe
+    observe
   };
 };
