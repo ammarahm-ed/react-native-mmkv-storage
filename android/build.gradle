@@ -75,13 +75,6 @@ def supportsNamespace() {
   return (major == 7 && minor >= 3) || major >= 8
 }
 
-// MMKV is consumed as a released binary rather than built from source.
-//
-// It is resolved through a standalone configuration instead of a normal
-// dependency so that AGP never runs prefab over it: the published module is
-// built with c++_static, which prefab refuses to hand to a c++_shared consumer
-// like React Native, regardless of NDK version. We extract the shared library
-// and headers ourselves and link them through an IMPORTED target.
 def mmkvVersion = "2.2.3"
 def mmkvExtractDir = "$buildDir/mmkv"
 

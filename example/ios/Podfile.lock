@@ -14,9 +14,9 @@ PODS:
   - hermes-engine (250829098.0.16):
     - hermes-engine/Pre-built (= 250829098.0.16)
   - hermes-engine/Pre-built (250829098.0.16)
-  - MMKV (1.3.16):
-    - MMKVCore (~> 1.3.16)
-  - MMKVCore (1.3.16)
+  - MMKV (2.2.4):
+    - MMKVCore (~> 2.2.4)
+  - MMKVCore (2.2.4)
   - RCT-Folly (2024.11.18.00):
     - RCT-Folly/Default (= 2024.11.18.00)
     - ReactNativeDependencies
@@ -1251,7 +1251,7 @@ PODS:
     - Yoga
   - react-native-mmkv-storage (12.0.1):
     - hermes-engine
-    - MMKV (~> 1.3.14)
+    - MMKV (~> 2.2.3)
     - RCTRequired
     - RCTTypeSafety
     - React-bridging
@@ -1984,8 +1984,8 @@ SPEC CHECKSUMS:
   fmt: c7776a2a4b1d7ce88b809a1e4d1f7add0f2369df
   glog: b4427c3119645da795ff09985ba9da909c940c96
   hermes-engine: 6a26e94b4a974cbadc751eed9caa12624c38f226
-  MMKV: 43cd10be0f925bf3fd5c2bd8bea501a328037b64
-  MMKVCore: 13be45a0394861b74836875ac9ec7ee939e86b78
+  MMKV: 1a8e7dbce7f9cad02c52e1b1091d07bd843aefaf
+  MMKVCore: f2dd4c9befea04277a55e84e7812f930537993df
   RCT-Folly: d173e541eeb78cad5c81011c1bbf62d5b86b9778
   RCTDeprecation: 122574403d0ef1a34ccdab26450e494c7f162d8c
   RCTRequired: 2a345851838366d39b0ef308a51d68b89d355aaa
@@ -2026,7 +2026,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: fed9e1d39a6b0261a96dd9b53a8f29b9e8219cb9
   React-microtasksnativemodule: 1d5fbafb74bcd852dd319b8cdb7f09cbc23308a5
   React-mutationobservernativemodule: 86d9ad60758f9939c7c7aa97e0f206f1f07b4549
-  react-native-mmkv-storage: 3c2a652f5d212670eeb8746da56ea013381079c0
+  react-native-mmkv-storage: 3ddae08606eb843668fc477152978285f500cf4e
   react-native-safe-area-context: e2dddda05ad659d7aa4a3322901975929ac39ac3
   React-NativeModulesApple: 4ce059af46318accfe6e60c982dab856db638ac2
   React-networking: 0a2077649b639b7442eb3d2e8170af5cd6cd852f
