@@ -39,8 +39,8 @@ export default class MMKVInstance {
   }
 
   publishWrite(key: string, value: any) {
-    const name = `${key}:onwrite`;
-    if (this.ev._registry[name]) this.ev.publish(name, { key, value });
+    if (!this.ev.hasListenersForKey(key)) return;
+    this.ev.publishEvent(`${key}:onwrite`, { key, value });
   }
 
   scheduleIndexFlush() {
@@ -618,8 +618,9 @@ export default class MMKVInstance {
 
     queueMicrotask(() => {
       keys?.forEach((key: string) => {
-        const name = `${key}:onwrite`;
-        if (this.ev._registry[name]) this.ev.publish(name, { key });
+        if (this.ev.hasListenersForKey(key)) {
+          this.ev.publishEvent(`${key}:onwrite`, { key });
+        }
 
         if (this.transactions.ondelete) {
           this.transactions.transact('string', 'ondelete', key);
