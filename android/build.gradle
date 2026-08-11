@@ -84,6 +84,19 @@ def buildMmkvFromSource() {
 
 def mmkvFromSource = buildMmkvFromSource()
 
+def mmkvEnv = new Properties()
+file("$projectDir/../scripts/mmkv.env").withInputStream { mmkvEnv.load(it) }
+def mmkvVersion = mmkvEnv.getProperty("MMKV_VERSION")
+
+if (project.group) {
+  configurations.matching { it.name.endsWith("ApiElements") || it.name.endsWith("RuntimeElements") }.configureEach {
+    outgoing {
+      capability("${project.group}:${project.name}:${project.version}")
+      capability("com.tencent:mmkv:${mmkvVersion}")
+    }
+  }
+}
+
 android {
   if (supportsNamespace()) {
     namespace "com.ammarahmed.mmkv"
