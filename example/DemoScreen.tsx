@@ -10,7 +10,9 @@ import {
   View,
 } from 'react-native';
 
-import { MMKVLoader, create } from 'react-native-mmkv-storage';
+import { create } from 'react-native-mmkv-storage';
+
+import { storage, storage2 } from './demoStorages';
 
 const Colors = {
   white: '#ffffff',
@@ -18,9 +20,6 @@ const Colors = {
   lighter: '#f3f3f3',
   darker: '#222222',
 };
-
-const storage = new MMKVLoader().withEncryption().initialize();
-const storage2 = new MMKVLoader().withInstanceID('storage2').initialize();
 
 const useStorage = create(storage);
 const useStorage2 = create(storage2);
