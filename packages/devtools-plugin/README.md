@@ -51,7 +51,16 @@ useMMKVDevTools({
 });
 ```
 
-Start the dev server, open React Native DevTools, and select the **MMKV Storage** panel.
+## Opening the panel
+
+1. Start Metro (`npx react-native start`). Rozenite discovers plugins at startup — look for `[Rozenite] Loaded 1 plugin(s)` and this plugin's name in the output.
+2. Run the app.
+3. Open React Native DevTools: press `j` in the Metro terminal, or use the dev menu (shake, or `adb shell input keyevent 82`).
+4. Select the **MMKV Storage** tab.
+
+If the tab never shows up, check in this order: `enabled` was passed to `withRozenite`; Metro was restarted after installing the plugin; `useMMKVDevTools` is actually being called.
+
+If the tab is present but entries never change, the instance being written to is not the one that was registered. Export the instance from a single module instead of calling `MMKVLoader` again where it is used — two loaders with the same ID give two handles to the same store, but only the object passed to the hook is observed.
 
 ## Options
 
@@ -91,3 +100,14 @@ Click a value to edit it, then press Enter or **Save**. The draft is parsed acco
 - `string` — used as typed
 
 An entry keeps its type. To store a different type for a key, delete it and write it again from your app.
+
+## Developing this plugin
+
+```bash
+npm install
+npm run build
+```
+
+`dist/` is not checked in, so it has to be built once before the example app can load the panel. Rozenite reads plugins when Metro boots, so after every rebuild Metro must be restarted — a fast refresh will not pick up the new panel bundle.
+
+The example app in this repo consumes the plugin from `file:../packages/devtools-plugin` and registers its storages in `example/App.tsx`.

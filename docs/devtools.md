@@ -40,8 +40,6 @@ export default function App() {
 }
 ```
 
-Then start the dev server, open React Native DevTools, and pick the **MMKV Storage** panel.
-
 Instances are passed explicitly rather than discovered. `getAllMMKVInstanceIDs()` can list the IDs, but rebuilding an instance from an ID alone would lose its encryption key and options, so the panel only shows what you hand it.
 
 Use an object to label them:
@@ -54,6 +52,51 @@ useMMKVDevTools({
   }
 });
 ```
+
+## Opening the panel
+
+The panel is not automatic — Metro has to be running with Rozenite enabled, and DevTools has to be opened by hand.
+
+1. **Start Metro.**
+
+   ```bash
+   npx react-native start
+   ```
+
+   Rozenite discovers plugins while Metro boots. Watch the startup output for:
+
+   ```
+   [Rozenite] Loaded 1 plugin(s):
+   [Rozenite]   - react-native-mmkv-storage-devtools
+   ```
+
+   If that line is missing, the panel will not appear no matter what you do in the app.
+
+2. **Run the app.**
+
+   ```bash
+   npx react-native run-android   # or run-ios
+   ```
+
+3. **Open React Native DevTools.** Press <kbd>j</kbd> in the Metro terminal. You can also open the dev menu — shake the device, or `adb shell input keyevent 82` on Android — and choose *Open DevTools*.
+
+4. **Select the MMKV Storage tab.**
+
+Entries appear as soon as the panel opens, and every later write or delete shows up immediately.
+
+## Troubleshooting
+
+**The tab is missing.**
+
+- `enabled` was not passed to `withRozenite`. It defaults to `false`.
+- Metro was started before the plugin was installed. Rozenite reads the dependency list at startup, so restart Metro after installing.
+- `useMMKVDevTools` is not being called, or is called in a component that has not mounted.
+
+**The tab is there but empty.** No instances were registered. `useMMKVDevTools({ storages: [] })` and forgetting the option both produce an empty panel.
+
+**Entries are listed but never change.** The instance you are writing to is not the one you registered. Two `MMKVLoader` calls with the same ID give you two handles to the same store, but only the object you passed to the hook is observed. Export the instance from one module and import it everywhere, rather than creating it again where it is used.
+
+**Nothing shows for a key you know exists.** Check `blacklist`, which is matched against `instanceId:key`. Instances created with `disableIndexing()` also start out empty — the snapshot is built from the type indexes, so there is nothing to enumerate. Writes made while the panel is open still appear, because those arrive through transactions rather than the index, but existing keys stay hidden until they are written again.
 
 ## Options
 
