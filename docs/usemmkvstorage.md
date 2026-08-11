@@ -155,7 +155,7 @@ export const useUser = () => useMMKVStorage<User>('user', MMKV, { name: 'robert'
 - **Async functions are not accepted as setters.** Passing one logs a `__DEV__` warning and the write is skipped. Resolve the value first, then call the setter.
 - **The initial value is resolved through the indexer.** The hook uses the type indexes to work out how to read the key on mount, so an instance created with `disableIndexing()` will not restore values into the hook. See [Querying and indexing](/queryingandindexing).
 - **Default values are not persisted by default.** `getItem` for an unwritten key returns `null` even though the hook returns the default. Use `new MMKVLoader().withPersistedDefaultValues().initialize()` to have the default written to storage on mount.
-- **Booleans and numbers bypass the default fallback once set.** A stored `false` or `0` is returned as-is rather than falling back to `defaultValue`.
+- **Falsy stored values are returned as-is.** `defaultValue` is only used when the key holds nothing. A stored `false`, `0` or `""` is returned unchanged rather than falling back to the default, and an updater function receives the stored falsy value rather than the default.
 
 ## See also
 
