@@ -148,7 +148,7 @@ export default class MMKVInstance {
       const values = items.map(item => {
         let value = item[1];
 
-        if (this.transactions.beforewrite[type]) {
+        if (this.transactions.hasListeners(type as DataType, 'beforewrite')) {
           value = this.transactions.transact(type as DataType, 'beforewrite', item[0], value);
         }
 
@@ -170,7 +170,7 @@ export default class MMKVInstance {
         items?.forEach((item, index) => {
           this.publishWrite(item[0], values[index]);
 
-          if (this.transactions.onwrite[type]) {
+          if (this.transactions.hasListeners(type as DataType, 'onwrite')) {
             this.transactions.transact(type as DataType, 'onwrite', item[0], values[index]);
           }
         });
@@ -205,7 +205,7 @@ export default class MMKVInstance {
       return keys.map((key, index) => {
         let value = result[index] ? JSON.parse(result[index]) : result[index];
 
-        if (this.transactions.onread[type]) {
+        if (this.transactions.hasListeners(type as DataType, 'onread')) {
           value = this.transactions.transact(type as DataType, 'onread', key, value);
         }
 
@@ -236,7 +236,7 @@ export default class MMKVInstance {
    * Set a string value to storage for the given key.
    */
   setString = (key: string, value: string): boolean | undefined => {
-    if (this.transactions.beforewrite['string']) {
+    if (this.transactions.hasListeners('string' as DataType, 'beforewrite')) {
       value = this.transactions.transact('string', 'beforewrite', key, value);
     }
     if (this.handleNullOrUndefined(key, value)) return true;
@@ -247,7 +247,7 @@ export default class MMKVInstance {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
 
-      if (this.transactions.onwrite['string']) {
+      if (this.transactions.hasListeners('string' as DataType, 'onwrite')) {
         this.transactions.transact('string', 'onwrite', key, value);
       }
     }
@@ -264,7 +264,7 @@ export default class MMKVInstance {
   ): string | null | undefined => {
     let string = handleAction2(mmkvJsiModule.getStringMMKV, key, this.instanceID);
 
-    if (this.transactions.onread['string']) {
+    if (this.transactions.hasListeners('string' as DataType, 'onread')) {
       string = this.transactions.transact('string', 'onread', key, string);
     }
 
@@ -275,7 +275,7 @@ export default class MMKVInstance {
    * Set a number value to storage for the given key.
    */
   setInt = (key: string, value: number): boolean | undefined => {
-    if (this.transactions.beforewrite['number']) {
+    if (this.transactions.hasListeners('number' as DataType, 'beforewrite')) {
       value = this.transactions.transact('number', 'beforewrite', key, value);
     }
 
@@ -286,7 +286,7 @@ export default class MMKVInstance {
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
-      if (this.transactions.onwrite['number']) {
+      if (this.transactions.hasListeners('number' as DataType, 'onwrite')) {
         this.transactions.transact('number', 'onwrite', key, value);
       }
     }
@@ -302,7 +302,7 @@ export default class MMKVInstance {
   ): number | null | undefined => {
     let int = handleAction2(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
 
-    if (this.transactions.onread['number']) {
+    if (this.transactions.hasListeners('number' as DataType, 'onread')) {
       int = this.transactions.transact('number', 'onread', key, int);
     }
 
@@ -314,7 +314,7 @@ export default class MMKVInstance {
    * Set a boolean value to storage for the given key
    */
   setBool = (key: string, value: boolean): boolean | undefined => {
-    if (this.transactions.beforewrite['boolean']) {
+    if (this.transactions.hasListeners('boolean' as DataType, 'beforewrite')) {
       value = this.transactions.transact('boolean', 'beforewrite', key, value);
     }
 
@@ -326,7 +326,7 @@ export default class MMKVInstance {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
 
-      if (this.transactions.onwrite['boolean']) {
+      if (this.transactions.hasListeners('boolean' as DataType, 'onwrite')) {
         this.transactions.transact('boolean', 'onwrite', key, value);
       }
     }
@@ -342,7 +342,7 @@ export default class MMKVInstance {
   ): boolean | null | undefined => {
     let bool = handleAction2(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
 
-    if (this.transactions.onread['boolean']) {
+    if (this.transactions.hasListeners('boolean' as DataType, 'onread')) {
       bool = this.transactions.transact('boolean', 'onread', key, bool);
     }
 
@@ -355,7 +355,7 @@ export default class MMKVInstance {
    * Note that this function does **not** work with the Map data type
    */
   setMap = (key: string, value: object): boolean | undefined => {
-    if (this.transactions.beforewrite['object']) {
+    if (this.transactions.hasListeners('object' as DataType, 'beforewrite')) {
       value = this.transactions.transact('object', 'beforewrite', key, value);
     }
 
@@ -371,7 +371,7 @@ export default class MMKVInstance {
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
-      if (this.transactions.onwrite['object']) {
+      if (this.transactions.hasListeners('object' as DataType, 'onwrite')) {
         this.transactions.transact('object', 'onwrite', key, value);
       }
     }
@@ -390,7 +390,7 @@ export default class MMKVInstance {
       if (json) {
         let map: T = JSON.parse(json);
 
-        if (this.transactions.onread['object']) {
+        if (this.transactions.hasListeners('object' as DataType, 'onread')) {
           map = this.transactions.transact('object', 'onread', key, map) as T;
         }
 
@@ -399,7 +399,7 @@ export default class MMKVInstance {
       }
     } catch (e) {}
 
-    if (this.transactions.onread['object']) {
+    if (this.transactions.hasListeners('object' as DataType, 'onread')) {
       this.transactions.transact('object', 'onread', key);
     }
 
@@ -411,7 +411,7 @@ export default class MMKVInstance {
    * Set an array to storage for the given key.
    */
   setArray = (key: string, value: any[]): boolean | undefined => {
-    if (this.transactions.beforewrite['array']) {
+    if (this.transactions.hasListeners('array' as DataType, 'beforewrite')) {
       value = this.transactions.transact('array', 'beforewrite', key, value);
     }
 
@@ -427,7 +427,7 @@ export default class MMKVInstance {
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
-      if (this.transactions.onwrite['array']) {
+      if (this.transactions.hasListeners('array' as DataType, 'onwrite')) {
         this.transactions.transact('array', 'onwrite', key, value);
       }
     }
@@ -447,7 +447,7 @@ export default class MMKVInstance {
       if (json) {
         let array: T[] = JSON.parse(json);
 
-        if (this.transactions.onread['array']) {
+        if (this.transactions.hasListeners('array' as DataType, 'onread')) {
           array = this.transactions.transact('array', 'onread', key, array) as T[];
         }
 
@@ -455,7 +455,7 @@ export default class MMKVInstance {
         return array;
       }
     } catch (e) {}
-    if (this.transactions.onread['array']) {
+    if (this.transactions.hasListeners('array' as DataType, 'onread')) {
       this.transactions.transact('array', 'onread', key);
     }
     callback && callback(null, null);
@@ -485,7 +485,7 @@ export default class MMKVInstance {
           }
         }
 
-        if (this.transactions.onread[type]) {
+        if (this.transactions.hasListeners(type as DataType, 'onread')) {
           value = this.transactions.transact(type as DataType, 'onread', keys[i], value);
         }
 
@@ -531,7 +531,7 @@ export default class MMKVInstance {
       this.publishWrite(key, null);
     }
 
-    if (this.transactions.ondelete) {
+    if (this.transactions.hasDeleteListeners()) {
       this.transactions.transact('string', 'ondelete', key);
     }
 
@@ -553,7 +553,7 @@ export default class MMKVInstance {
       if (result) {
         this.publishWrite(key, null);
       }
-      if (this.transactions.ondelete) {
+      if (this.transactions.hasDeleteListeners()) {
         this.transactions.transact('string', 'ondelete', key);
       }
     }
@@ -575,7 +575,7 @@ export default class MMKVInstance {
           this.ev.publishEvent(`${key}:onwrite`, { key });
         }
 
-        if (this.transactions.ondelete) {
+        if (this.transactions.hasDeleteListeners()) {
           this.transactions.transact('string', 'ondelete', key);
         }
       });
