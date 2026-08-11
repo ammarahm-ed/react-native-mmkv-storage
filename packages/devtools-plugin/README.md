@@ -59,7 +59,6 @@ Start the dev server, open React Native DevTools, and select the **MMKV Storage*
 | --- | --- | --- |
 | `storages` | `MMKVInstance[] \| Record<string, MMKVInstance>` | Instances to inspect. An array uses each instance's `instanceID` as its label. |
 | `blacklist` | `RegExp` | Hides matching entries. Tested against `instanceId:key`. |
-| `rescanIntervalMs` | `number` | How often to re-scan for added or removed keys. Defaults to `1000`. Set to `0` to disable. |
 
 Hide sensitive values with `blacklist`:
 
@@ -76,9 +75,11 @@ The package entry resolves to a no-op when `NODE_ENV` is `production`, so `useMM
 
 ## How updates reach the panel
 
-Writes to a key that the panel is displaying are pushed immediately through the instance's event manager. Keys that are added or removed are picked up by a re-scan on `rescanIntervalMs`, because a key nobody is subscribed to yet cannot publish an event.
+The panel observes the instance's transactions — an `onwrite` observer per data type and one `ondelete` observer — using `transactions.subscribe`. Transactions run on every write and delete regardless of listeners, so new and removed keys appear immediately without polling.
 
-Values are read straight from storage, so `onread` transaction mutators do not run — the panel shows what is actually stored.
+`subscribe` is used instead of `register` on purpose: a mutator would replace whatever the app had registered for that type. Observers are additive and cannot change values, so the panel never alters the behaviour of the app it inspects.
+
+The initial snapshot reads from the type indexes, so `onread` mutators do not run on it — the panel shows what is actually stored.
 
 ## Editing
 
