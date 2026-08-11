@@ -32,7 +32,7 @@ for abi in $MMKV_ABIS; do
     -DANDROID_ABI="$abi" \
     -DANDROID_PLATFORM="android-$MMKV_MIN_SDK" \
     -DANDROID_STL=c++_shared \
-    -DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON \
+    -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384" \
     -DCMAKE_BUILD_TYPE=Release \
     > /dev/null
   cmake --build "$WORK/$abi" --target mmkv > /dev/null
