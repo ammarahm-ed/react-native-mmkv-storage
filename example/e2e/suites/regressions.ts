@@ -5,6 +5,11 @@ import { renderHook } from '../../testing/hookHost';
 import { plain } from '../storages';
 
 suite('Regressions', () => {
+  test('a value written from js is visible to native code', () => {
+    plain.setString('__native_interop__', 'written from js');
+    expect(plain.getString('__native_interop__')).toBe('written from js');
+  });
+
   test('a handler unsubscribing during dispatch does not skip later handlers', async () => {
     const key = uniqueKey('dispatch_unsub');
     const called: string[] = [];

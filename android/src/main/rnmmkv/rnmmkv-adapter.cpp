@@ -2,9 +2,9 @@
 #include <jsi/jsi.h>
 #include <ReactCommon/CallInvokerHolder.h>
 #include <fbjni/fbjni.h>
-#include "MMKV.h"
-#include "MMKVPredef.h"
-#include "MMBuffer.h"
+#include <MMKV/MMKV.h>
+#include <MMKV/MMKVPredef.h>
+#include <MMKV/MMBuffer.h>
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
@@ -845,8 +845,7 @@ Java_com_ammarahmed_mmkv_MMKV_getMMKVWithID(JNIEnv *env, jclass clazz, jstring m
             }
             else
             {
-                kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode)mode, &crypt,
-                                      nullptr);
+                kv = MMKV::mmkvWithID(str, mmkv::DEFAULT_MMAP_SIZE, (MMKVMode)mode, &crypt, nullptr);
             }
             done = true;
         }
