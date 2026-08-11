@@ -66,6 +66,33 @@ export var mock = function () {
             return [];
         return MEMORY_STORE[id].indexes[type];
     };
+    mmkvJsiModule.indexContainsKeyMMKV = function (type, key, id) {
+        if (!MEMORY_STORE[id])
+            return undefined;
+        return MEMORY_STORE[id].indexes[type].includes(key);
+    };
+    mmkvJsiModule.getValueTypeMMKV = function (key, id) {
+        if (!MEMORY_STORE[id])
+            return undefined;
+        var indexes = [
+            ['stringIndex', 'string'],
+            ['numberIndex', 'number'],
+            ['boolIndex', 'boolean'],
+            ['mapIndex', 'object'],
+            ['arrayIndex', 'array']
+        ];
+        for (var _i = 0, indexes_1 = indexes; _i < indexes_1.length; _i++) {
+            var _a = indexes_1[_i], indexType = _a[0], dataType = _a[1];
+            if (MEMORY_STORE[id].indexes[indexType].includes(key))
+                return dataType;
+        }
+        return null;
+    };
+    mmkvJsiModule.flushIndexesMMKV = function (id) {
+        if (!MEMORY_STORE[id])
+            return undefined;
+        return true;
+    };
     mmkvJsiModule.removeValueMMKV = function (key, id) {
         if (!MEMORY_STORE[id])
             return undefined;
