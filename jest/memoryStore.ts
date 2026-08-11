@@ -1,4 +1,4 @@
-import { MMKVJsiModule, IndexType } from '../src/types/index';
+import { MMKVJsiModule, IndexType, DataType } from '../src/types/index';
 
 type MemoryStore = {
   [name: string]: {
@@ -90,6 +90,34 @@ export const mock = (): boolean => {
   mmkvJsiModule.getIndexMMKV = (type, id) => {
     if (!MEMORY_STORE[id]) return [];
     return MEMORY_STORE[id].indexes[type];
+  };
+
+  mmkvJsiModule.indexContainsKeyMMKV = (type, key, id) => {
+    if (!MEMORY_STORE[id]) return undefined;
+    return MEMORY_STORE[id].indexes[type].includes(key);
+  };
+
+  mmkvJsiModule.getValueTypeMMKV = (key, id) => {
+    if (!MEMORY_STORE[id]) return undefined;
+
+    const indexes: [IndexType, DataType][] = [
+      ['stringIndex', 'string'],
+      ['numberIndex', 'number'],
+      ['boolIndex', 'boolean'],
+      ['mapIndex', 'object'],
+      ['arrayIndex', 'array']
+    ];
+
+    for (const [indexType, dataType] of indexes) {
+      if (MEMORY_STORE[id].indexes[indexType].includes(key)) return dataType;
+    }
+
+    return null;
+  };
+
+  mmkvJsiModule.flushIndexesMMKV = id => {
+    if (!MEMORY_STORE[id]) return undefined;
+    return true;
   };
 
   mmkvJsiModule.removeValueMMKV = (key, id) => {
