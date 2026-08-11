@@ -1,0 +1,54 @@
+{
+  "name": "react-native-mmkv-storage-devtools",
+  "version": "0.1.0",
+  "description": "React Native DevTools panel for react-native-mmkv-storage.",
+  "type": "module",
+  "main": "./dist/react-native/index.cjs",
+  "exports": {
+    ".": {
+      "types": "./dist/react-native/index.d.ts",
+      "import": "./dist/react-native/index.js",
+      "require": "./dist/react-native/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "react-native.ts",
+    "src",
+    "rozenite.config.ts"
+  ],
+  "scripts": {
+    "build": "rozenite build",
+    "dev": "rozenite dev"
+  },
+  "keywords": [
+    "react-native",
+    "mmkv",
+    "devtools",
+    "rozenite",
+    "storage"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@rozenite/plugin-bridge": "^2.0.0"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-mmkv-storage": ">=12.0.0"
+  },
+  "devDependencies": {
+    "@rozenite/vite-plugin": "^2.0.0",
+    "@types/react": "~19.1.10",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.87.0-rc.4",
+    "react-native-web": "^0.21.2",
+    "rozenite": "^2.0.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  },
+  "module": "./dist/react-native/index.js",
+  "types": "./dist/react-native/index.d.ts"
+}
