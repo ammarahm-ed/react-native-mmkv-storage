@@ -47,63 +47,110 @@ export const useIndex = <T>(
   update: (key: string, value: T) => void,
   remove: (key: string) => void
 ] => {
-  const [values, setValues] = useState<GenericValueType<T>[]>(
-    storage.getMultipleItems(keys || [], type)
-  );
+  const positions = useRef<Map<string, number>>(new Map());
+
+  const [values, setValues] = useState<GenericValueType<T>[]>(() => {
+    const rows = storage.getMultipleItems<T>(keys || [], type) || [];
+    positions.current = buildPositions(rows);
+    return rows;
+  });
 
   const keysRef = useRef(keys);
   keysRef.current = keys;
 
+  const typeRef = useRef(type);
+  typeRef.current = type;
+
   const keysKey = keys ? keys.join('\u0000') : '';
 
-  const onChange = useCallback(({ key }) => {
-    setValues(values => {
-      let index = values.findIndex(v => v[0] === key);
+  const onChange = useCallback(
+    ({ key }: { key: string }) => {
       //@ts-ignore
-      let value = storage[methods[type]['get']](key);
-      if (value) {
-        if (index !== -1) {
-          values[index][1] = value;
-        } else {
-          storage.getMultipleItemsAsync<T>(keysRef.current || [], type).then(data => {
-            setValues(data);
-          });
+      const value = storage[methods[typeRef.current]['get']](key);
+
+      setValues(current => {
+        const index = positions.current.get(key);
+
+        if (value === null || value === undefined) {
+          if (index === undefined) return current;
+
+          const next = current.slice();
+          next.splice(index, 1);
+          positions.current = buildPositions(next);
+          return next;
         }
-      } else {
-        values.splice(index);
-      }
-      return [...values];
-    });
-  }, [storage, type]);
+
+        if (index === undefined) {
+          const next = current.slice();
+          next.splice(insertionPoint(next, key, keysRef.current), 0, [key, value]);
+          positions.current = buildPositions(next);
+          return next;
+        }
+
+        const next = current.slice();
+        next[index] = [key, value];
+        return next;
+      });
+    },
+    [storage]
+  );
 
   useEffect(() => {
-    let names = (keysRef.current || []).map(v => `${v}:onwrite`);
+    const names = (keysRef.current || []).map(value => `${value}:onwrite`);
     storage.ev.subscribeMulti(names, onChange);
 
     return () => {
-      names.forEach(name => {
-        storage.ev.unsubscribe(name, onChange);
-      });
+      storage.ev.unsubscribeMulti(names, onChange);
     };
   }, [keysKey, storage, onChange]);
 
   const remove = useCallback(
-    key => {
+    (key: string) => {
       storage.removeItem(key);
     },
     [storage]
   );
 
   const update = useCallback(
-    (key, value) => {
+    (key: string, value: T) => {
       if (!value) return remove(key);
       //@ts-ignore
-      storage[methods[type]['set']](key, value);
+      storage[methods[typeRef.current]['set']](key, value);
     },
-    [storage, type, remove]
+    [storage, remove]
   );
 
-  const result = useMemo(() => values.map(v => v[1]).filter(v => v !== null), [values]);
+  const result = useMemo(
+    () => values.map(value => value[1]).filter(value => value !== null),
+    [values]
+  );
 
   return [result, update, remove];
 };
+
+function buildPositions<T>(rows: GenericValueType<T>[]) {
+  const positions = new Map<string, number>();
+  for (let i = 0; i < rows.length; i++) {
+    positions.set(rows[i][0], i);
+  }
+  return positions;
+}
+
+function insertionPoint<T>(rows: GenericValueType<T>[], key: string, keys: string[]) {
+  if (!keys) return rows.length;
+
+  const order = new Map<string, number>();
+  for (let i = 0; i < keys.length; i++) {
+    if (!order.has(keys[i])) order.set(keys[i], i);
+  }
+
+  const target = order.get(key);
+  if (target === undefined) return rows.length;
+
+  for (let i = 0; i < rows.length; i++) {
+    const position = order.get(rows[i][0]);
+    if (position !== undefined && position > target) return i;
+  }
+
+  return rows.length;
+}
