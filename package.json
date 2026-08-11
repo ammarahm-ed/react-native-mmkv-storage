@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
+    "prepack": "bash scripts/check-mmkv-assets.sh",
+    "mmkv:update": "bash scripts/update-mmkv.sh",
+    "mmkv:check": "bash scripts/update-mmkv.sh --check",
     "watch": "tsc --watch",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
