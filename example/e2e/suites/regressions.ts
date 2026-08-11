@@ -206,4 +206,54 @@ suite('Regressions', () => {
     expect(hook.result.current![0]).toEqual(['a', 'b updated']);
     await hook.unmount();
   });
+
+  test('bulk number writes apply the beforewrite mutator once per item', async () => {
+    const keyA = uniqueKey('bulk_once_a');
+    const keyB = uniqueKey('bulk_once_b');
+
+    const unregister = plain.transactions.register('number', 'beforewrite', (_key, value) => {
+      return (value as number) + 1;
+    });
+
+    await plain.setMultipleItemsAsync(
+      [
+        [keyA, 1],
+        [keyB, 10]
+      ],
+      'number'
+    );
+    unregister();
+
+    expect(plain.getInt(keyA)).toBe(2);
+    expect(plain.getInt(keyB)).toBe(11);
+  });
+
+  test('bulk number writes publish one event per key', async () => {
+    const key = uniqueKey('bulk_event_once');
+    let count = 0;
+    const handler = () => {
+      count++;
+    };
+
+    plain.ev.subscribe(`${key}:onwrite`, handler);
+    await plain.setMultipleItemsAsync([[key, 5]], 'number');
+    await flush();
+    plain.ev.unsubscribe(`${key}:onwrite`, handler);
+
+    expect(count).toBe(1);
+  });
+
+  test('multi get applies the onread mutator once per item', () => {
+    const key = uniqueKey('multiget_once');
+    plain.setInt(key, 1);
+
+    const unregister = plain.transactions.register('number', 'onread', (_key, value) => {
+      return (value as number) + 1;
+    });
+
+    const items = plain.getMultipleItems<number>([key], 'number');
+    unregister();
+
+    expect(items![0][1]).toBe(2);
+  });
 });
