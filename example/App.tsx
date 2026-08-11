@@ -1,4 +1,5 @@
 import React from 'react';
+import type { MMKVInstance } from 'react-native-mmkv-storage';
 import { useMMKVDevTools } from 'react-native-mmkv-storage-devtools';
 import { encrypted, persistedDefaults, plain, unindexed } from './e2e/storages';
 
@@ -13,10 +14,13 @@ const Screen: React.ComponentType = E2E_ENABLED
   ? require('./benchmarks/BenchmarkScreen').default
   : require('./DemoScreen').default;
 
+const devToolsStorages: MMKVInstance[] =
+  E2E_ENABLED || BENCHMARK_ENABLED
+    ? [plain, encrypted, unindexed, persistedDefaults]
+    : [require('./demoStorages').storage, require('./demoStorages').storage2];
+
 export default function App(): React.JSX.Element {
-  useMMKVDevTools({
-    storages: [plain, encrypted, unindexed, persistedDefaults]
-  });
+  useMMKVDevTools({ storages: devToolsStorages });
 
   return <Screen />;
 }
