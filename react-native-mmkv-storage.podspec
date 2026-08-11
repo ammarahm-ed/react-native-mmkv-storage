@@ -9,13 +9,15 @@ Pod::Spec.new do |s|
   s.homepage      = "https://github.com/ammarahm-ed/react-native-mmkv-storage"
   s.license       = package["license"]
   s.authors       = package["author"]
-  s.platform      = :ios, (respond_to?(:min_ios_version_supported, true) ? min_ios_version_supported : "12.4")
+  rn_min_ios     = respond_to?(:min_ios_version_supported, true) ? min_ios_version_supported.to_s : "12.4"
+  mmkv_min_ios   = "13.0"
+  s.platform      = :ios, [Gem::Version.new(rn_min_ios), Gem::Version.new(mmkv_min_ios)].max.to_s
   s.source        = { :git => "#{s.homepage}", :tag => "V#{s.version}" }
   s.requires_arc  = true
 
   s.source_files = "ios/*.{h,m,mm,cpp}"
 
-  s.dependency 'MMKV', '~> 1.3.14'
+  s.dependency 'MMKV', '~> 2.2.3'
   if respond_to?(:install_modules_dependencies, true)
     install_modules_dependencies(s)
   else

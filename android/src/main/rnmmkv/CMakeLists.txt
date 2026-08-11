@@ -19,9 +19,6 @@ set_target_properties(
         POSITION_INDEPENDENT_CODE ON
 )
 
-# the published binary is built with MMKV_ANDROID defined; the header changes
-# both the mmkvWithID overload set and the class layout based on it, so our
-# translation unit has to agree with it
 add_compile_definitions(MMKV_ANDROID)
 
 add_library(mmkv SHARED IMPORTED)
