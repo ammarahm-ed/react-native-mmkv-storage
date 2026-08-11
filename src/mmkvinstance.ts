@@ -1,6 +1,6 @@
 import encryption from './encryption';
 import EventManager from './eventmanager';
-import { handleAction } from './handlers';
+import { handleAction1, handleAction2, handleAction3, handleAction4 } from './handlers';
 import indexer from './indexer/indexer';
 import { getCurrentMMKVInstanceIDs } from './initializer';
 import { default as IDStore } from './mmkv/IDStore';
@@ -157,7 +157,7 @@ export default class MMKVInstance {
         if (type === 'string') return value;
         return value ? JSON.stringify(value) : value;
       });
-      handleAction(
+      handleAction4(
         mmkvJsiModule.setMultiMMKV,
         items.map(item => item[0]),
         values,
@@ -210,7 +210,7 @@ export default class MMKVInstance {
 
     if (type === 'map') type = 'object';
     if (type === 'array' || type === 'string' || type === 'object') {
-      const result = handleAction(mmkvJsiModule.getMultiMMKV, keys, this.instanceID);
+      const result = handleAction2(mmkvJsiModule.getMultiMMKV, keys, this.instanceID);
       if (type === 'string') return keys.map((key, index) => [key, result[index] as T]);
 
       return keys.map((key, index) => {
@@ -273,7 +273,7 @@ export default class MMKVInstance {
     if (this.handleNullOrUndefined(key, value)) return true;
 
     assert('string', value);
-    let result = handleAction(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
+    let result = handleAction3(mmkvJsiModule.setStringMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
@@ -293,7 +293,7 @@ export default class MMKVInstance {
     key: string,
     callback?: (error: any, value: string | undefined | null) => void
   ): string | null | undefined => {
-    let string = handleAction(mmkvJsiModule.getStringMMKV, key, this.instanceID);
+    let string = handleAction2(mmkvJsiModule.getStringMMKV, key, this.instanceID);
 
     if (this.transactions.onread['string']) {
       string = this.transactions.transact('string', 'onread', key, string);
@@ -313,7 +313,7 @@ export default class MMKVInstance {
     if (this.handleNullOrUndefined(key, value)) return true;
     assert('number', value);
 
-    let result = handleAction(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
+    let result = handleAction3(mmkvJsiModule.setNumberMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
@@ -331,7 +331,7 @@ export default class MMKVInstance {
     key: string,
     callback?: (error: any, value: number | undefined | null) => void
   ): number | null | undefined => {
-    let int = handleAction(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
+    let int = handleAction2(mmkvJsiModule.getNumberMMKV, key, this.instanceID);
 
     if (this.transactions.onread['number']) {
       int = this.transactions.transact('number', 'onread', key, int);
@@ -352,7 +352,7 @@ export default class MMKVInstance {
     if (this.handleNullOrUndefined(key, value)) return true;
     assert('boolean', value);
 
-    let result = handleAction(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
+    let result = handleAction3(mmkvJsiModule.setBoolMMKV, key, value, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, value);
@@ -371,7 +371,7 @@ export default class MMKVInstance {
     key: string,
     callback?: (error: any, value: boolean | undefined | null) => void
   ): boolean | null | undefined => {
-    let bool = handleAction(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
+    let bool = handleAction2(mmkvJsiModule.getBoolMMKV, key, this.instanceID);
 
     if (this.transactions.onread['boolean']) {
       bool = this.transactions.transact('boolean', 'onread', key, bool);
@@ -393,7 +393,7 @@ export default class MMKVInstance {
     if (this.handleNullOrUndefined(key, value)) return true;
     assert('object', value);
 
-    let result = handleAction(
+    let result = handleAction3(
       mmkvJsiModule.setMapMMKV,
       key,
       JSON.stringify(value),
@@ -416,7 +416,7 @@ export default class MMKVInstance {
     key: string,
     callback?: (error: any, value: T | undefined | null) => void
   ): T | null | undefined => {
-    let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
+    let json = handleAction2(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
         let map: T = JSON.parse(json);
@@ -449,7 +449,7 @@ export default class MMKVInstance {
     if (this.handleNullOrUndefined(key, value)) return true;
     assert('array', value);
 
-    let result = handleAction(
+    let result = handleAction3(
       mmkvJsiModule.setArrayMMKV,
       key,
       JSON.stringify(value),
@@ -473,7 +473,7 @@ export default class MMKVInstance {
     key: string,
     callback?: (error: any, value: T[] | undefined | null) => void
   ): T[] | null | undefined => {
-    let json = handleAction(mmkvJsiModule.getMapMMKV, key, this.instanceID);
+    let json = handleAction2(mmkvJsiModule.getMapMMKV, key, this.instanceID);
     try {
       if (json) {
         let array: T[] = JSON.parse(json);
@@ -503,7 +503,7 @@ export default class MMKVInstance {
     if (type === 'map') type = 'object';
 
     if (type === 'string' || type === 'array' || type === 'object') {
-      const result = handleAction(mmkvJsiModule.getMultiMMKV, keys, this.instanceID) || [];
+      const result = handleAction2(mmkvJsiModule.getMultiMMKV, keys, this.instanceID) || [];
 
       for (let i = 0; i < keys.length; i++) {
         let value: any = result[i] === undefined ? null : result[i];
@@ -572,7 +572,7 @@ export default class MMKVInstance {
    * If you are removing large number of keys, use `removeItems` instead.
    */
   removeItem(key: string) {
-    let result = handleAction(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
+    let result = handleAction2(mmkvJsiModule.removeValueMMKV, key, this.instanceID);
     if (result) {
       this.scheduleIndexFlush();
       this.publishWrite(key, null);
@@ -590,7 +590,7 @@ export default class MMKVInstance {
    *
    */
   removeItems(keys: string[]) {
-    let result = handleAction(
+    let result = handleAction2(
       mmkvJsiModule.removeValuesMMKV,
       keys.filter(key => key !== this.instanceID),
       this.instanceID
@@ -612,8 +612,8 @@ export default class MMKVInstance {
    * Remove all keys and values from storage.
    */
   clearStore() {
-    let keys = handleAction(mmkvJsiModule.getAllKeysMMKV, this.instanceID);
-    let cleared = handleAction(mmkvJsiModule.clearMMKV, this.instanceID);
+    let keys = handleAction1(mmkvJsiModule.getAllKeysMMKV, this.instanceID);
+    let cleared = handleAction1(mmkvJsiModule.clearMMKV, this.instanceID);
     mmkvJsiModule.setBoolMMKV(this.instanceID, true, this.instanceID);
 
     queueMicrotask(() => {
@@ -643,7 +643,7 @@ export default class MMKVInstance {
    * Clear memory cache of the current MMKV instance
    */
   clearMemoryCache() {
-    let cleared = handleAction(mmkvJsiModule.clearMemoryCache, this.instanceID);
+    let cleared = handleAction1(mmkvJsiModule.clearMemoryCache, this.instanceID);
     return cleared;
   }
 }

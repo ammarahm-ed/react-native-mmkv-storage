@@ -1,5 +1,71 @@
 import { currentInstancesStatus, initialize } from './initializer';
 
+function ensureInitialized(id: string) {
+  if (!currentInstancesStatus[id]) {
+    currentInstancesStatus[id] = initialize(id);
+  }
+}
+
+/**
+ * Fixed arity variants of `handleAction`. They avoid the rest/spread pair that
+ * the variadic version allocates on every single storage operation.
+ */
+export function handleAction1<R>(action: (id: string) => R, id: string): R | undefined {
+  if (!action) return undefined;
+  ensureInitialized(id);
+  let result = action(id);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = action(id);
+  }
+  return result;
+}
+
+export function handleAction2<A, R>(action: (a: A, id: string) => R, a: A, id: string): R | undefined {
+  if (!action) return undefined;
+  ensureInitialized(id);
+  let result = action(a, id);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = action(a, id);
+  }
+  return result;
+}
+
+export function handleAction3<A, B, R>(
+  action: (a: A, b: B, id: string) => R,
+  a: A,
+  b: B,
+  id: string
+): R | undefined {
+  if (!action) return undefined;
+  ensureInitialized(id);
+  let result = action(a, b, id);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = action(a, b, id);
+  }
+  return result;
+}
+
+export function handleAction4<A, B, C, R>(
+  action: (a: A, b: B, c: C, id: string) => R,
+  a: A,
+  b: B,
+  c: C,
+  id: string
+): R | undefined {
+  if (!action) return undefined;
+  ensureInitialized(id);
+  let result = action(a, b, c, id);
+  if (result === undefined) {
+    currentInstancesStatus[id] = initialize(id);
+    result = action(a, b, c, id);
+  }
+  return result;
+}
+
+
 /**
  *
  * A handler function used to handle all the
