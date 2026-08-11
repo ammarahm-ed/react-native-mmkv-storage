@@ -19,13 +19,15 @@ set_target_properties(
         POSITION_INDEPENDENT_CODE ON
 )
 
-add_compile_definitions(MMKV_ANDROID)
-
-add_library(mmkv SHARED IMPORTED)
-set_target_properties(mmkv PROPERTIES
-        IMPORTED_LOCATION ${MMKV_DIR}/jni/${ANDROID_ABI}/libmmkv.so
-        INTERFACE_INCLUDE_DIRECTORIES ${MMKV_DIR}/prefab/modules/mmkv/include
-)
+if(MMKV_FROM_SOURCE)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../../mmkv mmkv)
+else()
+    add_library(mmkv SHARED IMPORTED)
+    set_target_properties(mmkv PROPERTIES
+            IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../../../prebuilt/${ANDROID_ABI}/libmmkv.so
+            INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/../../../../MMKV/Core/include
+    )
+endif()
 
 find_package(ReactAndroid REQUIRED CONFIG)
 find_library(log-lib log)
@@ -54,5 +56,3 @@ else()
             android
     )
 endif()
-
-
