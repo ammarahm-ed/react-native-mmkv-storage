@@ -103,6 +103,9 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            if (System.getenv("BENCHMARK") == "1" || System.getenv("E2E_TEST") == "1") {
+                manifestPlaceholders = [usesCleartextTraffic: "true"]
+            }
         }
     }
 }
