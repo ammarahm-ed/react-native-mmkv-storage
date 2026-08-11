@@ -33,6 +33,24 @@ A removal is therefore delivered as an ordinary write event whose `value` is `nu
 Events are per instance. Two instances created with different `instanceID`s have independent event managers, so a write on one never notifies subscribers of the other.
 :::
 
+## Subscribing and unsubscribing during dispatch
+
+Handlers are free to change the registry while an event is being delivered. Dispatch runs against the list of handlers as it was when the event started:
+
+- A handler that unsubscribes itself, or another handler, does not cause the remaining handlers to be skipped. Every handler registered when the event started is still called.
+- A handler that subscribes a new handler does not cause that new handler to run for the event currently being delivered. It receives the next one.
+
+This makes the common "unsubscribe on first call" pattern safe:
+
+```js
+const once = event => {
+  MMKV.ev.unsubscribe('user:onwrite', once);
+  console.log('first write only', event.value);
+};
+
+MMKV.ev.subscribe('user:onwrite', once);
+```
+
 ## subscribe
 
 ```ts
@@ -85,6 +103,21 @@ MMKV.ev.subscribe('user:onwrite', handler);
 MMKV.ev.unsubscribe('user:onwrite', handler);
 ```
 
+## unsubscribeMulti
+
+```ts
+function unsubscribeMulti(names: string[], handler: Function): void;
+```
+
+Removes the same handler from several event names at once — the counterpart to `subscribeMulti`.
+
+```js
+const names = keys.map(key => `${key}:onwrite`);
+
+MMKV.ev.subscribeMulti(names, onChange);
+MMKV.ev.unsubscribeMulti(names, onChange);
+```
+
 ## unsubscribeAll
 
 ```ts
@@ -107,6 +140,35 @@ Calls every handler registered for the name. The library publishes storage event
 
 ```js
 MMKV.ev.publish('sync:finished', { at: Date.now() });
+```
+
+## publishEvent
+
+```ts
+function publishEvent(name: string, event: any): void;
+```
+
+A single argument version of `publish`. The library uses it for key write events, where the payload is always one object, because it avoids allocating a rest array on every write.
+
+```js
+MMKV.ev.publishEvent('sync:finished', { at: Date.now() });
+```
+
+## hasListenersForKey
+
+```ts
+function hasListenersForKey(key: string): boolean;
+```
+
+Returns whether any handler is subscribed to an event for `key` — that is, to any name of the form `` `${key}:...` ``. Note that it takes the **key**, not the full event name.
+
+The library checks this before publishing a write event, so a key nobody is watching costs nothing to write.
+
+```js
+MMKV.ev.subscribe('user:onwrite', handler);
+
+MMKV.ev.hasListenersForKey('user'); // => true
+MMKV.ev.hasListenersForKey('user:onwrite'); // => false, that is an event name
 ```
 
 ## publishWithResult
