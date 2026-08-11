@@ -1,5 +1,6 @@
 const path = require('path');
 const { getDefaultConfig } = require('@react-native/metro-config');
+const { withRozenite } = require('@rozenite/metro');
 const { getConfig } = require('react-native-builder-bob/metro-config');
 const pkg = require('../package.json');
 const root = path.resolve(__dirname, '..');
@@ -18,7 +19,7 @@ const mode = `${process.env.E2E_TEST ?? '0'}-${process.env.BENCHMARK ?? '0'}`;
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-module.exports = {
+module.exports = withRozenite({
   ...config,
   cacheVersion: `${config.cacheVersion ?? 'mmkv-example'}-${mode}`,
   resolver: {
@@ -40,4 +41,6 @@ module.exports = {
       return context.resolveRequest(context, moduleName, platform);
     }
   }
-};
+}, {
+  enabled: process.env.NODE_ENV !== 'production'
+});
