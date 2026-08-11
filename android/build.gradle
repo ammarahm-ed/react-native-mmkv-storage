@@ -75,25 +75,14 @@ def supportsNamespace() {
   return (major == 7 && minor >= 3) || major >= 8
 }
 
-def mmkvVersion = "2.2.3"
-def mmkvExtractDir = "$buildDir/mmkv"
-
-configurations {
-  mmkvArtifact {
-    transitive = false
-    canBeConsumed = false
-    canBeResolved = true
-  }
+def buildMmkvFromSource() {
+  def value = rootProject.hasProperty("MmkvStorage_buildMmkvFromSource")
+          ? rootProject.getProperty("MmkvStorage_buildMmkvFromSource")
+          : project.properties["MmkvStorage_buildMmkvFromSource"]
+  return value?.toString() == "true"
 }
 
-tasks.register("extractMMKV", Copy) {
-  from({ zipTree(configurations.mmkvArtifact.singleFile) }) {
-    include "jni/**"
-    include "prefab/modules/mmkv/include/**"
-    include "classes.jar"
-  }
-  into mmkvExtractDir
-}
+def mmkvFromSource = buildMmkvFromSource()
 
 android {
   if (supportsNamespace()) {
@@ -118,9 +107,8 @@ android {
       cmake {
         cppFlags "-O3 -frtti -fexceptions -Wall -fstack-protector-all"
         arguments "-DANDROID_STL=c++_shared",
-                  "-DMMKV_DIR=${mmkvExtractDir}",
+                  "-DMMKV_FROM_SOURCE=${mmkvFromSource ? 'ON' : 'OFF'}",
                   "-DREACT_NATIVE_MINOR_VERSION=${REACT_NATIVE_MINOR_VERSION}",
-                  // Enable Android 16KB page size compatibility (NDK r27+)
                   "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
         abiFilters (*reactNativeArchitectures())
       }
@@ -135,7 +123,10 @@ android {
 
   sourceSets {
     main {
-      jniLibs.srcDirs += ["${mmkvExtractDir}/jni"]
+      java.srcDirs += ["../MMKV/Android/java"]
+      if (!mmkvFromSource) {
+        jniLibs.srcDirs += ["prebuilt"]
+      }
     }
   }
 
@@ -191,15 +182,12 @@ repositories {
 def kotlin_version = getExtOrDefault("kotlinVersion")
 
 dependencies {
-  mmkvArtifact "io.github.goooler.mmkv:mmkv:${mmkvVersion}@aar"
-
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "androidx.security:security-crypto:1.1.0-alpha03"
-  api files("${mmkvExtractDir}/classes.jar") { builtBy tasks.named("extractMMKV") }
   implementation 'com.google.code.gson:gson:2.8.6'
 }
 
@@ -208,12 +196,5 @@ if (isNewArchitectureEnabled()) {
     jsRootDir = file("../src/")
     libraryName = "MMKVStorage"
     codegenJavaPackageName = "com.ammarahmed.mmkv"
-  }
-}
-
-tasks.configureEach { task ->
-  if (task.name.startsWith("configureCMake") || task.name.startsWith("buildCMake") ||
-      task.name.startsWith("merge") && task.name.endsWith("JniLibFolders")) {
-    task.dependsOn tasks.named("extractMMKV")
   }
 }
