@@ -31,16 +31,60 @@ export type TransactionType = 'beforewrite' | 'onwrite' | 'onread' | 'ondelete';
  *
  * Documentation: https://rnmmkv.vercel.app/#/transactionmanager
  */
+export type ObserverFunction = (key: string, value?: unknown) => void;
+
 export default class transactions {
   beforewrite: Transaction;
   onwrite: Transaction;
   onread: Transaction;
   ondelete: MutatorFunction | null;
+  observers: { [transaction: string]: { [type: string]: ObserverFunction[] } };
+  deleteObservers: ObserverFunction[];
   constructor() {
     this.beforewrite = {};
     this.onwrite = {};
     this.onread = {};
     this.ondelete = null;
+    this.observers = { beforewrite: {}, onwrite: {}, onread: {} };
+    this.deleteObservers = [];
+  }
+
+  subscribe(type: DataType, transaction: TransactionType, observer: ObserverFunction) {
+    if (!transaction || !type || !observer) throw new Error('All parameters are required');
+
+    const list =
+      transaction === 'ondelete'
+        ? this.deleteObservers
+        : (this.observers[transaction][type] = this.observers[transaction][type] || []);
+
+    list.push(observer);
+
+    return () => {
+      const index = list.indexOf(observer);
+      if (index !== -1) list.splice(index, 1);
+    };
+  }
+
+  hasDeleteListeners() {
+    return this.ondelete !== null || this.deleteObservers.length > 0;
+  }
+
+  hasListeners(type: DataType, transaction: TransactionType) {
+    if (transaction === 'ondelete') return this.hasDeleteListeners();
+
+    const observers = this.observers[transaction][type];
+    return Boolean(this[transaction][type]) || (observers !== undefined && observers.length > 0);
+  }
+
+  private notify(type: DataType, transaction: TransactionType, key: string, value?: unknown) {
+    const list =
+      transaction === 'ondelete' ? this.deleteObservers : this.observers[transaction][type];
+    if (!list || list.length === 0) return;
+
+    const snapshot = list.slice();
+    for (let i = 0; i < snapshot.length; i++) {
+      snapshot[i](key, value);
+    }
   }
 
   /**
@@ -87,9 +131,18 @@ export default class transactions {
 
   transact<T>(type: DataType, transaction: TransactionType, key: string, value?: T): T | undefined {
     const mutator = transaction === 'ondelete' ? this.ondelete : this[transaction][type];
-    if (!mutator) return value;
+
+    if (!mutator) {
+      this.notify(type, transaction, key, value);
+      return value;
+    }
+
     let _value = mutator(key, value);
     // In case a mutator function does not return a value or returns undefined, we will return the original value.
-    return _value === undefined || _value === null ? value : _value;
+    const result = _value === undefined || _value === null ? value : _value;
+
+    this.notify(type, transaction, key, result);
+
+    return result;
   }
 }

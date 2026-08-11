@@ -62,11 +62,41 @@ MMKV.transactions.unregister('object', 'onwrite');
 
 ## clear
 
-Removes every registered mutator on the instance.
+Removes every registered mutator on the instance. Observers added with `subscribe` are left in place.
 
 ```js
 MMKV.transactions.clear();
 ```
+
+## subscribe
+
+Observes a lifecycle event without taking part in it.
+
+```ts
+function subscribe(
+  type: DataType,
+  transaction: TransactionType,
+  observer: (key: string, value?: unknown) => void
+): () => void;
+```
+
+**Returns:** a function that removes this observer, and only this one.
+
+Unlike `register`, any number of observers can watch the same type and transaction, and none of them replaces a mutator or another observer. An observer's return value is ignored, so it cannot change what is written, read or deleted.
+
+```js
+const unsubscribe = MMKV.transactions.subscribe('object', 'onwrite', (key, value) => {
+  console.log('wrote', key, value);
+});
+
+unsubscribe();
+```
+
+Observers receive the **final** value — after any `beforewrite` or `onread` mutator has run — so what an `onwrite` observer sees is what was actually stored.
+
+::: tip Which one do I want?
+Use `register` when you need to *change* a value or build an index. Use `subscribe` when you only need to *watch*, and especially in reusable code: a library that called `register` would silently replace whatever the app had registered for that type. This is how the [DevTools panel](/devtools) observes storage.
+:::
 
 ## Lifecycle events
 
