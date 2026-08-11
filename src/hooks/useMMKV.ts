@@ -148,6 +148,12 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
             ? defaultValueRef.current
             : current.value
         );
+
+        if (isThenable(updatedValue)) {
+          __DEV__ &&
+            console.warn(`Attempting to use an async function as state setter is not allowed.`);
+          return;
+        }
       }
 
       if (updatedValue === null || updatedValue === undefined) {
@@ -198,7 +204,14 @@ export const useMMKVStorage: UseMMKVStorageType = <T = undefined>(
 const clonedValues = new WeakMap<object, any>();
 
 function isAsyncFunction(value: any) {
-  return Object.prototype.toString.call(value) === '[object AsyncFunction]';
+  return (
+    Object.prototype.toString.call(value) === '[object AsyncFunction]' ||
+    value?.constructor?.name === 'AsyncFunction'
+  );
+}
+
+function isThenable(value: any) {
+  return value !== null && typeof value === 'object' && typeof value.then === 'function';
 }
 
 /**
