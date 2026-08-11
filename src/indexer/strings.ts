@@ -1,4 +1,4 @@
-import { handleAction, handleActionAsync } from '../handlers';
+import { handleAction2, handleAction3, handleActionAsync } from '../handlers';
 import mmkvJsiModule from '../module';
 const INDEX_TYPE = 'stringIndex';
 /**
@@ -21,7 +21,7 @@ export default class stringsIndex {
    * Checck if a key exists
    */
   hasKey(key: string) {
-    return handleAction(mmkvJsiModule.indexContainsKeyMMKV, INDEX_TYPE, key, this.instanceID);
+    return handleAction3(mmkvJsiModule.indexContainsKeyMMKV, INDEX_TYPE, key, this.instanceID);
   }
 
   /**
@@ -29,7 +29,7 @@ export default class stringsIndex {
    */
   async getAll() {
     return new Promise(resolve => {
-      let keys = handleAction(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
+      let keys = handleAction2(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
       if (!keys) keys = [];
       let items = [];
       for (let i = 0; i < keys.length; i++) {

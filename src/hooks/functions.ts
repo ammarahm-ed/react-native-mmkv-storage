@@ -1,4 +1,4 @@
-import { handleAction } from '../handlers';
+import { handleAction2 } from '../handlers';
 import MMKVInstance from '../mmkvinstance';
 import mmkvJsiModule from '../module';
 import { methods, types } from './constants';
@@ -13,7 +13,7 @@ export const getDataType = (value: any) => {
 
 const getValueType = (key: string, storage: MMKVInstance) => {
   if (mmkvJsiModule.getValueTypeMMKV) {
-    return handleAction(mmkvJsiModule.getValueTypeMMKV, key, storage.instanceID) || null;
+    return handleAction2(mmkvJsiModule.getValueTypeMMKV, key, storage.instanceID) || null;
   }
 
   if (!storage.indexer.hasKey(key)) return null;

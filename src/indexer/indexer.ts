@@ -3,7 +3,7 @@ import numbersIndex from './numbers';
 import boolIndex from './booleans';
 import mapsIndex from './maps';
 import arrayIndex from './arrays';
-import { handleAction, handleActionAsync } from '../handlers';
+import { handleAction2, handleActionAsync } from '../handlers';
 import mmkvJsiModule from '../module';
 
 export default class indexer {
@@ -35,6 +35,6 @@ export default class indexer {
    * Check if a key exists in storage.
    */
   hasKey(key: string) {
-    return handleAction(mmkvJsiModule.containsKeyMMKV, key, this.instanceID);
+    return handleAction2(mmkvJsiModule.containsKeyMMKV, key, this.instanceID);
   }
 }

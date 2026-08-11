@@ -1,4 +1,4 @@
-import { handleActionAsync, handleAction } from '../handlers';
+import { handleAction2, handleAction3, handleActionAsync } from '../handlers';
 import mmkvJsiModule from '../module';
 import { GenericReturnType } from '../types';
 const INDEX_TYPE = 'arrayIndex';
@@ -23,14 +23,14 @@ export default class arrayIndex {
    * Check if a key exists.
    */
   hasKey(key: string) {
-    return handleAction(mmkvJsiModule.indexContainsKeyMMKV, INDEX_TYPE, key, this.instanceID);
+    return handleAction3(mmkvJsiModule.indexContainsKeyMMKV, INDEX_TYPE, key, this.instanceID);
   }
   /**
    * Get all arrays from storage.
    */
   async getAll<T>() {
     return new Promise(resolve => {
-      let keys = handleAction(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
+      let keys = handleAction2(mmkvJsiModule.getIndexMMKV, INDEX_TYPE, this.instanceID);
       if (!keys) keys = [];
       let items: GenericReturnType<T>[] = [];
       for (let i = 0; i < keys.length; i++) {
