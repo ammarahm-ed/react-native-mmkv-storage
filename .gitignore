@@ -49,3 +49,5 @@ buck-out/
 \.buckd/
 *.keystore
 dist
+docs-dist
+
