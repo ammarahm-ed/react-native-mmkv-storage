@@ -3,6 +3,8 @@ package com.ammarahmed.mmkv;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.security.KeyPairGeneratorSpec;
 import android.util.Log;
 
@@ -31,6 +33,7 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
@@ -84,11 +87,12 @@ public class SecureKeystore {
                 Locale initialLocale = Locale.getDefault();
                 if (isRTL(initialLocale)) {
                     Locale.setDefault(Locale.ENGLISH);
-                    setCipherText(reactContext, key, value);
+                    setGcmCipherText(reactContext, key, value);
                     Locale.setDefault(initialLocale);
                 } else {
-                    setCipherText(reactContext, key, value);
+                    setGcmCipherText(reactContext, key, value);
                 }
+                deleteLegacyEntry(reactContext, key);
             } catch (Exception e) {
             }
 
@@ -106,13 +110,17 @@ public class SecureKeystore {
     public String getSecureKey(String key) {
         if (useKeystore()) {
             try {
-                String value = getPlainText(reactContext, key);
+                String value = getGcmPlainText(reactContext, key);
+                if (value != null) {
+                    return value;
+                }
 
-
-                return value;
+                return migrateLegacyKey(reactContext, key);
 
 
             } catch (FileNotFoundException fnfe) {
+                return migrateLegacyKey(reactContext, key);
+            } catch (javax.crypto.AEADBadTagException abte) {
 
 
                 return null;
@@ -143,7 +151,7 @@ public class SecureKeystore {
         if (useKeystore()) {
             try {
 
-                boolean exists = exists(reactContext, key);
+                boolean exists = gcmExists(reactContext, key) || exists(reactContext, key);
 
                 return exists;
 
@@ -173,10 +181,19 @@ public class SecureKeystore {
         if (useKeystore()) {
             try {
                 for (String filename : new String[]{
+                        Constants.SKS_GCM_FILENAME + key,
                         Constants.SKS_DATA_FILENAME + key,
                         Constants.SKS_KEY_FILENAME + key,
                 }) {
                     fileDeleted.add(reactContext.deleteFile(filename));
+                }
+
+                KeyStore keyStore = KeyStore.getInstance(getKeyStore());
+                keyStore.load(null);
+                for (String entry : new String[]{gcmAlias(key), key}) {
+                    if (keyStore.containsAlias(entry)) {
+                        keyStore.deleteEntry(entry);
+                    }
                 }
 
             } catch (Exception e) {
@@ -197,6 +214,112 @@ public class SecureKeystore {
         }
     }
 
+
+    private String gcmAlias(String alias) {
+        return alias + Constants.GCM_KEY_ALIAS_SUFFIX;
+    }
+
+    private SecretKey getOrCreateGcmKey(String alias) throws GeneralSecurityException, IOException {
+        KeyStore keyStore = KeyStore.getInstance(getKeyStore());
+        keyStore.load(null);
+
+        String keyAlias = gcmAlias(alias);
+        if (keyStore.containsAlias(keyAlias)) {
+            KeyStore.Entry entry = keyStore.getEntry(keyAlias, null);
+            if (entry instanceof KeyStore.SecretKeyEntry) {
+                return ((KeyStore.SecretKeyEntry) entry).getSecretKey();
+            }
+        }
+
+        KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, getKeyStore());
+        generator.init(new KeyGenParameterSpec.Builder(keyAlias,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(256)
+                .build());
+
+        return generator.generateKey();
+    }
+
+    private void setGcmCipherText(Context context, String alias, String value)
+            throws GeneralSecurityException, IOException {
+        Cipher cipher = Cipher.getInstance(Constants.GCM_ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, getOrCreateGcmKey(alias));
+
+        byte[] iv = cipher.getIV();
+        byte[] cipherText = cipher.doFinal(value.getBytes("UTF-8"));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        out.write(iv.length);
+        out.write(iv);
+        out.write(cipherText);
+
+        Storage.writeValues(context, Constants.SKS_GCM_FILENAME + alias, out.toByteArray());
+    }
+
+    private String getGcmPlainText(Context context, String alias)
+            throws GeneralSecurityException, IOException {
+        byte[] blob = Storage.readValues(context, Constants.SKS_GCM_FILENAME + alias);
+        if (blob == null || blob.length < 2) {
+            return null;
+        }
+
+        int ivLength = blob[0] & 0xff;
+        if (blob.length < 1 + ivLength) {
+            return null;
+        }
+
+        byte[] iv = new byte[ivLength];
+        System.arraycopy(blob, 1, iv, 0, ivLength);
+        byte[] cipherText = new byte[blob.length - 1 - ivLength];
+        System.arraycopy(blob, 1 + ivLength, cipherText, 0, cipherText.length);
+
+        Cipher cipher = Cipher.getInstance(Constants.GCM_ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, getOrCreateGcmKey(alias),
+                new GCMParameterSpec(Constants.GCM_TAG_LENGTH, iv));
+
+        return new String(cipher.doFinal(cipherText), "UTF-8");
+    }
+
+    private boolean gcmExists(Context context, String alias) throws IOException {
+        return Storage.exists(context, Constants.SKS_GCM_FILENAME + alias);
+    }
+
+    private void deleteLegacyEntry(Context context, String alias) {
+        try {
+            context.deleteFile(Constants.SKS_DATA_FILENAME + alias);
+            context.deleteFile(Constants.SKS_KEY_FILENAME + alias);
+            KeyStore keyStore = KeyStore.getInstance(getKeyStore());
+            keyStore.load(null);
+            if (keyStore.containsAlias(alias)) {
+                keyStore.deleteEntry(alias);
+            }
+        } catch (Exception e) {
+            Log.w(Constants.TAG, "could not remove legacy key material", e);
+        }
+    }
+
+    private String migrateLegacyKey(Context context, String alias) {
+        try {
+            if (!exists(context, alias)) {
+                return null;
+            }
+
+            String value = getPlainText(context, alias);
+            if (value == null) {
+                return null;
+            }
+
+            setGcmCipherText(context, alias, value);
+            deleteLegacyEntry(context, alias);
+            Log.i(Constants.TAG, "migrated key to AES/GCM keystore entry");
+            return value;
+        } catch (Exception e) {
+            Log.w(Constants.TAG, "could not migrate legacy key", e);
+            return null;
+        }
+    }
 
     private PublicKey getOrCreatePublicKey(Context context, String alias) throws GeneralSecurityException, IOException {
         KeyStore keyStore = KeyStore.getInstance(getKeyStore());

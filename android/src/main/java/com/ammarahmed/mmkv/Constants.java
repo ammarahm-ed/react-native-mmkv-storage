@@ -15,6 +15,11 @@ public class Constants {
     // Internal storage file
     public static final String SKS_KEY_FILENAME = "SKS_KEY_FILE";
     public static final String SKS_DATA_FILENAME = "SKS_DATA_FILE";
+    public static final String SKS_GCM_FILENAME = "SKS_GCM_FILE";
+
+    public static final String GCM_ALGORITHM = "AES/GCM/NoPadding";
+    public static final String GCM_KEY_ALIAS_SUFFIX = ".gcm";
+    public static final int GCM_TAG_LENGTH = 128;
 
 
     public static final int DATA_TYPE_STRING = 1;
