@@ -2,6 +2,7 @@ import MMKVInstance from './src/mmkvinstance';
 import { useIndex } from './src/hooks/useIndex';
 import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { createMMKVRefHookForStorage, useMMKVRef } from './src/hooks/useMMKVRef';
+import { isSecureKeySynchronizable } from './src/encryption';
 import {
   getCurrentMMKVInstanceIDs,
   KeyUnavailableError,
@@ -66,7 +67,8 @@ export {
   createMMKVRefHookForStorage,
   useMMKVRef,
   KeyUnavailableError,
-  InitializationError
+  InitializationError,
+  isSecureKeySynchronizable
 };
 
 export type {

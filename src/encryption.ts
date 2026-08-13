@@ -27,6 +27,11 @@ function encryptStorage(
   return true;
 }
 
+export function isSecureKeySynchronizable(alias: string) {
+  if (!mmkvJsiModule.isSecureKeySynchronizable) return false;
+  return mmkvJsiModule.isSecureKeySynchronizable(alias);
+}
+
 export default class encryption {
   instanceID: string;
   alias: string | null;
