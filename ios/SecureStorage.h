@@ -11,6 +11,7 @@
 - (bool) secureKeyExists:(nonnull NSString *)key;
 - (BOOL) migrateKeyToSynchronizable:(nonnull NSString *)key
                             options:(nullable NSDictionary *)options;
+- (BOOL) isKeySynchronizable:(nonnull NSString *)key;
 - (void) removeSecureKey:(nonnull NSString *)key;
 
 - (BOOL)searchKeychainCopyMatchingExists:(nonnull NSString *)identifier;

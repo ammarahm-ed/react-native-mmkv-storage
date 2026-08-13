@@ -63,6 +63,8 @@ export const mock = (): boolean => {
 
   mmkvJsiModule.migrateSecureKeyToSynchronizable = () => false;
 
+  mmkvJsiModule.isSecureKeySynchronizable = () => false;
+
   mmkvJsiModule.removeMMKVStorage = id => {
     delete MEMORY_STORE[id];
     return true;

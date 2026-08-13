@@ -760,6 +760,15 @@ static void install(jsi::Runtime &jsiRuntime) {
 
     });
 
+    CREATE_FUNCTION("isSecureKeySynchronizable", 1, {
+        NSString *alias = nsstring(arguments[0]);
+
+        [_secureStorage setServiceName: getServiceName(alias)];
+        BOOL result = [_secureStorage isKeySynchronizable:alias];
+
+        return Value((bool)result);
+    });
+
     CREATE_FUNCTION("migrateSecureKeyToSynchronizable", 2, {
         NSString *alias = nsstring(arguments[0]);
         NSString *accValue = nsstring(arguments[1]);
