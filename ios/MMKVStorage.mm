@@ -760,6 +760,17 @@ static void install(jsi::Runtime &jsiRuntime) {
 
     });
 
+    CREATE_FUNCTION("migrateSecureKeyToSynchronizable", 2, {
+        NSString *alias = nsstring(arguments[0]);
+        NSString *accValue = nsstring(arguments[1]);
+
+        [_secureStorage setServiceName: getServiceName(alias)];
+        BOOL migrated = [_secureStorage migrateKeyToSynchronizable:alias
+                                                           options:(@{@"accessible" : accValue})];
+
+        return Value((bool)migrated);
+    });
+
     CREATE_FUNCTION("removeMMKVStorage", 1, {
         NSString *ID = nsstring(arguments[0]);
 

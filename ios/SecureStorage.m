@@ -164,6 +164,39 @@ NSString *serviceName = nil;
     return NO;
 }
 
+- (BOOL)migrateKeyToSynchronizable:(NSString *)identifier options:(NSDictionary *)options
+{
+    NSMutableDictionary *query = [self newSearchDictionary:identifier];
+    query[(__bridge id)kSecAttrSynchronizable] = @NO;
+    query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+    query[(__bridge id)kSecReturnData] = (__bridge id)kCFBooleanTrue;
+
+    CFTypeRef result = NULL;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+    if (status != errSecSuccess || result == NULL) {
+        return NO;
+    }
+
+    NSData *data = (__bridge_transfer NSData *)result;
+    NSString *value = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    if (value == nil) {
+        return NO;
+    }
+
+    NSMutableDictionary *migrated = [NSMutableDictionary dictionaryWithDictionary:options ?: @{}];
+    migrated[@"synchronizable"] = @YES;
+
+    if (![self createKeychainValue:value forIdentifier:identifier options:migrated]) {
+        return NO;
+    }
+
+    NSMutableDictionary *deleteQuery = [self newSearchDictionary:identifier];
+    deleteQuery[(__bridge id)kSecAttrSynchronizable] = @NO;
+    SecItemDelete((__bridge CFDictionaryRef)deleteQuery);
+
+    return YES;
+}
+
 - (BOOL)createKeychainValue:(NSString *)value forIdentifier:(NSString *)identifier options: (NSDictionary * __nullable)options {
     CFStringRef accessibleVal = _accessibleValue(options);
     NSMutableDictionary *dictionary = [self newSearchDictionary:identifier];

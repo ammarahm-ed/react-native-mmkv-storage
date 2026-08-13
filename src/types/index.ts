@@ -80,6 +80,7 @@ export type MMKVJsiModule = {
   ) => boolean;
   secureKeyExists: (alias: string) => boolean;
   removeMMKVStorage: (id: string) => boolean;
+  migrateSecureKeyToSynchronizable: (alias: string, accessibleMode: string) => boolean;
   removeSecureKey: (alias: string) => boolean;
 
   setMultiMMKV: (
