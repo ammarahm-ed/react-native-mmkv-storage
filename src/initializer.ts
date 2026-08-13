@@ -3,6 +3,41 @@ import IDStore from './mmkv/IDStore';
 import mmkvJsiModule from './module';
 import { StorageOptions } from './types';
 
+export class KeyUnavailableError extends Error {
+  instanceID: string;
+  constructor(instanceID: string) {
+    super(
+      `Encryption key for storage "${instanceID}" could not be read. The storage exists but ` +
+        `cannot be decrypted, usually because the key was not restored onto this device. ` +
+        `Use MMKVLoader().recoverOnKeyLoss() to reset it, or withSynchronizableKey() to let ` +
+        `the key follow the user across devices.`
+    );
+    this.name = 'KeyUnavailableError';
+    this.instanceID = instanceID;
+  }
+}
+
+export class InitializationError extends Error {
+  instanceID: string;
+  constructor(instanceID: string) {
+    super(`Storage "${instanceID}" could not be opened.`);
+    this.name = 'InitializationError';
+    this.instanceID = instanceID;
+  }
+}
+
+function setupInstance(
+  id: string,
+  mode: number,
+  key: string,
+  path: string,
+  indexing: boolean
+) {
+  const created = mmkvJsiModule.setupMMKVInstance(id, mode, key, path, indexing);
+  if (!created) throw new InitializationError(id);
+  return created;
+}
+
 export const currentInstancesStatus: { [name: string]: boolean } = {};
 
 /**
@@ -67,7 +102,14 @@ function initWithEncryptionUsingOldKey(options: StorageOptions) {
     return setupWithEncryption(options.instanceID, options.processingMode, key, options.alias);
   }
 
-  return false;
+  if (!options.recoverOnKeyLoss) {
+    throw new KeyUnavailableError(options.instanceID);
+  }
+
+  mmkvJsiModule.removeMMKVStorage(options.instanceID);
+  IDStore.remove(options.instanceID);
+  mmkvJsiModule.removeSecureKey(options.alias);
+  return initWithEncryptionUsingNewKey(options);
 }
 
 /**
@@ -80,7 +122,12 @@ function initWithEncryptionUsingOldKey(options: StorageOptions) {
 function initWithEncryptionUsingNewKey(options: StorageOptions) {
   if (!options.key || options.key.length < 3) throw new Error('Key is null or too short');
   if (!options.alias) return false;
-  mmkvJsiModule.setSecureKey(options.alias, options.key, options.accessibleMode);
+  mmkvJsiModule.setSecureKey(
+    options.alias,
+    options.key,
+    options.accessibleMode,
+    options.synchronizableKey
+  );
   return setupWithEncryption(
     options.instanceID,
     options.processingMode,
@@ -120,7 +167,7 @@ function initWithoutEncryption(options: StorageOptions) {
 }
 
 function setup(id: string, mode: number) {
-  mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
+  setupInstance(id, mode, '', '', options[id].enableIndexing);
   if (!IDStore.exists(id)) {
     mmkvJsiModule.setBoolMMKV(id, true, id);
     IDStore.add(id, false, null);
@@ -135,7 +182,7 @@ function setup(id: string, mode: number) {
 }
 
 function setupWithEncryption(id: string, mode: number, key: string, alias: string) {
-  mmkvJsiModule.setupMMKVInstance(id, mode, key, '', options[id].enableIndexing);
+  setupInstance(id, mode, key, '', options[id].enableIndexing);
   if (!IDStore.exists(id)) {
     mmkvJsiModule.setBoolMMKV(id, true, id);
     IDStore.add(id, true, alias);
@@ -156,14 +203,14 @@ function setupWithEncryption(id: string, mode: number, key: string, alias: strin
  */
 function encryptionHandler(id: string, mode: number) {
   let alias = IDStore.getAlias(id);
-  if (!alias) return mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
+  if (!alias) return setupInstance(id, mode, '', '', options[id].enableIndexing);
   let exists = mmkvJsiModule.secureKeyExists(alias);
   let key = exists && mmkvJsiModule.getSecureKey(alias);
 
   if (IDStore.encrypted(id) && key) {
     options[id].key = key;
-    return mmkvJsiModule.setupMMKVInstance(id, mode, key, '', options[id].enableIndexing);
+    return setupInstance(id, mode, key, '', options[id].enableIndexing);
   } else {
-    return mmkvJsiModule.setupMMKVInstance(id, mode, '', '', options[id].enableIndexing);
+    return setupInstance(id, mode, '', '', options[id].enableIndexing);
   }
 }

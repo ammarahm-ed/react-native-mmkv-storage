@@ -66,7 +66,9 @@ RCT_EXPORT_MODULE(MMKVStorage)
     NSString *rootDir;
 
     appGroupId = [[NSBundle mainBundle].infoDictionary valueForKey:@"appGroupId"];
-    NSString *disableMMKVBackup = [[NSBundle mainBundle].infoDictionary valueForKey:@"disableMMKVBackup"];
+    id disableBackupValue = [[NSBundle mainBundle].infoDictionary valueForKey:@"disableMMKVBackup"];
+    BOOL disableMMKVBackup = [disableBackupValue respondsToSelector:@selector(boolValue)] &&
+                             [disableBackupValue boolValue];
 
     if (appGroupId != nil) {
         NSURL *appGroup = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:appGroupId];
@@ -82,10 +84,12 @@ RCT_EXPORT_MODULE(MMKVStorage)
         [MMKV initializeMMKV:rootDir];
     }
 
-    if (disableMMKVBackup) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath:rootDir]) {
         NSError *error = nil;
         NSURL *url = [NSURL fileURLWithPath:rootDir isDirectory:YES];
-        [url setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:&error];
+        [url setResourceValue:[NSNumber numberWithBool:disableMMKVBackup]
+                       forKey:NSURLIsExcludedFromBackupKey
+                        error:&error];
     }
 
     _secureStorage = [[SecureStorage alloc] init];
@@ -175,8 +179,12 @@ MMKV *createInstance(NSString *ID, MMKVMode mode, NSString *key,
     } else {
         kv = [MMKV mmkvWithID:ID mode:mode];
     }
-    [mmkvInstances setObject:kv forKey:ID];
-    
+    if (kv != nil) {
+        [mmkvInstances setObject:kv forKey:ID];
+    } else {
+        [mmkvInstances removeObjectForKey:ID];
+    }
+
     return kv;
 }
 
@@ -362,14 +370,16 @@ static void install(jsi::Runtime &jsiRuntime) {
         NSString *cryptKey = nsstring(arguments[2]);
         NSString *path = nsstring(arguments[3]);
         
-        createInstance(ID, mode, cryptKey, path);
-        
-        auto *kv = getInstance(ID);
-        
+        auto *kv = createInstance(ID, mode, cryptKey, path);
+
+        if (kv == nil) {
+            return Value(false);
+        }
+
         indexingEnabled[ID] = arguments[4].getBool() ? @YES : @NO;
         indexes[ID] = [NSMutableDictionary dictionary];
         indexesDirty[ID] = [NSMutableDictionary dictionary];
-        
+
         return Value(true);
     });
     
@@ -734,16 +744,33 @@ static void install(jsi::Runtime &jsiRuntime) {
     // Secure Store
     
     
-    CREATE_FUNCTION("setSecureKey", 3, {
+    CREATE_FUNCTION("setSecureKey", 4, {
         NSString *alias = nsstring(arguments[0]);
         NSString *key = nsstring(arguments[1]);
         NSString *accValue = nsstring(arguments[2]);
-        
+        BOOL synchronizable = arguments[3].isBool() ? arguments[3].getBool() : false;
+
         [_secureStorage setServiceName: getServiceName(alias)];
-        [_secureStorage setSecureKey:alias value:key options:@{@"accessible" : accValue}];
-        
+        [_secureStorage setSecureKey:alias
+                               value:key
+                             options:(@{@"accessible" : accValue,
+                                        @"synchronizable" : @(synchronizable)})];
+
         return Value(true);
-        
+
+    });
+
+    CREATE_FUNCTION("removeMMKVStorage", 1, {
+        NSString *ID = nsstring(arguments[0]);
+
+        [mmkvInstances removeObjectForKey:ID];
+        [indexingEnabled removeObjectForKey:ID];
+        [indexes removeObjectForKey:ID];
+        [indexesDirty removeObjectForKey:ID];
+
+        BOOL removed = [MMKV removeStorage:ID rootPath:appGroupId != nil ? rPath : nil];
+
+        return Value((bool)removed);
     });
     
     CREATE_FUNCTION("getSecureKey", 1, {

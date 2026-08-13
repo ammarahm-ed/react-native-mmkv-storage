@@ -18,6 +18,8 @@ export type StorageOptions = {
    * Import IOSAccessibleStates from library to use it.
    */
   accessibleMode: string;
+  synchronizableKey: boolean;
+  recoverOnKeyLoss: boolean;
   /**
    * Multi Process or Single Process.
    *
@@ -70,8 +72,14 @@ export type MMKVJsiModule = {
 
   setMMKVServiceName: (alias: string, serviceName: string) => string;
   getSecureKey: (alias: string) => string | null;
-  setSecureKey: (alias: string, key: string, accessibleMode: string) => boolean;
+  setSecureKey: (
+    alias: string,
+    key: string,
+    accessibleMode: string,
+    synchronizable: boolean
+  ) => boolean;
   secureKeyExists: (alias: string) => boolean;
+  removeMMKVStorage: (id: string) => boolean;
   removeSecureKey: (alias: string) => boolean;
 
   setMultiMMKV: (

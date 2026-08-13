@@ -20,6 +20,10 @@ function add(id: string, encrypted?: boolean, alias?: string | null) {
   mmkvJsiModule.setStringMMKV(id, JSON.stringify(storeUnit), STORE_ID);
 }
 
+function remove(id: string) {
+  mmkvJsiModule.removeValueMMKV(id, STORE_ID);
+}
+
 /**
  * Check if the storage instance with the given ID is encrypted or not.
  */
@@ -92,6 +96,7 @@ export default {
   getAlias,
   getAllMMKVInstanceIDs,
   add,
+  remove,
   exists,
   encrypted,
   STORE_ID

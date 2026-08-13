@@ -21,8 +21,20 @@ export default class MMKVLoader {
       serviceName: null,
       initialized: false,
       persistDefaults: false,
-      enableIndexing: true
+      enableIndexing: true,
+      synchronizableKey: false,
+      recoverOnKeyLoss: false
     };
+  }
+
+  withSynchronizableKey() {
+    this.options.synchronizableKey = true;
+    return this;
+  }
+
+  recoverOnKeyLoss() {
+    this.options.recoverOnKeyLoss = true;
+    return this;
   }
 
   /**

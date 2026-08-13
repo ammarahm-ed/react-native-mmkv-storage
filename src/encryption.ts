@@ -11,10 +11,11 @@ function encryptStorage(
   key: string,
   secureKeyStorage = true,
   alias: string,
-  accessibleMode: string
+  accessibleMode: string,
+  synchronizableKey = false
 ) {
   if (secureKeyStorage) {
-    mmkvJsiModule.setSecureKey(alias, key, accessibleMode);
+    mmkvJsiModule.setSecureKey(alias, key, accessibleMode, synchronizableKey);
     mmkvJsiModule.encryptMMKV(key, id);
     mmkvJsiModule.setBoolMMKV(id, true, id);
     IDStore.add(id, true, alias);
@@ -85,7 +86,8 @@ export default class encryption {
       this.key,
       secureKeyStorage,
       this.alias,
-      this.accessibleMode
+      this.accessibleMode,
+      options[this.instanceID].synchronizableKey
     );
   }
 

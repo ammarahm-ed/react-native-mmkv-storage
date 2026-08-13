@@ -61,6 +61,11 @@ export const mock = (): boolean => {
     return Object.keys(SECURE_KEYSTORE).includes(alias);
   };
 
+  mmkvJsiModule.removeMMKVStorage = id => {
+    delete MEMORY_STORE[id];
+    return true;
+  };
+
   mmkvJsiModule.removeSecureKey = alias => {
     delete SECURE_KEYSTORE[alias];
     return true;
