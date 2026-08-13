@@ -164,6 +164,20 @@ NSString *serviceName = nil;
     return NO;
 }
 
+- (BOOL)isKeySynchronizable:(NSString *)identifier
+{
+    NSMutableDictionary *query = [self newSearchDictionary:identifier];
+    query[(__bridge id)kSecAttrSynchronizable] = @YES;
+    query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+
+    CFTypeRef result = NULL;
+    OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
+    if (result != NULL) {
+        CFRelease(result);
+    }
+    return status == errSecSuccess;
+}
+
 - (BOOL)migrateKeyToSynchronizable:(NSString *)identifier options:(NSDictionary *)options
 {
     NSMutableDictionary *query = [self newSearchDictionary:identifier];

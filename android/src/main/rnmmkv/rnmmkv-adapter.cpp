@@ -377,6 +377,10 @@ void installBindings(Runtime &jsiRuntime)
         return Value(true);
     });
 
+    CREATE_FUNCTION("isSecureKeySynchronizable", 1, {
+        return Value(false);
+    });
+
     CREATE_FUNCTION("migrateSecureKeyToSynchronizable", 2, {
         return Value(false);
     });
