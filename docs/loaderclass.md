@@ -35,6 +35,12 @@ initialize(): MMKVInstance
 | --- | --- |
 | `MMKVStorage bindings not installed` | The JSI bindings could not be installed. See [`init()`](/generalmethods#init). |
 | `Key is null or too short` | Encryption was requested with a key shorter than 3 characters. |
+| `KeyUnavailableError` | An encrypted storage exists but its key could not be read, so the data cannot be decrypted. See [Backups and device transfers](/devicetransfer). |
+| `InitializationError` | The storage could not be opened. |
+
+::: warning Changed in 13.0.0
+`initialize()` previously returned a storage instance even when the underlying storage failed to open, and every read and write on it silently did nothing. It now throws instead. If you encrypt storage, handle `KeyUnavailableError` or opt into [`recoverOnKeyLoss()`](#recoveronkeyloss).
+:::
 
 ```js
 import { MMKVLoader } from 'react-native-mmkv-storage';
@@ -84,6 +90,52 @@ const storage = new MMKVLoader()
   .withEncryption()
   .initialize();
 ```
+
+## withSynchronizableKey
+
+Stores the encryption key as a synchronizable iCloud Keychain item so it follows the user onto a new device. Without it, iOS binds keychain backups to the hardware that made them, so restoring an iCloud backup onto a different device leaves the storage encrypted with a key that no longer exists.
+
+```ts
+withSynchronizableKey(): this
+```
+
+**Parameters:** none.
+
+**Returns:** `this`
+
+```js
+const storage = new MMKVLoader()
+  .withInstanceID('secure-storage')
+  .withEncryption()
+  .withSynchronizableKey()
+  .initialize();
+```
+
+A key stored before you added this call is migrated on the next `initialize()`, keeping its value so existing data stays readable. Use [`isSecureKeySynchronizable()`](#issecurekeysynchronizable) to confirm.
+
+Requires the user to have iCloud Keychain enabled, and has no effect on Android, where Keystore keys cannot be exported. See [Backups and device transfers](/devicetransfer).
+
+## recoverOnKeyLoss
+
+Deletes and recreates an encrypted storage when its key cannot be read, instead of throwing `KeyUnavailableError`.
+
+```ts
+recoverOnKeyLoss(): this
+```
+
+**Parameters:** none.
+
+**Returns:** `this`
+
+```js
+const storage = new MMKVLoader()
+  .withInstanceID('cache')
+  .withEncryption()
+  .recoverOnKeyLoss()
+  .initialize();
+```
+
+The storage comes back empty with a new key. Data encrypted under the missing key cannot be recovered by any means, so this discards it — opt in for caches, and handle the error for anything the user would miss.
 
 ## encryptWithCustomKey
 

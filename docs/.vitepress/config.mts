@@ -46,6 +46,7 @@ export default defineConfig({
           { text: 'Supported data types', link: '/datatypes' },
           { text: 'Value lifecycle control', link: '/transactionmanager' },
           { text: 'redux-persist', link: '/redux-persist' },
+          { text: 'Backups and device transfers', link: '/devicetransfer' },
           { text: 'Using MMKV from native code', link: '/nativeaccess' },
           { text: 'React Native DevTools', link: '/devtools' },
           { text: 'Testing with Jest', link: '/mockjest' }

@@ -113,3 +113,44 @@ After changing the encryption key, you must use the new key wherever you load th
 :::
 
 For a walkthrough of the common encryption workflows, see [Working with encryption](/workingwithencryption).
+
+## isSecureKeySynchronizable
+
+Reports whether the encryption key is stored as a synchronizable iCloud Keychain item, which is what allows it to survive a restore onto a different device.
+
+```ts
+isSecureKeySynchronizable(alias: string): boolean
+```
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `alias` | `string` | The alias the key is stored under, from `getKey().alias`. |
+
+**Returns:** `boolean` — always `false` on Android, which has no equivalent.
+
+```js
+import { isSecureKeySynchronizable } from 'react-native-mmkv-storage';
+
+const { alias } = storage.getKey();
+console.log(isSecureKeySynchronizable(alias));
+```
+
+Use it to confirm that [`withSynchronizableKey()`](/loaderclass#withsynchronizablekey) has taken effect, including after an existing key was migrated.
+
+## Where the key is stored
+
+| Platform | Storage |
+| --- | --- |
+| iOS | Keychain, `kSecAttrAccessibleAfterFirstUnlock` by default — see [`setAccessibleIOS`](/loaderclass#setaccessibleios) |
+| Android (API 23+) | Wrapped with an AES-256 key held in the Android Keystore and used in GCM mode |
+| Android (API 22 and below) | `SharedPreferences` |
+
+On Android, keys written by versions before 13.0.0 used an older scheme and are re-wrapped automatically the first time they are read. The value is unchanged, so existing storages keep working with no action needed.
+
+::: warning
+On API 22 and below the key is stored unencrypted. Every React Native version that supports this library requires a higher API level, so this path is unreachable in practice, but do not rely on encryption if you deliberately target those devices.
+:::
+
+Neither platform's key store survives every kind of device transfer. See [Backups and device transfers](/devicetransfer).
