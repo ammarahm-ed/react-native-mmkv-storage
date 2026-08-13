@@ -2,6 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "npm install --include=dev",
-  "buildCommand": "npm run docs:build && echo BUILD_CWD=$(pwd) && ls -la docs-dist | head -20",
+  "buildCommand": "npm run docs:build",
   "outputDirectory": "docs-dist"
 }
