@@ -34,34 +34,42 @@ NSString *serviceName = nil;
     }
 }
 
+- (void) waitForProtectedData
+{
+    if ([[UIApplication sharedApplication] isProtectedDataAvailable]) {
+        return;
+    }
+
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+    __block id observer = [[NSNotificationCenter defaultCenter]
+        addObserverForName:UIApplicationProtectedDataDidBecomeAvailable
+                    object:nil
+                     queue:nil
+                usingBlock:^(NSNotification *note) {
+                    dispatch_semaphore_signal(semaphore);
+                    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+                }];
+
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+}
+
 - (NSString *) getSecureKey:(NSString *)key
 {
-    
+
     @try {
         [self handleAppUninstallation];
+        [self waitForProtectedData];
         NSString *value = [self searchKeychainCopyMatching:key];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            int readAttempts = 0;
-            // See: https://github.com/ammarahm-ed/react-native-mmkv-storage/issues/195
-            while (![[UIApplication sharedApplication] isProtectedDataAvailable] && readAttempts++ < 100) {
-                // sleep 25ms before another attempt
-                usleep(25000);
-            }
-        });
-        if (value == nil) {
-            NSString* errorMessage = @"key does not present";
-          
-            return NULL;
-        } else {
-           
-            return value;
+        if (value == nil && [[UIApplication sharedApplication] isProtectedDataAvailable]) {
+            value = [self searchKeychainCopyMatching:key];
         }
+        return value;
     }
     @catch (NSException *exception) {
-      
+
         return NULL;
     }
-    
+
 }
 
 - (bool) secureKeyExists:(NSString *)key
@@ -110,7 +118,8 @@ NSString *serviceName = nil;
     [searchDictionary setObject:encodedIdentifier forKey:(id)kSecAttrGeneric];
     [searchDictionary setObject:encodedIdentifier forKey:(id)kSecAttrAccount];
     [searchDictionary setObject:serviceName forKey:(id)kSecAttrService];
-    
+    [searchDictionary setObject:(id)kSecAttrSynchronizableAny forKey:(id)kSecAttrSynchronizable];
+
     return searchDictionary;
 }
 
@@ -162,7 +171,8 @@ NSString *serviceName = nil;
     NSData *valueData = [value dataUsingEncoding:NSUTF8StringEncoding];
     [dictionary setObject:valueData forKey:(id)kSecValueData];
     dictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessibleVal;
-    
+    dictionary[(__bridge NSString *)kSecAttrSynchronizable] = @(_synchronizableValue(options));
+
     OSStatus status = SecItemAdd((CFDictionaryRef)dictionary, NULL);
     
     if (status == errSecSuccess) {
@@ -179,6 +189,7 @@ NSString *serviceName = nil;
     NSData *passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
     [updateDictionary setObject:passwordData forKey:(id)kSecValueData];
     updateDictionary[(__bridge NSString *)kSecAttrAccessible] = (__bridge id)accessibleVal;
+    updateDictionary[(__bridge NSString *)kSecAttrSynchronizable] = @(_synchronizableValue(options));
     OSStatus status = SecItemUpdate((CFDictionaryRef)searchDictionary,
                                     (CFDictionaryRef)updateDictionary);
     
@@ -224,6 +235,14 @@ NSString *serviceName = nil;
     serviceName = _serviceName;
 }
 
+
+BOOL _synchronizableValue(NSDictionary *options)
+{
+    if (options && options[@"synchronizable"] != nil) {
+        return [options[@"synchronizable"] boolValue];
+    }
+    return NO;
+}
 
 CFStringRef _accessibleValue(NSDictionary *options)
 {

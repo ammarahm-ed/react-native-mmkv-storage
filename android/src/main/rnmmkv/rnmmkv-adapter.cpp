@@ -122,7 +122,14 @@ static MMKV *createInstance(const string &ID, MMKVMode mode, string key, string 
                                 key.empty() ? nullptr : &key,
                                 path.empty() ? nullptr : &path);
 
-    mmkvInstances[ID] = kv;
+    if (kv != nullptr)
+    {
+        mmkvInstances[ID] = kv;
+    }
+    else
+    {
+        mmkvInstances.erase(ID);
+    }
     return kv;
 }
 
@@ -357,12 +364,30 @@ void installBindings(Runtime &jsiRuntime)
         auto mode = (MMKVMode)(int)arguments[1].getNumber();
         string cryptKey = std_string(arguments[2]);
         MMKVPath_t path = std_string(arguments[3]);
-        createInstance(id, mode, cryptKey, path);
+        MMKV *kv = createInstance(id, mode, cryptKey, path);
+
+        if (kv == nullptr)
+        {
+            return Value(false);
+        }
 
         indexing_enabled[id] = arguments[4].getBool();
         initIndexForId(id);
 
         return Value(true);
+    });
+
+    CREATE_FUNCTION("removeMMKVStorage", 1, {
+        string id = std_string(arguments[0]);
+
+        mmkvInstances.erase(id);
+        indexing_enabled.erase(id);
+        index_cache.erase(id);
+        index_dirty.erase(id);
+
+        bool removed = MMKV::removeStorage(id, &rPath);
+
+        return Value(removed);
     });
 
     CREATE_FUNCTION("getSecureKey", 1, {

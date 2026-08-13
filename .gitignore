@@ -51,3 +51,5 @@ buck-out/
 dist
 docs-dist
 
+example/ios/build-sim/
+example/ios/build-sim-signed/

@@ -2,7 +2,11 @@ import MMKVInstance from './src/mmkvinstance';
 import { useIndex } from './src/hooks/useIndex';
 import { create, useMMKVStorage } from './src/hooks/useMMKV';
 import { createMMKVRefHookForStorage, useMMKVRef } from './src/hooks/useMMKVRef';
-import { getCurrentMMKVInstanceIDs } from './src/initializer';
+import {
+  getCurrentMMKVInstanceIDs,
+  KeyUnavailableError,
+  InitializationError
+} from './src/initializer';
 import MMKVLoader from './src/mmkvloader';
 import IDStore from './src/mmkv/IDStore';
 import { init, isLoaded } from './src/mmkv/init';
@@ -60,7 +64,9 @@ export {
   getAllMMKVInstanceIDs,
   IDSTORE_ID,
   createMMKVRefHookForStorage,
-  useMMKVRef
+  useMMKVRef,
+  KeyUnavailableError,
+  InitializationError
 };
 
 export type {
