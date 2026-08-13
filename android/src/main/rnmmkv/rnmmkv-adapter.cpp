@@ -377,6 +377,10 @@ void installBindings(Runtime &jsiRuntime)
         return Value(true);
     });
 
+    CREATE_FUNCTION("migrateSecureKeyToSynchronizable", 2, {
+        return Value(false);
+    });
+
     CREATE_FUNCTION("removeMMKVStorage", 1, {
         string id = std_string(arguments[0]);
 

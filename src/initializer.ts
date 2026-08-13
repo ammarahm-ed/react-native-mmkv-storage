@@ -99,6 +99,9 @@ function initWithEncryptionUsingOldKey(options: StorageOptions) {
   let key = !options.secureKeyStorage ? options.key : mmkvJsiModule.getSecureKey(options.alias);
 
   if (key) {
+    if (options.secureKeyStorage && options.synchronizableKey) {
+      mmkvJsiModule.migrateSecureKeyToSynchronizable(options.alias, options.accessibleMode);
+    }
     return setupWithEncryption(options.instanceID, options.processingMode, key, options.alias);
   }
 
