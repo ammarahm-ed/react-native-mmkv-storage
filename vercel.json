@@ -3,5 +3,5 @@
   "framework": null,
   "installCommand": "npm install --include=dev",
   "buildCommand": "npm run docs:build",
-  "outputDirectory": "docs/.vitepress/dist"
+  "outputDirectory": "docs-dist"
 }

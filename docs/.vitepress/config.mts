@@ -5,6 +5,7 @@ export default defineConfig({
   description:
     'A fast, small and encrypted key-value storage for React Native, built on MMKV and JSI.',
   lang: 'en-US',
+  outDir: '../docs-dist',
   cleanUrls: true,
   lastUpdated: true,
   head: [
