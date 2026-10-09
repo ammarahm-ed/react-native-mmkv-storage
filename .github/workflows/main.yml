@@ -32,7 +32,10 @@ jobs:
         run: |
           npm ci --legacy-peer-deps
           npm run build
-          cd example
+          cd packages/devtools-plugin
+          npm ci --legacy-peer-deps
+          npm run build
+          cd ../../example
           npm ci --legacy-peer-deps
           cd android
           ./gradlew assembleRelease
