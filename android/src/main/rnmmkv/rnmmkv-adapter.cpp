@@ -1175,6 +1175,6 @@ private:
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *jvm, void *)
 {
-    return jni::initialize(vm, []
+    return jni::initialize(jvm, []
                            { RNMMKVModule::registerNatives(); });
 }
