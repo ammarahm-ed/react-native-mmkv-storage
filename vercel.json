@@ -3,5 +3,6 @@
   "framework": null,
   "installCommand": "npm install --include=dev",
   "buildCommand": "npm run docs:build",
-  "outputDirectory": "docs-dist"
+  "outputDirectory": "docs-dist",
+  "cleanUrls": true
 }

@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
-  title: 'react-native-mmkv-storage',
+  title: 'MMKVStorage',
   description:
     'A fast, small and encrypted key-value storage for React Native, built on MMKV and JSI.',
   lang: 'en-US',
