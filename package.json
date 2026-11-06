@@ -67,7 +67,7 @@
   "codegenConfig": {
     "name": "MMKVStorageSpec",
     "type": "modules",
-    "jsSrcsDir": "./src",
+    "jsSrcsDir": "./src/module",
     "android": {
       "javaPackageName": "com.ammarahmed.mmkv"
     }
