@@ -3,9 +3,6 @@
 #include <MMKV/MMKVPredef.h>
 #include <MMKV/MMBuffer.h>
 #include <algorithm>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -19,32 +16,16 @@ static std::unordered_map<std::string, MMKV *> mmkvInstances;
 
 static string rPath = "";
 
-static std::filesystem::path secureKeyPath(const string &alias)
-{
-    static const char digits[] = "0123456789abcdef";
-    string name;
-    for (unsigned char c : alias)
-    {
-        name += digits[c >> 4];
-        name += digits[c & 15];
-    }
-    return std::filesystem::path(rPath) / ".secure" / name;
-}
+extern "C" ssize_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
+extern "C" bool mmkv_secure_set(const char *alias, const char *value);
+extern "C" bool mmkv_secure_exists(const char *alias);
+extern "C" bool mmkv_secure_remove(const char *alias);
 
 static string readSecureKey(const string &alias)
 {
-    std::ifstream file(secureKeyPath(alias), std::ios::binary);
-    std::stringstream content;
-    content << file.rdbuf();
-    return content.str();
-}
-
-static void writeSecureKey(const string &alias, const string &key)
-{
-    auto path = secureKeyPath(alias);
-    std::filesystem::create_directories(path.parent_path());
-    std::ofstream(path, std::ios::binary | std::ios::trunc) << key;
-    std::filesystem::permissions(path, std::filesystem::perms::owner_read | std::filesystem::perms::owner_write);
+    char buffer[512];
+    ssize_t length = mmkv_secure_get(alias.c_str(), buffer, sizeof(buffer));
+    return length < 0 ? string() : string(buffer, length);
 }
 
 static MMKV *getInstance(const string &ID)
@@ -345,17 +326,15 @@ void installBindings(Runtime &jsiRuntime)
     });
 
     CREATE_FUNCTION("setSecureKey", 2, {
-        writeSecureKey(std_string(arguments[0]), std_string(arguments[1]));
-        return Value(true);
+        return Value(mmkv_secure_set(std_string(arguments[0]).c_str(), std_string(arguments[1]).c_str()));
     });
 
     CREATE_FUNCTION("secureKeyExists", 1, {
-        return Value(std::filesystem::exists(secureKeyPath(std_string(arguments[0]))));
+        return Value(mmkv_secure_exists(std_string(arguments[0]).c_str()));
     });
 
     CREATE_FUNCTION("removeSecureKey", 1, {
-        std::filesystem::remove(secureKeyPath(std_string(arguments[0])));
-        return Value(true);
+        return Value(mmkv_secure_remove(std_string(arguments[0]).c_str()));
     });
 
     CREATE_FUNCTION("setStringMMKV", 3, {
