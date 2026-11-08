@@ -1,4 +1,4 @@
-src/
+/src/
 !dist/src
 !android/src
 !src/module/NativeMMKVStorage.ts
