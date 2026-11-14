@@ -15,7 +15,7 @@ using namespace std;
 
 static std::unordered_map<std::string, MMKV *> mmkvInstances;
 
-static string rPath = "";
+static MMKVPath_t rPath;
 
 extern "C" std::ptrdiff_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
 extern "C" bool mmkv_secure_set(const char *alias, const char *value);
@@ -39,7 +39,7 @@ static MMKV *getInstance(const string &ID)
     return kv->second;
 }
 
-static MMKV *createInstance(const string &ID, MMKVMode mode, string key, string path)
+static MMKV *createInstance(const string &ID, MMKVMode mode, string key, MMKVPath_t path)
 {
     MMKV *kv = MMKV::mmkvWithID(ID, mode,
                                 key.empty() ? nullptr : &key,
@@ -286,7 +286,7 @@ void installBindings(Runtime &jsiRuntime)
         string id = std_string(arguments[0]);
         auto mode = (MMKVMode)(int)arguments[1].getNumber();
         string cryptKey = std_string(arguments[2]);
-        MMKVPath_t path = std_string(arguments[3]);
+        MMKVPath_t path = string2MMKVPath_t(std_string(arguments[3]));
         MMKV *kv = createInstance(id, mode, cryptKey, path);
 
         if (kv == nullptr)
@@ -711,8 +711,8 @@ void installBindings(Runtime &jsiRuntime)
 
 void installMMKV(Runtime &runtime, const std::string &rootPath)
 {
-    rPath = rootPath;
+    rPath = string2MMKVPath_t(rootPath);
     MMKV::initializeMMKV(rPath);
     installBindings(runtime);
-    createInstance("mmkvIDStore", MMKV_SINGLE_PROCESS, "", "");
+    createInstance("mmkvIDStore", MMKV_SINGLE_PROCESS, "", MMKVPath_t());
 }
