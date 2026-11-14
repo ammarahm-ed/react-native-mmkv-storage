@@ -3,6 +3,7 @@
 #include <MMKV/MMKVPredef.h>
 #include <MMKV/MMBuffer.h>
 #include <algorithm>
+#include <cstddef>
 #include <unordered_map>
 #include <vector>
 
@@ -16,7 +17,7 @@ static std::unordered_map<std::string, MMKV *> mmkvInstances;
 
 static string rPath = "";
 
-extern "C" ssize_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
+extern "C" std::ptrdiff_t mmkv_secure_get(const char *alias, char *out, size_t capacity);
 extern "C" bool mmkv_secure_set(const char *alias, const char *value);
 extern "C" bool mmkv_secure_exists(const char *alias);
 extern "C" bool mmkv_secure_remove(const char *alias);
@@ -24,7 +25,7 @@ extern "C" bool mmkv_secure_remove(const char *alias);
 static string readSecureKey(const string &alias)
 {
     char buffer[512];
-    ssize_t length = mmkv_secure_get(alias.c_str(), buffer, sizeof(buffer));
+    std::ptrdiff_t length = mmkv_secure_get(alias.c_str(), buffer, sizeof(buffer));
     return length < 0 ? string() : string(buffer, length);
 }
 
